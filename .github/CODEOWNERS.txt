@@ -1,0 +1,15 @@
+# CODEOWNERS file
+# This file is used to define code owners for different parts of your repository.
+# Code owners are automatically requested for review when a pull request affects the files they own.
+
+# Specify the default code owner for all files in the repository.
+# The asterisk (*) represents all files in the repository.
+* @AlphaSweater
+
+# If you want to specify owners for particular directories or files, you can add more rules.
+# For example, if you want @AnotherUser to be the code owner of files in the /docs directory:
+# /docs/ @AnotherUser
+
+# You can also specify multiple code owners for different sections of the repository.
+# For example, if you want both @AlphaSweater and @AnotherUser to be code owners for files in the /src directory:
+# /src/ @AlphaSweater @AnotherUser
