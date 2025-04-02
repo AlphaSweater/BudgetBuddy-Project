@@ -1,1 +1,1 @@
-# OpenSource - Project
+# BudgetBuddy App - Project
