@@ -1,10 +1,52 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="purple_200">#FFBB86FC</color>
-    <color name="purple_500">#FF6200EE</color>
-    <color name="purple_700">#FF3700B3</color>
-    <color name="teal_200">#FF03DAC5</color>
-    <color name="teal_700">#FF018786</color>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
+
+    <!-- =========================================================================================== -->
+    <!-- Dark Mode -->
+    <!-- Dark Background colour -->
+    <color name="dark_background">#030b1e</color>
+
+    <!-- Mostly used for text fields and widgets -->
+    <color name="dark_shaded">#1c2234</color>
+    <color name="dark_shaded_alt">#4e5361</color>
+
+    <!-- Text colours -->
+    <color name="dark_text">#d2dff9</color>
+    <color name="dark_link_blue">#67a8fb</color>
+    <color name="dark_text_shaded">#878fa0</color>
+    <!-- =========================================================================================== -->
+
+    <!-- =========================================================================================== -->
+
+    <!-- Light Mode -->
+    <!-- Light Background colour -->
+    <color name="light_background">#eaf3f1</color>
+
+    <!-- Mostly used for text fields and widgets -->
+    <color name="light_shaded">#c7cfcd</color>
+    <color name="light_shaded_alt">#f0f7f5</color>
+
+    <!-- Text colours -->
+    <color name="light_text">#05122d</color>
+    <color name="light_link_blue">#67a8fb</color>
+    <color name="light_text_shaded">#040d1f</color>
+    <!-- =========================================================================================== -->
+
+    <!-- =========================================================================================== -->
+    <!-- Global colour -->
+    <color name="profit_green">#25c290</color>
+    <color name="expense_red">#fb6569</color>
+    <color name="button">#6b509a</color>
+    <!-- =========================================================================================== -->
+
+    <!-- =========================================================================================== -->
+    <!-- Category colour -->
+    <color name="cat_blue">#46a9e2</color>
+    <color name="cat_green">#61c4ae</color>
+    <color name="cat_gold">#b59760</color>
+    <color name="cat_yellow">#fda62b</color>
+    <color name="cat_orange">#da8041</color>
+    <color name="cat_pink">#e16eeb</color>
+    <!-- =========================================================================================== -->
+
 </resources>
