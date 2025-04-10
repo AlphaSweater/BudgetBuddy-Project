@@ -21,7 +21,6 @@
         <item name="colorOnSecondary">@color/light_text_shaded</item>
         <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
 
-        <!-- 🌟 Add this line -->
         <item name="bottomNavigationStyle">@style/Widget.BudgetBuddy.BottomNavigationView</item>
     </style>
 

@@ -20,5 +20,12 @@
         <item name="colorSecondary">@color/dark_shaded_alt</item>
         <item name="colorOnSecondary">@color/dark_text_shaded</item>
         <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
+
+        <item name="bottomNavigationStyle">@style/Widget.BudgetBuddy.BottomNavigationView</item>
+    </style>
+
+    <style name="Widget.BudgetBuddy.BottomNavigationView" parent="Widget.MaterialComponents.BottomNavigationView">
+        <item name="itemIconTint">@color/bottom_nav_selector</item>
+        <item name="itemTextColor">@color/bottom_nav_selector</item>
     </style>
 </resources>
