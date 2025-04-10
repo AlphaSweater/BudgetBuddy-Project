@@ -1,16 +1,31 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
     <style name="Theme.BudgetBuddy" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
-        <!-- Primary brand color. -->
-        <item name="colorPrimary">@color/dark_background</item>
+        <!-- Custom attributes -->
+        <item name="bb_background">@color/dark_background</item>
+        <item name="bb_surface">@color/dark_shaded</item>
+        <item name="bb_surfaceAlt">@color/dark_shaded_alt</item>
+        <item name="bb_primaryText">@color/dark_text</item>
+        <item name="bb_secondaryText">@color/dark_text_shaded</item>
+        <item name="bb_accent">@color/button</item>
+        <item name="bb_linkText">@color/dark_link_blue</item>
+
+        <item name="bb_expense">@color/expense_red</item>
+        <item name="bb_profit">@color/profit_green</item>
+        <item name="bb_button">@color/button</item>
+
+        <!-- Material theme compatibility (fallback) -->
+        <item name="colorPrimary">@color/dark_shaded</item>
         <item name="colorPrimaryVariant">@color/dark_shaded</item>
         <item name="colorOnPrimary">@color/dark_text</item>
-        <!-- Secondary brand color. -->
         <item name="colorSecondary">@color/dark_shaded_alt</item>
-        <item name="colorSecondaryVariant">@color/dark_text_shaded</item>
-        <item name="colorOnSecondary">@color/dark_link_blue</item>
-        <!-- Status bar color. -->
+        <item name="colorOnSecondary">@color/dark_text_shaded</item>
         <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
-        <!-- Customize your theme here. -->
+
+        <item name="bottomNavigationStyle">@style/Widget.BudgetBuddy.BottomNavigationView</item>
+    </style>
+
+    <style name="Widget.BudgetBuddy.BottomNavigationView" parent="Widget.MaterialComponents.BottomNavigationView">
+        <item name="itemIconTint">@color/bottom_nav_selector</item>
+        <item name="itemTextColor">@color/bottom_nav_selector</item>
     </style>
 </resources>

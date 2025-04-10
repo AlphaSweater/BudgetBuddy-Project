@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- BudgetBuddy custom theme attributes -->
+    <attr name="bb_background" format="color" />
+    <attr name="bb_surface" format="color" />
+    <attr name="bb_surfaceAlt" format="color" />
+    <attr name="bb_primaryText" format="color" />
+    <attr name="bb_secondaryText" format="color" />
+    <attr name="bb_accent" format="color" />
+    <attr name="bb_button" format="color" />
+    <attr name="bb_linkText" format="color" />
+    <attr name="bb_expense" format="color" />
+    <attr name="bb_profit" format="color" />
+</resources>
