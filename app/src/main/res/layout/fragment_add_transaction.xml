@@ -18,7 +18,8 @@
         android:layout_width="76dp"
         android:layout_height="44dp"
         android:background="@null"
-        android:src="?attr/actionModeCloseDrawable" />
+        android:src="?attr/actionModeCloseDrawable"
+        tools:ignore="TouchTargetSizeCheck" />
 
     <Space
         android:layout_width="match_parent"
@@ -27,7 +28,7 @@
     <androidx.cardview.widget.CardView
         android:id="@+id/crdVwTransactions"
         android:layout_width="372dp"
-        android:layout_height="689dp"
+        android:layout_height="780dp"
         android:layout_gravity="center"
         app:cardBackgroundColor="@color/light_shaded"
         app:cardCornerRadius="20dp">
@@ -40,7 +41,85 @@
             android:paddingVertical="12dp">
 
             <LinearLayout
+                android:layout_width="354dp"
+                android:layout_height="50dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:padding="8dp">
+
+                <ImageView
+                    android:layout_width="35dp"
+                    android:layout_height="36dp"
+                    android:src="@drawable/baseline_circle_24"
+                    app:tint="@color/button" />
+
+                <Space
+                    android:layout_width="3dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Select Categories"
+                    android:textColor="#000000"
+                    android:textSize="16sp" />
+
+                <Space
+                    android:layout_width="141dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1" />
+
+            </LinearLayout>
+
+            <Space
                 android:layout_width="match_parent"
+                android:layout_height="13dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:padding="8dp">
+
+                <ImageView
+                    android:layout_width="34dp"
+                    android:layout_height="35dp"
+                    android:src="@drawable/baseline_account_balance_wallet_24"
+                    app:tint="?attr/bb_button" />
+
+                <Space
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Wallet"
+                    android:textColor="#000000"
+                    android:textSize="16sp" />
+
+                <ImageButton
+                    android:id="@+id/btnWallet"
+                    android:layout_width="245dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_weight="1"
+                    android:background="@null"
+                    android:rotation="180"
+                    android:scaleType="fitStart"
+                    android:src="?attr/actionModeCloseDrawable"
+                    tools:ignore="TouchTargetSizeCheck" />
+            </LinearLayout>
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="13dp" />
+
+            <LinearLayout
+                android:layout_width="355dp"
                 android:layout_height="wrap_content"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
@@ -50,88 +129,96 @@
                     android:id="@+id/currencyIcon"
                     android:layout_width="34dp"
                     android:layout_height="35dp"
-                    android:contentDescription="Currency"
-                    android:src="@drawable/baseline_attach_money_24" />
+                    android:src="@drawable/baseline_attach_money_24"
+                    app:tint="?attr/bb_button" />
+
+                <Space
+                    android:layout_width="18dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1" />
 
                 <LinearLayout
-                    android:layout_width="311dp"
+                    android:layout_width="290dp"
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
 
                     <TextView
-                        android:id="@+id/txtReminder"
+                        android:id="@+id/lblCurrency"
                         android:layout_width="147dp"
                         android:layout_height="wrap_content"
                         android:text="Currency"
-                        android:textAlignment="viewStart"
                         android:textColor="#000000"
                         android:textSize="16sp" />
 
+                    <Space
+                        android:layout_width="match_parent"
+                        android:layout_height="3dp" />
+
                     <Spinner
                         android:id="@+id/currencySpinner"
-                        android:layout_width="327dp"
-                        android:layout_height="wrap_content" />
+                        android:layout_width="318dp"
+                        android:layout_height="34dp"
+                        tools:ignore="TouchTargetSizeCheck" />
+
+                    <View
+                        android:id="@+id/divider2"
+                        android:layout_width="110dp"
+                        android:layout_height="2dp"
+                        android:background="?android:attr/listDivider" />
                 </LinearLayout>
 
             </LinearLayout>
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:padding="8dp">
-
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:contentDescription="Wallet Icon" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingStart="12dp"
-                    android:text="Select Categories"
-                    android:textColor="#000000"
-                    android:textSize="16sp" />
-
-            </LinearLayout>
-
             <Space
                 android:layout_width="match_parent"
                 android:layout_height="13dp" />
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
                 android:padding="8dp">
 
                 <ImageView
+                    android:id="@+id/amountIcon"
                     android:layout_width="34dp"
                     android:layout_height="35dp"
-                    android:contentDescription="Wallet Icon"
-                    android:src="@drawable/baseline_account_balance_wallet_24" />
+                    android:src="@drawable/baseline_email_24"
+                    app:tint="?attr/bb_button"/>
 
-                <TextView
-                    android:layout_width="wrap_content"
+                <Space
+                    android:layout_width="47dp"
                     android:layout_height="wrap_content"
-                    android:paddingStart="12dp"
-                    android:text="Wallet"
-                    android:textColor="#000000"
-                    android:textSize="16sp" />
+                    android:layout_weight="1" />
 
-                <ImageButton
-                    android:id="@+id/btnBack3"
-                    android:layout_width="226dp"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_weight="1"
-                    android:background="@null"
-                    android:rotation="180"
-                    android:scaleType="fitStart"
-                    android:src="?attr/actionModeCloseDrawable" />
+                <LinearLayout
+                    android:layout_width="300dp"
+                    android:layout_height="47dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/lblAmount"
+                        android:layout_width="147dp"
+                        android:layout_height="wrap_content"
+                        android:text="Amount"
+                        android:textAlignment="viewStart"
+                        android:textColor="#000000"
+                        android:textSize="16sp" />
+
+                    <Space
+                        android:layout_width="match_parent"
+                        android:layout_height="3dp" />
+
+                    <EditText
+                        android:id="@+id/editTextNumberDecimal"
+                        android:layout_width="132dp"
+                        android:layout_height="34dp"
+                        android:ems="10"
+                        android:inputType="numberDecimal"
+                        tools:ignore="TouchTargetSizeCheck" />
+                </LinearLayout>
+
             </LinearLayout>
 
             <Space
@@ -148,96 +235,25 @@
                 <ImageView
                     android:layout_width="34dp"
                     android:layout_height="35dp"
-                    android:contentDescription="Wallet Icon"
-                    android:src="@drawable/baseline_add_photo_alternate_24" />
+                    android:src="@drawable/baseline_calendar_month_24"
+                    app:tint="?attr/bb_button" />
 
-                <TextView
-                    android:id="@+id/txtReminder"
-                    android:layout_width="wrap_content"
+                <Space
+                    android:layout_width="18dp"
                     android:layout_height="wrap_content"
-                    android:paddingStart="12dp"
-                    android:text="Add a Photo"
-                    android:textColor="#000000"
-                    android:textSize="16sp" />
+                    android:layout_weight="1" />
 
-                <ImageButton
-                    android:id="@+id/btnBack3"
-                    android:layout_width="226dp"
+                <EditText
+                    android:id="@+id/editTextDate"
+                    android:layout_width="131dp"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center"
                     android:layout_weight="1"
-                    android:background="@null"
-                    android:rotation="180"
-                    android:scaleType="fitStart"
-                    android:src="?attr/actionModeCloseDrawable" />
-            </LinearLayout>
-
-            <Space
-                android:layout_width="match_parent"
-                android:layout_height="13dp" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:padding="8dp">
-
-                <ImageView
-                    android:layout_width="34dp"
-                    android:layout_height="35dp"
-                    android:contentDescription="Alert Icon"
-                    android:src="@drawable/baseline_add_alert_24" />
-
-                <TextView
-                    android:id="@+id/txtReminder"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingStart="12dp"
-                    android:text="Set Reminder"
-                    android:textColor="#000000"
-                    android:textSize="16sp" />
+                    android:ems="10"
+                    android:inputType="date"
+                    tools:ignore="TouchTargetSizeCheck" />
 
                 <ImageButton
-                    android:id="@+id/btnBack3"
-                    android:layout_width="226dp"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_weight="1"
-                    android:background="@null"
-                    android:rotation="180"
-                    android:scaleType="fitStart"
-                    android:src="?attr/actionModeCloseDrawable" />
-            </LinearLayout>
-
-            <Space
-                android:layout_width="match_parent"
-                android:layout_height="13dp" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:padding="8dp">
-
-                <ImageView
-                    android:layout_width="34dp"
-                    android:layout_height="35dp"
-                    android:contentDescription="RecureIcon"
-                    android:src="@drawable/baseline_autorenew_24" />
-
-                <TextView
-                    android:id="@+id/txtReminder"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingStart="12dp"
-                    android:text="Recurrence"
-                    android:textColor="#000000"
-                    android:textSize="16sp" />
-
-                <ImageButton
-                    android:id="@+id/btnBack3"
+                    android:id="@+id/btnBackCalender"
                     android:layout_width="153dp"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
@@ -245,12 +261,274 @@
                     android:background="@null"
                     android:rotation="180"
                     android:scaleType="fitStart"
-                    android:src="?attr/actionModeCloseDrawable" />
+                    android:src="?attr/actionModeCloseDrawable"
+                    tools:ignore="TouchTargetSizeCheck" />
             </LinearLayout>
 
             <Space
                 android:layout_width="match_parent"
                 android:layout_height="13dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:padding="8dp">
+
+                <ImageView
+                    android:layout_width="38dp"
+                    android:layout_height="37dp"
+                    android:contentDescription="editIcon"
+                    android:src="@drawable/baseline_edit_note_24"
+                    app:tint="?attr/bb_button" />
+
+                <Space
+                    android:layout_width="64dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1" />
+
+                <TextView
+                    android:id="@+id/lblNote"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Write a Note"
+                    android:textColor="#000000"
+                    android:textSize="16sp" />
+
+                <ImageButton
+                    android:id="@+id/btnBackNote"
+                    android:layout_width="246dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_weight="1"
+                    android:background="@null"
+                    android:rotation="180"
+                    android:scaleType="fitStart"
+                    android:src="?attr/actionModeCloseDrawable"
+                    tools:ignore="TouchTargetSizeCheck" />
+            </LinearLayout>
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="13dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:padding="8dp">
+
+                <ImageView
+                    android:layout_width="34dp"
+                    android:layout_height="35dp"
+                    android:src="@drawable/baseline_discount_24"
+                    app:tint="?attr/bb_button" />
+
+                <Space
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1" />
+
+                <TextView
+                    android:id="@+id/lblLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Label"
+                    android:textColor="#000000"
+                    android:textSize="16sp" />
+
+                <ImageButton
+                    android:id="@+id/btnBackLabel"
+                    android:layout_width="226dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_weight="1"
+                    android:background="@null"
+                    android:rotation="180"
+                    android:scaleType="fitStart"
+                    android:src="?attr/actionModeCloseDrawable"
+                    tools:ignore="TouchTargetSizeCheck,SpeakableTextPresentCheck" />
+            </LinearLayout>
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="13dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:padding="8dp">
+
+                <ImageView
+                    android:layout_width="34dp"
+                    android:layout_height="35dp"
+                    android:contentDescription="Photo Icon"
+                    android:src="@drawable/baseline_add_photo_alternate_24"
+                    app:tint="?attr/bb_button" />
+
+                <Space
+                    android:layout_width="13dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1" />
+
+                <Space
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1" />
+
+                <TextView
+                    android:id="@+id/lblPhoto"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Add a Photo"
+                    android:textColor="#000000"
+                    android:textSize="16sp" />
+
+                <ImageButton
+                    android:id="@+id/btnBackPhoto"
+                    android:layout_width="200dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_weight="1"
+                    android:background="@null"
+                    android:rotation="180"
+                    android:scaleType="fitStart"
+                    android:src="?attr/actionModeCloseDrawable"
+                    tools:ignore="TouchTargetSizeCheck" />
+            </LinearLayout>
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="13dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:padding="8dp">
+
+                <ImageView
+                    android:layout_width="34dp"
+                    android:layout_height="35dp"
+                    android:src="@drawable/baseline_autorenew_24"
+                    app:tint="?attr/bb_button" />
+
+                <Space
+                    android:layout_width="64dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1" />
+
+                <TextView
+                    android:id="@+id/lblRecure"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Recurrence"
+                    android:textColor="#000000"
+                    android:textSize="16sp" />
+
+                <ImageButton
+                    android:id="@+id/btnBackRecure"
+                    android:layout_width="246dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_weight="1"
+                    android:background="@null"
+                    android:rotation="180"
+                    android:scaleType="fitStart"
+                    android:src="?attr/actionModeCloseDrawable"
+                    tools:ignore="TouchTargetSizeCheck" />
+            </LinearLayout>
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="13dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:padding="8dp">
+
+                <ImageView
+                    android:layout_width="38dp"
+                    android:layout_height="37dp"
+                    android:src="@drawable/baseline_event_24"
+                    app:tint="?attr/bb_button" />
+
+                <Space
+                    android:layout_width="64dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1" />
+
+                <TextView
+                    android:id="@+id/lblEvent"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Select Event"
+                    android:textColor="#000000"
+                    android:textSize="16sp" />
+
+                <ImageButton
+                    android:id="@+id/btnBackEvent"
+                    android:layout_width="246dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_weight="1"
+                    android:background="@null"
+                    android:rotation="180"
+                    android:scaleType="fitStart"
+                    android:src="?attr/actionModeCloseDrawable"
+                    tools:ignore="TouchTargetSizeCheck" />
+            </LinearLayout>
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="13dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:padding="8dp">
+
+                <ImageView
+                    android:layout_width="34dp"
+                    android:layout_height="35dp"
+                    android:src="@drawable/baseline_add_alert_24"
+                    app:tint="?attr/bb_button" />
+
+                <Space
+                    android:layout_width="54dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1" />
+
+                <TextView
+                    android:id="@+id/lblAlert"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Set Reminder"
+                    android:textColor="#000000"
+                    android:textSize="16sp" />
+
+                <ImageButton
+                    android:id="@+id/btnBackReminder"
+                    android:layout_width="226dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_weight="1"
+                    android:background="@null"
+                    android:rotation="180"
+                    android:scaleType="fitStart"
+                    android:src="?attr/actionModeCloseDrawable"
+                    tools:ignore="TouchTargetSizeCheck" />
+            </LinearLayout>
 
 
         </LinearLayout>
