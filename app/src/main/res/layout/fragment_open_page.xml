@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".ui.openPage.OpenPageFragment">
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="58dp" />
+
+    <TextView
+        android:id="@+id/lblBuddyBuddy"
+        android:layout_width="218dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:fontFamily="@font/tilt_warp"
+        android:text="@string/app_name"
+        android:textAlignment="center"
+        android:textColor="?attr/bb_primaryText"
+        android:textSize="48sp" />
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="58dp" />
+
+    <ImageView
+        android:id="@+id/imgBuddy"
+        android:layout_width="match_parent"
+        android:layout_height="304dp"
+        tools:src="@tools:sample/avatars" />
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="101dp" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnSignUp"
+        style="@style/Widget.MaterialComponents.Button"
+        android:layout_width="268dp"
+        android:layout_height="67dp"
+        android:layout_gravity="center"
+        android:text="@string/signup"
+        android:textColor="@android:color/white"
+        android:textSize="24sp"
+        app:backgroundTint="?attr/bb_button"
+        app:cornerRadius="24dp" />
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="38dp" />
+
+    <TextView
+        android:id="@+id/lblSignIn"
+        android:layout_width="106dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:clickable="true"
+        android:focusable="true"
+        android:text="@string/signin"
+        android:textAlignment="center"
+        android:textColor="?attr/bb_button"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        tools:ignore="TouchTargetSizeCheck" />
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="86dp" />
+
+    <TextView
+        android:id="@+id/lblVersionOpenPage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="@string/version"
+        android:textAlignment="center"
+        android:textSize="20sp" />
+
+
+</LinearLayout>

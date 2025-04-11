@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".ui.login.LoginFragment">
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="12dp" />
+
+    <ImageButton
+        android:id="@+id/btnBack"
+        android:layout_width="69dp"
+        android:layout_height="44dp"
+        android:background="@null"
+        android:src="?attr/actionModeCloseDrawable"
+        tools:ignore="TouchTargetSizeCheck" />
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="50dp" />
+
+    <!-- ==================================== Sign Up label ====================================== -->
+    <TextView
+        android:id="@+id/lblSignIn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/tilt_warp"
+        android:text="@string/login"
+        android:textAlignment="center"
+        android:textColor="?attr/bb_primaryText"
+        android:textSize="48sp" />
+    <!-- ======================================================================================== -->
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="42dp" />
+
+    <!-- ==================================== Google button ====================================== -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/Btngoogle"
+        style="@style/Widget.MaterialComponents.Button"
+        android:layout_width="295dp"
+        android:layout_height="67dp"
+        android:layout_gravity="center"
+        android:text="@string/googleLogin"
+        android:textAlignment="textEnd"
+        android:textColor="?attr/bb_primaryText"
+        android:textSize="16sp"
+        app:backgroundTint="?attr/bb_surface"
+        app:cornerRadius="24dp" />
+    <!-- ======================================================================================== -->
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="19dp" />
+
+    <!-- ================================== Microsoft button ==================================== -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/Btnmicrosoft"
+        style="@style/Widget.MaterialComponents.Button"
+        android:layout_width="295dp"
+        android:layout_height="67dp"
+        android:layout_gravity="center"
+        android:text="@string/microsoftLogin"
+        android:textAlignment="textEnd"
+        android:textColor="?attr/bb_primaryText"
+        android:textSize="15sp"
+        app:backgroundTint="?attr/bb_surface"
+        app:cornerRadius="24dp" />
+    <!-- ======================================================================================== -->
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="51dp" />
+
+    <View
+        android:id="@+id/divider"
+        android:layout_width="410dp"
+        android:layout_height="4dp"
+        android:layout_gravity="center"
+        android:background="?attr/bb_surface" />
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="46dp" />
+
+    <!-- ================================ Email input and Label ================================= -->
+    <TextView
+        android:id="@+id/lblEmail"
+        android:layout_width="362dp"
+        android:layout_height="26dp"
+        android:layout_gravity="center"
+        android:text="@string/email"
+        android:textSize="20sp" />
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="12dp" />
+
+    <EditText
+        android:id="@+id/edtEmailAddress"
+        android:layout_width="362dp"
+        android:layout_height="48dp"
+        android:layout_gravity="center"
+        android:ems="10"
+        android:background="@drawable/edittext_rounded_grey"
+        android:textColor="?attr/bb_primaryText"
+        android:padding="12dp"
+        android:inputType="textEmailAddress"
+        />
+    <!-- ======================================================================================== -->
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="15dp" />
+
+    <!-- =============================== Password input and Label =============================== -->
+    <TextView
+        android:id="@+id/lblPassword"
+        android:layout_width="362dp"
+        android:layout_height="26dp"
+        android:layout_gravity="center"
+        android:text="@string/password"
+        android:textSize="20sp" />
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="12dp" />
+
+    <EditText
+        android:id="@+id/edtPassword"
+        android:layout_width="362dp"
+        android:layout_height="48dp"
+        android:layout_gravity="center"
+        android:ems="10"
+        android:inputType="textPassword"
+        android:background="@drawable/edittext_rounded_grey"
+        android:textColor="?attr/bb_primaryText"
+        android:padding="12dp" />
+    <!-- ======================================================================================== -->
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="18dp" />
+
+    <!-- ===================================== Login Button ==================================== -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnSignUp"
+        style="@style/Widget.MaterialComponents.Button"
+        android:layout_width="268dp"
+        android:layout_height="67dp"
+        android:layout_gravity="center"
+        android:text="@string/login"
+        android:textColor="@android:color/white"
+        android:textSize="20sp"
+        app:backgroundTint="?attr/bb_button"
+        app:cornerRadius="24dp" />
+    <!-- ======================================================================================== -->
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="139dp" />
+
+    <!-- ======================================================================================== -->
+
+    <!-- ===================================== Version Label ==================================== -->
+    <TextView
+        android:id="@+id/lblVersionOpenPage"
+        android:layout_width="match_parent"
+        android:layout_height="28dp"
+        android:layout_gravity="center"
+        android:text="@string/version"
+        android:textAlignment="center"
+        android:textSize="20sp" />
+    <!-- ======================================================================================== -->
+
+</LinearLayout>
