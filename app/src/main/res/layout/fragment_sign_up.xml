@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".ui.signUp.SignUpFragment">
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="101dp" />
+
+    <!-- ==================================== Sign Up label ====================================== -->
+    <TextView
+        android:id="@+id/lblSignUp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/tilt_warp"
+        android:text="@string/signup"
+        android:textAlignment="center"
+        android:textColor="@color/light_text"
+        android:textSize="48sp" />
+    <!-- ======================================================================================== -->
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="42dp" />
+
+    <!-- ==================================== Google button ====================================== -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/Btngoogle"
+        style="@style/Widget.MaterialComponents.Button"
+        android:layout_width="295dp"
+        android:layout_height="67dp"
+        android:layout_gravity="center"
+        android:text="@string/google"
+        android:textAlignment="textEnd"
+        android:textColor="?attr/bb_primaryText"
+        android:textSize="16sp"
+        app:backgroundTint="?attr/bb_surface"
+        app:cornerRadius="24dp" />
+    <!-- ======================================================================================== -->
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="19dp" />
+
+    <!-- ================================== Microsoft button ==================================== -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/Btnmicrosoft"
+        style="@style/Widget.MaterialComponents.Button"
+        android:layout_width="295dp"
+        android:layout_height="67dp"
+        android:layout_gravity="center"
+        android:text="@string/microsoft"
+        android:textAlignment="textEnd"
+        android:textColor="?attr/bb_primaryText"
+        android:textSize="15sp"
+        app:backgroundTint="?attr/bb_surface"
+        app:cornerRadius="24dp" />
+    <!-- ======================================================================================== -->
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="34dp" />
+
+    <View
+        android:id="@+id/divider"
+        android:layout_width="410dp"
+        android:layout_height="4dp"
+        android:layout_gravity="center"
+        android:background="?attr/bb_surface" />
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="59dp" />
+
+    <!-- ================================ Email input and Label ================================= -->
+
+    <TextView
+        android:id="@+id/lblEmail"
+        android:layout_width="362dp"
+        android:layout_height="26dp"
+        android:layout_gravity="center"
+        android:text="@string/email"
+        android:textSize="20sp" />
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="12dp" />
+
+    <EditText
+        android:id="@+id/edtEmailAddress"
+        android:layout_width="362dp"
+        android:layout_height="48dp"
+        android:layout_gravity="center"
+        android:ems="10"
+        android:background="@drawable/edittext_rounded_grey"
+        android:textColor="?attr/bb_primaryText"
+        android:padding="12dp"
+        android:inputType="textEmailAddress"
+        />
+    <!-- ======================================================================================== -->
+
+    <!-- =============================== Password input and Label =============================== -->
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="15dp" />
+
+    <TextView
+        android:id="@+id/lblPassword"
+        android:layout_width="362dp"
+        android:layout_height="26dp"
+        android:layout_gravity="center"
+        android:text="@string/password"
+        android:textSize="20sp" />
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="12dp" />
+
+    <EditText
+        android:id="@+id/edtPassword"
+        android:layout_width="362dp"
+        android:layout_height="48dp"
+        android:layout_gravity="center"
+        android:ems="10"
+        android:inputType="textPassword"
+        android:background="@drawable/edittext_rounded_grey"
+        android:textColor="?attr/bb_primaryText"
+        android:padding="12dp" />
+    <!-- ======================================================================================== -->
+
+    <!-- =========================== Confirm Password input and Label =========================== -->
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="15dp" />
+
+    <TextView
+        android:id="@+id/edtPasswordConfirm"
+        android:layout_width="362dp"
+        android:layout_height="26dp"
+        android:layout_gravity="center"
+        android:text="@string/confirm_password"
+        android:textSize="20sp" />
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="12dp" />
+
+    <EditText
+        android:id="@+id/edtTxtPasswordConfirm"
+        android:layout_width="362dp"
+        android:layout_height="48dp"
+        android:layout_gravity="center"
+        android:ems="10"
+        android:inputType="textPassword"
+        android:background="@drawable/edittext_rounded_grey"
+        android:textColor="?attr/bb_primaryText"
+        android:padding="12dp" />
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="168dp" />
+
+    <!-- ======================================================================================== -->
+
+    <!-- ===================================== Version Label ==================================== -->
+    <TextView
+        android:id="@+id/lblVersionOpenPage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="@string/version"
+        android:textAlignment="center"
+        android:textSize="20sp" />
+    <!-- ======================================================================================== -->
+
+</LinearLayout>

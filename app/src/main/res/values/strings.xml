@@ -4,4 +4,13 @@
     <string name="title_transaction">Add Transaction</string>
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
+    <string name="signup">SIGN UP</string>
+    <string name="signin">SIGN IN</string>
+    <string name="version">Version 0.0.0.0</string>
+    <string name="google">SIGN UP WITH GOOGLE</string>
+    <string name="microsoft">SIGN UP WITH MIRCOSOFT</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="confirm_password">Confirm Password</string>
+
 </resources>
