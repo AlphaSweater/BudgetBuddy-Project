@@ -2,6 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/RecureIcon"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_gravity="center"
@@ -29,7 +30,7 @@
         android:layout_height="689dp"
         android:layout_gravity="center"
         app:cardBackgroundColor="@color/light_shaded"
-        app:cardCornerRadius="20dp" >
+        app:cardCornerRadius="20dp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -38,9 +39,41 @@
             android:orientation="vertical"
             android:paddingVertical="12dp">
 
-            <Space
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="13dp" />
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:padding="8dp">
+
+                <ImageView
+                    android:id="@+id/currencyIcon"
+                    android:layout_width="34dp"
+                    android:layout_height="35dp"
+                    android:contentDescription="Currency"
+                    android:src="@drawable/baseline_attach_money_24" />
+
+                <LinearLayout
+                    android:layout_width="311dp"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/txtReminder"
+                        android:layout_width="147dp"
+                        android:layout_height="wrap_content"
+                        android:text="Currency"
+                        android:textAlignment="viewStart"
+                        android:textColor="#000000"
+                        android:textSize="16sp" />
+
+                    <Spinner
+                        android:id="@+id/currencySpinner"
+                        android:layout_width="327dp"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>
+
+            </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -71,8 +104,8 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
                 android:gravity="center_vertical"
+                android:orientation="horizontal"
                 android:padding="8dp">
 
                 <ImageView
@@ -84,10 +117,10 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Wallet"
-                    android:textSize="16sp"
                     android:paddingStart="12dp"
-                    android:textColor="#000000" />
+                    android:text="Wallet"
+                    android:textColor="#000000"
+                    android:textSize="16sp" />
 
                 <ImageButton
                     android:id="@+id/btnBack3"
@@ -100,6 +133,124 @@
                     android:scaleType="fitStart"
                     android:src="?attr/actionModeCloseDrawable" />
             </LinearLayout>
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="13dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:padding="8dp">
+
+                <ImageView
+                    android:layout_width="34dp"
+                    android:layout_height="35dp"
+                    android:contentDescription="Wallet Icon"
+                    android:src="@drawable/baseline_add_photo_alternate_24" />
+
+                <TextView
+                    android:id="@+id/txtReminder"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingStart="12dp"
+                    android:text="Add a Photo"
+                    android:textColor="#000000"
+                    android:textSize="16sp" />
+
+                <ImageButton
+                    android:id="@+id/btnBack3"
+                    android:layout_width="226dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_weight="1"
+                    android:background="@null"
+                    android:rotation="180"
+                    android:scaleType="fitStart"
+                    android:src="?attr/actionModeCloseDrawable" />
+            </LinearLayout>
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="13dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:padding="8dp">
+
+                <ImageView
+                    android:layout_width="34dp"
+                    android:layout_height="35dp"
+                    android:contentDescription="Alert Icon"
+                    android:src="@drawable/baseline_add_alert_24" />
+
+                <TextView
+                    android:id="@+id/txtReminder"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingStart="12dp"
+                    android:text="Set Reminder"
+                    android:textColor="#000000"
+                    android:textSize="16sp" />
+
+                <ImageButton
+                    android:id="@+id/btnBack3"
+                    android:layout_width="226dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_weight="1"
+                    android:background="@null"
+                    android:rotation="180"
+                    android:scaleType="fitStart"
+                    android:src="?attr/actionModeCloseDrawable" />
+            </LinearLayout>
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="13dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:padding="8dp">
+
+                <ImageView
+                    android:layout_width="34dp"
+                    android:layout_height="35dp"
+                    android:contentDescription="RecureIcon"
+                    android:src="@drawable/baseline_autorenew_24" />
+
+                <TextView
+                    android:id="@+id/txtReminder"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingStart="12dp"
+                    android:text="Recurrence"
+                    android:textColor="#000000"
+                    android:textSize="16sp" />
+
+                <ImageButton
+                    android:id="@+id/btnBack3"
+                    android:layout_width="153dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_weight="1"
+                    android:background="@null"
+                    android:rotation="180"
+                    android:scaleType="fitStart"
+                    android:src="?attr/actionModeCloseDrawable" />
+            </LinearLayout>
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="13dp" />
 
 
         </LinearLayout>
