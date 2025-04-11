@@ -2,7 +2,7 @@
 <shape xmlns:android="http://schemas.android.com/apk/res/android"
     android:shape="rectangle">
 
-    <solid android:color="#D3D3D3" /> <!-- light grey background -->
+    <solid android:color="?attr/bb_surface" /> <!-- light grey background -->
     <corners android:radius="12dp" /> <!-- rounded corners -->
     <padding
         android:left="8dp"

@@ -21,7 +21,7 @@
 
     <Space
         android:layout_width="match_parent"
-        android:layout_height="69dp" />
+        android:layout_height="54dp" />
 
     <!-- ==================================== Sign Up label ====================================== -->
     <TextView
@@ -31,7 +31,7 @@
         android:fontFamily="@font/tilt_warp"
         android:text="@string/signup"
         android:textAlignment="center"
-        android:textColor="@color/light_text"
+        android:textColor="?attr/bb_primaryText"
         android:textSize="48sp" />
     <!-- ======================================================================================== -->
 
@@ -86,10 +86,9 @@
 
     <Space
         android:layout_width="match_parent"
-        android:layout_height="59dp" />
+        android:layout_height="37dp" />
 
     <!-- ================================ Email input and Label ================================= -->
-
     <TextView
         android:id="@+id/lblEmail"
         android:layout_width="362dp"
@@ -174,11 +173,28 @@
 
     <Space
         android:layout_width="match_parent"
-        android:layout_height="98dp" />
+        android:layout_height="22dp" />
 
     <!-- ======================================================================================== -->
 
+    <!-- ===================================== SignUp Button ==================================== -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnSignUp"
+        style="@style/Widget.MaterialComponents.Button"
+        android:layout_width="268dp"
+        android:layout_height="67dp"
+        android:layout_gravity="center"
+        android:text="@string/signup"
+        android:textColor="@android:color/white"
+        android:textSize="20sp"
+        app:backgroundTint="?attr/bb_button"
+        app:cornerRadius="24dp" />
+    <!-- ======================================================================================== -->
+
     <!-- ===================================== Version Label ==================================== -->
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="22dp" />
     <TextView
         android:id="@+id/lblVersionOpenPage"
         android:layout_width="match_parent"

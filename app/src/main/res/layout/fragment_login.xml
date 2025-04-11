@@ -21,7 +21,7 @@
 
     <Space
         android:layout_width="match_parent"
-        android:layout_height="69dp" />
+        android:layout_height="50dp" />
 
     <!-- ==================================== Sign Up label ====================================== -->
     <TextView
@@ -31,7 +31,7 @@
         android:fontFamily="@font/tilt_warp"
         android:text="@string/login"
         android:textAlignment="center"
-        android:textColor="@color/light_text"
+        android:textColor="?attr/bb_primaryText"
         android:textSize="48sp" />
     <!-- ======================================================================================== -->
 
@@ -86,10 +86,9 @@
 
     <Space
         android:layout_width="match_parent"
-        android:layout_height="59dp" />
+        android:layout_height="46dp" />
 
     <!-- ================================ Email input and Label ================================= -->
-
     <TextView
         android:id="@+id/lblEmail"
         android:layout_width="362dp"
@@ -115,11 +114,11 @@
         />
     <!-- ======================================================================================== -->
 
-    <!-- =============================== Password input and Label =============================== -->
     <Space
         android:layout_width="match_parent"
         android:layout_height="15dp" />
 
+    <!-- =============================== Password input and Label =============================== -->
     <TextView
         android:id="@+id/lblPassword"
         android:layout_width="362dp"
@@ -144,18 +143,27 @@
         android:padding="12dp" />
     <!-- ======================================================================================== -->
 
-    <!-- =========================== Confirm Password input and Label =========================== -->
     <Space
         android:layout_width="match_parent"
-        android:layout_height="15dp" />
+        android:layout_height="18dp" />
+
+    <!-- ===================================== Login Button ==================================== -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnSignUp"
+        style="@style/Widget.MaterialComponents.Button"
+        android:layout_width="268dp"
+        android:layout_height="67dp"
+        android:layout_gravity="center"
+        android:text="@string/login"
+        android:textColor="@android:color/white"
+        android:textSize="20sp"
+        app:backgroundTint="?attr/bb_button"
+        app:cornerRadius="24dp" />
+    <!-- ======================================================================================== -->
 
     <Space
         android:layout_width="match_parent"
-        android:layout_height="12dp" />
-
-    <Space
-        android:layout_width="match_parent"
-        android:layout_height="175dp" />
+        android:layout_height="139dp" />
 
     <!-- ======================================================================================== -->
 
