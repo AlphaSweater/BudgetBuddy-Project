@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- =========================================================================================== -->
+    <!-- Dark Mode -->
+    <!-- Dark Background colour -->
+    <color name="dark_background">#030b1e</color>
+
+    <!-- Mostly used for text fields and widgets -->
+    <color name="dark_shaded">#1c2234</color>
+    <color name="dark_shaded_alt">#4e5361</color>
+
+    <!-- Text colours -->
+    <color name="dark_text">#d2dff9</color>
+    <color name="dark_link_blue">#67a8fb</color>
+    <color name="dark_text_shaded">#878fa0</color>
+
+    <!-- Button colours -->
+    <color name="dark_button_selected">#8a73b6</color>
+    <!-- =========================================================================================== -->
+
+    <!-- =========================================================================================== -->
+
+    <!-- Light Mode -->
+    <!-- Light Background colour -->
+    <color name="light_background">#eaf3f1</color>
+
+    <!-- Mostly used for text fields and widgets -->
+    <color name="light_shaded">#c7cfcd</color>
+    <color name="light_shaded_alt">#f0f7f5</color>
+
+    <!-- Text colours -->
+    <color name="light_text">#05122d</color>
+    <color name="light_link_blue">#67a8fb</color>
+    <color name="light_text_shaded">#040d1f</color>
+
+    <!-- Button colours -->
+    <color name="light_button_selected">#59397f</color>
+    <!-- =========================================================================================== -->
+
+    <!-- =========================================================================================== -->
+    <!-- Global colour -->
+    <color name="profit_green">#25c290</color>
+    <color name="expense_red">#fb6569</color>
+    <color name="button">#6b509a</color>
+
+    <!-- =========================================================================================== -->
+
+    <!-- =========================================================================================== -->
+    <!-- Category colour -->
+    <color name="cat_blue">#46a9e2</color>
+    <color name="cat_green">#61c4ae</color>
+    <color name="cat_gold">#b59760</color>
+    <color name="cat_yellow">#fda62b</color>
+    <color name="cat_orange">#da8041</color>
+    <color name="cat_pink">#e16eeb</color>
+    <!-- =========================================================================================== -->
+
+    <!-- =========================================================================================== -->
+    <!-- Google Button -->
+    <color name="google_neutral">#F2F2F2</color>
+    <color name="google_neutral_selected">#e0e0e0</color>
+
+    <!-- =========================================================================================== -->
+
+
+</resources>

@@ -8,7 +8,7 @@
 
 # If you want to specify owners for particular directories or files, you can add more rules.
 # For example, if you want @AnotherUser to be the code owner of files in the /docs directory:
-# /docs/ @AnotherUser
+/src/ @AlphaSweater
 
 # You can also specify multiple code owners for different sections of the repository.
 # For example, if you want both @AlphaSweater and @AnotherUser to be code owners for files in the /src directory:
