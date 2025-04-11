@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".ui.signUp.SignUpFragment">
+    tools:context=".ui.login.LoginFragment">
 
     <Space
         android:layout_width="match_parent"
@@ -28,7 +28,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:fontFamily="@font/tilt_warp"
-        android:text="@string/signup"
+        android:text="@string/login"
         android:textAlignment="center"
         android:textColor="@color/light_text"
         android:textSize="48sp" />
@@ -45,7 +45,7 @@
         android:layout_width="295dp"
         android:layout_height="67dp"
         android:layout_gravity="center"
-        android:text="@string/googleSignUp"
+        android:text="@string/googleLogin"
         android:textAlignment="textEnd"
         android:textColor="?attr/bb_primaryText"
         android:textSize="16sp"
@@ -64,7 +64,7 @@
         android:layout_width="295dp"
         android:layout_height="67dp"
         android:layout_gravity="center"
-        android:text="@string/microsoftSignUp"
+        android:text="@string/microsoftLogin"
         android:textAlignment="textEnd"
         android:textColor="?attr/bb_primaryText"
         android:textSize="15sp"
@@ -148,32 +148,13 @@
         android:layout_width="match_parent"
         android:layout_height="15dp" />
 
-    <TextView
-        android:id="@+id/edtPasswordConfirm"
-        android:layout_width="362dp"
-        android:layout_height="26dp"
-        android:layout_gravity="center"
-        android:text="@string/confirm_password"
-        android:textSize="20sp" />
-
     <Space
         android:layout_width="match_parent"
         android:layout_height="12dp" />
 
-    <EditText
-        android:id="@+id/edtTxtPasswordConfirm"
-        android:layout_width="362dp"
-        android:layout_height="48dp"
-        android:layout_gravity="center"
-        android:ems="10"
-        android:inputType="textPassword"
-        android:background="@drawable/edittext_rounded_grey"
-        android:textColor="?attr/bb_primaryText"
-        android:padding="12dp" />
-
     <Space
         android:layout_width="match_parent"
-        android:layout_height="98dp" />
+        android:layout_height="175dp" />
 
     <!-- ======================================================================================== -->
 
@@ -181,7 +162,7 @@
     <TextView
         android:id="@+id/lblVersionOpenPage"
         android:layout_width="match_parent"
-        android:layout_height="36dp"
+        android:layout_height="28dp"
         android:layout_gravity="center"
         android:text="@string/version"
         android:textAlignment="center"

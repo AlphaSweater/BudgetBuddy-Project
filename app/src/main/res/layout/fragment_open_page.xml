@@ -12,7 +12,7 @@
         android:layout_height="58dp" />
 
     <TextView
-        android:id="@+id/lblBuddyBuddyOpenPage"
+        android:id="@+id/lblBuddyBuddy"
         android:layout_width="218dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
