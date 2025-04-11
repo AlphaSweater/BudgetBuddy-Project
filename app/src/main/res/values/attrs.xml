@@ -8,7 +8,17 @@
     <attr name="bb_secondaryText" format="color" />
     <attr name="bb_accent" format="color" />
     <attr name="bb_button" format="color" />
+    <attr name="bb_buttonSelected" format="color" />
     <attr name="bb_linkText" format="color" />
     <attr name="bb_expense" format="color" />
     <attr name="bb_profit" format="color" />
+
+    <declare-styleable name="RoundedIconButton">
+        <attr name="layoutResource" format="reference" />
+        <attr name="buttonText" format="string" />
+        <attr name="iconDrawable" format="reference" />
+        <attr name="buttonBackground" format="reference|color" />
+        <attr name="textColor" format="color" />
+    </declare-styleable>
+
 </resources>
