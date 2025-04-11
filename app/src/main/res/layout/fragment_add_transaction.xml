@@ -51,7 +51,7 @@
                 <ImageView
                     android:layout_width="35dp"
                     android:layout_height="36dp"
-                    android:src="@drawable/baseline_circle_24"
+                    android:src="@drawable/ic_circle_24"
                     app:tint="@color/button" />
 
                 <Space
@@ -89,7 +89,7 @@
                 <ImageView
                     android:layout_width="34dp"
                     android:layout_height="35dp"
-                    android:src="@drawable/baseline_account_balance_wallet_24"
+                    android:src="@drawable/ic_account_balance_wallet_24"
                     app:tint="?attr/bb_button" />
 
                 <Space
@@ -135,7 +135,7 @@
                     android:id="@+id/currencyIcon"
                     android:layout_width="34dp"
                     android:layout_height="35dp"
-                    android:src="@drawable/baseline_attach_money_24"
+                    android:src="@drawable/ic_attach_money_24"
                     app:tint="?attr/bb_button" />
 
                 <Space
@@ -192,7 +192,7 @@
                     android:id="@+id/amountIcon"
                     android:layout_width="34dp"
                     android:layout_height="35dp"
-                    android:src="@drawable/baseline_email_24"
+                    android:src="@drawable/ic_email_24"
                     app:tint="?attr/bb_button"/>
 
                 <Space
@@ -245,7 +245,7 @@
                 <ImageView
                     android:layout_width="34dp"
                     android:layout_height="35dp"
-                    android:src="@drawable/baseline_calendar_month_24"
+                    android:src="@drawable/ic_calendar_month_24"
                     app:tint="?attr/bb_button" />
 
                 <Space
@@ -307,7 +307,7 @@
                     android:layout_width="38dp"
                     android:layout_height="37dp"
                     android:contentDescription="editIcon"
-                    android:src="@drawable/baseline_edit_note_24"
+                    android:src="@drawable/ic_edit_note_24"
                     app:tint="?attr/bb_button" />
 
                 <Space
@@ -352,7 +352,7 @@
                 <ImageView
                     android:layout_width="34dp"
                     android:layout_height="35dp"
-                    android:src="@drawable/baseline_discount_24"
+                    android:src="@drawable/ic_discount_24"
                     app:tint="?attr/bb_button" />
 
                 <Space
@@ -398,7 +398,7 @@
                     android:layout_width="34dp"
                     android:layout_height="35dp"
                     android:contentDescription="Photo Icon"
-                    android:src="@drawable/baseline_add_photo_alternate_24"
+                    android:src="@drawable/ic_add_photo_alternate_24"
                     app:tint="?attr/bb_button" />
 
                 <Space
@@ -443,7 +443,7 @@
                 <ImageView
                     android:layout_width="34dp"
                     android:layout_height="35dp"
-                    android:src="@drawable/baseline_autorenew_24"
+                    android:src="@drawable/ic_autorenew_24"
                     app:tint="?attr/bb_button" />
 
                 <Space
@@ -488,7 +488,7 @@
                 <ImageView
                     android:layout_width="38dp"
                     android:layout_height="37dp"
-                    android:src="@drawable/baseline_event_24"
+                    android:src="@drawable/ic_event_24"
                     app:tint="?attr/bb_button" />
 
                 <Space
@@ -533,7 +533,7 @@
                 <ImageView
                     android:layout_width="34dp"
                     android:layout_height="35dp"
-                    android:src="@drawable/baseline_add_alert_24"
+                    android:src="@drawable/ic_add_alert_24"
                     app:tint="?attr/bb_button" />
 
                 <Space

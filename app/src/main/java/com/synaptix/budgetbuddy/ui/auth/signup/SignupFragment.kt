@@ -1,0 +1,31 @@
+package com.synaptix.budgetbuddy.ui.auth.signup
+
+import androidx.fragment.app.viewModels
+import android.os.Bundle
+import androidx.fragment.app.Fragment
+import android.view.View
+import com.synaptix.budgetbuddy.R
+import com.synaptix.budgetbuddy.databinding.FragmentSignupBinding
+
+class SignupFragment : Fragment(R.layout.fragment_signup) {
+
+    private lateinit var binding: FragmentSignupBinding
+    private val viewModel: SignupViewModel by viewModels()
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        // Inflate ViewBinding
+        binding = FragmentSignupBinding.bind(view)
+
+        // Handle signup logic with ViewBinding
+        binding.btnSignup.setOnClickListener {
+            // Handle signup action
+        }
+
+        // Handle back button
+        binding.btnBackSignup.setOnClickListener {
+            requireActivity().onBackPressedDispatcher.onBackPressed()
+        }
+    }
+}

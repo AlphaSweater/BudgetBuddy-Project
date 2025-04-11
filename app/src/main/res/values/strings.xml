@@ -11,8 +11,8 @@
     <!-- =========================================================== -->
 
     <!-- ============ Open, Sign In and Sign Up Strings ============-->
-    <string name="signup">SIGN UP</string>
-    <string name="signin">SIGN IN</string>
+    <string name="signupText">SIGN UP</string>
+    <string name="loginText">LOGIN</string>
     <string name="version">Version 0.0.0.0</string>
     <string name="googleSignUp">SIGN UP WITH GOOGLE</string>
     <string name="microsoftSignUp">SIGN UP WITH MIRCOSOFT</string>\
