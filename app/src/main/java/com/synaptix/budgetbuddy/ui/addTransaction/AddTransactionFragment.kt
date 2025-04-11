@@ -31,10 +31,10 @@ class AddTransactionFragment : Fragment() {
         _binding = FragmentAddTransactionBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
-        val textView: TextView = binding.textAddTransaction
-        addTransactionViewModel.text.observe(viewLifecycleOwner) {
-            textView.text = it
-        }
+//        val textView: TextView = binding.textAddTransaction
+//        addTransactionViewModel.text.observe(viewLifecycleOwner) {
+//            textView.text = it
+//        }
         return root
     }
 
