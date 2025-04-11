@@ -1,7 +1,39 @@
 <resources>
+
+    <!-- ====================== Global Strings ====================== -->
     <string name="app_name">Budget Buddy</string>
     <string name="title_home">Home</string>
     <string name="title_transaction">Add Transaction</string>
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <!-- =========================================================== -->
+
+    <!-- ============ Open, Sign In and Sign Up Strings ============-->
+    <string name="signup">SIGN UP</string>
+    <string name="signin">SIGN IN</string>
+    <string name="version">Version 0.0.0.0</string>
+    <string name="googleSignUp">SIGN UP WITH GOOGLE</string>
+    <string name="microsoftSignUp">SIGN UP WITH MIRCOSOFT</string>\
+    <string name="confirm_password">Confirm Password</string>
+    <string name="login">LOGIN</string>
+    <string name="googleLogin">LOGIN WITH GOOGLE</string>
+    <string name="microsoftLogin">LOGIN WITH MICROSOFT</string>
+    <!-- =========================================================== -->
+
+    <!-- ==================== Add Transactions ======================-->
+    <string name="select_category">Select Category</string>
+    <string name="wallet">Wallet</string>
+    <string name="currency">Currency</string>
+    <string name="amount">Amount</string>
+    <string name="calender">Calender</string>
+    <string name="note">Write a Note</string>
+    <string name="event">Select Event</string>
+    <string name="recurrence">Recurrence</string>
+    <string name="label">Label</string>
+    <string name="set_reminder">Set Reminder</string>
+    <string name="add_photo">Add a Photo</string>
+    <!-- =========================================================== -->
+
 </resources>
