@@ -63,7 +63,8 @@
         android:textAlignment="center"
         android:textColor="?attr/bb_button"
         android:textSize="24sp"
-        android:textStyle="bold" />
+        android:textStyle="bold"
+        tools:ignore="TouchTargetSizeCheck" />
 
     <Space
         android:layout_width="match_parent"

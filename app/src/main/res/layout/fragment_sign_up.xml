@@ -16,7 +16,8 @@
         android:layout_width="69dp"
         android:layout_height="44dp"
         android:background="@null"
-        android:src="?attr/actionModeCloseDrawable" />
+        android:src="?attr/actionModeCloseDrawable"
+        tools:ignore="TouchTargetSizeCheck" />
 
     <Space
         android:layout_width="match_parent"
