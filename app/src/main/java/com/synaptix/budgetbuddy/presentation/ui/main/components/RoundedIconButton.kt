@@ -1,4 +1,4 @@
-package com.synaptix.budgetbuddy.ui.components
+package com.synaptix.budgetbuddy.presentation.ui.main.components
 
 import android.content.Context
 import android.util.AttributeSet

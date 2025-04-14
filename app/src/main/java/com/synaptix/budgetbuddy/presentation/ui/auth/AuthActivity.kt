@@ -1,15 +1,14 @@
-package com.synaptix.budgetbuddy
+package com.synaptix.budgetbuddy.presentation.ui.auth
 
 import android.content.Intent
 import android.os.Bundle
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
+import com.synaptix.budgetbuddy.R
 import com.synaptix.budgetbuddy.databinding.ActivityAuthBinding
-import com.synaptix.budgetbuddy.ui.auth.landing.LandingFragment
-import com.synaptix.budgetbuddy.ui.auth.login.LoginFragment
-import com.synaptix.budgetbuddy.ui.auth.signup.SignupFragment
+import com.synaptix.budgetbuddy.presentation.ui.auth.landing.LandingFragment
+import com.synaptix.budgetbuddy.presentation.ui.auth.login.LoginFragment
+import com.synaptix.budgetbuddy.presentation.ui.auth.signup.SignupFragment
+import com.synaptix.budgetbuddy.presentation.ui.main.MainActivity
 
 class AuthActivity : AppCompatActivity() {
 
