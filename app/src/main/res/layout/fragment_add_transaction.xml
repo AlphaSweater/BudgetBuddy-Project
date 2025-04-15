@@ -460,7 +460,7 @@
                     android:textSize="18sp" />
 
                 <ImageButton
-                    android:id="@+id/btnBackRecure"
+                    android:id="@+id/btnRecurrence"
                     android:layout_width="246dp"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
@@ -469,7 +469,7 @@
                     android:rotation="180"
                     android:scaleType="fitStart"
                     android:src="?attr/actionModeCloseDrawable"
-                    tools:ignore="TouchTargetSizeCheck" />
+                     />
             </LinearLayout>
             <!-- ========================================================== -->
 
