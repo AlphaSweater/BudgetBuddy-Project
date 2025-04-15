@@ -5,12 +5,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- EditText -->
-
-    <!-- Label -->
-
-    <!-- Scrollable Button Row -->
-
     <TextView
         android:id="@+id/textView"
         android:layout_width="wrap_content"
@@ -37,81 +31,117 @@
             android:orientation="horizontal"
             android:padding="8dp">
 
+            <ImageButton
+                android:id="@+id/btnLightPink"
+                android:layout_marginEnd="12dp"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:background="@drawable/circle_button_background"
+                app:backgroundTint="@color/cat_light_pink"
+                android:gravity="center"
+                android:layout_gravity="center" />
 
             <ImageButton
-                android:id="@+id/imageButton5"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                app:srcCompat="@drawable/ic_circle_24" />
+                android:id="@+id/btnDarkPink"
+                android:layout_marginEnd="12dp"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:background="@drawable/circle_button_background"
+                app:backgroundTint="@color/cat_dark_pink"
+                android:gravity="center"
+                android:layout_gravity="center" />
 
             <ImageButton
-                android:id="@+id/imageButton5"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                app:srcCompat="@drawable/ic_circle_24" />
+                android:id="@+id/btnLightPurple"
+                android:layout_marginEnd="12dp"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:background="@drawable/circle_button_background"
+                app:backgroundTint="@color/cat_light_purple"
+                android:gravity="center"
+                android:layout_gravity="center" />
 
             <ImageButton
-                android:id="@+id/imageButton5"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                app:srcCompat="@drawable/ic_circle_24" />
+                android:id="@+id/btnDarkPurple"
+                android:layout_marginEnd="12dp"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:background="@drawable/circle_button_background"
+                app:backgroundTint="@color/cat_dark_purple"
+                android:gravity="center"
+                android:layout_gravity="center" />
+
+
+            <Button
+                android:id="@+id/btnLightBlue"
+                android:layout_marginEnd="12dp"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:background="@drawable/circle_button_background"
+                app:backgroundTint="@color/cat_light_blue"
+                android:gravity="center"
+                android:layout_gravity="center" />
+
+            <Button
+                android:id="@+id/btnDarkBlue"
+                android:layout_marginEnd="12dp"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:background="@drawable/circle_button_background"
+                app:backgroundTint="@color/cat_dark_blue"
+                android:gravity="center"
+                android:layout_gravity="center" />
 
             <ImageButton
-                android:id="@+id/imageButton5"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                app:srcCompat="@drawable/ic_circle_24" />
+                android:id="@+id/btnLightGreen"
+                android:layout_marginEnd="12dp"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:background="@drawable/circle_button_background"
+                app:backgroundTint="@color/cat_light_green"
+                android:gravity="center"
+                android:layout_gravity="center" />
 
             <ImageButton
-                android:id="@+id/imageButton5"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                app:srcCompat="@drawable/ic_circle_24" />
+                android:id="@+id/btnDarkGreen"
+                android:layout_marginEnd="12dp"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:background="@drawable/circle_button_background"
+                app:backgroundTint="@color/cat_dark_green"
+                android:gravity="center"
+                android:layout_gravity="center" />
 
             <ImageButton
-                android:id="@+id/imageButton5"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                app:srcCompat="@drawable/ic_circle_24" />
+                android:id="@+id/btnYellow"
+                android:layout_marginEnd="12dp"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:background="@drawable/circle_button_background"
+                app:backgroundTint="@color/cat_yellow"
+                android:gravity="center"
+                android:layout_gravity="center"/>
 
             <ImageButton
-                android:id="@+id/imageButton5"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                app:srcCompat="@drawable/ic_circle_24" />
+                android:id="@+id/btnOrange"
+                android:layout_marginEnd="12dp"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:background="@drawable/circle_button_background"
+                app:backgroundTint="@color/cat_orange"
+                android:gravity="center"
+                android:layout_gravity="center" />
 
             <ImageButton
-                android:id="@+id/imageButton5"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                app:srcCompat="@drawable/ic_circle_24" />
+                android:id="@+id/btnGold"
+                android:layout_marginEnd="12dp"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:background="@drawable/circle_button_background"
+                app:backgroundTint="@color/cat_gold"
+                android:gravity="center"
+                android:layout_gravity="center" />
 
-            <ImageButton
-                android:id="@+id/imageButton5"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                app:srcCompat="@drawable/ic_circle_24" />
-            <ImageButton
-                android:id="@+id/imageButton5"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                app:srcCompat="@drawable/ic_circle_24" />
-            <ImageButton
-                android:id="@+id/imageButton5"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                app:srcCompat="@drawable/ic_circle_24" />
 
         </LinearLayout>
     </HorizontalScrollView>
@@ -156,7 +186,9 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="horizontal"></LinearLayout>
+            android:orientation="horizontal">
+
+        </LinearLayout>
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
