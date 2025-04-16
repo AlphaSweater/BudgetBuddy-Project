@@ -9,33 +9,36 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.lifecycle.ViewModelProvider
 import com.synaptix.budgetbuddy.databinding.FragmentAddTransactionBinding
+import com.synaptix.budgetbuddy.ui.recurrence.RecurrenceBottomSheet
 
 class AddTransactionFragment : Fragment() {
 
     private var _binding: FragmentAddTransactionBinding? = null
-
-    // This property is only valid between onCreateView and
-    // onDestroyView.
     private val binding get() = _binding!!
 
-    private val viewModel: AddTransactionViewModel by viewModels()
+    //private val viewModel: AddTransactionViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val addTransactionViewModel =
-            ViewModelProvider(this).get(AddTransactionViewModel::class.java)
-
         _binding = FragmentAddTransactionBinding.inflate(inflater, container, false)
-        val root: View = binding.root
+        return binding.root
+    }
 
-//        val textView: TextView = binding.textAddTransaction
-//        addTransactionViewModel.text.observe(viewLifecycleOwner) {
-//            textView.text = it
-//        }
-        return root
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        // Show bottom sheet when recurrence button is clicked
+        binding.btnReccurrenceDialog.setOnClickListener {
+            RecurrenceBottomSheet().show(parentFragmentManager, "RecurrenceBottomSheet")
+        }
+
+        // Observe the selected recurrence from ViewModel and update label
+        //viewModel.recurrenceOption.observe(viewLifecycleOwner) { selection ->
+        //    binding.recurrenceLabel.text = selection
+        //}
     }
 
     override fun onDestroyView() {
