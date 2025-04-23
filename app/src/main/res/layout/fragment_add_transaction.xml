@@ -232,7 +232,7 @@
                     android:textSize="18sp" />
 
                 <ImageButton
-                    android:id="@+id/btnBackLabel"
+                    android:id="@+id/btnLabel"
                     android:layout_width="226dp"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"

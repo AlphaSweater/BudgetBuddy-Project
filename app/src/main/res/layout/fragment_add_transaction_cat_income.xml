@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".ui.addTransactionCat.AddTransactionCatFragment">
+    tools:context=".ui.addTransactionCat.AddTransactionCatIncomeFragment">
 
     <androidx.cardview.widget.CardView
         android:id="@+id/icomeTab"
@@ -119,7 +119,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="@string/food"
+                    android:text="@string/salary"
                     android:textColor="?attr/bb_primaryText"
                     android:textSize="18sp"
                     android:layout_marginStart="12dp"
@@ -147,7 +147,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="@string/transport"
+                    android:text="@string/investment"
                     android:textColor="?attr/bb_primaryText"
                     android:textSize="18sp"
                     android:layout_marginStart="12dp"/>
@@ -172,7 +172,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="@string/shopping"
+                    android:text="@string/bonus"
                     android:textColor="?attr/bb_primaryText"
                     android:textSize="18sp"
                     tools:layout_editor_absoluteX="19dp"
@@ -198,7 +198,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="@string/education"
+                    android:text="@string/commission"
                     android:textColor="?attr/bb_primaryText"
                     android:textSize="18sp"
                     android:layout_marginStart="12dp"/>
@@ -224,35 +224,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="@string/rentMortgage"
-                    android:textColor="?attr/bb_primaryText"
-                    android:textSize="18sp"
-                    android:layout_marginStart="12dp" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="15dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
-
-                <ImageView
-                    android:id="@+id/imgHealth"
-                    android:layout_width="36dp"
-                    android:layout_height="36dp"
-                    android:src="@drawable/ic_add_alert_24"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/newCat"
-                    app:tint="@color/cat_light_purple" />
-
-                <TextView
-                    android:id="@+id/txtHealth"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/health"
+                    android:text="@string/Overtime"
                     android:textColor="?attr/bb_primaryText"
                     android:textSize="18sp"
                     android:layout_marginStart="12dp" />

@@ -39,6 +39,7 @@
     <!-- =========================================================== -->
 
     <!-- ==================== Categories ======================-->
+    <!-- Expenses -->
     <string name="food">Food</string>
     <string name="entertainment">Entertainment</string>
     <string name="transport">Transport</string>
@@ -46,6 +47,13 @@
     <string name="education">Education</string>
     <string name="health">Health</string>
     <string name="rentMortgage">Rent/Mortgage</string>">
+
+    <!-- Income -->
+    <string name="salary">Salary</string>
+    <string name="bonus">Bonus</string>
+    <string name="investment">Investment</string>
+    <string name="commission">Commission</string>">
+    <string name="Overtime">Overtime</string>">
     <!-- =========================================================== -->
 
 

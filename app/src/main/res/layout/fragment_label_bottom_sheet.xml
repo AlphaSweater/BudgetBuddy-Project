@@ -1,18 +1,14 @@
-<?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".ui.labelPopupBottomSheet.LabelBottomSheet">
+    android:layout_height="match_parent">
 
-    <!-- Search bar for labels -->
     <SearchView
         android:id="@+id/searchViewLabels"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:queryHint="Search labels..." />
 
-    <!-- RecyclerView to display filtered labels -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewLabels"
         android:layout_width="match_parent"
@@ -20,5 +16,4 @@
         android:layout_weight="1"
         android:paddingTop="8dp"
         android:clipToPadding="false"/>
-
-</FrameLayout>
+</LinearLayout>

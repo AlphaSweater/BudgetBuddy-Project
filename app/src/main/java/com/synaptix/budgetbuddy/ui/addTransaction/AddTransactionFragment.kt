@@ -11,6 +11,7 @@ import android.widget.ArrayAdapter
 import android.widget.TextView
 import androidx.lifecycle.ViewModelProvider
 import com.synaptix.budgetbuddy.databinding.FragmentAddTransactionBinding
+import com.synaptix.budgetbuddy.ui.labelPopupBottomSheet.LabelBottomSheet
 import com.synaptix.budgetbuddy.ui.recurrence.RecurrenceBottomSheet
 
 class AddTransactionFragment : Fragment() {
@@ -46,15 +47,11 @@ class AddTransactionFragment : Fragment() {
             RecurrenceBottomSheet().show(parentFragmentManager, "RecurrenceBottomSheet")
         }
 
-        // Show bottom sheet when recurrence button is clicked
-        binding.btnRecurrence.setOnClickListener {
-            RecurrenceBottomSheet().show(parentFragmentManager, "RecurrenceBottomSheet")
+        // show bottom sheet when label button is clicked
+        binding.btnLabel.setOnClickListener {
+            LabelBottomSheet().show(parentFragmentManager, "LabelBottomSheet")
         }
 
-        // Observe the selected recurrence from ViewModel and update label
-        //viewModel.recurrenceOption.observe(viewLifecycleOwner) { selection ->
-        //    binding.recurrenceLabel.text = selection
-        //}
     }
 
     override fun onDestroyView() {
