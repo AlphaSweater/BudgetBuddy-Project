@@ -32,22 +32,5 @@ class AddTransactionCatFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        // Collapsible CardView logic
-        val cardHeader = view.findViewById<LinearLayout>(R.id.cardHeader)
-        val subCategoriesLayout = view.findViewById<LinearLayout>(R.id.subCategoriesLayout)
-        val arrowIcon = view.findViewById<ImageView>(R.id.arrowIcon)
-
-        var isExpanded = false
-
-        cardHeader.setOnClickListener {
-            isExpanded = !isExpanded
-
-            subCategoriesLayout.visibility = if (isExpanded) View.VISIBLE else View.GONE
-
-            arrowIcon.setImageResource(
-                if (isExpanded) R.drawable.baseline_arrow_downward_24 else R.drawable.baseline_arrow_downward_24
-            )
-        }
     }
 }
