@@ -93,7 +93,7 @@
                     app:tint="?attr/bb_button" />
 
                 <Space
-                    android:layout_width="wrap_content"
+                    android:layout_width="18dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1" />
 
@@ -196,7 +196,7 @@
                     app:tint="?attr/bb_button"/>
 
                 <Space
-                    android:layout_width="47dp"
+                    android:layout_width="18dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1" />
 
@@ -311,29 +311,24 @@
                     app:tint="?attr/bb_button" />
 
                 <Space
+                    android:layout_width="18dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1" />
+
+                <EditText
+                    android:id="@+id/editTextText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:ems="10"
+                    android:inputType="text"
+                    android:text="Name" />
+
+                <Space
                     android:layout_width="64dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1" />
 
-                <TextView
-                    android:id="@+id/lblNote"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/note"
-                    android:textColor="?attr/bb_primaryText"
-                    android:textSize="18sp" />
-
-                <ImageButton
-                    android:id="@+id/btnBackNote"
-                    android:layout_width="246dp"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_weight="1"
-                    android:background="@null"
-                    android:rotation="180"
-                    android:scaleType="fitStart"
-                    android:src="?attr/actionModeCloseDrawable"
-                     />
             </LinearLayout>
             <!-- ========================================================== -->
 
@@ -402,7 +397,7 @@
                     app:tint="?attr/bb_button" />
 
                 <Space
-                    android:layout_width="13dp"
+                    android:layout_width="18dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1" />
 
