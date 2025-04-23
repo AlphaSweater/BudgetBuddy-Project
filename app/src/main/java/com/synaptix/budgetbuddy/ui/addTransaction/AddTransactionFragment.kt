@@ -1,5 +1,7 @@
 package com.synaptix.budgetbuddy.ui.addTransaction
 
+import android.app.DatePickerDialog
+import android.icu.util.Calendar
 import com.synaptix.budgetbuddy.R
 import androidx.fragment.app.viewModels
 import android.os.Bundle
@@ -8,11 +10,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
+import android.widget.EditText
 import android.widget.TextView
 import androidx.lifecycle.ViewModelProvider
 import com.synaptix.budgetbuddy.databinding.FragmentAddTransactionBinding
+import com.synaptix.budgetbuddy.ui.addTransactionCat.AddTransactionCatFragment
 import com.synaptix.budgetbuddy.ui.labelPopupBottomSheet.LabelBottomSheet
 import com.synaptix.budgetbuddy.ui.recurrence.RecurrenceBottomSheet
+import androidx.navigation.fragment.findNavController
 
 class AddTransactionFragment : Fragment() {
 
@@ -50,6 +55,35 @@ class AddTransactionFragment : Fragment() {
         // show bottom sheet when label button is clicked
         binding.btnLabel.setOnClickListener {
             LabelBottomSheet().show(parentFragmentManager, "LabelBottomSheet")
+        }
+
+        //Direct to another fragment AddTransactionCat
+        binding.btnSelectCat.setOnClickListener {
+
+        }
+
+        val editTextDate = view.findViewById<EditText>(R.id.editTextDate)
+
+        // Set an OnClickListener to open the DatePickerDialog when the EditText is clicked
+        editTextDate.setOnClickListener {
+            val calendar = Calendar.getInstance()
+            val year = calendar.get(Calendar.YEAR)
+            val month = calendar.get(Calendar.MONTH)
+            val day = calendar.get(Calendar.DAY_OF_MONTH)
+
+            // Create and show DatePickerDialog
+            val datePickerDialog = DatePickerDialog(
+                requireContext(),
+                R.style.CustomDatePickerDialog, // Use custom style here
+                { _, selectedYear, selectedMonth, selectedDay ->
+                    // Format the selected date and set it in the EditText
+                    val formattedDate = "$selectedDay/${selectedMonth + 1}/$selectedYear"
+                    editTextDate.setText(formattedDate)
+                },
+                year, month, day
+            )
+
+            datePickerDialog.show()
         }
 
     }

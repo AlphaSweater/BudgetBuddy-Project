@@ -10,6 +10,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.synaptix.budgetbuddy.R
 data class Label(val name: String)
 
+
 class LabelBottomSheet : BottomSheetDialogFragment() {
 
     override fun onCreateView(
