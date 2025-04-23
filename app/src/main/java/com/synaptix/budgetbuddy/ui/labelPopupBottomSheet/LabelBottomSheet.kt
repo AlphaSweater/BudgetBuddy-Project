@@ -1,4 +1,4 @@
-package com.synaptix.budgetbuddy.ui.recurrencePopUpBottomSheet
+package com.synaptix.budgetbuddy.ui.labelPopupBottomSheet
 
 import androidx.fragment.app.viewModels
 import android.os.Bundle
@@ -8,14 +8,13 @@ import android.view.View
 import android.view.ViewGroup
 import com.synaptix.budgetbuddy.R
 
-class RecurrencePopUpFragment : Fragment() {
-
+class LabelBottomSheet : Fragment() {
 
     companion object {
-        fun newInstance() = RecurrencePopUpFragment()
+        fun newInstance() = LabelBottomSheet()
     }
 
-    private val viewModel: RecurrencePopUpViewModel by viewModels()
+    private val viewModel: LabelBottomSheetViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -27,6 +26,6 @@ class RecurrencePopUpFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        return inflater.inflate(R.layout.fragment_recurrence_pop_up, container, false)
+        return inflater.inflate(R.layout.fragment_label_bottom_sheet, container, false)
     }
 }

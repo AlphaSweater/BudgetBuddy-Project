@@ -38,6 +38,11 @@ class RecurrenceBottomSheet : BottomSheetDialogFragment() {
             dismiss()
         }
 
+        binding.optionEveryWeek2.setOnClickListener{
+            // Handles "Every 2 weeks" click
+            dismiss()
+        }
+
         return binding.root
     }
 

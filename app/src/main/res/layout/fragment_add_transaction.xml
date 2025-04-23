@@ -28,7 +28,7 @@
     <androidx.cardview.widget.CardView
         android:id="@+id/crdVwTransactions"
         android:layout_width="372dp"
-        android:layout_height="780dp"
+        android:layout_height="674dp"
         android:layout_gravity="center"
         app:cardBackgroundColor="?attr/bb_surface"
         app:cardCornerRadius="20dp">
@@ -193,7 +193,7 @@
                     android:layout_width="34dp"
                     android:layout_height="35dp"
                     android:src="@drawable/ic_email_24"
-                    app:tint="?attr/bb_button"/>
+                    app:tint="?attr/bb_button" />
 
                 <Space
                     android:layout_width="18dp"
@@ -223,8 +223,7 @@
                         android:layout_width="132dp"
                         android:layout_height="34dp"
                         android:ems="10"
-                        android:inputType="numberDecimal"
-                        />
+                        android:inputType="numberDecimal" />
                 </LinearLayout>
 
             </LinearLayout>
@@ -263,9 +262,9 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:textSize="18sp"
                         android:text="@string/calender"
-                        android:textColor="?attr/bb_primaryText"/>
+                        android:textColor="?attr/bb_primaryText"
+                        android:textSize="18sp" />
 
                     <EditText
                         android:id="@+id/editTextDate"
@@ -286,8 +285,7 @@
                     android:background="@null"
                     android:rotation="180"
                     android:scaleType="fitStart"
-                    android:src="?attr/actionModeCloseDrawable"
-                    />
+                    android:src="?attr/actionModeCloseDrawable" />
             </LinearLayout>
             <!-- ========================================================== -->
 
@@ -322,7 +320,7 @@
                     android:layout_weight="1"
                     android:ems="10"
                     android:inputType="text"
-                    android:text="Name" />
+                    android:text="Write a Note" />
 
                 <Space
                     android:layout_width="64dp"
@@ -372,8 +370,7 @@
                     android:background="@null"
                     android:rotation="180"
                     android:scaleType="fitStart"
-                    android:src="?attr/actionModeCloseDrawable"
-                     />
+                    android:src="?attr/actionModeCloseDrawable" />
             </LinearLayout>
             <!-- ========================================================== -->
 
@@ -418,8 +415,7 @@
                     android:background="@null"
                     android:rotation="180"
                     android:scaleType="fitStart"
-                    android:src="?attr/actionModeCloseDrawable"
-                     />
+                    android:src="?attr/actionModeCloseDrawable" />
             </LinearLayout>
             <!-- ========================================================== -->
 
@@ -468,53 +464,30 @@
             </LinearLayout>
             <!-- ========================================================== -->
 
-            <Space
-                android:layout_width="match_parent"
-                android:layout_height="13dp" />
-
-
-            <!-- ================== Set a Reminder Layout ================== -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:padding="8dp">
-
-                <ImageView
-                    android:layout_width="34dp"
-                    android:layout_height="35dp"
-                    android:src="@drawable/ic_add_alert_24"
-                    app:tint="?attr/bb_button" />
-
-                <Space
-                    android:layout_width="54dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1" />
-
-                <TextView
-                    android:id="@+id/lblAlert"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/set_reminder"
-                    android:textColor="?attr/bb_primaryText"
-                    android:textSize="18sp" />
-
-                <ImageButton
-                    android:id="@+id/btnBackReminder"
-                    android:layout_width="226dp"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_weight="1"
-                    android:background="@null"
-                    android:rotation="180"
-                    android:scaleType="fitStart"
-                    android:src="?attr/actionModeCloseDrawable"
-                     />
-            </LinearLayout>
             <!-- ========================================================== -->
 
         </LinearLayout>
 
+
     </androidx.cardview.widget.CardView>
+
+    <Button
+        android:id="@+id/btnSignup2"
+        android:layout_width="206dp"
+        android:layout_height="71dp"
+        android:layout_gravity="center"
+        android:layout_marginTop="50dp"
+        android:layout_weight="1"
+        android:text="@string/save"
+        android:textColor="@android:color/white"
+        android:textSize="20sp"
+        app:backgroundTint="?attr/bb_button"
+        app:cornerRadius="24dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/edtTxtPasswordConfirm" />
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="91dp" />
 </LinearLayout>
