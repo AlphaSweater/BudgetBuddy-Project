@@ -48,12 +48,17 @@
 
     <!-- =========================================================================================== -->
     <!-- Category colour -->
-    <color name="cat_blue">#46a9e2</color>
-    <color name="cat_green">#61c4ae</color>
+    <color name="cat_light_blue">#46a9e2</color>
+    <color name="cat_dark_blue">#30278c</color>
+    <color name="cat_light_green">#5bf562</color>
+    <color name="cat_dark_green">#19801e</color>
     <color name="cat_gold">#b59760</color>
     <color name="cat_yellow">#fda62b</color>
     <color name="cat_orange">#da8041</color>
-    <color name="cat_pink">#e16eeb</color>
+    <color name="cat_dark_pink">#f736b7</color>
+    <color name="cat_light_pink">#fa73cd</color>
+    <color name="cat_light_purple">#d247f5</color>
+    <color name="cat_dark_purple">#790596</color>
     <!-- =========================================================================================== -->
 
     <!-- =========================================================================================== -->

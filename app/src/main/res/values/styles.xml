@@ -1,3 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
-</resources>
+    <resources>
+        <!-- Customize the DatePickerDialog -->
+        <style name="CustomDatePickerDialog" parent="Theme.AppCompat.Light.Dialog">
+            <!-- Customize the title color (top text) -->
+            <item name="android:textColorPrimary">@android:color/black</item>
+            <!-- Customize other elements, e.g., button color -->
+            <item name="android:buttonBarNegativeButtonStyle">@android:color/black</item>
+            <item name="android:buttonBarPositiveButtonStyle">@android:color/black</item>
+        </style>
+    </resources>
