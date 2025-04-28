@@ -193,8 +193,8 @@
                 android:layout_width="28dp"
                 android:layout_height="28dp"
                 android:rotation="270"
-                android:src="@android:drawable/arrow_down_float"
                 android:tint="?attr/bb_primaryText"
+                android:src="@android:drawable/arrow_down_float"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -207,7 +207,8 @@
             android:layout_width="50dp"
             android:layout_height="60dp"
             android:layout_marginEnd="20dp"
-            android:backgroundTint="" tint="?attr/bb_button"
+            android:backgroundTint="?attr/bb_button"
+            android:tint="?attr/bb_button"
             app:layout_constraintEnd_toEndOf="parent"
             tools:layout_editor_absoluteY="812dp" />
 
@@ -216,7 +217,6 @@
             android:layout_width="30dp"
             android:layout_height="30dp"
             android:src="@android:drawable/ic_input_add"
-            android:tint="?attr/bb_button"
             app:layout_constraintBottom_toBottomOf="@+id/button_add"
             app:layout_constraintEnd_toEndOf="@+id/button_add"
             app:layout_constraintStart_toStartOf="@+id/button_add"
