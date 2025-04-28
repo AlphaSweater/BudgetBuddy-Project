@@ -202,26 +202,24 @@
     </androidx.cardview.widget.CardView>
 
 
-    <!-- Wallet Card 2 -->
+        <Button
+            android:id="@+id/button_add"
+            android:layout_width="50dp"
+            android:layout_height="60dp"
+            android:layout_marginEnd="20dp"
+            android:backgroundTint="" tint="?attr/bb_button"
+            app:layout_constraintEnd_toEndOf="parent"
+            tools:layout_editor_absoluteY="812dp" />
 
-    <Button
-        android:id="@+id/button_add"
-        android:layout_width="50dp"
-        android:layout_height="60dp"
-        android:layout_marginEnd="20dp"
-        android:backgroundTint="" tint="?attr/bb_button"
-        app:layout_constraintEnd_toEndOf="parent"
-        tools:layout_editor_absoluteY="812dp" />
-
-    <ImageView
-        android:id="@+id/imageView3"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:src="@android:drawable/ic_input_add"
-        android:tint="?attr/bb_button"
-        app:layout_constraintBottom_toBottomOf="@+id/button_add"
-        app:layout_constraintEnd_toEndOf="@+id/button_add"
-        app:layout_constraintStart_toStartOf="@+id/button_add"
-        app:layout_constraintTop_toTopOf="@+id/button_add" />
+        <ImageView
+            android:id="@+id/imageView3"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:src="@android:drawable/ic_input_add"
+            android:tint="?attr/bb_button"
+            app:layout_constraintBottom_toBottomOf="@+id/button_add"
+            app:layout_constraintEnd_toEndOf="@+id/button_add"
+            app:layout_constraintStart_toStartOf="@+id/button_add"
+            app:layout_constraintTop_toTopOf="@+id/button_add" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
