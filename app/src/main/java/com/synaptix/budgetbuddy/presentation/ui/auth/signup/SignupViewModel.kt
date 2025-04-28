@@ -1,4 +1,4 @@
-package com.synaptix.budgetbuddy.ui.auth.signup
+package com.synaptix.budgetbuddy.presentation.ui.auth.signup
 
 import androidx.lifecycle.ViewModel
 

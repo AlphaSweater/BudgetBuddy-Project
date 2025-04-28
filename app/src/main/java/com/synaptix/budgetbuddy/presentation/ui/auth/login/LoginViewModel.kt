@@ -1,4 +1,4 @@
-package com.synaptix.budgetbuddy.ui.auth.login
+package com.synaptix.budgetbuddy.presentation.ui.auth.login
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData

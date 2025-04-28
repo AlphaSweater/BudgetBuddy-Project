@@ -1,0 +1,78 @@
+
+📁 core/ — Core Layer Documentation (Budgeting App)
+This layer contains the pure logic of the app — no Android dependencies, no database, no UI code. Everything here should be reusable, testable, and clean.
+
+This is where we define what the app does: models, logic, and core functionality.
+
+📦 Folders Overview
+core/
+├── model/       # Budget, Expense, Income - clean data structures
+├── logic/       # Business rules & calculations (e.g. total spent, balance)
+└── usecase/     # Application-specific actions (e.g. AddExpense, GetMonthlyBudget)
+
+
+----------------------------------------------------------------------------------------------------
+📁 model/
+Purpose: Represent the main data types your app uses.
+These should be pure Kotlin classes — no Room annotations or Android stuff.
+
+Example:
+    data class Expense(
+        val id: String,
+        val amount: Double,
+        val category: String,
+        val timestamp: Long
+    )
+
+    data class Budget(
+        val id: String,
+        val month: String,
+        val totalLimit: Double
+    )
+
+
+----------------------------------------------------------------------------------------------------
+📁 logic/
+Purpose: Contains reusable logic and calculations used throughout the app.
+
+Examples:
+    - Calculating total expenses this month
+    - Finding remaining budget
+    - Grouping expenses by category
+
+Example:
+    object BudgetCalculator {
+        fun calculateRemaining(budget: Double, expenses: List<Expense>): Double {
+            val totalSpent = expenses.sumOf { it.amount }
+            return budget - totalSpent
+        }
+    }
+
+
+----------------------------------------------------------------------------------------------------
+📁 usecase/
+Purpose: Encapsulate specific app actions or flows.
+These orchestrate logic and repositories (from data/), and are called from ViewModels.
+
+Examples:
+    - AddExpenseUseCase
+    - GetMonthlySummaryUseCase
+    - UpdateBudgetLimitUseCase
+
+Example:
+    class GetRemainingBudgetUseCase(
+        private val repo: BudgetRepository // from data layer
+    ) {
+        suspend fun execute(month: String): Double {
+            val budget = repo.getBudgetForMonth(month)
+            val expenses = repo.getExpensesForMonth(month)
+            return BudgetCalculator.calculateRemaining(budget.totalLimit, expenses)
+        }
+    }
+
+
+----------------------------------------------------------------------------------------------------
+✅ Key Principles
+- No Android stuff allowed (no LiveData, Context, etc.)
+- Keep things testable, clean, and reusable
+- Use this layer to describe what your app does, not how

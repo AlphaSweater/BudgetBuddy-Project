@@ -1,4 +1,4 @@
-package com.synaptix.budgetbuddy.ui.addTransaction
+package com.synaptix.budgetbuddy.presentation.ui.main.addTransaction
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData

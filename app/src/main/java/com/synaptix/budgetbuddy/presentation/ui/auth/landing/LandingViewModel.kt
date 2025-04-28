@@ -1,4 +1,4 @@
-package com.synaptix.budgetbuddy.ui.auth.landing
+package com.synaptix.budgetbuddy.presentation.ui.auth.landing
 
 import androidx.lifecycle.ViewModel
 
