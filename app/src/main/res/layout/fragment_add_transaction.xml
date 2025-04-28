@@ -1,58 +1,61 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/RecureIcon"
+    android:id="@+id/layout_add_transaction"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_gravity="center"
     android:orientation="vertical"
+    android:padding="16dp"
     tools:context=".presentation.ui.main.addTransaction.AddTransactionFragment">
 
+    <!-- Top Back Button -->
     <ImageButton
         android:id="@+id/btnBackTransaction"
-        android:layout_width="44dp"
-        android:layout_height="44dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginBottom="16dp"
-        android:background="@null"
-        android:src="?attr/actionModeCloseDrawable"
-        tools:ignore="TouchTargetSizeCheck" />
-
-    <androidx.cardview.widget.CardView
-        android:id="@+id/crdVwTransactions"
-        android:layout_width="410dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
+        android:layout_marginStart="14dp"
+        android:layout_marginTop="14dp"
+        android:layout_marginEnd="307dp"
+        android:background="@null"
+        android:contentDescription="@string/back"
+        android:src="?attr/actionModeCloseDrawable"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- Main Card -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/card_transaction_form"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
         app:cardBackgroundColor="?attr/bb_surface"
-        app:cardCornerRadius="20dp">
+        app:cardCornerRadius="20dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btnBackTransaction">
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="16dp">
+            android:padding="16dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
             <!-- Category Row -->
             <LinearLayout
-                android:id="@+id/btnSelectCat"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="15dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:clickable="true"
-                android:focusable="true">
+                android:id="@+id/rowSelectCategory"
+                style="@style/RowStyle">
 
                 <ImageView
-                    android:layout_width="36dp"
-                    android:layout_height="36dp"
+                    style="@style/RowIconStyle"
                     android:src="@drawable/ic_circle_24"
-                    app:tint="@color/button" />
+                    app:tint="?attr/bb_button" />
 
                 <TextView
                     android:layout_width="0dp"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
                     android:layout_marginStart="12dp"
                     android:layout_weight="1"
                     android:gravity="center_vertical"
@@ -60,306 +63,226 @@
                     android:textColor="?attr/bb_primaryText"
                     android:textSize="18sp" />
             </LinearLayout>
-            <!-- ========================================================== -->
 
             <!-- Wallet Row -->
             <LinearLayout
-                android:id="@+id/btnSelectWallet"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="15dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:clickable="true"
-                android:focusable="true">
+                android:id="@+id/rowSelectWallet"
+                style="@style/RowStyle">
 
                 <ImageView
-                    android:layout_width="36dp"
-                    android:layout_height="36dp"
+                    style="@style/RowIconStyle"
                     android:src="@drawable/ic_account_balance_wallet_24"
                     app:tint="?attr/bb_button" />
 
                 <TextView
                     android:layout_width="0dp"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
                     android:layout_marginStart="12dp"
                     android:layout_weight="1"
-                    android:gravity="center_vertical"
                     android:text="@string/wallet"
+                    android:textSize="18sp"
                     android:textColor="?attr/bb_primaryText"
-                    android:textSize="18sp" />
+                    android:gravity="center_vertical" />
 
                 <ImageView
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    android:layout_weight="0"
-                    android:background="@null"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_marginStart="8dp"
+                    android:src="?attr/actionModeCloseDrawable"
                     android:rotation="180"
-                    android:src="?attr/actionModeCloseDrawable" />
+                    android:background="@null" />
             </LinearLayout>
-            <!-- ========================================================== -->
 
             <!-- Currency Row -->
             <LinearLayout
-                android:id="@+id/currencySpinner"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="15dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:clickable="true"
-                android:focusable="true">
+                android:id="@+id/rowSelectCurrency"
+                style="@style/RowStyle">
 
                 <ImageView
-                    android:layout_width="36dp"
-                    android:layout_height="36dp"
-                    android:layout_marginEnd="12dp"
+                    style="@style/RowIconStyle"
                     android:src="@drawable/ic_attach_money_24"
                     app:tint="?attr/bb_button" />
 
                 <Spinner
-                    android:id="@+id/spnCurrency"
+                    android:id="@+id/spinnerCurrency"
                     android:layout_width="0dp"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:gravity="center_vertical"
                     android:spinnerMode="dropdown"
                     tools:ignore="TouchTargetSizeCheck" />
             </LinearLayout>
-            <!-- ========================================================== -->
 
             <!-- Amount Row -->
             <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="12dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:clickable="true"
-                android:focusable="true">
+                android:id="@+id/rowSelectAmount"
+                style="@style/RowStyle">
 
                 <ImageView
-                    android:id="@+id/amountIcon"
-                    android:layout_width="36dp"
-                    android:layout_height="36dp"
+                    style="@style/RowIconStyle"
                     android:src="@drawable/ic_email_24"
                     app:tint="?attr/bb_button" />
 
                 <EditText
-                    android:id="@+id/editTextNumberDecimal"
+                    android:id="@+id/edtTextAmount"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="12dp"
                     android:layout_weight="1"
-                    android:hint="Amount"
-                    android:inputType="numberDecimal" />
+                    android:hint="@string/amount"
+                    android:inputType="numberDecimal"
+                    android:textColor="?attr/bb_primaryText"
+                    android:textColorHint="?attr/bb_primaryText" />
             </LinearLayout>
-            <!-- ========================================================== -->
 
-            <!-- Calender Row -->
+            <!-- Date Row -->
             <LinearLayout
-                android:id="@+id/btnDateSelect"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="12dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:clickable="true"
-                android:focusable="true">
+                android:id="@+id/rowSelectDate"
+                style="@style/RowStyle">
 
                 <ImageView
-                    android:layout_width="36dp"
-                    android:layout_height="36dp"
+                    style="@style/RowIconStyle"
                     android:src="@drawable/ic_calendar_month_24"
                     app:tint="?attr/bb_button" />
 
                 <EditText
                     android:id="@+id/edtTextDate"
-                    android:layout_width="243dp"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="12dp"
                     android:layout_weight="1"
                     android:clickable="true"
                     android:focusable="false"
-                    android:hint="Date"
-                    android:inputType="date" />
-
-                <ImageView
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    android:layout_weight="0"
-                    android:background="@null"
-                    android:rotation="180"
-                    android:src="?attr/actionModeCloseDrawable" />
-
+                    android:hint="@string/date"
+                    android:inputType="date"
+                    android:textColor="?attr/bb_primaryText"
+                    android:textColorHint="?attr/bb_primaryText" />
             </LinearLayout>
-            <!-- ========================================================== -->
 
             <!-- Note Row -->
             <LinearLayout
-                android:id="@+id/btnNote"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="15dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:clickable="true"
-                android:focusable="true">
+                android:id="@+id/rowSelectNote"
+                style="@style/RowStyle">
 
                 <ImageView
-                    android:layout_width="36dp"
-                    android:layout_height="36dp"
-                    android:contentDescription="editIcon"
+                    style="@style/RowIconStyle"
                     android:src="@drawable/ic_edit_note_24"
                     app:tint="?attr/bb_button" />
 
                 <EditText
-                    android:id="@+id/editTextText"
+                    android:id="@+id/edtTextNote"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="12dp"
                     android:layout_weight="1"
-                    android:hint="Write a Note"
+                    android:hint="@string/write_a_note"
                     android:inputType="text"
                     android:textColor="?attr/bb_primaryText"
-                    android:textColorHint="?attr/bb_primaryText"
-                    tools:ignore="TouchTargetSizeCheck" />
+                    android:textColorHint="?attr/bb_primaryText" />
             </LinearLayout>
-            <!-- ========================================================== -->
 
-            <!-- label Row -->
+            <!-- Label Row -->
             <LinearLayout
-                android:id="@+id/btnLabel"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="12dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:clickable="true"
-                android:focusable="true">
+                android:id="@+id/rowSelectLabel"
+                style="@style/RowStyle">
 
                 <ImageView
-                    android:layout_width="36dp"
-                    android:layout_height="36dp"
+                    style="@style/RowIconStyle"
                     android:src="@drawable/ic_discount_24"
                     app:tint="?attr/bb_button" />
 
                 <TextView
-                    android:id="@+id/lblLabel"
                     android:layout_width="0dp"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
                     android:layout_marginStart="12dp"
                     android:layout_weight="1"
-                    android:gravity="center_vertical"
                     android:text="@string/label"
+                    android:textSize="18sp"
                     android:textColor="?attr/bb_primaryText"
-                    android:textSize="18sp" />
+                    android:gravity="center_vertical" />
 
                 <ImageView
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    android:layout_weight="0"
-                    android:background="@null"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_marginStart="8dp"
+                    android:src="?attr/actionModeCloseDrawable"
                     android:rotation="180"
-                    android:src="?attr/actionModeCloseDrawable" />
+                    android:background="@null" />
             </LinearLayout>
-            <!-- ========================================================== -->
 
             <!-- Photo Row -->
             <LinearLayout
-                android:id="@+id/btnPhoto"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="15dp"
-                android:clickable="true"
-                android:focusable="true"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
+                android:id="@+id/rowSelectPhoto"
+                style="@style/RowStyle">
 
                 <ImageView
-                    android:layout_width="36dp"
-                    android:layout_height="36dp"
-                    android:contentDescription="Photo Icon"
+                    style="@style/RowIconStyle"
                     android:src="@drawable/ic_add_photo_alternate_24"
                     app:tint="?attr/bb_button" />
 
                 <TextView
-                    android:id="@+id/lblPhoto"
-                    android:layout_width="114dp"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="12dp"
                     android:layout_weight="1"
-                    android:gravity="center_vertical"
                     android:text="@string/add_photo"
+                    android:textSize="18sp"
                     android:textColor="?attr/bb_primaryText"
-                    android:textSize="18sp" />
+                    android:gravity="center_vertical" />
 
                 <ImageView
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    android:layout_weight="0"
-                    android:background="@null"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_marginStart="8dp"
+                    android:src="?attr/actionModeCloseDrawable"
                     android:rotation="180"
-                    android:src="?attr/actionModeCloseDrawable" />
+                    android:background="@null" />
             </LinearLayout>
-            <!-- ========================================================== -->
 
             <!-- Recurrence Row -->
             <LinearLayout
-                android:id="@+id/btnRecurrence"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="15dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:clickable="true"
-                android:focusable="true">
+                android:id="@+id/rowSelectRecurrenceRate"
+                style="@style/RowStyle">
 
                 <ImageView
-                    android:layout_width="36dp"
-                    android:layout_height="36dp"
+                    style="@style/RowIconStyle"
                     android:src="@drawable/ic_autorenew_24"
                     app:tint="?attr/bb_button" />
 
                 <TextView
-                    android:id="@+id/lblRecure"
-                    android:layout_width="181dp"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="12dp"
                     android:layout_weight="1"
-                    android:gravity="center_vertical"
                     android:text="@string/recurrence"
+                    android:textSize="18sp"
                     android:textColor="?attr/bb_primaryText"
-                    android:textSize="18sp" />
+                    android:gravity="center_vertical" />
 
                 <ImageView
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    android:layout_weight="0"
-                    android:background="@null"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_marginStart="8dp"
+                    android:src="?attr/actionModeCloseDrawable"
                     android:rotation="180"
-                    android:src="?attr/actionModeCloseDrawable" />
+                    android:background="@null" />
             </LinearLayout>
-            <!-- ========================================================== -->
-
         </LinearLayout>
-
-
     </androidx.cardview.widget.CardView>
 
-    <Space
-        android:layout_width="match_parent"
-        android:layout_height="54dp" />
-
+    <!-- Save Button -->
     <Button
         android:id="@+id/btnSave"
-        android:layout_width="200dp"
-        android:layout_height="59dp"
-        android:layout_gravity="center"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:paddingHorizontal="32dp"
+        android:paddingVertical="12dp"
         android:text="@string/save"
         android:textColor="@android:color/white"
-        android:textSize="20sp"
+        android:textSize="18sp"
         app:backgroundTint="?attr/bb_button"
-        app:cornerRadius="24dp" />
+        app:cornerRadius="24dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/card_transaction_form"
+        tools:layout_conversion_absoluteHeight="19dp"
+        tools:layout_conversion_absoluteWidth="98dp" />
 
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

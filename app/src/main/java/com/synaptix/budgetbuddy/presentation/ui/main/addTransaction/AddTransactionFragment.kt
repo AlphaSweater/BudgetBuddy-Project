@@ -44,20 +44,20 @@ class AddTransactionFragment : Fragment() {
             listOf("Currency", "USD", "EUR", "GBP")
         )
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        binding.spnCurrency.adapter = adapter
+        binding.spinnerCurrency.adapter = adapter
 
         // Show bottom sheet when recurrence button is clicked
-        binding.btnRecurrence.setOnClickListener {
+        binding.rowSelectRecurrenceRate.setOnClickListener {
             RecurrenceBottomSheet().show(parentFragmentManager, "RecurrenceBottomSheet")
         }
 
         // show bottom sheet when label button is clicked
-        binding.btnLabel.setOnClickListener {
+        binding.rowSelectLabel.setOnClickListener {
             LabelBottomSheet().show(parentFragmentManager, "LabelBottomSheet")
         }
 
         //Direct to another fragment AddTransactionCat
-        binding.btnSelectCat.setOnClickListener {
+        binding.rowSelectCategory.setOnClickListener {
 
         }
 
@@ -79,7 +79,7 @@ class AddTransactionFragment : Fragment() {
             datePickerDialog.show()
         }
 
-        binding.btnDateSelect.setOnClickListener {
+        binding.rowSelectDate.setOnClickListener {
             openDatePicker()
         }
 
