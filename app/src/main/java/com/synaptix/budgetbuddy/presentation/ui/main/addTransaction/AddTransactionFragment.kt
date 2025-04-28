@@ -14,8 +14,8 @@ import android.widget.EditText
 import android.widget.TextView
 import androidx.lifecycle.ViewModelProvider
 import com.synaptix.budgetbuddy.databinding.FragmentAddTransactionBinding
-import com.synaptix.budgetbuddy.ui.addTransactionCat.AddTransactionCatFragment
-import com.synaptix.budgetbuddy.ui.labelPopupBottomSheet.LabelBottomSheet
+import com.synaptix.budgetbuddy.presentation.ui.main.addTransaction.addTransactionCat.AddTransactionCatFragment
+import com.synaptix.budgetbuddy.presentation.ui.main.addTransaction.labelPopupBottomSheet.LabelBottomSheet
 import com.synaptix.budgetbuddy.ui.recurrence.RecurrenceBottomSheet
 import androidx.navigation.fragment.findNavController
 

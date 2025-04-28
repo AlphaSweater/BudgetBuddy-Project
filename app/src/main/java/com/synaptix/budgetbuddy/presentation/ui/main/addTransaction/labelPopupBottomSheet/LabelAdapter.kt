@@ -1,4 +1,4 @@
-package com.synaptix.budgetbuddy.ui.labelPopupBottomSheet
+package com.synaptix.budgetbuddy.presentation.ui.main.addTransaction.labelPopupBottomSheet
 
 import android.view.LayoutInflater
 import android.view.View

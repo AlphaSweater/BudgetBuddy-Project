@@ -1,4 +1,4 @@
-package com.synaptix.budgetbuddy.ui.addTransactionCat
+package com.synaptix.budgetbuddy.presentation.ui.main.addTransaction.addTransactionCat
 
 import androidx.fragment.app.viewModels
 import android.os.Bundle

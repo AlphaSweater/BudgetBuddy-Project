@@ -1,4 +1,4 @@
-package com.synaptix.budgetbuddy.ui.recurrencePopUpBottomSheet
+package com.synaptix.budgetbuddy.presentation.ui.main.addTransaction.recurrencePopUpBottomSheet
 
 import androidx.lifecycle.ViewModel
 
