@@ -1,4 +1,4 @@
-package com.synaptix.budgetbuddy.ui.addTransaction
+package com.synaptix.budgetbuddy.presentation.ui.main.addTransaction
 
 import android.app.DatePickerDialog
 import android.icu.util.Calendar
