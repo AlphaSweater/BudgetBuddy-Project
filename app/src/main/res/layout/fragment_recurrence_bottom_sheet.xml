@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/bottom_sheet_layout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/rounded_top_bg"
+    android:orientation="vertical"
+    android:padding="24dp"
+    >
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:maxHeight="400dp"
+        >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" >
+
+            <TextView
+                android:id="@+id/txtRecurrence"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="16dp"
+                android:text="Recurrence"
+                android:textSize="30sp" />
+
+            <TextView
+                android:id="@+id/optionEveryDay"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="16dp"
+                android:text="Every day"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/optionEveryTwoDays"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="16dp"
+                android:text="Every 2 days"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/optionEveryWorkDay"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="16dp"
+                android:text="Every work day"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/optionEveryWeek"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="16dp"
+                android:text="Every week"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/optionEveryWeek2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="16dp"
+                android:text="Every 2 weeks"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/optionEveryWeek4"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="16dp"
+                android:text="Every 4 weeks"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/optionEveryMonth"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="16dp"
+                android:text="Every month"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/optionEveryMonth2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="16dp"
+                android:text="Every 2 months"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/optionEveryMonth3"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="16dp"
+                android:text="Every 3 Months"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/optionEveryMonth6"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="16dp"
+                android:text="Every 6 Months"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/optionEveryYear"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="16dp"
+                android:text="Year"
+                android:textSize="18sp" />
+        </LinearLayout>
+    </ScrollView>
+
+    <!-- Add more recurrence options here -->
+</LinearLayout>

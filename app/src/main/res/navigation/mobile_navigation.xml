@@ -28,4 +28,5 @@
         android:name="com.synaptix.budgetbuddy.presentation.ui.main.addTransaction.AddTransactionFragment"
         android:label="@string/title_transaction"
         tools:layout="@layout/fragment_add_transaction" />
+
 </navigation>
