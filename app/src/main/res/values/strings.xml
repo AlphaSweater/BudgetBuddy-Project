@@ -9,6 +9,9 @@
     <string name="email">Email</string>
     <string name="password">Password</string>
     <string name="save">Save</string>
+    <string name="total_balance">Total Balance</string>
+    <string name="spending_overview">Spending Overview</string>
+    <string name="total_expense">Total Expense</string>
     <!-- =========================================================== -->
 
     <!-- ============ Open, Sign In and Sign Up Strings ============-->
@@ -59,5 +62,16 @@
     <string name="write_a_note">Write a Note\n</string>">
     <!-- =========================================================== -->
 
-
+    <!-- ==================== Home Page ======================-->
+    <string name="my_wallet">My Wallets</string>
+    <string name="see_all">See All</string>
+    <string name="monthly_reports">Monthly Reports</string>
+    <string name="see_reports">See Reports</string>
+    <string name="spending_details">Spending Details</string>
+    <string name="see_details">See Details</string>
+    <string name="recent_transactions">Recent Transactions</string>
+    <string name="show_more">Show More</string>
+    <string name="week">Week</string>
+    <string name="month">Month</string>
+    <!-- =========================================================== -->
 </resources>
