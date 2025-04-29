@@ -9,6 +9,9 @@
     <string name="email">Email</string>
     <string name="password">Password</string>
     <string name="save">Save</string>
+    <string name="total_balance">Total Balance</string>
+    <string name="spending_overview">Spending Overview</string>
+    <string name="total_expense">Total Expense</string>
     <!-- =========================================================== -->
 
     <!-- ============ Open, Sign In and Sign Up Strings ============-->
