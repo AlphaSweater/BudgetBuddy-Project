@@ -1,4 +1,4 @@
-package com.synaptix.budgetbuddy.data.local.signup
+package com.synaptix.budgetbuddy.presentation.ui.auth.signup
 
 import androidx.fragment.app.viewModels
 import android.os.Bundle
@@ -6,7 +6,6 @@ import androidx.fragment.app.Fragment
 import android.view.View
 import com.synaptix.budgetbuddy.presentation.ui.auth.AuthActivity
 import com.synaptix.budgetbuddy.R
-import com.synaptix.budgetbuddy.data.entity.SignupViewModel
 import com.synaptix.budgetbuddy.databinding.FragmentSignupBinding
 import dagger.hilt.android.AndroidEntryPoint
 

@@ -1,8 +1,9 @@
-package com.synaptix.budgetbuddy.data.entity
+package com.synaptix.budgetbuddy.presentation.ui.auth.signup
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.synaptix.budgetbuddy.core.usecase.auth.SignUpUseCase
+import com.synaptix.budgetbuddy.data.entity.UserEntity
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
