@@ -22,12 +22,6 @@ class SignupFragment : Fragment(R.layout.fragment_signup) {
         // Inflate ViewBinding
         binding = FragmentSignupBinding.bind(view)
 
-        // Handle signup logic with ViewBinding
-        binding.btnSignup.setOnClickListener {
-            (activity as? AuthActivity)?.showLogin()
-            // Handle signup action
-        }
-
         // Handle back button
         binding.btnBackSignup.setOnClickListener {
             requireActivity().onBackPressedDispatcher.onBackPressed()
@@ -61,6 +55,7 @@ class SignupFragment : Fragment(R.layout.fragment_signup) {
 
             // Call the ViewModel to handle signup
             viewModel.signUp(email, password)
+            (activity as? AuthActivity)?.showLogin()
 
         }
     }
