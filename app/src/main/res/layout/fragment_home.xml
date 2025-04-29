@@ -360,12 +360,6 @@
                 </LinearLayout>
             </LinearLayout>
 
-            <!-- Gradient Line -->
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="2dp"
-                android:layout_marginTop="12dp"
-                android:background="@drawable/gradient_line"/>
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 
