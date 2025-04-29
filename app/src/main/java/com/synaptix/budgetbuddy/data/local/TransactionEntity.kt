@@ -5,18 +5,24 @@ import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 
 @Entity(
-    tableName = "wallet_table",
+    tableName = "transaction_table",
     //AI assisted with the creation of this foreign key
     foreignKeys = [
         ForeignKey(
             entity = UserEntity::class,
             parentColumns = ["user_id"],
             childColumns = ["user_id"]
+        ),
+        ForeignKey(
+            entity = WalletEntity::class,
+            parentColumns = ["wallet_id"],
+            childColumns = ["wallet_id"]
         )
     ]
 )
-data class WalletEntity (
-    @PrimaryKey(autoGenerate = true) val wallet_id: Int,
+
+data class TransactionEntity (
+    @PrimaryKey(autoGenerate = true) val transaction_id: Int,
     val user_id: Int,
-    val name: String
+    val wallet_id: Int
 )
