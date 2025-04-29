@@ -2,7 +2,9 @@ package com.synaptix.budgetbuddy.di
 
 import android.content.Context
 import androidx.room.Room
+import com.synaptix.budgetbuddy.core.repository.UserRepository
 import com.synaptix.budgetbuddy.core.usecase.AddTransactionUseCase
+import com.synaptix.budgetbuddy.core.usecase.auth.LoginUseCase
 import com.synaptix.budgetbuddy.data.AppDatabase
 import com.synaptix.budgetbuddy.data.local.UserDao
 import dagger.Module
@@ -21,11 +23,6 @@ object AppModule {
     fun provideAddTransactionUseCase(): AddTransactionUseCase {
         return AddTransactionUseCase()
     }
-//    @Provides
-//    @Singleton
-//    fun provideSignUpUseCase(): SignUpUseCase {
-//        return SignUpUseCase()
-//    }
 
     @Provides
     @Singleton
@@ -42,5 +39,17 @@ object AppModule {
             AppDatabase::class.java,
             "budgetbuddy_db"
         ).build()
+    }
+
+    @Provides
+    @Singleton
+    fun provideUserRepository(userDao: UserDao): UserRepository {
+        return UserRepository(userDao)
+    }
+
+    @Provides
+    @Singleton
+    fun provideLoginUseCase(repository: UserRepository): LoginUseCase {
+        return LoginUseCase(repository)
     }
 }
