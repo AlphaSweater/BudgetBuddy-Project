@@ -57,16 +57,17 @@
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="650dp"
+            android:layout_height="match_parent"
             android:background="?attr/bb_surface"
             android:padding="16dp">
 
             <!-- Wallet Name -->
             <ImageView
                 android:id="@+id/ivWalletIcon"
-                android:layout_width="70dp"
-                android:layout_height="70dp"
-                android:src="@drawable/ic_wallet"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:src="@drawable/ic_account_balance_wallet_24"
+                android:tint="?attr/bb_button"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -75,7 +76,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="12dp"
-                android:layout_marginTop="25dp"
+                android:layout_marginTop="15dp"
                 android:backgroundTint="?attr/bb_primaryText"
                 android:hint="Wallet Name"
                 android:inputType="text"
@@ -86,10 +87,11 @@
             <!-- Currency -->
             <ImageView
                 android:id="@+id/ivCurrencyIcon"
-                android:layout_width="70dp"
-                android:layout_height="70dp"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
                 android:layout_marginTop="30dp"
-                android:src="@drawable/ic_currency"
+                android:src="@drawable/ic_attach_money_24"
+                android:tint="?attr/bb_button"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/etWalletName" />
 
@@ -103,8 +105,8 @@
                 android:backgroundTint="?attr/bb_surface"
                 android:inputType="text"
                 android:text="Currency"
-                android:textSize="15dp"
                 android:textColor="?attr/bb_secondaryText"
+                android:textSize="15dp"
                 app:layout_constraintStart_toEndOf="@id/ivCurrencyIcon"
                 app:layout_constraintTop_toTopOf="@id/ivCurrencyIcon" />
 
@@ -113,7 +115,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="12dp"
-                android:layout_marginTop="25dp"
+                android:layout_marginTop="15dp"
                 android:backgroundTint="?attr/bb_primaryText"
                 android:hint="Currency"
                 android:inputType="text"
@@ -124,10 +126,11 @@
             <!-- Initial Amount -->
             <ImageView
                 android:id="@+id/ivMoneyIcon"
-                android:layout_width="70dp"
-                android:layout_height="70dp"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
                 android:layout_marginTop="30dp"
-                android:src="@drawable/ic_money"
+                android:src="@drawable/ic_edit_note_24"
+                android:tint="?attr/bb_button"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/etCurrency" />
 
@@ -151,7 +154,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="12dp"
-                android:layout_marginTop="25dp"
+                android:layout_marginTop="15dp"
                 android:backgroundTint="?attr/bb_primaryText"
                 android:hint="Initial Amount"
                 android:inputType="numberDecimal"
@@ -164,10 +167,11 @@
 
             <ImageView
                 android:id="@+id/ivShareIcon"
-                android:layout_width="70dp"
-                android:layout_height="70dp"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
                 android:layout_marginTop="30dp"
-                android:src="@drawable/ic_share_wallet"
+                android:src="@drawable/ic_notifications_black_24dp"
+                android:tint="?attr/bb_button"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/etInitialAmount" />
 
@@ -176,7 +180,7 @@
                 android:layout_width="250dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="12dp"
-                android:layout_marginTop="25dp"
+                android:layout_marginTop="15dp"
                 android:text="Share Wallet with Other People"
                 android:textColor="?attr/bb_primaryText"
                 android:textSize="18dp"
@@ -190,7 +194,7 @@
                 android:layout_width="28dp"
                 android:layout_height="28dp"
                 android:layout_marginStart="5dp"
-                android:layout_marginTop="325dp"
+                android:layout_marginTop="285dp"
                 android:rotation="270"
                 android:src="@android:drawable/arrow_down_float"
                 android:tint="?attr/bb_primaryText"
@@ -202,7 +206,7 @@
                 android:id="@+id/tvEnableNotifications"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="40dp"
+                android:layout_marginTop="30dp"
                 android:text="Enable Notifications"
                 android:textColor="?attr/bb_primaryText"
                 android:textSize="18dp"
@@ -235,7 +239,7 @@
                 android:id="@+id/tvExcludeFromTotal"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="40dp"
+                android:layout_marginTop="30dp"
                 android:text="Exclude from Total"
                 android:textColor="?attr/bb_primaryText"
                 android:textSize="18dp"
