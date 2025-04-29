@@ -41,7 +41,7 @@
         android:layout_marginStart="4dp"
         android:layout_marginTop="16dp"
         android:src="@android:drawable/ic_menu_view"
-        android:tint="?attr/bb_primaryText"
+        app:tint="?attr/bb_primaryText"
         app:layout_constraintStart_toEndOf="@+id/tvCurrencyTotal"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -100,7 +100,7 @@
                 android:paddingBottom="5dp"
                 android:rotation="270"
                 android:src="@android:drawable/arrow_down_float"
-                android:tint="?attr/bb_primaryText"
+                app:tint="?attr/bb_primaryText"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -130,7 +130,7 @@
                 android:layout_width="70dp"
                 android:layout_height="70dp"
                 android:src="@drawable/ic_account_balance_wallet_24"
-                android:tint="?attr/bb_button"
+                app:tint="?attr/bb_button"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -178,7 +178,7 @@
                 android:layout_width="28dp"
                 android:layout_height="28dp"
                 android:rotation="270"
-                android:tint="?attr/bb_primaryText"
+                app:tint="?attr/bb_primaryText"
                 android:src="@android:drawable/arrow_down_float"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
