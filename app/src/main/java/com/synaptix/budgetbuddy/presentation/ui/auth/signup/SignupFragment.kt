@@ -7,8 +7,9 @@ import android.view.View
 import com.synaptix.budgetbuddy.presentation.ui.auth.AuthActivity
 import com.synaptix.budgetbuddy.R
 import com.synaptix.budgetbuddy.databinding.FragmentSignupBinding
+import dagger.hilt.android.AndroidEntryPoint
 
-
+@AndroidEntryPoint
 class SignupFragment : Fragment(R.layout.fragment_signup) {
 
     private lateinit var binding: FragmentSignupBinding
