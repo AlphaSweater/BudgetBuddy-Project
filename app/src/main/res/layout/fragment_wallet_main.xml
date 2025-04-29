@@ -2,7 +2,6 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/frameLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="?attr/bb_background"
@@ -10,10 +9,10 @@
     tools:context=".ui.wallet.WalletMainFragment">
 
     <TextView
-        android:id="@+id/textView_currency_total2"
+        android:id="@+id/textViewCurrency"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="132dp"
+        android:layout_marginStart="124dp"
         android:layout_marginTop="16dp"
         android:text="ZAR"
         android:textColor="?attr/bb_primaryText"
@@ -26,22 +25,23 @@
         android:id="@+id/textView_currency_total"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="186dp"
+        android:layout_marginStart="4dp"
         android:layout_marginTop="16dp"
         android:text="12,200"
         android:textColor="?attr/bb_profit"
         android:textSize="26sp"
         android:textStyle="bold"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/textViewCurrency"
         app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
         android:id="@+id/imageView_eye"
         android:layout_width="47dp"
         android:layout_height="36dp"
+        android:layout_marginStart="4dp"
         android:layout_marginTop="16dp"
-        android:tint="?attr/bb_primaryText"
         android:src="@android:drawable/ic_menu_view"
+        android:tint="?attr/bb_primaryText"
         app:layout_constraintStart_toEndOf="@+id/textView_currency_total"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -57,34 +57,18 @@
         app:layout_constraintTop_toBottomOf="@+id/textView_currency_total" />
 
     <androidx.cardview.widget.CardView
-        android:id="@+id/cardview_graph"
-        android:layout_width="0dp"
-        android:layout_height="330dp"
-        android:layout_marginTop="90dp"
-        android:backgroundTint="?attr/bb_surface"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:padding="16dp" />
-    </androidx.cardview.widget.CardView>
-
-    <androidx.cardview.widget.CardView
         android:id="@+id/cardView_overview"
         android:layout_width="200dp"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="16dp"
-        android:layout_marginTop="440dp"
+        android:layout_marginTop="60dp"
         android:backgroundTint="?attr/bb_surface"
         android:padding="12dp"
         app:cardCornerRadius="16dp"
         app:cardElevation="4dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toBottomOf="@+id/textView_currency_total">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -115,8 +99,8 @@
                 android:paddingTop="5dp"
                 android:paddingBottom="5dp"
                 android:rotation="270"
-                android:tint="?attr/bb_primaryText"
                 android:src="@android:drawable/arrow_down_float"
+                android:tint="?attr/bb_primaryText"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />

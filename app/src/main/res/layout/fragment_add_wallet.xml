@@ -193,7 +193,7 @@
                 android:id="@+id/arrowIcon1"
                 android:layout_width="28dp"
                 android:layout_height="28dp"
-                android:layout_marginStart="250dp"
+                android:layout_marginStart="255dp"
                 android:layout_marginTop="285dp"
                 android:rotation="270"
                 android:src="@android:drawable/arrow_down_float"
