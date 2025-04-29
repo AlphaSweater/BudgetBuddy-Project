@@ -1,8 +1,7 @@
-package com.synaptix.budgetbuddy.presentation.ui.auth.signup
+package com.synaptix.budgetbuddy.data.entity
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.synaptix.budgetbuddy.core.model.User
 import com.synaptix.budgetbuddy.core.usecase.auth.SignUpUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -13,7 +12,7 @@ class SignupViewModel @Inject constructor(
     private val signUpUseCase: SignUpUseCase
 ): ViewModel() {
     fun signUp(email: String, password: String) {
-        val user = User(
+        val userEntity = UserEntity(
             userId = 0,
             name = null,
             surname = null,
@@ -22,7 +21,7 @@ class SignupViewModel @Inject constructor(
         )
 
         viewModelScope.launch {
-            val result = signUpUseCase.execute(user)
+            val result = signUpUseCase.execute(userEntity)
         }
     }
 

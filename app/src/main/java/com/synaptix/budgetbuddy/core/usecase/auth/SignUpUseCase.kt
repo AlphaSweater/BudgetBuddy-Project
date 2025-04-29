@@ -1,8 +1,8 @@
 package com.synaptix.budgetbuddy.core.usecase.auth
 
 
-import com.synaptix.budgetbuddy.data.entity.UserDao
-import com.synaptix.budgetbuddy.data.local.UserEntity
+import com.synaptix.budgetbuddy.data.local.UserDao
+import com.synaptix.budgetbuddy.data.entity.UserEntity
 import javax.inject.Inject
 
 //AI assisted with the injection logic

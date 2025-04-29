@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".presentation.ui.auth.signup.SignupFragment">
+    tools:context=".data.local.signup.SignupFragment">
 
     <ImageButton
         android:id="@+id/btn_back_signup"
