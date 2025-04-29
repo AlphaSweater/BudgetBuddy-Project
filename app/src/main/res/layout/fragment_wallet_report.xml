@@ -10,7 +10,7 @@
     <!-- Top Balance Header -->
 
     <TextView
-        android:id="@+id/textViewCurrency"
+        android:id="@+id/tvCurrency"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="134dp"
@@ -23,7 +23,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/textView_currency_total"
+        android:id="@+id/tvCurrencyTotal"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="186dp"
@@ -36,13 +36,13 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
-        android:id="@+id/imageView_eye"
+        android:id="@+id/ivEye"
         android:layout_width="47dp"
         android:layout_height="36dp"
         android:layout_marginTop="16dp"
         android:tint="?attr/bb_primaryText"
         android:src="@android:drawable/ic_menu_view"
-        app:layout_constraintStart_toEndOf="@+id/textView_currency_total"
+        app:layout_constraintStart_toEndOf="@+id/tvCurrencyTotal"
         app:layout_constraintTop_toTopOf="parent" />
 
     <!-- Filter Spinners -->
@@ -50,7 +50,7 @@
     <!-- Date Filter Tabs -->
 
     <TextView
-        android:id="@+id/textView_total_balance"
+        android:id="@+id/tvTotalBalance"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="180dp"
@@ -58,7 +58,7 @@
         android:textColor="?attr/bb_secondaryText"
         android:textSize="18sp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView_currency_total" />
+        app:layout_constraintTop_toBottomOf="@+id/tvCurrencyTotal" />
 
     <LinearLayout
         android:id="@+id/filter_container"
@@ -70,7 +70,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/textView_currency_total">
+        app:layout_constraintTop_toBottomOf="@id/tvCurrencyTotal">
 
         <Spinner
             android:id="@+id/spinner_wallet"

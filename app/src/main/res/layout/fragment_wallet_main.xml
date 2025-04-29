@@ -9,7 +9,7 @@
     tools:context=".ui.wallet.WalletMainFragment">
 
     <TextView
-        android:id="@+id/textViewCurrency"
+        android:id="@+id/tvCurrency"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="124dp"
@@ -22,7 +22,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/textView_currency_total"
+        android:id="@+id/tvCurrencyTotal"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="4dp"
@@ -31,22 +31,22 @@
         android:textColor="?attr/bb_profit"
         android:textSize="26sp"
         android:textStyle="bold"
-        app:layout_constraintStart_toEndOf="@+id/textViewCurrency"
+        app:layout_constraintStart_toEndOf="@+id/tvCurrency"
         app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
-        android:id="@+id/imageView_eye"
+        android:id="@+id/ivEye"
         android:layout_width="47dp"
         android:layout_height="36dp"
         android:layout_marginStart="4dp"
         android:layout_marginTop="16dp"
         android:src="@android:drawable/ic_menu_view"
         android:tint="?attr/bb_primaryText"
-        app:layout_constraintStart_toEndOf="@+id/textView_currency_total"
+        app:layout_constraintStart_toEndOf="@+id/tvCurrencyTotal"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/textView_total_balance"
+        android:id="@+id/tvTotalBalance"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="156dp"
@@ -54,7 +54,7 @@
         android:textColor="?attr/bb_secondaryText"
         android:textSize="18sp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView_currency_total" />
+        app:layout_constraintTop_toBottomOf="@+id/tvCurrencyTotal" />
 
     <androidx.cardview.widget.CardView
         android:id="@+id/cardView_overview"
@@ -68,14 +68,14 @@
         app:cardElevation="4dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView_currency_total">
+        app:layout_constraintTop_toBottomOf="@+id/tvCurrencyTotal">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
             <TextView
-                android:id="@+id/textView_spending_overview"
+                android:id="@+id/tvSpendingOverview"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingTop="5dp"
@@ -135,7 +135,7 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
-                android:id="@+id/walletName1"
+                android:id="@+id/tvWalletName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="50dp"
@@ -148,7 +148,7 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
-                android:id="@+id/textView_currency1"
+                android:id="@+id/tvCurrency1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="50dp"
@@ -158,10 +158,10 @@
                 android:textSize="26sp"
                 android:textStyle="bold"
                 app:layout_constraintStart_toEndOf="@id/walletIcon1"
-                app:layout_constraintTop_toBottomOf="@id/walletName1" />
+                app:layout_constraintTop_toBottomOf="@id/tvWalletName" />
 
             <TextView
-                android:id="@+id/textView_wallet_amount1"
+                android:id="@+id/tvWalletAmount"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="105dp"
@@ -171,7 +171,7 @@
                 android:textSize="26sp"
                 android:textStyle="bold"
                 app:layout_constraintStart_toEndOf="@id/walletIcon1"
-                app:layout_constraintTop_toBottomOf="@id/walletName1" />
+                app:layout_constraintTop_toBottomOf="@id/tvWalletName" />
 
             <ImageView
                 android:id="@+id/arrowIcon2"
@@ -188,7 +188,7 @@
 
 
         <Button
-            android:id="@+id/button_add"
+            android:id="@+id/buttonAdd"
             android:layout_width="50dp"
             android:layout_height="60dp"
             android:layout_marginEnd="20dp"
@@ -198,13 +198,13 @@
             tools:layout_editor_absoluteY="812dp" />
 
         <ImageView
-            android:id="@+id/imageView3"
+            android:id="@+id/ivAddButton"
             android:layout_width="30dp"
             android:layout_height="30dp"
             android:src="@android:drawable/ic_input_add"
-            app:layout_constraintBottom_toBottomOf="@+id/button_add"
-            app:layout_constraintEnd_toEndOf="@+id/button_add"
-            app:layout_constraintStart_toStartOf="@+id/button_add"
-            app:layout_constraintTop_toTopOf="@+id/button_add" />
+            app:layout_constraintBottom_toBottomOf="@+id/buttonAdd"
+            app:layout_constraintEnd_toEndOf="@+id/buttonAdd"
+            app:layout_constraintStart_toStartOf="@+id/buttonAdd"
+            app:layout_constraintTop_toTopOf="@+id/buttonAdd" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
