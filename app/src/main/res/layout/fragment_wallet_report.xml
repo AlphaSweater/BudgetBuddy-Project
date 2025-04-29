@@ -10,7 +10,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/headerContainer"
         android:layout_width="0dp"
-        android:layout_height="70dp"
+        android:layout_height="180dp"
         android:background="?attr/bb_surface"
         android:paddingStart="16dp"
         android:paddingEnd="16dp"
@@ -22,9 +22,9 @@
             android:id="@+id/btnBackTransaction"
             android:layout_width="44dp"
             android:layout_height="44dp"
+            android:layout_marginTop="12dp"
             android:background="@null"
             android:src="?attr/actionModeCloseDrawable"
-            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:tint="?attr/bb_primaryText"
@@ -34,7 +34,7 @@
             android:id="@+id/tvCurrency"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="134dp"
+            android:layout_marginStart="105dp"
             android:layout_marginTop="16dp"
             android:text="ZAR"
             android:textColor="?attr/bb_primaryText"
@@ -47,19 +47,20 @@
             android:id="@+id/tvCurrencyTotal"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="186dp"
+            android:layout_marginStart="6dp"
             android:layout_marginTop="16dp"
             android:text="12,200"
             android:textColor="?attr/bb_profit"
             android:textSize="26sp"
             android:textStyle="bold"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/tvCurrency"
             app:layout_constraintTop_toTopOf="parent" />
 
         <ImageView
             android:id="@+id/ivEye"
             android:layout_width="47dp"
             android:layout_height="36dp"
+            android:layout_marginStart="6dp"
             android:layout_marginTop="16dp"
             android:src="@android:drawable/ic_menu_view"
             app:layout_constraintStart_toEndOf="@+id/tvCurrencyTotal"
@@ -71,7 +72,8 @@
             android:id="@+id/tvTotalBalance"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="180dp"
+            android:layout_marginStart="165dp"
+            android:layout_marginTop="4dp"
             android:text="Balance"
             android:textColor="?attr/bb_secondaryText"
             android:textSize="18sp"
@@ -83,13 +85,13 @@
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="100dp"
+        android:layout_marginTop="90dp"
         android:gravity="center"
         android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvTotalBalance">
+        app:layout_constraintTop_toTopOf="@+id/headerContainer">
 
         <androidx.cardview.widget.CardView
             android:layout_width="wrap_content"
@@ -103,6 +105,7 @@
             <RelativeLayout
                 android:layout_width="130dp"
                 android:layout_height="40dp"
+                android:background="?attr/bb_background"
                 android:gravity="center_vertical"
                 android:paddingStart="8dp"
                 android:paddingEnd="8dp">
@@ -126,12 +129,13 @@
                     android:layout_marginEnd="8dp"
                     android:layout_toStartOf="@id/arrowIcon1"
                     android:layout_toEndOf="@id/ivWalletIcon"
-                    android:background="@android:color/transparent"
+                    android:backgroundTint="?attr/bb_background"
                     android:entries="@array/wallets_array"
                     android:gravity="center_vertical"
                     android:popupBackground="@android:color/white"
                     android:spinnerMode="dropdown"
-                    android:textAlignment="center" />
+                    android:textAlignment="center"
+                    android:text="?attr/bb_expense" />
 
                 <!-- Right Arrow Icon -->
                 <ImageView
@@ -169,6 +173,7 @@
                     android:gravity="center_vertical"
                     android:paddingStart="16dp"
                     android:paddingEnd="36dp"
+                    android:backgroundTint="?attr/bb_background"
                     android:popupBackground="@android:color/white"
                     android:spinnerMode="dropdown"
                     android:textAlignment="center" />
