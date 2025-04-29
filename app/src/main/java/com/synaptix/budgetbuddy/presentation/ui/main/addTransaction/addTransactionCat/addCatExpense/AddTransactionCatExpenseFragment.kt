@@ -1,22 +1,21 @@
-package com.synaptix.budgetbuddy.presentation.ui.main.addTransaction.addTransactionCat
+package com.synaptix.budgetbuddy.presentation.ui.main.addTransaction.addTransactionCat.addCatExpense
 
-import androidx.fragment.app.viewModels
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.LinearLayout
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import com.synaptix.budgetbuddy.R
+import com.synaptix.budgetbuddy.presentation.ui.main.addTransaction.addTransactionCat.addCatExpense.AddTransactionCatExpenseViewModel
 
-class AddTransactionCatFragment : Fragment() {
+class AddTransactionCatExpenseFragment : Fragment() {
 
     companion object {
-        fun newInstance() = AddTransactionCatFragment()
+        fun newInstance() = AddTransactionCatExpenseFragment()
     }
 
-    private val viewModel: AddTransactionCatViewModel by viewModels()
+    private val viewModel: AddTransactionCatExpenseViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -27,7 +26,7 @@ class AddTransactionCatFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        return inflater.inflate(R.layout.fragment_add_transaction_cat, container, false)
+        return inflater.inflate(R.layout.fragment_add_transaction_cat_expense, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

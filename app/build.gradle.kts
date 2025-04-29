@@ -3,6 +3,9 @@ plugins {
     alias(libs.plugins.kotlin.android)
     id("kotlin-kapt")
     id("dagger.hilt.android.plugin")
+    id("com.google.devtools.ksp") version "2.0.21-1.0.27"
+
+
 }
 
 android {
@@ -58,6 +61,11 @@ dependencies {
     // Hilt dependencies
     implementation(libs.hilt.android)
     kapt(libs.dagger.hilt.compiler)
+
+    //roomDB dependencies
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
+    ksp(libs.androidx.room.compiler)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
