@@ -70,7 +70,7 @@
                 android:id="@+id/rowSelectWalletName"
                 style="@style/RowStyle"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" >
+                app:layout_constraintTop_toTopOf="parent">
 
                 <ImageView
                     android:id="@+id/ivWalletIcon"
@@ -121,8 +121,7 @@
                         android:layout_height="wrap_content"
                         android:text="Currency"
                         android:textColor="?attr/bb_primaryText"
-                        android:textSize="14dp"
-                        app:layout_c="parent" />
+                        android:textSize="14dp" />
 
                     <EditText
                         android:id="@+id/edtCurrency"
@@ -164,8 +163,7 @@
                         android:layout_height="wrap_content"
                         android:text="Initial Amount"
                         android:textColor="?attr/bb_primaryText"
-                        android:textSize="14dp"
-                        app:layout_c="parent" />
+                        android:textSize="14dp" />
 
                     <EditText
                         android:id="@+id/edtInitialAmount"
