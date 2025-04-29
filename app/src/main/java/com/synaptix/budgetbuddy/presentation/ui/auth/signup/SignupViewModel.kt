@@ -12,6 +12,8 @@ import javax.inject.Inject
 class SignupViewModel @Inject constructor(
     private val signUpUseCase: SignUpUseCase
 ): ViewModel() {
+    //function that instantiates the UserEntity object
+    //takes email and password from the viewModel
     fun signUp(email: String, password: String) {
         val userEntity = UserEntity(
             user_id = 0,
@@ -21,6 +23,7 @@ class SignupViewModel @Inject constructor(
             password = password
         )
 
+        // Call the use case to sign up the user
         viewModelScope.launch {
             val result = signUpUseCase.execute(userEntity)
         }

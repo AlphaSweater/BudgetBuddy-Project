@@ -32,8 +32,7 @@ class SignupFragment : Fragment(R.layout.fragment_signup) {
             requireActivity().onBackPressedDispatcher.onBackPressed()
         }
 
-        // Inside onViewCreated in SignupFragment.kt
-
+       //binding data and passing data to viewModel
         binding.btnSignup.setOnClickListener {
             val email = binding.edtEmailAddress.text.toString()
             val password = binding.edtPassword.text.toString()
