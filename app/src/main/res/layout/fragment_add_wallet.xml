@@ -193,13 +193,13 @@
                 android:id="@+id/arrowIcon1"
                 android:layout_width="28dp"
                 android:layout_height="28dp"
-                android:layout_marginStart="5dp"
+                android:layout_marginStart="250dp"
                 android:layout_marginTop="285dp"
                 android:rotation="270"
                 android:src="@android:drawable/arrow_down_float"
                 android:tint="?attr/bb_primaryText"
                 app:layout_constraintStart_toEndOf="@+id/tvShareWallet"
-                app:layout_constraintStart_toSOf="@id/tvShareWallet"
+                app:layout_constraintStart_toStartOf="@id/tvShareWallet"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <TextView

@@ -145,7 +145,8 @@
                 android:id="@+id/walletIcon1"
                 android:layout_width="70dp"
                 android:layout_height="70dp"
-                android:src="@drawable/ic_wallet"
+                android:src="@drawable/ic_account_balance_wallet_24"
+                android:tint="?attr/bb_button"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
