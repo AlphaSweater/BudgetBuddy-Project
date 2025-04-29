@@ -2,18 +2,18 @@ package com.synaptix.budgetbuddy.presentation.ui.main.addTransaction
 
 import android.app.DatePickerDialog
 import android.icu.util.Calendar
-import com.synaptix.budgetbuddy.R
 import android.os.Bundle
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.Toast
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
+import com.synaptix.budgetbuddy.R
 import com.synaptix.budgetbuddy.databinding.FragmentAddTransactionBinding
-import com.synaptix.budgetbuddy.presentation.ui.main.addTransaction.labelSelectorDialog.LabelSelectorDialogFragment
 import com.synaptix.budgetbuddy.ui.recurrence.RecurrenceBottomSheet
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -25,6 +25,7 @@ class AddTransactionFragment : Fragment() {
 
     private val viewModel: AddTransactionViewModel by viewModels()
 
+    // --- Lifecycle ---
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -36,13 +37,23 @@ class AddTransactionFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         setupUI()
         observeViewModel()
+        setupFragmentResultListener()
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+
+    // --- Setup Methods ---
     private fun setupUI() {
-        //spinner (dropbox) set up
+        setupCurrencySpinner()
+        setupClickListeners()
+    }
+
+    private fun setupCurrencySpinner() {
         val adapter = ArrayAdapter(
             requireContext(),
             R.layout.spinner_item,
@@ -50,108 +61,107 @@ class AddTransactionFragment : Fragment() {
         )
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         binding.spinnerCurrency.adapter = adapter
+    }
 
-        // Show bottom sheet when recurrence button is clicked
+    private fun setupClickListeners() {
         binding.rowSelectRecurrenceRate.setOnClickListener {
             RecurrenceBottomSheet().show(parentFragmentManager, "RecurrenceBottomSheet")
         }
 
-        // show bottom sheet when label button is clicked
         binding.rowSelectLabel.setOnClickListener {
-            showLabelSelector() // <- we’ll make this next
+            showLabelSelector()
         }
 
-        //Direct to another fragment AddTransactionCat
         binding.rowSelectCategory.setOnClickListener {
-
+            // TODO: Navigate to category selector
         }
 
         val openDatePicker = {
             val calendar = Calendar.getInstance()
-            val year = calendar.get(Calendar.YEAR)
-            val month = calendar.get(Calendar.MONTH)
-            val day = calendar.get(Calendar.DAY_OF_MONTH)
-
             val datePickerDialog = DatePickerDialog(
                 requireContext(),
                 R.style.CustomDatePickerDialog,
-                { _, selectedYear, selectedMonth, selectedDay ->
-                    val formattedDate = "$selectedDay/${selectedMonth + 1}/$selectedYear"
+                { _, year, month, dayOfMonth ->
+                    val formattedDate = "$dayOfMonth/${month + 1}/$year"
                     binding.edtTextDate.setText(formattedDate)
                 },
-                year, month, day
+                calendar.get(Calendar.YEAR),
+                calendar.get(Calendar.MONTH),
+                calendar.get(Calendar.DAY_OF_MONTH)
             )
             datePickerDialog.show()
         }
 
-        binding.rowSelectDate.setOnClickListener {
-            openDatePicker()
-        }
+        binding.rowSelectDate.setOnClickListener { openDatePicker() }
+        binding.edtTextDate.setOnClickListener { openDatePicker() }
 
-        binding.edtTextDate.setOnClickListener {
-            openDatePicker()
-        }
+        binding.btnSave.setOnClickListener { saveTransaction() }
+    }
 
-        binding.btnSave.setOnClickListener {
-            val category = "Test Category" // Replace with actual category
-            viewModel.category.value = category;
-
-            val walletId = "Test Wallet" // Replace with actual wallet
-            viewModel.walletId.value  = walletId;
-
-            val currencyType = "Test Currency" // Replace with actual currency type;
-            viewModel.currency.value  = currencyType;
-
-            val amount = binding.edtTextAmount.text.toString().toDoubleOrNull() ?: 0.0
-            viewModel.amount.value = amount;
-
-            val date = binding.edtTextDate.text.toString()
-            viewModel.date.value  = date;
-
-            val note = binding.edtTextNote.text.toString()
-            viewModel.note.value  = note;
-
-            val labels = listOf("Label1", "Label2") // Replace with actual labels
-            viewModel.labels.value  = labels;
-
-            val photo = "Test Photo" // Replace with actual photo
-            viewModel.photo.value  = photo;
-
-            val recurrenceRate = "Weekly" // Replace with actual recurrence rate
-            viewModel.recurrenceRate.value  = recurrenceRate;
-
-            // Validation
-            if (category.isBlank() || walletId.isBlank() || currencyType.isBlank() || amount <= 0.0 || date.toString().isBlank()) {
-                Toast.makeText(requireContext(), "Please fill in all required fields correctly.", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-
-            viewModel.addTransaction()
-            Toast.makeText(requireContext(), "Transaction saved successfully!", Toast.LENGTH_SHORT).show()
+    private fun setupFragmentResultListener() {
+        parentFragmentManager.setFragmentResultListener(
+            "labelSelectorResult",
+            viewLifecycleOwner
+        ) { _, bundle ->
+            val selectedLabels = bundle.getStringArrayList("selectedLabels") ?: arrayListOf()
+            viewModel.labels.value = selectedLabels
         }
     }
 
+    // --- Save Logic ---
+    private fun saveTransaction() {
+        // TODO: Replace with actual data from UI
+        viewModel.category.value = "Test Category"
+        viewModel.walletId.value = "Test Wallet"
+        viewModel.currency.value = "Test Currency"
+
+        val amount = binding.edtTextAmount.text.toString().toDoubleOrNull() ?: 0.0
+        viewModel.amount.value = amount
+
+        val date = binding.edtTextDate.text.toString()
+        viewModel.date.value = date
+
+        viewModel.note.value = binding.edtTextNote.text.toString()
+        viewModel.labels.value = listOf("Label1", "Label2") // Replace with actual labels
+        viewModel.photo.value = "Test Photo" // Replace with actual photo
+        viewModel.recurrenceRate.value = "Weekly" // Replace with actual rate
+
+        // Validate input
+        if (viewModel.category.value.isNullOrBlank() ||
+            viewModel.walletId.value.isNullOrBlank() ||
+            viewModel.currency.value.isNullOrBlank() ||
+            amount <= 0.0 ||
+            date.isBlank()
+        ) {
+            Toast.makeText(
+                requireContext(),
+                "Please fill in all required fields correctly.",
+                Toast.LENGTH_SHORT
+            ).show()
+            return
+        }
+
+        viewModel.addTransaction()
+        Toast.makeText(requireContext(), "Transaction saved successfully!", Toast.LENGTH_SHORT).show()
+    }
+
+    // --- Label Navigation ---
     private fun showLabelSelector() {
         val currentLabels = viewModel.labels.value ?: emptyList()
-        val dialog = LabelSelectorDialogFragment.newInstance(currentLabels)
-
-        dialog.setOnLabelsSelected { selected ->
-            viewModel.labels.value = selected
+        val bundle = Bundle().apply {
+            putStringArrayList("currentLabels", ArrayList(currentLabels))
         }
-
-        dialog.show(parentFragmentManager, "LabelSelector")
+        findNavController().navigate(
+            R.id.action_addTransactionFragment_to_labelSelectorFragment,
+            bundle
+        )
     }
 
-
+    // --- Observers ---
     private fun observeViewModel() {
         viewModel.labels.observe(viewLifecycleOwner) { selectedLabels ->
-            // TODO: show chips or comma-separated labels somewhere
             Log.d("Labels", selectedLabels.toString())
+            // TODO: Show labels as chips or in a list
         }
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
     }
 }

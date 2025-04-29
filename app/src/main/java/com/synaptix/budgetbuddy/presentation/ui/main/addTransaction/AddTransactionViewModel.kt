@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModel
 import com.synaptix.budgetbuddy.core.model.Transaction
 import java.util.UUID
 import com.synaptix.budgetbuddy.core.usecase.AddTransactionUseCase
+import com.synaptix.budgetbuddy.presentation.ui.main.addTransaction.labelSelector.Label
 
 @HiltViewModel
 class AddTransactionViewModel @Inject constructor(
@@ -20,7 +21,7 @@ class AddTransactionViewModel @Inject constructor(
     val amount = MutableLiveData<Double>()
     val date = MutableLiveData<String>()
     val note = MutableLiveData<String?>()
-    val labels = MutableLiveData<List<String>>(emptyList())
+    val labels = MutableLiveData<List<Label>>(emptyList())
     val photo = MutableLiveData<String?>()
     val recurrenceRate = MutableLiveData<String?>()
 
