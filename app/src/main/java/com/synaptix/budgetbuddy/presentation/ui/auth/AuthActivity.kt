@@ -9,7 +9,9 @@ import com.synaptix.budgetbuddy.presentation.ui.auth.landing.LandingFragment
 import com.synaptix.budgetbuddy.presentation.ui.auth.login.LoginFragment
 import com.synaptix.budgetbuddy.presentation.ui.auth.signup.SignupFragment
 import com.synaptix.budgetbuddy.presentation.ui.main.MainActivity
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class AuthActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityAuthBinding

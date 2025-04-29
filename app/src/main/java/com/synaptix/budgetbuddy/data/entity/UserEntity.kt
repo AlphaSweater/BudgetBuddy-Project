@@ -1,4 +1,4 @@
-package com.synaptix.budgetbuddy.data.local
+package com.synaptix.budgetbuddy.data.entity
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
@@ -8,8 +8,8 @@ import androidx.room.PrimaryKey
 )
 data class UserEntity (
     @PrimaryKey(autoGenerate = true) val user_id: Int,
-    val name: String,
-    val surname: String,
+    val name: String?,
+    val surname: String?,
     val email: String,
     val password: String
 )
