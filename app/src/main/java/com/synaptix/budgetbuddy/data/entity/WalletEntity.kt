@@ -1,4 +1,4 @@
-package com.synaptix.budgetbuddy.data.local
+package com.synaptix.budgetbuddy.data.entity
 
 import androidx.room.Entity
 import androidx.room.ForeignKey
@@ -18,5 +18,6 @@ import androidx.room.PrimaryKey
 data class WalletEntity (
     @PrimaryKey(autoGenerate = true) val wallet_id: Int,
     val user_id: Int,
-    val name: String
+    val name: String,
+    val currency: String
 )

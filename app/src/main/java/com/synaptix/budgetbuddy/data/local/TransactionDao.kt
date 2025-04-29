@@ -1,10 +1,10 @@
-package com.synaptix.budgetbuddy.data.entity
+package com.synaptix.budgetbuddy.data.local
 
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.synaptix.budgetbuddy.data.local.TransactionEntity
+import com.synaptix.budgetbuddy.data.entity.TransactionEntity
 
 @Dao
 interface TransactionDao {

@@ -1,4 +1,4 @@
-package com.synaptix.budgetbuddy.data.local
+package com.synaptix.budgetbuddy.data.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
