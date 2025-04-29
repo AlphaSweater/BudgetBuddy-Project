@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.auth.landing.LandingFragment">
+    tools:context=".presentation.ui.auth.landing.LandingFragment">
 
     <TextView
         android:id="@+id/lblBuddyBuddy"

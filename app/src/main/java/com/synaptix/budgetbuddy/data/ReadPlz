@@ -1,0 +1,91 @@
+
+📁 data/ — Data Layer Documentation (Budgeting App)
+This layer is in charge of how we store, fetch, and manage data — from databases, Firebase, files,
+    or even mock sources. It supports the app's logic (defined in core/) by giving it the data it needs.
+
+This is where you implement the how — meaning you write the actual code to get data from Room,
+    send stuff to Firebase, or cache results.
+
+📦 Common Structure
+data/
+├── repository/       # Implements the interfaces (contracts) from core
+├── local/            # Room DB, DAOs, and mappers
+├── remote/           # Firebase or other future APIs
+└── model/            # Database-specific or API-specific models (if needed)
+
+
+----------------------------------------------------------------------------------------------------
+📁 repository/
+Purpose: Implements the interfaces defined in core (BudgetRepository, etc.)
+Think of it like the middleman between your app’s logic and your data sources (Room, Firebase, etc.)
+
+Example:
+    class BudgetRepositoryImpl(
+        private val budgetDao: BudgetDao,
+        private val expenseDao: ExpenseDao
+    ) : BudgetRepository {
+
+        override suspend fun getBudgetForMonth(month: String): Budget {
+            return budgetDao.getBudget(month).toDomain()
+        }
+
+        override suspend fun getExpensesForMonth(month: String): List<Expense> {
+            return expenseDao.getExpensesForMonth(month).map { it.toDomain() }
+        }
+    }
+
+Note: toDomain() is a mapper function to convert from database model to core model.
+
+
+----------------------------------------------------------------------------------------------------
+📁 local/
+Purpose: This is where RoomDB lives. Define your entities, DAOs, and Room database class here.
+
+Example:
+    ExpenseEntity.kt
+        @Entity
+        data class ExpenseEntity(
+            @PrimaryKey val id: String,
+            val amount: Double,
+            val category: String,
+            val timestamp: Long
+        )
+
+    ExpenseDao.kt
+        @Dao
+        interface ExpenseDao {
+            @Query("SELECT * FROM ExpenseEntity WHERE month = :month")
+            suspend fun getExpensesForMonth(month: String): List<ExpenseEntity>
+        }
+
+    Mapper (in a separate file or mapper.kt)
+        fun ExpenseEntity.toDomain(): Expense {
+            return Expense(id, amount, category, timestamp)
+        }
+
+
+----------------------------------------------------------------------------------------------------
+📁 remote/ (optional for now)
+Purpose: For Firebase or other API stuff. You’ll implement the "how" for saving/fetching data remotely.
+
+When we use Firebase later:
+    - Create FirebaseService classes here
+    - Handle Firestore/Realtime DB logic
+    - Convert data to and from core/model/
+
+
+----------------------------------------------------------------------------------------------------
+📁 model/ (optional, only if needed)
+Purpose: If your database or API uses different structures than your core models,
+    you define specific models here and map them to the core ones.
+
+
+----------------------------------------------------------------------------------------------------
+🧠 Key Concepts
+    - The data layer talks to the outside world (DBs, APIs, files)
+    - It implements the contracts (interfaces) from the core layer
+    - It translates between app logic (core/model) and database formats (data/local/model)
+
+🔄 Bonus Tip: Why the mapping?
+Let’s say Firebase or Room has a different format than your app logic expects — you don’t want
+    those tech-specific details to "leak" into your core logic. So we use mappers to translate between the two.

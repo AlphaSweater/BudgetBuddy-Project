@@ -1,0 +1,22 @@
+com.synaptix.budgetbuddy/
+│
+├── core/                    # 💡 Pure logic and business rules
+│   ├── model/               # 🧍 Clean models (no annotations!)
+│   ├── logic/               # 🧠 Calculation or processing logic
+│   └── usecase/             # 🎯 App actions (can call repo + logic)
+│
+├── data/                    # 🗄️ Data sources (Room, Firebase, etc.)
+│   ├── local/               # RoomDB: DAO, entities, database
+│   ├── repository/          # Implements logic to access DB
+│   └── mapper/              # Converts Entity ↔ Core Model
+│
+├── presentation/            # 🎨 View layer
+│   ├── ui/
+│   │   └── main/
+│   │       └──home/         # One folder per screen (fragment + viewmodel)
+│   │           ├── HomeFragment.kt
+│   │           └── HomeViewModel.kt
+│   └── components/          # Shared UI elements like custom views/adapters
+│
+└── di/                      # 🧪 Dependency injection (Hilt modules etc.)
+    └── AppModule.kt
