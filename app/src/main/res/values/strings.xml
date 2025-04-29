@@ -62,5 +62,16 @@
     <string name="write_a_note">Write a Note\n</string>">
     <!-- =========================================================== -->
 
-
+    <!-- ==================== Home Page ======================-->
+    <string name="my_wallet">My Wallets</string>
+    <string name="see_all">See All</string>
+    <string name="monthly_reports">Monthly Reports</string>
+    <string name="see_reports">See Reports</string>
+    <string name="spending_details">Spending Details</string>
+    <string name="see_details">See Details</string>
+    <string name="recent_transactions">Recent Transactions</string>
+    <string name="show_more">Show More</string>
+    <string name="week">Week</string>
+    <string name="month">Month</string>
+    <!-- =========================================================== -->
 </resources>
