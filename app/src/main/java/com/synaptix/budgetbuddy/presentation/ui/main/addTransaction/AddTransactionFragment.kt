@@ -1,6 +1,8 @@
 package com.synaptix.budgetbuddy.presentation.ui.main.addTransaction
 
 import android.app.DatePickerDialog
+import android.content.res.ColorStateList
+import android.graphics.Color
 import android.icu.util.Calendar
 import android.os.Bundle
 import android.util.Log
@@ -9,11 +11,15 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import com.google.android.material.chip.Chip
+import com.google.android.material.color.MaterialColors
 import com.synaptix.budgetbuddy.R
 import com.synaptix.budgetbuddy.databinding.FragmentAddTransactionBinding
+import com.synaptix.budgetbuddy.presentation.ui.main.addTransaction.labelSelector.Label
 import com.synaptix.budgetbuddy.ui.recurrence.RecurrenceBottomSheet
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -96,6 +102,8 @@ class AddTransactionFragment : Fragment() {
         binding.edtTextDate.setOnClickListener { openDatePicker() }
 
         binding.btnSave.setOnClickListener { saveTransaction() }
+
+        binding.btnGoBack.setOnClickListener { findNavController().popBackStack() }
     }
 
     private fun setupFragmentResultListener() {
@@ -103,10 +111,42 @@ class AddTransactionFragment : Fragment() {
             "labelSelectorResult",
             viewLifecycleOwner
         ) { _, bundle ->
-            val selectedLabels = bundle.getStringArrayList("selectedLabels") ?: arrayListOf()
+            @Suppress("DEPRECATION")
+            val selectedLabels = bundle.getSerializable("selectedLabels") as? ArrayList<Label> ?: arrayListOf()
             viewModel.labels.value = selectedLabels
         }
     }
+
+    private fun updateSelectedLabelChips(labels: List<Label>) {
+        val selectedLabels = labels.filter { it.isSelected }
+
+        val chipGroup = binding.chipGroupLabels
+        chipGroup.removeAllViews()
+
+        if (selectedLabels.isEmpty()) {
+            chipGroup.visibility = View.GONE
+            return
+        }
+
+        chipGroup.visibility = View.VISIBLE
+
+        selectedLabels.forEach { label ->
+            val chip = Chip(requireContext()).apply {
+                text = label.labelName
+                isClickable = false
+                isCheckable = false
+
+                // Resolve the color from the theme attribute
+                val chipBackgroundColor = MaterialColors.getColor(this.context, R.attr.bb_surfaceAlt, Color.TRANSPARENT)
+                setChipBackgroundColor(ColorStateList.valueOf(chipBackgroundColor))
+
+                val textColor = MaterialColors.getColor(this.context, R.attr.bb_primaryText, Color.TRANSPARENT)
+                setTextColor(textColor)
+            }
+            chipGroup.addView(chip)
+        }
+    }
+
 
     // --- Save Logic ---
     private fun saveTransaction() {
@@ -122,7 +162,6 @@ class AddTransactionFragment : Fragment() {
         viewModel.date.value = date
 
         viewModel.note.value = binding.edtTextNote.text.toString()
-        viewModel.labels.value = listOf("Label1", "Label2") // Replace with actual labels
         viewModel.photo.value = "Test Photo" // Replace with actual photo
         viewModel.recurrenceRate.value = "Weekly" // Replace with actual rate
 
@@ -149,7 +188,7 @@ class AddTransactionFragment : Fragment() {
     private fun showLabelSelector() {
         val currentLabels = viewModel.labels.value ?: emptyList()
         val bundle = Bundle().apply {
-            putStringArrayList("currentLabels", ArrayList(currentLabels))
+            putSerializable("currentLabels", ArrayList(viewModel.labels.value))
         }
         findNavController().navigate(
             R.id.action_addTransactionFragment_to_labelSelectorFragment,
@@ -161,6 +200,7 @@ class AddTransactionFragment : Fragment() {
     private fun observeViewModel() {
         viewModel.labels.observe(viewLifecycleOwner) { selectedLabels ->
             Log.d("Labels", selectedLabels.toString())
+            updateSelectedLabelChips(viewModel.labels.value?: emptyList())
             // TODO: Show labels as chips or in a list
         }
     }

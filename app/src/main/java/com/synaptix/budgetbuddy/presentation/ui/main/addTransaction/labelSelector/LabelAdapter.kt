@@ -7,6 +7,7 @@ import android.widget.CheckBox
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.synaptix.budgetbuddy.R
+import java.io.Serializable
 
 class LabelAdapter(
     private val labels: List<Label>,
@@ -55,4 +56,4 @@ data class Label(
     val labelName: String,
     val transactionInfo: String,
     var isSelected: Boolean = false
-)
+) : Serializable

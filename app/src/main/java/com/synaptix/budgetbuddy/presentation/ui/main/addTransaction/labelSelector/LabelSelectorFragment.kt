@@ -5,55 +5,70 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import com.synaptix.budgetbuddy.R
+import com.synaptix.budgetbuddy.databinding.FragmentLabelSelectorBinding
 
 class LabelSelectorFragment : Fragment() {
 
-    private lateinit var recyclerView: RecyclerView
-    private lateinit var adapter: LabelAdapter
+    private var _binding: FragmentLabelSelectorBinding? = null
+    private val binding get() = _binding!!
 
-    // Your base label names
+    private lateinit var labelAdapter: LabelAdapter
+
     private val baseLabelNames = listOf("Salary", "Gift", "Bonus", "Investment", "Cashback")
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? = inflater.inflate(R.layout.fragment_label_selector, container, false)
+    ): View {
+        _binding = FragmentLabelSelectorBinding.inflate(inflater, container, false)
+        return binding.root
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        setupRecyclerView()
+        setupOnClickListeners()
+    }
 
-        recyclerView = view.findViewById(R.id.recyclerViewLabels)
-
-        val previouslySelected = arguments?.getStringArrayList("currentLabels") ?: arrayListOf()
+    private fun setupRecyclerView() {
+        val selectedLabels = arguments?.getSerializable("currentLabels") as? ArrayList<Label> ?: arrayListOf()
 
         val labels = baseLabelNames.map { labelName ->
+            val isSelected = selectedLabels.any { it.labelName == labelName && it.isSelected }
             Label(
                 labelName = labelName,
                 transactionInfo = "0 transactions in 0 wallets",
-                isSelected = previouslySelected.contains(labelName)
+                isSelected = isSelected
             )
         }.toMutableList()
 
-        adapter = LabelAdapter(labels) {
-            // You can do live UI preview updates here if needed
+        labelAdapter = LabelAdapter(labels) {
+            // Optional: handle live preview updates
         }
 
-        recyclerView.layoutManager = LinearLayoutManager(requireContext())
-        recyclerView.adapter = adapter
+        binding.recyclerViewLabels.apply {
+            layoutManager = LinearLayoutManager(requireContext())
+            adapter = labelAdapter
+        }
+    }
+
+    private fun setupOnClickListeners() {
+        binding.btnGoBack.setOnClickListener {
+            findNavController().popBackStack()
+        }
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        val selected = ArrayList(
-            adapter.getSelectedLabels().map { it.labelName }
-        )
+        val selected = ArrayList(labelAdapter.getSelectedLabels())
         val result = Bundle().apply {
-            putStringArrayList("selectedLabels", selected)
+            putSerializable("selectedLabels", selected)
         }
         parentFragmentManager.setFragmentResult("labelSelectorResult", result)
+        _binding = null
     }
-}
 
+}

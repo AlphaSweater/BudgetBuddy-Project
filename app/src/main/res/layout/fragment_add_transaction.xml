@@ -9,19 +9,17 @@
     android:padding="16dp"
     tools:context=".presentation.ui.main.addTransaction.AddTransactionFragment">
 
-    <!-- Top Back Button -->
+    <!-- Back Button -->
     <ImageButton
-        android:id="@+id/btnBackTransaction"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="14dp"
-        android:layout_marginTop="14dp"
-        android:layout_marginEnd="307dp"
+        android:id="@+id/btnGoBack"
+        android:layout_width="44dp"
+        android:layout_height="44dp"
         android:background="@null"
         android:contentDescription="@string/back"
         android:src="?attr/actionModeCloseDrawable"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:tint="?attr/bb_primaryText" />
 
     <!-- Main Card -->
     <androidx.cardview.widget.CardView
@@ -33,7 +31,7 @@
         app:cardCornerRadius="20dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btnBackTransaction">
+        app:layout_constraintTop_toBottomOf="@+id/btnGoBack">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -180,31 +178,51 @@
             <!-- Label Row -->
             <LinearLayout
                 android:id="@+id/rowSelectLabel"
-                style="@style/RowStyle">
+                style="@style/RowStyle"
+                android:orientation="vertical">
 
-                <ImageView
-                    style="@style/RowIconStyle"
-                    android:src="@drawable/ic_discount_24"
-                    app:tint="?attr/bb_button" />
-
-                <TextView
-                    android:layout_width="0dp"
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="12dp"
-                    android:layout_weight="1"
-                    android:text="@string/label"
-                    android:textSize="18sp"
-                    android:textColor="?attr/bb_primaryText"
-                    android:gravity="center_vertical" />
+                    android:orientation="horizontal">
 
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:layout_marginStart="8dp"
-                    android:src="?attr/actionModeCloseDrawable"
-                    android:rotation="180"
-                    android:background="@null" />
+                    <ImageView
+                        style="@style/RowIconStyle"
+                        android:src="@drawable/ic_discount_24"
+                        app:tint="?attr/bb_button" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="12dp"
+                        android:layout_weight="1"
+                        android:text="@string/label"
+                        android:textSize="18sp"
+                        android:textColor="?attr/bb_primaryText"
+                        android:gravity="center_vertical" />
+
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_marginStart="8dp"
+                        android:src="?attr/actionModeCloseDrawable"
+                        android:rotation="180"
+                        android:background="@null" />
+                </LinearLayout>
+
+                <!-- Chip Group for Selected Labels -->
+                <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/chipGroupLabels"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginStart="48dp"
+                    android:layout_marginEnd="8dp"
+                    app:singleLine="false"
+                    app:chipSpacing="4dp"
+                    android:visibility="gone"/>
             </LinearLayout>
+
 
             <!-- Photo Row -->
             <LinearLayout
