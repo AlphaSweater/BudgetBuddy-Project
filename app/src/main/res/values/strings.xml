@@ -31,7 +31,7 @@
     <string name="calender">Calender</string>
     <string name="note">Write a Note</string>
     <string name="event">Select Event</string>
-    <string name="recurrence">Recurrence</string>
+    <string name="recurrence">Recurrence Rate</string>
     <string name="label">Label</string>
     <string name="set_reminder">Set Reminder</string>
     <string name="add_photo">Add a Photo</string>
@@ -53,7 +53,10 @@
     <string name="bonus">Bonus</string>
     <string name="investment">Investment</string>
     <string name="commission">Commission</string>">
-    <string name="Overtime">Overtime</string>">
+    <string name="Overtime">Overtime</string>
+    <string name="back">Back</string>
+    <string name="date">Date</string>
+    <string name="write_a_note">Write a Note\n</string>">
     <!-- =========================================================== -->
 
 

@@ -1,0 +1,15 @@
+package com.synaptix.budgetbuddy.core.model
+
+data class Transaction(
+    val userId: String,
+    val transactionId: String,
+    val walletId: String,
+    val category: String,
+    val currencyType: String,
+    val amount: Double,
+    val date: String,
+    val note: String?,
+    val labels: List<String>,
+    val photo: String?,
+    val recurrenceRate: String?
+)
