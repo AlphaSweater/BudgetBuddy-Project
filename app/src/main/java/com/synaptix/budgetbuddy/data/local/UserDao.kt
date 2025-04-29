@@ -15,4 +15,9 @@ interface UserDao {
     //sql query to grab a user based on user ID
     @Query("SELECT * FROM user_table WHERE user_id = :userId")
     suspend fun getUserById(userId: Int): UserEntity?
+
+    //sql query to grab a user based on email
+    @Query("SELECT * FROM user_table WHERE email = :email")
+    suspend fun getUserByEmail(email: String): UserEntity?
+
 }
