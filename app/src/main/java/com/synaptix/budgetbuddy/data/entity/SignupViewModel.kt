@@ -13,7 +13,7 @@ class SignupViewModel @Inject constructor(
 ): ViewModel() {
     fun signUp(email: String, password: String) {
         val userEntity = UserEntity(
-            userId = 0,
+            user_id = 0,
             name = null,
             surname = null,
             email = email,

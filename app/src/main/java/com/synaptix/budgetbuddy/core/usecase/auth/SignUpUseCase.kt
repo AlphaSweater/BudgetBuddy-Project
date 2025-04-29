@@ -10,6 +10,7 @@ class SignUpUseCase @Inject constructor(
     private val userDao: UserDao
 ) {
     suspend fun execute(user: UserEntity): Long {
+        println("User to be inserted: $user")
         return userDao.insert(user)
     }
 }
