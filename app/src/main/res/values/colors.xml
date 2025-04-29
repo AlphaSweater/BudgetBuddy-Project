@@ -32,7 +32,7 @@
     <!-- Text colours -->
     <color name="light_text">#05122d</color>
     <color name="light_link_blue">#67a8fb</color>
-    <color name="light_text_shaded">#040d1f</color>
+    <color name="light_text_shaded">#434343</color>
 
     <!-- Button colours -->
     <color name="light_button_selected">#59397f</color>
