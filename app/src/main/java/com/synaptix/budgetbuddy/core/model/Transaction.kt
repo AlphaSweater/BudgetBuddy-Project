@@ -9,7 +9,7 @@ data class Transaction(
     val amount: Double,
     val date: String,
     val note: String?,
-    val labels: List<String>,
+    val selectedLabels: List<Any?> = mutableListOf(),
     val photo: String?,
     val recurrenceRate: String?
 )

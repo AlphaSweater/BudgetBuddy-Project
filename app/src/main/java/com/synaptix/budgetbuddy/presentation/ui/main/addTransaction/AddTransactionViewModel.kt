@@ -2,7 +2,6 @@ package com.synaptix.budgetbuddy.presentation.ui.main.addTransaction
 
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 
 import androidx.lifecycle.ViewModel
@@ -15,31 +14,30 @@ class AddTransactionViewModel @Inject constructor(
     private val addTransactionUseCase: AddTransactionUseCase
 ) : ViewModel() {
 
-    fun addTransaction(
-        category: String,
-        walletId: String,
-        currencyType: String,
-        amount: Double,
-        date: String,
-        note: String?,
-        labels: List<String>,
-        photo: String?,
-        recurrenceRate: String?
-    ) {
-        val transaction = Transaction(
-            userId = "user123", // Replace with actual user ID
-            transactionId = UUID.randomUUID().toString(),
-            category = category,
-            walletId = walletId,
-            currencyType = currencyType,
-            amount = amount,
-            date = date,
-            note = note,
-            labels = labels,
-            photo = photo,
-            recurrenceRate = recurrenceRate
-        )
+    val category = MutableLiveData<String>()
+    val walletId = MutableLiveData<String>()
+    val currency = MutableLiveData<String>()
+    val amount = MutableLiveData<Double>()
+    val date = MutableLiveData<String>()
+    val note = MutableLiveData<String?>()
+    val labels = MutableLiveData<List<String>>(emptyList())
+    val photo = MutableLiveData<String?>()
+    val recurrenceRate = MutableLiveData<String?>()
 
+    fun addTransaction() {
+        val transaction = Transaction(
+            userId = "user123",
+            transactionId = UUID.randomUUID().toString(),
+            category = category.value ?: "",
+            walletId = walletId.value ?: "",
+            currencyType = currency.value ?: "",
+            amount = amount.value ?: 0.0,
+            date = date.value ?: "",
+            note = note.value,
+            selectedLabels = labels.value ?: emptyList(),
+            photo = photo.value,
+            recurrenceRate = recurrenceRate.value
+        )
         addTransactionUseCase.execute(transaction)
     }
 }
