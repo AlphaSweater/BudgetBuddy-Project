@@ -20,5 +20,4 @@
         <attr name="buttonBackground" format="reference|color" />
         <attr name="textColor" format="color" />
     </declare-styleable>
-
 </resources>
