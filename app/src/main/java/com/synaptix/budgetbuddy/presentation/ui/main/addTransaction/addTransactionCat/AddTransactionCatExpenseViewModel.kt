@@ -2,6 +2,6 @@ package com.synaptix.budgetbuddy.presentation.ui.main.addTransaction.addTransact
 
 import androidx.lifecycle.ViewModel
 
-class AddTransactionCatViewModel : ViewModel() {
+class AddTransactionCatExpenseViewModel : ViewModel() {
     // TODO: Implement the ViewModel
 }

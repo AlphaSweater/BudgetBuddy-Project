@@ -3,7 +3,6 @@ package com.synaptix.budgetbuddy.presentation.ui.main.addTransaction
 import android.app.DatePickerDialog
 import android.icu.util.Calendar
 import com.synaptix.budgetbuddy.R
-import androidx.fragment.app.viewModels
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -11,13 +10,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.EditText
-import android.widget.TextView
-import androidx.lifecycle.ViewModelProvider
 import com.synaptix.budgetbuddy.databinding.FragmentAddTransactionBinding
-import com.synaptix.budgetbuddy.presentation.ui.main.addTransaction.addTransactionCat.AddTransactionCatFragment
 import com.synaptix.budgetbuddy.presentation.ui.main.addTransaction.labelPopupBottomSheet.LabelBottomSheet
 import com.synaptix.budgetbuddy.ui.recurrence.RecurrenceBottomSheet
-import androidx.navigation.fragment.findNavController
 
 class AddTransactionFragment : Fragment() {
 
