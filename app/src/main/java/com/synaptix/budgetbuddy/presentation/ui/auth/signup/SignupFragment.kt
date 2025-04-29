@@ -8,6 +8,7 @@ import com.synaptix.budgetbuddy.presentation.ui.auth.AuthActivity
 import com.synaptix.budgetbuddy.R
 import com.synaptix.budgetbuddy.databinding.FragmentSignupBinding
 
+
 class SignupFragment : Fragment(R.layout.fragment_signup) {
 
     private lateinit var binding: FragmentSignupBinding
@@ -37,8 +38,8 @@ class SignupFragment : Fragment(R.layout.fragment_signup) {
             val password = binding.edtPassword.text.toString()
             val confirmPassword = binding.edtTxtPasswordConfirm.text.toString()
 
-            viewModel.Signup(email, password, confirmPassword)
-            viewModel.
+            viewModel.signUp(email, password)
+
         }
     }
 }
