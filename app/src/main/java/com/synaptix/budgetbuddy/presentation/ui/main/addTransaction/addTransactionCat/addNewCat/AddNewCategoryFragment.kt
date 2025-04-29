@@ -1,12 +1,13 @@
-package com.synaptix.budgetbuddy.presentation.ui.main.addTransaction.addTransactionCat
+package com.synaptix.budgetbuddy.presentation.ui.main.addTransaction.addTransactionCat.addNewCat
 
-import androidx.fragment.app.viewModels
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import com.synaptix.budgetbuddy.R
+import com.synaptix.budgetbuddy.presentation.ui.main.addTransaction.addTransactionCat.addNewCat.AddNewCategoryViewModel
 
 class AddNewCategoryFragment : Fragment() {
 
