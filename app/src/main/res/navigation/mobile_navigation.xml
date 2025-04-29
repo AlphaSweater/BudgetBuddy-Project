@@ -23,10 +23,27 @@
         android:label="@string/title_notifications"
         tools:layout="@layout/fragment_notifications" />
 
+    <!-- AddTransactionFragment -->
     <fragment
         android:id="@+id/navigation_add_transaction"
         android:name="com.synaptix.budgetbuddy.presentation.ui.main.addTransaction.AddTransactionFragment"
         android:label="@string/title_transaction"
-        tools:layout="@layout/fragment_add_transaction" />
+        tools:layout="@layout/fragment_add_transaction">
+
+        <action
+            android:id="@+id/action_addTransactionFragment_to_labelSelectorFragment"
+            app:destination="@id/navigation_label_selector"
+            app:enterAnim="@anim/slide_in_up"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/slide_out_down" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/navigation_label_selector"
+        android:name="com.synaptix.budgetbuddy.presentation.ui.main.addTransaction.labelSelector.LabelSelectorFragment"
+        android:label="Select Labels"
+        tools:layout="@layout/fragment_label_selector" />
+
 
 </navigation>

@@ -58,6 +58,9 @@ dependencies {
     implementation(libs.androidx.activity)
     implementation(libs.androidx.material3.android)
 
+    // Material Components
+    implementation(libs.material)
+
     // Hilt dependencies
     implementation(libs.hilt.android)
     kapt(libs.dagger.hilt.compiler)
