@@ -8,6 +8,7 @@
     <string name="title_notifications">Notifications</string>
     <string name="email">Email</string>
     <string name="password">Password</string>
+    <string name="save">Save</string>
     <!-- =========================================================== -->
 
     <!-- ============ Open, Sign In and Sign Up Strings ============-->
@@ -30,10 +31,33 @@
     <string name="calender">Calender</string>
     <string name="note">Write a Note</string>
     <string name="event">Select Event</string>
-    <string name="recurrence">Recurrence</string>
+    <string name="recurrence">Recurrence Rate</string>
     <string name="label">Label</string>
     <string name="set_reminder">Set Reminder</string>
     <string name="add_photo">Add a Photo</string>
+    <string name="select_currency">Select Currency</string>
     <!-- =========================================================== -->
+
+    <!-- ==================== Categories ======================-->
+    <!-- Expenses -->
+    <string name="food">Food</string>
+    <string name="entertainment">Entertainment</string>
+    <string name="transport">Transport</string>
+    <string name="shopping">Shopping</string>
+    <string name="education">Education</string>
+    <string name="health">Health</string>
+    <string name="rentMortgage">Rent/Mortgage</string>">
+
+    <!-- Income -->
+    <string name="salary">Salary</string>
+    <string name="bonus">Bonus</string>
+    <string name="investment">Investment</string>
+    <string name="commission">Commission</string>">
+    <string name="Overtime">Overtime</string>
+    <string name="back">Back</string>
+    <string name="date">Date</string>
+    <string name="write_a_note">Write a Note\n</string>">
+    <!-- =========================================================== -->
+
 
 </resources>
