@@ -45,6 +45,7 @@
 
 
     <!-- Form Card -->
+
     <androidx.cardview.widget.CardView
         android:id="@+id/cardWalletForm"
         android:layout_width="0dp"
@@ -64,6 +65,7 @@
 
 
             <!-- Wallet Name Row -->
+
             <LinearLayout
                 android:id="@+id/rowSelectWalletName"
                 style="@style/RowStyle"
@@ -96,6 +98,7 @@
             <LinearLayout
                 android:id="@+id/rowSelectCurrency"
                 style="@style/RowStyle"
+                android:layout_marginTop="20dp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/rowSelectWalletName">
 
@@ -103,14 +106,14 @@
                     android:id="@+id/ivCurrencyIcon"
                     android:layout_width="60dp"
                     android:layout_height="60dp"
-                    android:src="@drawable/ic_account_balance_wallet_24"
+                    android:src="@drawable/ic_attach_money_24"
                     app:tint="?attr/bb_button" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:layout_marginLeft="6dp">
+                    android:layout_marginLeft="6dp"
+                    android:orientation="vertical">
 
                     <TextView
                         android:id="@+id/tvCurrencyHeader"
@@ -138,6 +141,7 @@
             <LinearLayout
                 android:id="@+id/rowSelectInitialAmount"
                 style="@style/RowStyle"
+                android:layout_marginTop="20dp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/rowSelectCurrency">
 
@@ -145,7 +149,7 @@
                     android:id="@+id/ivInitialAmountIcon"
                     android:layout_width="60dp"
                     android:layout_height="60dp"
-                    android:src="@drawable/ic_account_balance_wallet_24"
+                    android:src="@drawable/ic_edit_note_24"
                     app:tint="?attr/bb_button" />
 
                 <LinearLayout
@@ -180,6 +184,7 @@
             <LinearLayout
                 android:id="@+id/rowSelectShareWallet"
                 style="@style/RowStyle"
+                android:layout_marginTop="20dp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/rowSelectInitialAmount">
 
@@ -187,21 +192,19 @@
                     android:id="@+id/ivShareWalletIcon"
                     android:layout_width="60dp"
                     android:layout_height="60dp"
-                    android:layout_marginTop="30dp"
-                    android:src="@drawable/ic_attach_money_24"
+                    android:src="@drawable/ic_notifications_black_24dp"
                     app:tint="?attr/bb_button" />
 
                 <TextView
                     android:id="@+id/tvShareWallet"
-                    android:layout_width="80dp"
+                    android:layout_width="240dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="12dp"
-                    android:layout_marginTop="-10dp"
+                    android:layout_marginLeft="6dp"
                     android:backgroundTint="?attr/bb_surface"
                     android:inputType="text"
-                    android:text="Share Wallet"
+                    android:text="Share Wallet with Other People"
                     android:textColor="?attr/bb_secondaryText"
-                    android:textSize="15dp"
+                    android:textSize="17dp"
                     app:layout_constraintStart_toEndOf="@id/ivCurrencyIcon"
                     app:layout_constraintTop_toTopOf="@id/ivCurrencyIcon" />
 
@@ -209,14 +212,14 @@
                     android:id="@+id/arrowIcon1"
                     android:layout_width="28dp"
                     android:layout_height="28dp"
-                    android:layout_marginStart="255dp"
-                    android:layout_marginTop="285dp"
+                    android:layout_marginTop="2dp"
                     android:rotation="270"
                     android:src="@android:drawable/arrow_down_float"
-                    android:tint="?attr/bb_primaryText"
                     app:layout_constraintStart_toEndOf="@+id/tvShareWallet"
                     app:layout_constraintStart_toStartOf="@id/tvShareWallet"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:tint="?attr/bb_primaryText" />
+
             </LinearLayout>
 
 
@@ -225,60 +228,78 @@
             <LinearLayout
                 android:id="@+id/rowSelectEnableNotifications"
                 style="@style/RowStyle"
+                android:layout_marginTop="20dp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/rowSelectShareWallet">
 
-                <TextView
-                    android:id="@+id/tvEnableNotifications"
-                    android:layout_width="0dp"
+                <LinearLayout
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="30dp"
-                    android:text="Enable Notifications"
-                    android:textColor="?attr/bb_primaryText"
-                    android:textSize="18dp" />
+                    android:layout_marginLeft="6dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
 
-                <TextView
-                    android:id="@+id/tvNotificationsInfo"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="6dp"
-                    android:text="Get notified when there are changes to this wallet’s transactions."
-                    android:textColor="?attr/bb_secondaryText"
-                    android:textSize="14sp"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/tvEnableNotifications" />
+                    <TextView
+                        android:id="@+id/tvEnableNotifications"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Enable Notifications"
+                        android:textColor="?attr/bb_primaryText"
+                        android:textSize="18dp" />
+
+                    <TextView
+                        android:id="@+id/tvNotificationsInfo"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:text="Get notified when there are changes to this wallet’s transactions."
+                        android:textColor="?attr/bb_secondaryText"
+                        android:textSize="14sp"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/tvEnableNotifications" />
+
+                </LinearLayout>
 
                 <Switch
                     android:id="@+id/switchNotifications"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_weight="0"
                     android:checked="true"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="@id/tvEnableNotifications" />
 
+            </LinearLayout>
 
-                <!-- Exclude from Total Row -->
+
+            <!-- Exclude from Total Row -->
+
+            <LinearLayout
+                android:id="@+id/rowSelectExcludeTotal"
+                style="@style/RowStyle"
+                android:layout_marginTop="20dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/rowSelectEnableNotifications">
 
                 <LinearLayout
-                    android:id="@+id/rowSelectExcludeTotal"
-                    style="@style/RowStyle">
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="6dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
 
                     <TextView
                         android:id="@+id/tvExcludeFromTotal"
-                        android:layout_width="0dp"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="30dp"
                         android:text="Exclude from Total"
                         android:textColor="?attr/bb_primaryText"
-                        android:textSize="18dp"
-                        app:layout_constraintEnd_toStartOf="@id/switchExcludeTotal"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/tvNotificationsInfo" />
+                        android:textSize="18dp" />
 
                     <TextView
                         android:id="@+id/tvExcludeInfo"
-                        android:layout_width="0dp"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="6dp"
                         android:text="Ignore this wallet and its balance in the Total Balance."
@@ -286,23 +307,22 @@
                         android:textSize="14sp"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/tvExcludeFromTotal" />
-
-                    <Switch
-                        android:id="@+id/switchExcludeTotal"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:checked="true"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="@id/tvExcludeFromTotal" />
+                        app:layout_constraintTop_toBottomOf="@id/tvEnableNotifications" />
 
                 </LinearLayout>
 
+                <Switch
+                    android:id="@+id/switchExcludeTotal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0"
+                    android:checked="true"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="@id/tvEnableNotifications" />
+
             </LinearLayout>
 
-            <!-- Exclude from Total Row -->
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.cardview.widget.CardView>
 
@@ -316,7 +336,7 @@
         android:layout_marginTop="10dp"
         android:backgroundTint="?attr/bb_button"
         android:text="Save"
-        android:textColor="#FFFFFF"
+        android:textColor="?attr/bb_primaryText"
         android:textSize="16dp"
         app:cornerRadius="24dp"
         app:layout_constraintEnd_toEndOf="parent"
