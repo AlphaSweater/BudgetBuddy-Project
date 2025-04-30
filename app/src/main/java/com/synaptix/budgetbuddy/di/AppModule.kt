@@ -45,7 +45,8 @@ object AppModule {
             context,
             AppDatabase::class.java,
             "budgetbuddy_db"
-        ).build()
+        )   .fallbackToDestructiveMigration()
+            .build()
     }
 
     @Provides
@@ -65,4 +66,11 @@ object AppModule {
     fun provideLoginUseCase(repository: UserRepository): LoginUserUseCase {
         return LoginUserUseCase(repository)
     }
+
+    @Provides
+    @Singleton
+    fun provideWalletDao(appDatabase: AppDatabase): WalletDao {
+        return appDatabase.walletDao()
+    }
+
 }

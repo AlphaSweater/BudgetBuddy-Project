@@ -9,6 +9,7 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
 import com.synaptix.budgetbuddy.R
 import com.synaptix.budgetbuddy.databinding.ActivityMainBinding
+import com.synaptix.budgetbuddy.ui.wallet.AddWalletFragment
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -48,5 +49,13 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+
+    //temp opens add waller for testing
+    fun showWalletMain() {
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.nav_host_fragment_activity_main, AddWalletFragment())
+            .addToBackStack(null)
+            .commit()
     }
 }
