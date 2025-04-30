@@ -1,4 +1,4 @@
-package com.synaptix.budgetbuddy.ui.wallet
+package com.synaptix.budgetbuddy.presentation.ui.main.wallet
 
 import androidx.lifecycle.ViewModel
 

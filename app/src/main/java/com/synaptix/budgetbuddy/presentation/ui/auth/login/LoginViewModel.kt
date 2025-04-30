@@ -4,26 +4,42 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.synaptix.budgetbuddy.core.usecase.auth.LoginUseCase
+import com.synaptix.budgetbuddy.core.usecase.auth.LoginUserUseCase
+import com.synaptix.budgetbuddy.core.usecase.auth.LoginResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+sealed class LoginUiState {
+    object Idle : LoginUiState()
+    object Loading : LoginUiState()
+    object Success : LoginUiState()
+    data class Error(val message: String) : LoginUiState()
+}
+
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-    // Injected use case for login logic
-    private val loginUseCase: LoginUseCase
+    private val loginUserUseCase: LoginUserUseCase
 ) : ViewModel() {
 
-    private val _loginResult = MutableLiveData<Boolean>()
-    val loginResult: LiveData<Boolean> get() = _loginResult
+    private val _loginState = MutableLiveData<LoginUiState>(LoginUiState.Idle)
+    val loginState: LiveData<LoginUiState> get() = _loginState
 
-    // Login logic - called from the fragment
     fun login(email: String, password: String) {
+        _loginState.value = LoginUiState.Loading
+
         viewModelScope.launch {
-            // Call the use case and get result (true/false)
-            val result = loginUseCase.execute(email, password)
-            _loginResult.postValue(result)
+            val result = loginUserUseCase(email, password)
+            _loginState.value = when (result) {
+                is LoginResult.Success -> LoginUiState.Success
+                is LoginResult.UserNotFound -> LoginUiState.Error("User not found")
+                is LoginResult.IncorrectPassword -> LoginUiState.Error("Incorrect password")
+                is LoginResult.Error -> LoginUiState.Error(result.message)
+            }
         }
+    }
+
+    fun resetState() {
+        _loginState.value = LoginUiState.Idle
     }
 }

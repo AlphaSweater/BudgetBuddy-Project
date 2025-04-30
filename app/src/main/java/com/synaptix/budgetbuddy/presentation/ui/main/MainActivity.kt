@@ -9,7 +9,7 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
 import com.synaptix.budgetbuddy.R
 import com.synaptix.budgetbuddy.databinding.ActivityMainBinding
-import com.synaptix.budgetbuddy.ui.wallet.AddWalletFragment
+import com.synaptix.budgetbuddy.presentation.ui.main.wallet.addWallet.AddWalletFragment
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

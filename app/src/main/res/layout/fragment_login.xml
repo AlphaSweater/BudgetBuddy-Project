@@ -169,4 +169,17 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
+    <!-- =============================== Loading Spinner Overlay =============================== -->
+    <ProgressBar
+        android:id="@+id/progressSpinner"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:indeterminate="true"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@+id/edtPassword"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/edtEmailAddress" />
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>

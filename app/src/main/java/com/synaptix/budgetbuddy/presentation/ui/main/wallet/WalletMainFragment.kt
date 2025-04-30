@@ -1,4 +1,4 @@
-package com.synaptix.budgetbuddy.ui.wallet
+package com.synaptix.budgetbuddy.presentation.ui.main.wallet
 
 import androidx.fragment.app.viewModels
 import android.os.Bundle
@@ -6,8 +6,6 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.synaptix.budgetbuddy.R
-import com.synaptix.budgetbuddy.databinding.FragmentAddWalletBinding
 import com.synaptix.budgetbuddy.databinding.FragmentWalletMainBinding
 import com.synaptix.budgetbuddy.presentation.ui.auth.AuthActivity
 

@@ -1,4 +1,4 @@
-package com.synaptix.budgetbuddy.ui.wallet
+package com.synaptix.budgetbuddy.presentation.ui.main.wallet.addWallet
 
 import androidx.fragment.app.viewModels
 import android.os.Bundle
@@ -6,9 +6,11 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.synaptix.budgetbuddy.R
+import android.widget.Toast
+import androidx.lifecycle.lifecycleScope
 import com.synaptix.budgetbuddy.databinding.FragmentAddWalletBinding
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class AddWalletFragment : Fragment() {
@@ -73,7 +75,23 @@ class AddWalletFragment : Fragment() {
                 return@setOnClickListener
             }
 
-            viewModel.addWallet(name, balance, currency )
+            // Launch coroutine to call suspend function
+            viewLifecycleOwner.lifecycleScope.launch {
+                try {
+                    viewModel.addWallet(name, balance, currency )
+                    Toast.makeText(
+                        requireContext(),
+                        "Wallet saved successfully!",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                } catch (e: Exception) {
+                    Toast.makeText(
+                        requireContext(),
+                        "Wallet to save transaction: ${e.message}",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
         }
     }
 
