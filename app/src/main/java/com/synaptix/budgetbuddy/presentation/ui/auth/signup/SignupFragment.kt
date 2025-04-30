@@ -4,11 +4,12 @@ import androidx.fragment.app.viewModels
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.View
-import android.widget.Toast
+import androidx.lifecycle.lifecycleScope
 import com.synaptix.budgetbuddy.presentation.ui.auth.AuthActivity
 import com.synaptix.budgetbuddy.R
 import com.synaptix.budgetbuddy.databinding.FragmentSignupBinding
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class SignupFragment : Fragment(R.layout.fragment_signup) {
@@ -27,23 +28,30 @@ class SignupFragment : Fragment(R.layout.fragment_signup) {
             requireActivity().onBackPressedDispatcher.onBackPressed()
         }
 
-       //binding data and passing data to viewModel
+        //binding data and passing data to viewModel
         binding.btnSignup.setOnClickListener {
             val email = binding.edtEmailAddress.text.toString()
             val password = binding.edtPassword.text.toString()
             val confirmPassword = binding.edtTxtPasswordConfirm.text.toString()
 
-            //user input validation that ensures inputs are not empty
-            if (email.isEmpty()) {
-                binding.edtEmailAddress.error = "Email is required"
+            //checks to ensure email is valid
+            if (!isValidEmail(email)) {
+                binding.edtEmailAddress.error = "Invalid email address"
                 return@setOnClickListener
             }
-            if (password.isEmpty()) {
-                binding.edtPassword.error = "Password is required"
-                return@setOnClickListener
-            }
-            if (confirmPassword.isEmpty()) {
-                binding.edtTxtPasswordConfirm.error = "Please confirm your password"
+
+            //checks to see if email is already in database
+
+
+            //checks to ensure password has more than 8 characters and has 1no, 1upper, 1special
+            if (password.length < 8
+                || !password.matches(Regex(".*[0-9].*"))
+                || !password.matches(Regex(".*[A-Z].*"))
+                || !password.matches(Regex(".*[!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>\\/?].*"))
+            ) {
+
+                binding.edtPassword.error =
+                    "Password must be at least 8 characters and contain 1 number, capital and special character"
                 return@setOnClickListener
             }
 
@@ -53,10 +61,29 @@ class SignupFragment : Fragment(R.layout.fragment_signup) {
                 return@setOnClickListener
             }
 
-            // Call the ViewModel to handle signup
-            viewModel.signUp(email, password)
-            (activity as? AuthActivity)?.showLogin()
+
+            lifecycleScope.launch {
+                val emailExists = viewModel.checkEmailExists(email)
+                if (emailExists) {
+                    binding.edtEmailAddress.error = "Email already in use"
+                    return@launch
+                }
+                // Call the ViewModel to handle signup
+                viewModel.signUp(email, password)
+                (activity as? AuthActivity)?.showLogin()
+
+            }
+
 
         }
+
+
+
+    }
+    //uses regex to ensure that the email follows a valid layout
+    //AI assisted with the regex logic for this function
+    private fun isValidEmail(email: String): Boolean {
+        return email.matches(Regex("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}$"))
     }
 }
+

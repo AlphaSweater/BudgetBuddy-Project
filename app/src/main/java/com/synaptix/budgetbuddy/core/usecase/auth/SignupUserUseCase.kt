@@ -16,4 +16,7 @@ class SignupUserUseCase @Inject constructor(
         //returns the user object to UserDao and adds to database
         return userDao.insert(user)
     }
+    suspend fun emailExists(email: String): Boolean {
+        return userDao.emailExists(email)
+    }
 }

@@ -123,7 +123,7 @@
                         android:id="@+id/tvCurrencyHeader"
                         android:layout_width="80dp"
                         android:layout_height="wrap_content"
-                        android:text="Currency"
+                        android:text="@string/currency"
                         android:textColor="?attr/bb_primaryText"
                         android:textSize="14dp" />
 

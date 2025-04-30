@@ -1,4 +1,4 @@
-package com.synaptix.budgetbuddy.presentation.ui.main.budget
+package com.synaptix.budgetbuddy.presentation.ui.main.budget.budgetReport
 
 import androidx.lifecycle.ViewModel
 
