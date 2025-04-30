@@ -41,7 +41,26 @@ class AddWalletFragment : Fragment() {
 
         //oncliick listener that saves user input and injects into usecase
         binding.btnSave.setOnClickListener(
+            val name = binding.edtWalletName.text.toString()
+            val currency = binding.edtCurrency.text.toString()
+            val balance = binding.edtInitialAmount.text.toString()
 
+            if (name.isEmpty()) {
+                binding.edtWalletName.error = "Wallet name is required"
+                return@setOnClickListener
+            }
+
+            if (currency.isEmpty()) {
+                binding.edtCurrency.error = "Currency is required"
+                return@setOnClickListener
+            }
+
+            if (balance.isEmpty()) {
+                binding.edtInitialAmount.error = "Initial amount is required"
+                return@setOnClickListener
+            }
+
+            viewModel.addWallet(name, currency, balance)
         )
     }
 
