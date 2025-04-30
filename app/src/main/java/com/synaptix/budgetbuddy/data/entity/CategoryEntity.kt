@@ -2,11 +2,12 @@ package com.synaptix.budgetbuddy.data.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import androidx.room.ForeignKey
 
 @Entity(
     tableName = "category_table",
     foreignKeys = [
-        androidx.room.ForeignKey(
+        ForeignKey(
             entity = UserEntity::class,
             parentColumns = ["user_id"],
             childColumns = ["user_id"]
