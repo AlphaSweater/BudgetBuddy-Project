@@ -19,8 +19,7 @@ class LoginUserUseCase @Inject constructor(
         return try {
             val user = userRepository.getUserByEmail(email)
                 ?: return LoginResult.UserNotFound
-
-            // TODO: ⚠️ WARNING: Replace with secure password hashing later
+            
             return if (BCrypt.checkpw(password, user.password )) {
                 userRepository.setUserSession(user)
                 LoginResult.Success

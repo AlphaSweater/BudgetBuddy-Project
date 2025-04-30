@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".presentation.ui.main.transactions.GeneralIndividualTransactionsFragment">
+    tools:context=".presentation.ui.main.transactions.generalIndividualTransactions.GeneralIndividualTransactionsFragment">
 
     <LinearLayout
         android:id="@+id/top_bar"
@@ -217,7 +217,7 @@
             android:layout_marginStart="12dp"
             android:layout_weight="1"
             android:gravity="center_vertical"
-            android:text="Pictures"
+            android:text="@string/picture"
             android:textColor="?attr/bb_primaryText"
             android:textSize="18sp" />
     </LinearLayout>

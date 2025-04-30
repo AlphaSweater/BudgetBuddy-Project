@@ -20,4 +20,6 @@ interface UserDao {
     @Query("SELECT * FROM user_table WHERE email = :email")
     suspend fun getUserByEmail(email: String): UserEntity?
 
+    @Query("SELECT EXISTS(SELECT 1 FROM user_table WHERE email = :email)")
+    suspend fun emailExists(email: String): Boolean
 }
