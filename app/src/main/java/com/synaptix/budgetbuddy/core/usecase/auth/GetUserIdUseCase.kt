@@ -7,7 +7,7 @@ class GetUserIdUseCase @Inject constructor(
     private val userRepository: UserRepository
 ) {
     // The UseCase should handle fetching the user ID from the repository
-    suspend fun execute(): Int? {
+    suspend fun execute(): Int {
         return userRepository.getCurrentUserId()
     }
 }

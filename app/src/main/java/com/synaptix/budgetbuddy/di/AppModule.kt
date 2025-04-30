@@ -8,6 +8,7 @@ import com.synaptix.budgetbuddy.core.usecase.main.transaction.AddTransactionUseC
 import com.synaptix.budgetbuddy.core.usecase.auth.LoginUserUseCase
 import com.synaptix.budgetbuddy.data.AppDatabase
 import com.synaptix.budgetbuddy.data.local.dao.UserDao
+import com.synaptix.budgetbuddy.data.local.dao.WalletDao
 import com.synaptix.budgetbuddy.data.local.datastore.DataStoreManager
 import dagger.Module
 import dagger.Provides

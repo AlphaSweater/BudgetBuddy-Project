@@ -43,9 +43,9 @@ class DataStoreManager @Inject constructor(
     }
 
     // Fetch user ID
-    suspend fun getUserId(): Int? {
+    suspend fun getUserId(): Int {
         val preferences = dataStore.data.first()
-        return preferences[PreferencesKeys.USER_ID]
+        return preferences[PreferencesKeys.USER_ID] ?: 0 // Default to 0 if null
     }
 
     suspend fun clearUser() {

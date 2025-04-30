@@ -29,7 +29,7 @@ class AddTransactionViewModel @Inject constructor(
 
     suspend fun addTransaction() {
         val transaction = Transaction(
-            userId = getUserIdUseCase.execute() ?: 0,
+            userId = getUserIdUseCase.execute(),
             transactionId = UUID.randomUUID().toString(),
             category = category.value ?: "",
             walletId = walletId.value ?: "",

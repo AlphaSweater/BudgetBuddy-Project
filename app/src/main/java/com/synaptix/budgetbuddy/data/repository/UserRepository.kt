@@ -24,7 +24,7 @@ class UserRepository @Inject constructor(
         return dataStoreManager.userFlow
     }
 
-    suspend fun getCurrentUserId(): Int? {
+    suspend fun getCurrentUserId(): Int {
         return dataStoreManager.getUserId()
     }
 
