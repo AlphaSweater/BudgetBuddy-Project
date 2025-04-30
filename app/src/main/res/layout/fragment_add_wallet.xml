@@ -18,6 +18,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
+        <!-- Back button -->
         <ImageButton
             android:id="@+id/btnGoBack"
             android:layout_width="44dp"
@@ -30,6 +31,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             tools:ignore="TouchTargetSizeCheck" />
 
+        <!-- Title Text -->
         <TextView
             android:id="@+id/tvAddNewWallet"
             android:layout_width="wrap_content"
@@ -44,8 +46,7 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 
-    <!-- Form Card -->
-
+    <!-- Card containing the wallet creation form -->
     <androidx.cardview.widget.CardView
         android:id="@+id/cardWalletForm"
         android:layout_width="0dp"
@@ -57,21 +58,21 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
+        <!-- Container for the form inputs -->
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="?attr/bb_surface"
             android:padding="16dp">
 
-
-            <!-- Wallet Name Row -->
-
+            <!-- Row for entering Wallet Name -->
             <LinearLayout
                 android:id="@+id/rowSelectWalletName"
                 style="@style/RowStyle"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
 
+                <!-- Wallet icon -->
                 <ImageView
                     android:id="@+id/ivWalletIcon"
                     android:layout_width="60dp"
@@ -79,6 +80,7 @@
                     android:src="@drawable/ic_account_balance_wallet_24"
                     app:tint="?attr/bb_button" />
 
+                <!-- Wallet name input field -->
                 <EditText
                     android:id="@+id/edtWalletName"
                     android:layout_width="250dp"
@@ -90,11 +92,10 @@
                     android:inputType="text"
                     android:layout_marginLeft="6dp"
                     app:layout_constraintEnd_toEndOf="parent" />
-
             </LinearLayout>
 
 
-            <!-- Currency Row -->
+            <!-- Row for selecting Currency -->
             <LinearLayout
                 android:id="@+id/rowSelectCurrency"
                 style="@style/RowStyle"
@@ -102,6 +103,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/rowSelectWalletName">
 
+                <!-- Currency icon -->
                 <ImageView
                     android:id="@+id/ivCurrencyIcon"
                     android:layout_width="60dp"
@@ -109,12 +111,14 @@
                     android:src="@drawable/ic_attach_money_24"
                     app:tint="?attr/bb_button" />
 
+                <!-- Currency input -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="6dp"
                     android:orientation="vertical">
 
+                    <!-- Currency label -->
                     <TextView
                         android:id="@+id/tvCurrencyHeader"
                         android:layout_width="80dp"
@@ -123,6 +127,7 @@
                         android:textColor="?attr/bb_primaryText"
                         android:textSize="14dp" />
 
+                    <!-- Currency input field -->
                     <EditText
                         android:id="@+id/edtCurrency"
                         android:layout_width="80dp"
@@ -132,11 +137,10 @@
                         android:inputType="text"
                         app:layout_constraintEnd_toEndOf="parent" />
                 </LinearLayout>
-
             </LinearLayout>
 
 
-            <!-- Initial Amount Row -->
+            <!-- Row for entering Initial Amount -->
             <LinearLayout
                 android:id="@+id/rowSelectInitialAmount"
                 style="@style/RowStyle"
@@ -144,6 +148,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/rowSelectCurrency">
 
+                <!-- Initial Amount icon -->
                 <ImageView
                     android:id="@+id/ivInitialAmountIcon"
                     android:layout_width="60dp"
@@ -151,12 +156,14 @@
                     android:src="@drawable/ic_edit_note_24"
                     app:tint="?attr/bb_button" />
 
+                <!-- Initial Amount input -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="6dp"
                     android:orientation="vertical">
 
+                    <!-- Label -->
                     <TextView
                         android:id="@+id/tvInitialAmountHeader"
                         android:layout_width="100dp"
@@ -165,6 +172,7 @@
                         android:textColor="?attr/bb_primaryText"
                         android:textSize="14dp" />
 
+                    <!-- Input field -->
                     <EditText
                         android:id="@+id/edtInitialAmount"
                         android:layout_width="250dp"
@@ -173,12 +181,11 @@
                         android:hint="0"
                         android:inputType="text"
                         app:layout_constraintEnd_toEndOf="parent" />
-
                 </LinearLayout>
-
             </LinearLayout>
 
-            <!-- Share Wallet Row -->
+
+            <!-- Row for sharing the wallet -->
             <LinearLayout
                 android:id="@+id/rowSelectShareWallet"
                 style="@style/RowStyle"
@@ -186,13 +193,15 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/rowSelectInitialAmount">
 
+                <!-- Share wallet icon -->
                 <ImageView
                     android:id="@+id/ivShareWalletIcon"
                     android:layout_width="60dp"
                     android:layout_height="60dp"
-                    android:src="@drawable/ic_notifications_black_24dp"
+                    android:src="@drawable/baseline_share_24"
                     app:tint="?attr/bb_button" />
 
+                <!-- Share wallet text -->
                 <TextView
                     android:id="@+id/tvShareWallet"
                     android:layout_width="240dp"
@@ -206,6 +215,7 @@
                     app:layout_constraintStart_toEndOf="@id/ivCurrencyIcon"
                     app:layout_constraintTop_toTopOf="@id/ivCurrencyIcon" />
 
+                <!-- Arrow icon (expand/collapse indicator) -->
                 <ImageView
                     android:id="@+id/arrowIcon1"
                     android:layout_width="28dp"
@@ -217,12 +227,10 @@
                     app:layout_constraintStart_toStartOf="@id/tvShareWallet"
                     app:layout_constraintTop_toTopOf="parent"
                     app:tint="?attr/bb_primaryText" />
-
             </LinearLayout>
 
 
-            <!-- Enable Notifications Row-->
-
+            <!-- Row for enabling notifications -->
             <LinearLayout
                 android:id="@+id/rowSelectEnableNotifications"
                 style="@style/RowStyle"
@@ -230,6 +238,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/rowSelectShareWallet">
 
+                <!-- Column containing notification toggle text -->
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -237,6 +246,7 @@
                     android:layout_weight="1"
                     android:orientation="vertical">
 
+                    <!-- Notification header -->
                     <TextView
                         android:id="@+id/tvEnableNotifications"
                         android:layout_width="match_parent"
@@ -245,6 +255,7 @@
                         android:textColor="?attr/bb_primaryText"
                         android:textSize="18dp" />
 
+                    <!-- Info text -->
                     <TextView
                         android:id="@+id/tvNotificationsInfo"
                         android:layout_width="match_parent"
@@ -256,9 +267,9 @@
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@id/tvEnableNotifications" />
-
                 </LinearLayout>
 
+                <!-- Switch toggle -->
                 <Switch
                     android:id="@+id/switchNotifications"
                     android:layout_width="wrap_content"
@@ -267,12 +278,10 @@
                     android:checked="true"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="@id/tvEnableNotifications" />
-
             </LinearLayout>
 
 
             <!-- Exclude from Total Row -->
-
             <LinearLayout
                 android:id="@+id/rowSelectExcludeTotal"
                 style="@style/RowStyle"
@@ -280,6 +289,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/rowSelectEnableNotifications">
 
+                <!-- Column containing exclude from total toggle text -->
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -287,6 +297,7 @@
                     android:layout_weight="1"
                     android:orientation="vertical">
 
+                    <!-- Exclude from total header -->
                     <TextView
                         android:id="@+id/tvExcludeFromTotal"
                         android:layout_width="match_parent"
@@ -295,6 +306,7 @@
                         android:textColor="?attr/bb_primaryText"
                         android:textSize="18dp" />
 
+                    <!-- Info text -->
                     <TextView
                         android:id="@+id/tvExcludeInfo"
                         android:layout_width="match_parent"
@@ -306,9 +318,9 @@
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@id/tvEnableNotifications" />
-
                 </LinearLayout>
 
+                <!-- Switch toggle -->
                 <Switch
                     android:id="@+id/switchExcludeTotal"
                     android:layout_width="wrap_content"
@@ -317,11 +329,8 @@
                     android:checked="true"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="@id/tvEnableNotifications" />
-
             </LinearLayout>
-
     </androidx.constraintlayout.widget.ConstraintLayout>
-
     </androidx.cardview.widget.CardView>
 
 
@@ -340,5 +349,4 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/cardWalletForm" />
-
 </androidx.constraintlayout.widget.ConstraintLayout>
