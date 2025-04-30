@@ -4,7 +4,6 @@ import androidx.fragment.app.viewModels
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.View
-import android.widget.Toast
 import com.synaptix.budgetbuddy.presentation.ui.auth.AuthActivity
 import com.synaptix.budgetbuddy.R
 import com.synaptix.budgetbuddy.databinding.FragmentSignupBinding
@@ -34,15 +33,15 @@ class SignupFragment : Fragment(R.layout.fragment_signup) {
             val confirmPassword = binding.edtTxtPasswordConfirm.text.toString()
 
             //checks to ensure email is valid
-            if (isValidEmail(email) == false) {
+            if (!isValidEmail(email)) {
                 binding.edtEmailAddress.error = "Invalid email address"
                 return@setOnClickListener
             }
 
             //checks to ensure password has more than 8 characters and has 1no, 1upper, 1special
-            if (password.length >= 8 && password.matches(Regex(".*[0-9].*"))
-                && password.matches(Regex(".*[A-Z].*"))
-                && password.matches(Regex(".*[!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>\\/?].*"))) {
+            if (password.length < 8 || password.matches(Regex(".*[0-9].*"))
+                || password.matches(Regex(".*[A-Z].*"))
+                || password.matches(Regex(".*[!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>\\/?].*"))) {
 
                 binding.edtPassword.error = "Password must be at least 8 characters and contain 1 number, capital and special character"
                 return@setOnClickListener
@@ -65,7 +64,7 @@ class SignupFragment : Fragment(R.layout.fragment_signup) {
 
     //uses regex to ensure that the email follows a valid layout
     //AI assisted with the regex logic for this function
-    fun isValidEmail(email: String): Boolean {
+    private fun isValidEmail(email: String): Boolean {
         return email.matches(Regex("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}$"))
     }
 
