@@ -16,7 +16,7 @@ import com.synaptix.budgetbuddy.data.local.dao.BudgetDao
 //Ai assisted with the creation of this database
 @Database(
     entities = [UserEntity::class, TransactionEntity::class, WalletEntity::class, CategoryEntity::class, BudgetEntity::class],
-    version = 3
+    version = 4
 )
 
 
