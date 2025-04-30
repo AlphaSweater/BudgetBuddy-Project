@@ -44,6 +44,9 @@
     <!-- ==================== Categories ======================-->
     <string name="category">Category</string>
     <string name="transaction">Transactions</string>
+    <string name="category_colour">Category colour</string>
+    <string name="category_icon">Category Icon</string>
+
     <!-- Expenses -->
     <string name="food">Food</string>
     <string name="entertainment">Entertainment</string>
@@ -95,6 +98,11 @@
     <string name="budget_for">Budget for</string>
     <string name="start_date">Start Date</string>
     <string name="budget_name">Budget Name</string>
+    <string name="budget_colour">Budget Colour</string>
+    <string name="budget_icon">Budget Icon</string>
+    <string name="total_budget">Total budget</string>
+    <string name="total_spent">Total spent</string>
+    <string name="end_of_month">End of Month</string>
     <!-- =========================================================== -->
 
 

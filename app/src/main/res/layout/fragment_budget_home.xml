@@ -121,7 +121,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:text="Total budget"
+                android:text="@string/total_budget"
                 android:textColor="?attr/bb_secondaryText"
                 android:textSize="14sp" />
         </LinearLayout>
@@ -146,7 +146,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:text="Total spent"
+                android:text="@string/total_spent"
                 android:textColor="?attr/bb_secondaryText"
                 android:textSize="14sp" />
         </LinearLayout>
@@ -171,7 +171,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:text="End of month"
+                android:text="@string/end_of_month"
                 android:textColor="?attr/bb_secondaryText"
                 android:textSize="14sp" />
         </LinearLayout>
