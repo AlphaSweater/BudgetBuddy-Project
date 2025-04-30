@@ -14,6 +14,7 @@ import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.chip.Chip
 import com.google.android.material.color.MaterialColors
@@ -22,6 +23,7 @@ import com.synaptix.budgetbuddy.databinding.FragmentAddTransactionBinding
 import com.synaptix.budgetbuddy.presentation.ui.main.addTransaction.labelSelector.Label
 import com.synaptix.budgetbuddy.ui.recurrence.RecurrenceBottomSheet
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class AddTransactionFragment : Fragment() {
@@ -181,8 +183,23 @@ class AddTransactionFragment : Fragment() {
             return
         }
 
-        viewModel.addTransaction()
-        Toast.makeText(requireContext(), "Transaction saved successfully!", Toast.LENGTH_SHORT).show()
+        // Launch coroutine to call suspend function
+        viewLifecycleOwner.lifecycleScope.launch {
+            try {
+                viewModel.addTransaction()
+                Toast.makeText(
+                    requireContext(),
+                    "Transaction saved successfully!",
+                    Toast.LENGTH_SHORT
+                ).show()
+            } catch (e: Exception) {
+                Toast.makeText(
+                    requireContext(),
+                    "Failed to save transaction: ${e.message}",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
     }
 
     // --- Label Navigation ---

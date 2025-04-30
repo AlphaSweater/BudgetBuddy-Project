@@ -19,5 +19,6 @@ data class WalletEntity (
     @PrimaryKey(autoGenerate = true) val wallet_id: Int,
     val user_id: Int,
     val name: String,
-    val currency: String
+    val currency: String,
+    val balance: Double
 )

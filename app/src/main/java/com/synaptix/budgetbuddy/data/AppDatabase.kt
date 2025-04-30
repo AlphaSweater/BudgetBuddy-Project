@@ -2,19 +2,21 @@ package com.synaptix.budgetbuddy.data
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
-import com.synaptix.budgetbuddy.data.local.CategoryDao
-import com.synaptix.budgetbuddy.data.local.TransactionDao
-import com.synaptix.budgetbuddy.data.local.UserDao
-import com.synaptix.budgetbuddy.data.local.WalletDao
+import com.synaptix.budgetbuddy.data.entity.BudgetEntity
+import com.synaptix.budgetbuddy.data.local.dao.CategoryDao
+import com.synaptix.budgetbuddy.data.local.dao.TransactionDao
+import com.synaptix.budgetbuddy.data.local.dao.UserDao
+import com.synaptix.budgetbuddy.data.local.dao.WalletDao
 import com.synaptix.budgetbuddy.data.entity.CategoryEntity
 import com.synaptix.budgetbuddy.data.entity.TransactionEntity
 import com.synaptix.budgetbuddy.data.entity.UserEntity
 import com.synaptix.budgetbuddy.data.entity.WalletEntity
+import com.synaptix.budgetbuddy.data.local.dao.BudgetDao
 
 //Ai assisted with the creation of this database
 @Database(
-    entities = [UserEntity::class, TransactionEntity::class, WalletEntity::class, CategoryEntity::class],
-    version = 1
+    entities = [UserEntity::class, TransactionEntity::class, WalletEntity::class, CategoryEntity::class, BudgetEntity::class],
+    version = 3
 )
 
 
@@ -24,4 +26,5 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun transactionDao(): TransactionDao
     abstract fun walletDao(): WalletDao
     abstract fun categoryDao(): CategoryDao
+    abstract fun budgetDao(): BudgetDao
 }
