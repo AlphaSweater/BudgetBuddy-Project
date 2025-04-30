@@ -9,7 +9,7 @@ import com.synaptix.budgetbuddy.data.entity.WalletEntity
 @Dao
 interface WalletDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun insert(wallet: WalletEntity): Long
+    suspend fun insertWallet(wallet: WalletEntity): Long
 
     //sql query to grab a wallet based on wallet ID
     @Query("SELECT * FROM wallet_table WHERE wallet_id = :walletId")

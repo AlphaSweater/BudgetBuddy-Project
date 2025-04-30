@@ -8,7 +8,9 @@ import android.view.View
 import android.view.ViewGroup
 import com.synaptix.budgetbuddy.R
 import com.synaptix.budgetbuddy.databinding.FragmentAddWalletBinding
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class AddWalletFragment : Fragment() {
 
     private var _binding: FragmentAddWalletBinding? = null
@@ -40,28 +42,31 @@ class AddWalletFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         //oncliick listener that saves user input and injects into usecase
-        binding.btnSave.setOnClickListener(
+        binding.btnSave.setOnClickListener {
             val name = binding.edtWalletName.text.toString()
             val currency = binding.edtCurrency.text.toString()
             val balance = binding.edtInitialAmount.text.toString()
 
+            // check if wallet name is empty
             if (name.isEmpty()) {
                 binding.edtWalletName.error = "Wallet name is required"
                 return@setOnClickListener
             }
 
+            // Check if currency is empty
             if (currency.isEmpty()) {
                 binding.edtCurrency.error = "Currency is required"
                 return@setOnClickListener
             }
 
+            // Check if balance is empty
             if (balance.isEmpty()) {
                 binding.edtInitialAmount.error = "Initial amount is required"
                 return@setOnClickListener
             }
 
             viewModel.addWallet(name, currency, balance)
-        )
+        }
     }
 
 }
