@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    tools:context=".presentation.ui.main.budget.chooseBudgetIcon.chooseBudgetIconFragment"
     android:padding="16dp">
 
     <TextView
@@ -11,7 +12,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="11dp"
-        android:text="Category colour"
+        android:text="Budget colour"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/imageView6" />
 
@@ -146,6 +147,7 @@
         </LinearLayout>
     </HorizontalScrollView>
 
+
     <ImageView
         android:id="@+id/imageView6"
         android:layout_width="118dp"
@@ -155,25 +157,12 @@
         app:srcCompat="@drawable/ic_circle_24"
         app:tint="?attr/bb_surface" />
 
-
-    <EditText
-        android:id="@+id/editTxtText"
-        android:layout_width="207dp"
-        android:layout_height="39dp"
-        android:layout_marginTop="68dp"
-        android:layout_marginEnd="68dp"
-        android:hint="Category name"
-        android:inputType="text"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:ignore="TouchTargetSizeCheck" />
-
     <TextView
         android:id="@+id/textView2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
-        android:text="Category Icon"
+        android:text="Budget Icon"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/horizontalScrollView" />
 
