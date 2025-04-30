@@ -1,122 +1,67 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/bottom_sheet_layout"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/rounded_top_bg"
-    android:orientation="vertical"
-    android:padding="24dp"
-    >
+    android:elevation="8dp">
 
-    <ScrollView
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:maxHeight="400dp"
-        >
+        android:orientation="vertical"
+        android:padding="24dp">
 
-        <LinearLayout
+        <!-- Back Button -->
+        <ImageButton
+            android:id="@+id/btnGoBack"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="?attr/actionModeCloseDrawable"
+            android:contentDescription="@string/back"
+            app:tint="?attr/bb_primaryText" />
+
+        <!-- Title -->
+        <TextView
+            android:id="@+id/txtRecurrence"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Select Recurrence"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:textColor="?attr/bb_primaryText"
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="16dp" />
+
+        <!-- Scrollable Options -->
+        <ScrollView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical" >
+            android:maxHeight="400dp">
 
-            <TextView
-                android:id="@+id/txtRecurrence"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="16dp"
-                android:text="Recurrence"
-                android:textSize="30sp" />
+                android:orientation="vertical"
+                android:divider="?android:attr/dividerHorizontal"
+                android:showDividers="middle"
+                android:dividerPadding="8dp">
 
-            <TextView
-                android:id="@+id/optionEveryDay"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="16dp"
-                android:text="Every day"
-                android:textSize="18sp" />
+                <!-- Reusable styled recurrence options -->
+                <TextView android:id="@+id/optionEveryDay" style="@style/RecurrenceOption" android:text="Every day" />
+                <TextView android:id="@+id/optionEveryTwoDays" style="@style/RecurrenceOption" android:text="Every 2 days" />
+                <TextView android:id="@+id/optionEveryWorkDay" style="@style/RecurrenceOption" android:text="Every work day" />
+                <TextView android:id="@+id/optionEveryWeek" style="@style/RecurrenceOption" android:text="Every week" />
+                <TextView android:id="@+id/optionEveryWeek2" style="@style/RecurrenceOption" android:text="Every 2 weeks" />
+                <TextView android:id="@+id/optionEveryWeek4" style="@style/RecurrenceOption" android:text="Every 4 weeks" />
+                <TextView android:id="@+id/optionEveryMonth" style="@style/RecurrenceOption" android:text="Every month" />
+                <TextView android:id="@+id/optionEveryMonth2" style="@style/RecurrenceOption" android:text="Every 2 months" />
+                <TextView android:id="@+id/optionEveryMonth3" style="@style/RecurrenceOption" android:text="Every 3 months" />
+                <TextView android:id="@+id/optionEveryMonth6" style="@style/RecurrenceOption" android:text="Every 6 months" />
+                <TextView android:id="@+id/optionEveryYear" style="@style/RecurrenceOption" android:text="Every year" />
 
-            <TextView
-                android:id="@+id/optionEveryTwoDays"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="16dp"
-                android:text="Every 2 days"
-                android:textSize="18sp" />
-
-            <TextView
-                android:id="@+id/optionEveryWorkDay"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="16dp"
-                android:text="Every work day"
-                android:textSize="18sp" />
-
-            <TextView
-                android:id="@+id/optionEveryWeek"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="16dp"
-                android:text="Every week"
-                android:textSize="18sp" />
-
-            <TextView
-                android:id="@+id/optionEveryWeek2"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="16dp"
-                android:text="Every 2 weeks"
-                android:textSize="18sp" />
-
-            <TextView
-                android:id="@+id/optionEveryWeek4"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="16dp"
-                android:text="Every 4 weeks"
-                android:textSize="18sp" />
-
-            <TextView
-                android:id="@+id/optionEveryMonth"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="16dp"
-                android:text="Every month"
-                android:textSize="18sp" />
-
-            <TextView
-                android:id="@+id/optionEveryMonth2"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="16dp"
-                android:text="Every 2 months"
-                android:textSize="18sp" />
-
-            <TextView
-                android:id="@+id/optionEveryMonth3"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="16dp"
-                android:text="Every 3 Months"
-                android:textSize="18sp" />
-
-            <TextView
-                android:id="@+id/optionEveryMonth6"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="16dp"
-                android:text="Every 6 Months"
-                android:textSize="18sp" />
-
-            <TextView
-                android:id="@+id/optionEveryYear"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="16dp"
-                android:text="Year"
-                android:textSize="18sp" />
-        </LinearLayout>
-    </ScrollView>
-
-    <!-- Add more recurrence options here -->
-</LinearLayout>
+            </LinearLayout>
+        </ScrollView>
+    </LinearLayout>
+</FrameLayout>
