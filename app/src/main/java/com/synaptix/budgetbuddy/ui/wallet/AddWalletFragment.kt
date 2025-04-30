@@ -7,14 +7,19 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.synaptix.budgetbuddy.R
+import com.synaptix.budgetbuddy.databinding.FragmentAddWalletBinding
 
 class AddWalletFragment : Fragment() {
+
+    private var _binding: FragmentAddWalletBinding? = null
+    private val binding get() = _binding!!
+
+    private val viewModel: AddWalletViewModel by viewModels()
+
 
     companion object {
         fun newInstance() = AddWalletFragment()
     }
-
-    private val viewModel: AddWalletViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -23,9 +28,21 @@ class AddWalletFragment : Fragment() {
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        return inflater.inflate(R.layout.fragment_add_wallet, container, false)
+        _binding = FragmentAddWalletBinding.inflate(inflater, container, false)
+        return binding.root
     }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        //oncliick listener that saves user input and injects into usecase
+        binding.btnSave.setOnClickListener(
+
+        )
+    }
+
 }
