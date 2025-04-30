@@ -171,8 +171,8 @@
                 android:paddingVertical="8dp">
 
                 <ImageView
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
                     android:layout_marginEnd="12dp"
                     android:src="@drawable/ic_account_balance_wallet_24"
                     app:tint="?attr/colorOnPrimary" />
@@ -223,8 +223,8 @@
                 android:paddingVertical="8dp">
 
                 <ImageView
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
                     android:layout_marginEnd="12dp"
                     android:src="@drawable/baseline_savings_24"
                     app:tint="?attr/colorOnPrimary" />
@@ -459,8 +459,8 @@
 
                     <!-- Food & Drink and Expense Info -->
                     <View
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
                         android:layout_gravity="center"
                         android:layout_marginEnd="12dp"
                         android:background="@drawable/circle_button_background" />
@@ -557,8 +557,8 @@
                     android:paddingVertical="8dp">
 
                     <ImageView
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
                         android:layout_marginEnd="12dp"
                         android:src="@drawable/ic_attach_money_24"
                         app:tint="?attr/colorOnPrimary" />
@@ -616,8 +616,8 @@
                     android:paddingVertical="8dp">
 
                     <ImageView
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
                         android:layout_marginEnd="12dp"
                         android:src="@drawable/baseline_local_gas_station_24"
                         app:tint="?attr/colorOnPrimary" />

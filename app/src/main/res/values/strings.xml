@@ -12,6 +12,7 @@
     <string name="total_balance">Total Balance</string>
     <string name="spending_overview">Spending Overview</string>
     <string name="total_expense">Total Expense</string>
+    <string name="labels">Labels</string>
     <!-- =========================================================== -->
 
     <!-- ============ Open, Sign In and Sign Up Strings ============-->
@@ -39,12 +40,17 @@
     <string name="set_reminder">Set Reminder</string>
     <string name="add_photo">Add a Photo</string>
     <string name="select_currency">Select Currency</string>
+    <string name="picture">Pictures</string>
     <!-- =========================================================== -->
 
     <!-- ==================== Categories ======================-->
     <string name="category">Category</string>
     <string name="transaction">Transactions</string>
+    <string name="category_colour">Category colour</string>
+    <string name="category_icon">Category Icon</string>
+
     <!-- Expenses -->
+    <string name="expenses">Expenses</string>
     <string name="food">Food</string>
     <string name="entertainment">Entertainment</string>
     <string name="transport">Transport</string>
@@ -54,6 +60,7 @@
     <string name="rentMortgage">Rent/Mortgage</string>">
 
     <!-- Income -->
+    <string name="income">Income</string>
     <string name="salary">Salary</string>
     <string name="bonus">Bonus</string>
     <string name="investment">Investment</string>
@@ -95,6 +102,11 @@
     <string name="budget_for">Budget for</string>
     <string name="start_date">Start Date</string>
     <string name="budget_name">Budget Name</string>
+    <string name="budget_colour">Budget Colour</string>
+    <string name="budget_icon">Budget Icon</string>
+    <string name="total_budget">Total budget</string>
+    <string name="total_spent">Total spent</string>
+    <string name="end_of_month">End of Month</string>
     <!-- =========================================================== -->
 
 
