@@ -117,7 +117,7 @@
 
                 <ImageView
                     style="@style/RowIconStyle"
-                    android:src="@drawable/ic_email_24"
+                    android:src="@drawable/baseline_savings_24"
                     app:tint="?attr/bb_button" />
 
                 <EditText

@@ -59,6 +59,7 @@ class AddTransactionFragment : Fragment() {
         setupClickListeners()
     }
 
+    //Handles the setup of the currency spinner.
     private fun setupCurrencySpinner() {
         val adapter = ArrayAdapter(
             requireContext(),

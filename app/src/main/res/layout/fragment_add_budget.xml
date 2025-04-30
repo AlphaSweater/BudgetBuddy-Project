@@ -12,18 +12,12 @@
         android:layout_width="match_parent"
         android:layout_height="70dp"
         android:orientation="horizontal"
-        android:gravity="center_vertical"
+        android:gravity="center"
         android:background="?attr/bb_surface"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
-
-        <ImageView
-            android:id="@+id/back_arrow"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:src="?attr/actionModeCloseDrawable"
-            android:contentDescription="Back Arrow"/>
+        app:layout_constraintEnd_toEndOf="parent"
+        >
 
         <TextView
             android:id="@+id/title"
@@ -36,6 +30,18 @@
             android:layout_marginStart="16dp"/>
     </LinearLayout>
 
+    <ImageButton
+        android:id="@+id/btnGoBack"
+        android:layout_width="44dp"
+        android:layout_height="44dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:background="@null"
+        android:contentDescription="@string/back"
+        android:src="?attr/actionModeCloseDrawable"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:tint="?attr/bb_primaryText" />
     <!-- Budget Details Section -->
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/budget_details_card"
@@ -60,7 +66,7 @@
 
             <!-- Budget Name -->
         <LinearLayout
-            android:id="@+id/rowSelectCategory"
+            android:id="@+id/rowSelectBudgetName"
             style="@style/RowStyle">
 
             <ImageView
@@ -73,13 +79,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="Budget Name"
-
+                android:textColor="?attr/bb_primaryText"
+                android:textColorHint="?attr/bb_primaryText"
                 android:textSize="16sp"/>
         </LinearLayout>
 
             <!-- Amount and Currency -->
             <LinearLayout
-                android:id="@+id/rowSelectCategory"
+                android:id="@+id/rowAmountAndCurrency"
                 style="@style/RowStyle">
 
                 <ImageView
@@ -94,20 +101,21 @@
                     android:layout_weight="1"
                     android:hint="Amount"
                     android:inputType="numberDecimal"
+                    android:textColor="?attr/bb_primaryText"
+                    android:textColorHint="?attr/bb_primaryText"
                     android:textSize="16sp"/>
 
-                <TextView
-                    android:id="@+id/currency"
+                <Spinner
+                    android:id="@+id/currency_spinner"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="ZAR"
-                    android:textSize="16sp"
-                    android:paddingStart="16dp"/>
+                    android:paddingStart="16dp"
+                    android:spinnerMode="dropdown"/>
             </LinearLayout>
 
             <!-- Budget Category -->
             <LinearLayout
-                android:id="@+id/rowSelectCategory"
+                android:id="@+id/rowBudgetFor"
                 style="@style/RowStyle">
 
                 <ImageView
@@ -138,13 +146,12 @@
                     android:layout_height="24dp"
                     android:src="@drawable/baseline_arrow_forward_ios_24"
                     android:contentDescription="Arrow"
-                    app:tint="?attr/colorOnPrimary"
-                    android:background=""/>
+                    app:tint="?attr/colorOnPrimary"/>
             </LinearLayout>
 
             <!-- Recurrence -->
             <LinearLayout
-                android:id="@+id/rowSelectCategory"
+                android:id="@+id/rowRecurrence"
                 style="@style/RowStyle">
 
                 <ImageView
@@ -180,7 +187,7 @@
 
             <!-- Start Date -->
             <LinearLayout
-                android:id="@+id/rowSelectCategory"
+                android:id="@+id/rowStartDate"
                 style="@style/RowStyle">
 
                 <ImageView

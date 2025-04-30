@@ -6,9 +6,16 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ArrayAdapter
+import android.widget.Spinner
 import com.synaptix.budgetbuddy.R
+import com.synaptix.budgetbuddy.databinding.FragmentAddBudgetBinding
+import com.synaptix.budgetbuddy.ui.recurrence.RecurrenceBottomSheet
 
 class AddBudgetFragment : Fragment() {
+
+    private var _binding: FragmentAddBudgetBinding? = null
+    private val binding get() = _binding!!
 
     companion object {
         fun newInstance() = AddBudgetFragment()
@@ -25,5 +32,27 @@ class AddBudgetFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View {
         return inflater.inflate(R.layout.fragment_add_budget, container, false)
+
+        setupCurrencySpinner()
+        setupClickListeners()
+    }
+
+
+    private fun setupCurrencySpinner() {
+        val currencies = arrayOf("ZAR", "USD", "EUR", "GBP")
+        val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, currencies)
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        binding.currencySpinner.adapter = adapter
+    }
+
+    private fun setupClickListeners() {
+        binding.rowRecurrence.setOnClickListener {
+            RecurrenceBottomSheet().show(parentFragmentManager, "RecurrenceBottomSheet")
+        }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }
