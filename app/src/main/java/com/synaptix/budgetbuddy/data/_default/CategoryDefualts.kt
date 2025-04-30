@@ -1,7 +1,9 @@
-package com.synaptix.budgetbuddy.data.defuaults
+package com.synaptix.budgetbuddy.data._default
 
 import com.synaptix.budgetbuddy.data.entity.CategoryEntity
 
+//object list of default categories for the database
+//null User ID makes default categories global and accessible by all users
 object CategoryDefualts {
     val defaultCategories = listOf(
         CategoryEntity(0, null, "Food", "@color/cat_dark_pink", "@drawable/baseline_fastfood_24", "expense"),

@@ -57,7 +57,9 @@ object AppModule {
             AppDatabase::class.java,
             "budgetbuddy_db"
         )
+            //this destroys database if version changes to allow for easier migration when testing and developing app
             .fallbackToDestructiveMigration()
+
             //AI assisted with callback to allow for default categories to be added to the database on creation
             .addCallback(CategoryDatabaseCallback { db })
             .build()

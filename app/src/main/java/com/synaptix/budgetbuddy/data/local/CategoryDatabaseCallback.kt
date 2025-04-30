@@ -3,7 +3,7 @@ package com.synaptix.budgetbuddy.data.local
 import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.synaptix.budgetbuddy.data.AppDatabase
-import com.synaptix.budgetbuddy.data.defuaults.CategoryDefualts
+import com.synaptix.budgetbuddy.data._default.CategoryDefualts
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
