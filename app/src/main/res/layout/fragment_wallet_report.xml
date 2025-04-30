@@ -4,8 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".presentation.ui.main.wallet.reportWallet.WalletReportFragment"
-    android:background="?attr/bb_background">
+    android:background="?attr/bb_background"
+    tools:context=".presentation.ui.main.wallet.reportWallet.WalletReportFragment">
 
     <!-- Header Container (Holds top balance summary and back button) -->
     <androidx.constraintlayout.widget.ConstraintLayout
