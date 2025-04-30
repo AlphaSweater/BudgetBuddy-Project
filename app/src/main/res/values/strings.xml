@@ -42,6 +42,8 @@
     <!-- =========================================================== -->
 
     <!-- ==================== Categories ======================-->
+    <string name="category">Category</string>
+    <string name="transaction">Transactions</string>
     <!-- Expenses -->
     <string name="food">Food</string>
     <string name="entertainment">Entertainment</string>
@@ -60,6 +62,19 @@
     <string name="back">Back</string>
     <string name="date">Date</string>
     <string name="write_a_note">Write a Note\n</string>">
+
+    <!-- Budget Categories -->
+    <string name="select_all">Select All</string>
+    <string name="beauty">Beauty</string>
+    <string name="bills_and_fees">Bills And Fees</string>
+    <string name="cars">Cars</string>
+    <string name="family_and_person">Family And Personal</string>
+    <string name="food_and_drinks">Food And Drinks</string>
+    <string name="gifts">Gifts</string>
+    <string name="Groceries">Groceries</string>
+    <string name="healthcare">HealthCare</string>
+    <string name="home">Home</string>
+    <string name="other">Other</string>
     <!-- =========================================================== -->
 
     <!-- ==================== Home Page ======================-->
@@ -74,4 +89,13 @@
     <string name="week">Week</string>
     <string name="month">Month</string>
     <!-- =========================================================== -->
+
+    <!-- ==================== Budget Page ======================-->
+    <string name="add_new_budget">Add New Budget</string>
+    <string name="budget_for">Budget for</string>
+    <string name="start_date">Start Date</string>
+    <string name="budget_name">Budget Name</string>
+    <!-- =========================================================== -->
+
+
 </resources>

@@ -23,7 +23,7 @@
             android:id="@+id/title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Add New Budget"
+            android:text="@string/add_new_budget"
             android:textSize="18sp"
             android:textStyle="bold"
             android:textColor="?attr/bb_primaryText"
@@ -78,7 +78,7 @@
                 android:id="@+id/budget_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Budget Name"
+                android:hint="@string/budget_name"
                 android:textColor="?attr/bb_primaryText"
                 android:textColorHint="?attr/bb_primaryText"
                 android:textSize="16sp"/>
@@ -99,7 +99,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:hint="Amount"
+                    android:hint="@string/amount"
                     android:inputType="numberDecimal"
                     android:textColor="?attr/bb_primaryText"
                     android:textColorHint="?attr/bb_primaryText"
@@ -165,7 +165,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="12dp"
                     android:layout_weight="1"
-                    android:text="Recurrence"
+                    android:text="@string/recurrence"
                     android:textColor="?attr/bb_primaryText"
                     android:textSize="16sp"/>
 
@@ -200,7 +200,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Start Date"
+                    android:text="@string/start_date"
                     android:textColor="?attr/bb_primaryText"
                     android:layout_marginStart="12dp"
                     android:textSize="16sp"/>
