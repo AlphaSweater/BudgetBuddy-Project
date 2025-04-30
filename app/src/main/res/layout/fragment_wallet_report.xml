@@ -6,13 +6,38 @@
     android:layout_height="match_parent"
     tools:context=".presentation.ui.main.wallet.reportWallet.WalletReportFragment"
     android:background="?attr/bb_background">
-    <!--
 
+    <!-- Header Container (Holds top balance summary and back button) -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/headerContainer"
+        android:layout_width="0dp"
+        android:layout_height="195dp"
+        android:background="?attr/bb_surface"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <!-- Back Button -->
+        <ImageButton
+            android:id="@+id/btnBackTransaction"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:layout_marginTop="12dp"
+            android:background="@null"
+            android:src="?attr/actionModeCloseDrawable"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="?attr/bb_primaryText"
+            tools:ignore="TouchTargetSizeCheck" />
+
+        <!-- Currency Text ("ZAR" or others) -->
         <TextView
             android:id="@+id/tvCurrency"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="134dp"
+            android:layout_marginStart="105dp"
             android:layout_marginTop="16dp"
             android:text="ZAR"
             android:textColor="?attr/bb_primaryText"
@@ -21,90 +46,577 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
+        <!-- Total Currency Value -->
         <TextView
             android:id="@+id/tvCurrencyTotal"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="186dp"
+            android:layout_marginStart="6dp"
             android:layout_marginTop="16dp"
             android:text="12,200"
             android:textColor="?attr/bb_profit"
             android:textSize="26sp"
             android:textStyle="bold"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/tvCurrency"
             app:layout_constraintTop_toTopOf="parent" />
 
+        <!-- Eye Icon (Probably to toggle balance visibility) -->
         <ImageView
             android:id="@+id/ivEye"
             android:layout_width="47dp"
             android:layout_height="36dp"
+            android:layout_marginStart="6dp"
             android:layout_marginTop="16dp"
-            android:tint="?attr/bb_primaryText"
             android:src="@android:drawable/ic_menu_view"
             app:layout_constraintStart_toEndOf="@+id/tvCurrencyTotal"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="?attr/bb_primaryText" />
 
-
+        <!-- Balance Label Text -->
         <TextView
             android:id="@+id/tvTotalBalance"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="180dp"
+            android:layout_marginStart="165dp"
+            android:layout_marginTop="4dp"
             android:text="Balance"
             android:textColor="?attr/bb_secondaryText"
             android:textSize="18sp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tvCurrencyTotal" />
-
-        <LinearLayout
-            android:id="@+id/filter_container"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="40dp"
-            android:gravity="center"
-            android:orientation="horizontal"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tvCurrencyTotal">
-
-            <Spinner
-                android:id="@+id/spinner_wallet"
-                android:layout_width="wrap_content"
-                android:layout_height="48dp"
-                android:entries="@array/wallets_array"
-                android:paddingStart="16dp"
-                android:paddingEnd="40dp"
-                android:gravity="center_vertical"
-                android:background="@android:drawable/btn_dropdown"
-                android:spinnerMode="dropdown"
-                android:dropDownWidth="wrap_content"
-                android:popupBackground="@android:color/white" />
-
-            <Spinner
-                android:id="@+id/spinner_date"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:entries="@array/date_filter_array" />
-        </LinearLayout>
-
-        <com.google.android.material.tabs.TabLayout
-            android:id="@+id/tab_layout"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="52dp"
-            android:background="@android:color/white"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/filter_container"
-            app:tabIndicatorColor="@color/black"
-            app:tabMode="fixed"
-            app:tabSelectedTextColor="@color/black"
-            app:tabTextColor="@color/dark_gray" />
-
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    -->
+    <!-- Wallet and Time Period Spinners (Dropdown Filters) -->
+    <LinearLayout
+        android:id="@+id/linearLayout5"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="90dp"
+        android:gravity="center"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/headerContainer">
+
+        <!-- Wallet Selection Dropdown -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            app:cardBackgroundColor="?attr/bb_background"
+            app:cardCornerRadius="25dp"
+            app:cardElevation="4dp">
+
+            <RelativeLayout
+                android:layout_width="130dp"
+                android:layout_height="40dp"
+                android:background="?attr/bb_background"
+                android:gravity="center_vertical"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp">
+
+                <!-- Wallet Icon -->
+                <ImageView
+                    android:id="@+id/ivWalletIcon"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true"
+                    android:src="@drawable/ic_account_balance_wallet_24"
+                    app:tint="?attr/bb_button" />
+
+                <!-- Wallet Spinner Dropdown -->
+                <Spinner
+                    android:id="@+id/spinnerWallet"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_toStartOf="@id/arrowIcon1"
+                    android:layout_toEndOf="@id/ivWalletIcon"
+                    android:backgroundTint="?attr/bb_background"
+                    android:gravity="center_vertical"
+                    android:popupBackground="?attr/bb_background"
+                    android:spinnerMode="dropdown"
+                    android:text="?attr/bb_expense" />
+
+                <!-- Arrow Icon for Wallet Dropdown -->
+                <ImageView
+                    android:id="@+id/arrowIcon1"
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:src="@android:drawable/arrow_down_float"
+                    app:tint="?attr/bb_primaryText" />
+            </RelativeLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- Time Period Selection Dropdown -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            app:cardBackgroundColor="?attr/bb_background"
+            app:cardCornerRadius="25dp"
+            app:cardElevation="4dp">
+
+            <FrameLayout
+                android:layout_width="130dp"
+                android:layout_height="40dp">
+
+                <!-- Time Period Spinner Dropdown -->
+                <Spinner
+                    android:id="@+id/spinnerTimePeriod"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@android:color/transparent"
+                    android:backgroundTint="?attr/bb_background"
+                    android:dropDownWidth="wrap_content"
+                    android:gravity="center_vertical"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="36dp"
+                    android:popupBackground="?attr/bb_background"
+                    android:spinnerMode="dropdown" />
+
+                <!-- Arrow Icon for Time Period Dropdown -->
+                <ImageView
+                    android:id="@+id/arrowIcon2"
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:layout_gravity="end|center_vertical"
+                    android:layout_marginEnd="8dp"
+                    android:src="@android:drawable/arrow_down_float"
+                    app:tint="?attr/bb_primaryText" />
+            </FrameLayout>
+        </androidx.cardview.widget.CardView>
+    </LinearLayout>
+
+    <!-- TabLayout for switching between report tabs -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout5">
+
+        <!-- Tab Layout for selecting tabs like "Summary", "Expenses", "Income" -->
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/tabLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            app:tabIndicatorColor="?attr/bb_primaryText"
+            app:tabIndicatorHeight="2dp"
+            app:tabSelectedTextColor="?attr/bb_primaryText"
+            app:tabTextColor="?attr/bb_primaryText" />
+    </LinearLayout>
+
+    <!-- Holds the transaction history of the chosen wallet -->
+    <ScrollView
+        android:id="@+id/scrollContent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@+id/headerContainer">
+
+        <!-- Main vertical layout container that holds all child views inside the ScrollView -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp"
+            app:layout_constraintTop_toBottomOf="@+id/top_bar">
+
+            <!-- First MaterialCardView (for date header card) -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/date_header_card"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                app:cardBackgroundColor="?attr/bb_surface"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="4dp">
+
+                <!-- LinearLayout to display date and transaction info inside the card -->
+                <LinearLayout
+                    style="@style/RowStyle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <!-- TextView displaying the day of the month -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="17"
+                        android:textColor="?attr/bb_primaryText"
+                        android:textSize="24sp" />
+
+                    <!-- Nested LinearLayout to hold more detailed date info like "Today" and "March 2025" -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="12dp"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Today"
+                            android:textColor="?attr/bb_primaryText"
+                            android:textSize="14sp" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="March 2025"
+                            android:textColor="?attr/bb_primaryText"
+                            android:textSize="12sp" />
+                    </LinearLayout>
+
+                    <!-- TextView displaying the transaction amount with negative sign for expense -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="-R 800"
+                        android:textColor="@android:color/holo_red_light"
+                        android:textSize="14sp" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Row-style LinearLayout displaying the Bills and Fees section -->
+            <LinearLayout
+                style="@style/RowStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <!-- ImageView for Bills and Fees icon -->
+                <ImageView
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:src="@drawable/baseline_savings_24"
+                    app:tint="@color/cat_dark_green" />
+
+                <!-- Vertical LinearLayout containing textual information about the Bills and Fees -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Bills and Fees"
+                        android:textColor="?attr/bb_primaryText"
+                        android:textSize="14sp" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Bills and Fees"
+                        android:textColor="?attr/bb_secondaryText"
+                        android:textSize="12sp" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Cash Wallet"
+                        android:textColor="?attr/bb_secondaryText"
+                        android:textSize="12sp" />
+                </LinearLayout>
+
+                <!-- Vertical LinearLayout for amount and date information -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="end"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="-R 800"
+                        android:textAlignment="textEnd"
+                        android:textColor="@android:color/holo_red_light"
+                        android:textSize="14sp" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Today"
+                        android:textColor="?attr/bb_secondaryText"
+                        android:textSize="12sp" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Second MaterialCardView for another date header card -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/date_header_card2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                app:cardBackgroundColor="?attr/bb_surface"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="4dp">
+
+                <!-- LinearLayout to display transaction info for another date -->
+                <LinearLayout
+                    style="@style/RowStyle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="16"
+                        android:textColor="?attr/bb_primaryText"
+                        android:textSize="24sp" />
+
+                    <!-- Vertical LinearLayout with text for "Yesterday" and the month -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="12dp"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Yesterday"
+                            android:textColor="?attr/bb_primaryText"
+                            android:textSize="14sp" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="March 2025"
+                            android:textColor="?attr/bb_primaryText"
+                            android:textSize="12sp" />
+                    </LinearLayout>
+
+                    <!-- TextView displaying the expense amount -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="-R 3,500"
+                        android:textColor="@android:color/holo_red_light"
+                        android:textSize="14sp" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Row-style LinearLayout displaying car expenses -->
+            <LinearLayout
+                style="@style/RowStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <!-- ImageView for Car Expenses icon -->
+                <ImageView
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:src="@drawable/ic_car_24"
+                    app:tint="@color/cat_light_blue" />
+
+                <!-- Vertical LinearLayout with textual info about the Car Expenses -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Car Expenses"
+                        android:textColor="?attr/bb_primaryText"
+                        android:textSize="14sp" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Petrol"
+                        android:textColor="?attr/bb_secondaryText"
+                        android:textSize="12sp" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Cash Wallet"
+                        android:textColor="?attr/bb_secondaryText"
+                        android:textSize="12sp" />
+                </LinearLayout>
+
+                <!-- Vertical LinearLayout for the amount and date -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="end"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="-R 1,500"
+                        android:textAlignment="textEnd"
+                        android:textColor="@android:color/holo_red_light"
+                        android:textSize="14sp" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Yesterday"
+                        android:textColor="?attr/bb_secondaryText"
+                        android:textSize="12sp" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Row-style LinearLayout displaying groceries expenses -->
+            <LinearLayout
+                style="@style/RowStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <!-- ImageView for Groceries icon -->
+                <ImageView
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:src="@drawable/baseline_shopping_bag_24"
+                    app:tint="@color/cat_orange" />
+
+                <!-- Vertical LinearLayout with groceries info -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Groceries"
+                        android:textColor="?attr/bb_primaryText"
+                        android:textSize="14sp" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Cash Wallet"
+                        android:textColor="?attr/bb_secondaryText"
+                        android:textSize="12sp" />
+                </LinearLayout>
+
+                <!-- Amount and date info for groceries -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="end"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="-R 2,000"
+                        android:textAlignment="textEnd"
+                        android:textColor="@android:color/holo_red_light"
+                        android:textSize="14sp" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Yesterday"
+                        android:textColor="?attr/bb_secondaryText"
+                        android:textSize="12sp" />
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+
+    <!-- CardView for Spending Overview -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardView_overview"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="600dp"
+        android:backgroundTint="?attr/bb_surface"
+        android:padding="12dp"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="4dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/headerContainer">
+
+        <!-- Inner ConstraintLayout inside CardView -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <!-- Icon: Pie chart image -->
+            <ImageView
+                android:id="@+id/spendingIcon"
+                android:layout_width="26dp"
+                android:layout_height="26dp"
+                android:layout_marginStart="5dp"
+                android:paddingTop="5dp"
+                android:paddingBottom="5dp"
+                android:src="@drawable/ic_pie_chart_24"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:tint="?attr/bb_primaryText" />
+
+            <!-- Text: Spending Overview title -->
+            <TextView
+                android:id="@+id/tvSpendingOverview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingTop="5dp"
+                android:paddingBottom="5dp"
+                android:text="Spending Overview"
+                android:textColor="?attr/bb_primaryText"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/arrowIcon3"
+                app:layout_constraintStart_toEndOf="@+id/spendingIcon"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.0" />
+
+            <!-- Arrow icon -->
+            <ImageView
+                android:id="@+id/arrowIcon3"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:layout_marginEnd="4dp"
+                android:paddingTop="5dp"
+                android:paddingBottom="5dp"
+                android:rotation="270"
+                android:src="@android:drawable/arrow_down_float"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:tint="?attr/bb_primaryText" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.cardview.widget.CardView>
 </androidx.constraintlayout.widget.ConstraintLayout>

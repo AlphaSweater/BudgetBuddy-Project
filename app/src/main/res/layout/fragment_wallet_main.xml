@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="?attr/bb_background"
-    android:foregroundTint="#3F51B5"
     tools:context=".presentation.ui.main.wallet.WalletMainFragment">
 
+    <!-- Currency Label (ZAR) -->
     <TextView
         android:id="@+id/tvCurrency"
         android:layout_width="wrap_content"
@@ -21,6 +22,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <!-- Total Currency Amount -->
     <TextView
         android:id="@+id/tvCurrencyTotal"
         android:layout_width="wrap_content"
@@ -34,6 +36,7 @@
         app:layout_constraintStart_toEndOf="@+id/tvCurrency"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <!-- Eye Icon to Toggle Visibility -->
     <ImageView
         android:id="@+id/ivEye"
         android:layout_width="47dp"
@@ -41,10 +44,11 @@
         android:layout_marginStart="4dp"
         android:layout_marginTop="16dp"
         android:src="@android:drawable/ic_menu_view"
-        android:tint="?attr/bb_primaryText"
+        app:tint="?attr/bb_primaryText"
         app:layout_constraintStart_toEndOf="@+id/tvCurrencyTotal"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <!-- Text Label "Total Balance" -->
     <TextView
         android:id="@+id/tvTotalBalance"
         android:layout_width="wrap_content"
@@ -56,6 +60,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tvCurrencyTotal" />
 
+    <!-- Card: Spending Overview -->
     <androidx.cardview.widget.CardView
         android:id="@+id/cardView_overview"
         android:layout_width="200dp"
@@ -70,10 +75,12 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tvCurrencyTotal">
 
+        <!-- Inside the Overview Card -->
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
+            <!-- Label "Spending Overview" -->
             <TextView
                 android:id="@+id/tvSpendingOverview"
                 android:layout_width="wrap_content"
@@ -91,6 +98,7 @@
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintVertical_bias="0.0" />
 
+            <!-- Arrow Icon in the Card -->
             <ImageView
                 android:id="@+id/arrowIcon1"
                 android:layout_width="22dp"
@@ -100,13 +108,14 @@
                 android:paddingBottom="5dp"
                 android:rotation="270"
                 android:src="@android:drawable/arrow_down_float"
-                android:tint="?attr/bb_primaryText"
+                app:tint="?attr/bb_primaryText"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>
 
+    <!-- Card: Wallet Info -->
     <androidx.cardview.widget.CardView
         android:id="@+id/cardView_wallet1"
         android:layout_width="0dp"
@@ -120,20 +129,23 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/cardView_overview">
 
+        <!-- Inside the Wallet Card -->
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:padding="16dp">
 
+            <!-- Wallet Icon -->
             <ImageView
                 android:id="@+id/walletIcon1"
                 android:layout_width="70dp"
                 android:layout_height="70dp"
                 android:src="@drawable/ic_account_balance_wallet_24"
-                android:tint="?attr/bb_button"
+                app:tint="@color/cat_light_brown"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
+            <!-- Wallet Name (e.g., Cash Wallet) -->
             <TextView
                 android:id="@+id/tvWalletName"
                 android:layout_width="wrap_content"
@@ -147,6 +159,7 @@
                 app:layout_constraintStart_toEndOf="@id/walletIcon1"
                 app:layout_constraintTop_toTopOf="parent" />
 
+            <!-- Wallet Currency Label -->
             <TextView
                 android:id="@+id/tvCurrency1"
                 android:layout_width="wrap_content"
@@ -160,6 +173,7 @@
                 app:layout_constraintStart_toEndOf="@id/walletIcon1"
                 app:layout_constraintTop_toBottomOf="@id/tvWalletName" />
 
+            <!-- Wallet Amount -->
             <TextView
                 android:id="@+id/tvWalletAmount"
                 android:layout_width="wrap_content"
@@ -173,12 +187,13 @@
                 app:layout_constraintStart_toEndOf="@id/walletIcon1"
                 app:layout_constraintTop_toBottomOf="@id/tvWalletName" />
 
+            <!-- Arrow Icon in Wallet Card -->
             <ImageView
                 android:id="@+id/arrowIcon2"
                 android:layout_width="28dp"
                 android:layout_height="28dp"
                 android:rotation="270"
-                android:tint="?attr/bb_primaryText"
+                app:tint="?attr/bb_primaryText"
                 android:src="@android:drawable/arrow_down_float"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -186,25 +201,28 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>
 
+    <!-- Add Button (Floating Style Button) -->
+    <Button
+        android:id="@+id/buttonAdd"
+        android:layout_width="50dp"
+        android:layout_height="60dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="80dp"
+        android:backgroundTint="?attr/bb_button"
+        android:tint="?attr/bb_button"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
-        <Button
-            android:id="@+id/buttonAdd"
-            android:layout_width="50dp"
-            android:layout_height="60dp"
-            android:layout_marginEnd="20dp"
-            android:backgroundTint="?attr/bb_button"
-            android:tint="?attr/bb_button"
-            app:layout_constraintEnd_toEndOf="parent"
-            tools:layout_editor_absoluteY="812dp" />
-
-        <ImageView
-            android:id="@+id/ivAddButton"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:src="@android:drawable/ic_input_add"
-            app:layout_constraintBottom_toBottomOf="@+id/buttonAdd"
-            app:layout_constraintEnd_toEndOf="@+id/buttonAdd"
-            app:layout_constraintStart_toStartOf="@+id/buttonAdd"
-            app:layout_constraintTop_toTopOf="@+id/buttonAdd" />
+    <!-- Add Icon inside Button -->
+    <ImageView
+        android:id="@+id/ivAddButton"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:src="@android:drawable/ic_input_add"
+        app:tint="?attr/bb_primaryText"
+        app:layout_constraintBottom_toBottomOf="@+id/buttonAdd"
+        app:layout_constraintEnd_toEndOf="@+id/buttonAdd"
+        app:layout_constraintStart_toStartOf="@+id/buttonAdd"
+        app:layout_constraintTop_toTopOf="@+id/buttonAdd" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
