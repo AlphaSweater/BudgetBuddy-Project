@@ -50,6 +50,8 @@ class AuthActivity : AppCompatActivity() {
             .commit()
     }
 
+
+
     fun goToMainActivity() {
         startActivity(Intent(this, MainActivity::class.java))
         finish()
