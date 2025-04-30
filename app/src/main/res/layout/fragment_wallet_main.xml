@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="?attr/bb_background"
     android:foregroundTint="#3F51B5"
-    tools:context=".ui.wallet.WalletMainFragment">
+    tools:context=".presentation.ui.main.wallet.WalletMainFragment">
 
     <TextView
         android:id="@+id/tvCurrency"

@@ -50,4 +50,13 @@
             <!-- Scale inside ImageView -->
             <item name="android:scaleType">centerInside</item>
         </style>
-    </resources>
+
+        <!-- Bottom Sheet Dialog Styles -->
+        <style name="FullScreenBottomSheetDialog" parent="Theme.Design.Light.BottomSheetDialog">
+            <item name="bottomSheetStyle">@style/FullScreenBottomSheetStyle</item>
+        </style>
+
+        <style name="FullScreenBottomSheetStyle" parent="Widget.Design.BottomSheet.Modal">
+            <item name="android:layout_height">match_parent</item>
+        </style>
+</resources>
