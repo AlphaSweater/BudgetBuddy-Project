@@ -16,8 +16,9 @@ import androidx.room.ForeignKey
 )
 data class CategoryEntity (
     @PrimaryKey(autoGenerate = true) val category_id: Int,
-    val user_id: Int,
+    val user_id: Int?, //nullable to allow for default categories to be globally acessible
     val name: String,
     val colour: String,
-    val icon: String
+    val icon: String,
+    val type: String
 )

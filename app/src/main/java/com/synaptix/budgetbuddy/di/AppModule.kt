@@ -2,11 +2,15 @@ package com.synaptix.budgetbuddy.di
 
 import android.content.Context
 import androidx.room.Room
+import androidx.room.RoomDatabase
+import androidx.sqlite.db.SupportSQLiteDatabase
 import com.synaptix.budgetbuddy.core.usecase.auth.GetUserIdUseCase
 import com.synaptix.budgetbuddy.data.repository.UserRepository
 import com.synaptix.budgetbuddy.core.usecase.main.transaction.AddTransactionUseCase
 import com.synaptix.budgetbuddy.core.usecase.auth.LoginUserUseCase
 import com.synaptix.budgetbuddy.data.AppDatabase
+import com.synaptix.budgetbuddy.data.entity.CategoryEntity
+import com.synaptix.budgetbuddy.data.local.CategoryDatabaseCallback
 import com.synaptix.budgetbuddy.data.local.dao.UserDao
 import com.synaptix.budgetbuddy.data.local.dao.WalletDao
 import com.synaptix.budgetbuddy.data.local.datastore.DataStoreManager
@@ -15,6 +19,9 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import javax.inject.Singleton
 
 @Module
@@ -39,15 +46,22 @@ object AppModule {
         return appDatabase.userDao()
     }
 
+
+
     @Provides
     @Singleton
     fun provideAppDatabase(@ApplicationContext context: Context): AppDatabase {
-        return Room.databaseBuilder(
+        lateinit var db: AppDatabase
+        db = Room.databaseBuilder(
             context,
             AppDatabase::class.java,
             "budgetbuddy_db"
-        )   .fallbackToDestructiveMigration()
+        )
+            .fallbackToDestructiveMigration()
+            //AI assisted with callback to allow for default categories to be added to the database on creation
+            .addCallback(CategoryDatabaseCallback { db })
             .build()
+        return db
     }
 
     @Provides
