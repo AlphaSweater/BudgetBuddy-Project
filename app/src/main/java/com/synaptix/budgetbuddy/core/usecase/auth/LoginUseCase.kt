@@ -1,6 +1,6 @@
 package com.synaptix.budgetbuddy.core.usecase.auth
 
-import com.synaptix.budgetbuddy.core.repository.UserRepository
+import com.synaptix.budgetbuddy.data.repository.UserRepository
 import javax.inject.Inject
 
 class LoginUseCase @Inject constructor(

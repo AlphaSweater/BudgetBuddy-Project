@@ -7,7 +7,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.synaptix.budgetbuddy.core.model.Transaction
 import java.util.UUID
-import com.synaptix.budgetbuddy.core.usecase.AddTransactionUseCase
+import com.synaptix.budgetbuddy.core.usecase.main.transaction.AddTransactionUseCase
 import com.synaptix.budgetbuddy.presentation.ui.main.addTransaction.labelSelector.Label
 
 @HiltViewModel
