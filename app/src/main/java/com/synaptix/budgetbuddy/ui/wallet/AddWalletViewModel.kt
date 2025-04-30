@@ -6,6 +6,7 @@ import androidx.room.PrimaryKey
 import com.synaptix.budgetbuddy.core.usecase.main.wallet.AddWalletUseCase
 import com.synaptix.budgetbuddy.data.entity.WalletEntity
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel

@@ -45,7 +45,7 @@ class AddWalletFragment : Fragment() {
         binding.btnSave.setOnClickListener {
             val name = binding.edtWalletName.text.toString()
             val currency = binding.edtCurrency.text.toString()
-            val balance = binding.edtInitialAmount.text.toString()
+            val balanceText = binding.edtInitialAmount.text.toString()
 
             // check if wallet name is empty
             if (name.isEmpty()) {
@@ -59,13 +59,21 @@ class AddWalletFragment : Fragment() {
                 return@setOnClickListener
             }
 
-            // Check if balance is empty
-            if (balance.isEmpty()) {
-                binding.edtInitialAmount.error = "Initial amount is required"
+            if (balanceText.isEmpty()){
+                binding.edtCurrency.error = "Currency is required"
                 return@setOnClickListener
             }
 
-            viewModel.addWallet(name, currency, balance)
+            //concers balancetext into a double
+            val balance = balanceText.toDoubleOrNull()
+
+            // Check if balance is empty
+            if (balance == null) {
+                binding.edtInitialAmount.error = "Please enter a valid number"
+                return@setOnClickListener
+            }
+
+            viewModel.addWallet(name, balance, currency )
         }
     }
 
