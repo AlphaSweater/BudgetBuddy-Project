@@ -31,5 +31,7 @@ class SignupViewModel @Inject constructor(
             val result = signupUserUseCase.execute(userEntity)
         }
     }
-
+    suspend fun checkEmailExists(email: String): Boolean {
+        return signupUserUseCase.emailExists(email)
+    }
 }
