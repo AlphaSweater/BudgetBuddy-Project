@@ -9,6 +9,7 @@ import com.synaptix.budgetbuddy.presentation.ui.auth.landing.LandingFragment
 import com.synaptix.budgetbuddy.presentation.ui.auth.login.LoginFragment
 import com.synaptix.budgetbuddy.presentation.ui.auth.signup.SignupFragment
 import com.synaptix.budgetbuddy.presentation.ui.main.MainActivity
+import com.synaptix.budgetbuddy.ui.wallet.AddWalletFragment
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -41,6 +42,15 @@ class AuthActivity : AppCompatActivity() {
             .addToBackStack(null)
             .commit()
     }
+
+    fun showAddWallet(){
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.auth_fragment_container, AddWalletFragment())
+            .addToBackStack(null)
+            .commit()
+    }
+
+
 
     fun goToMainActivity() {
         startActivity(Intent(this, MainActivity::class.java))
