@@ -33,17 +33,18 @@ class SignupFragment : Fragment(R.layout.fragment_signup) {
             val password = binding.edtPassword.text.toString()
             val confirmPassword = binding.edtTxtPasswordConfirm.text.toString()
 
-            //user input validation that ensures inputs are not empty
-            if (email.isEmpty()) {
-                binding.edtEmailAddress.error = "Email is required"
+            //checks to ensure email is valid
+            if (isValidEmail(email) == false) {
+                binding.edtEmailAddress.error = "Invalid email address"
                 return@setOnClickListener
             }
-            if (password.isEmpty()) {
-                binding.edtPassword.error = "Password is required"
-                return@setOnClickListener
-            }
-            if (confirmPassword.isEmpty()) {
-                binding.edtTxtPasswordConfirm.error = "Please confirm your password"
+
+            //checks to ensure password has more than 8 characters and has 1no, 1upper, 1special
+            if (password.length >= 8 && password.matches(Regex(".*[0-9].*"))
+                && password.matches(Regex(".*[A-Z].*"))
+                && password.matches(Regex(".*[!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>\\/?].*"))) {
+
+                binding.edtPassword.error = "Password must be at least 8 characters and contain 1 number, capital and special character"
                 return@setOnClickListener
             }
 
@@ -58,5 +59,15 @@ class SignupFragment : Fragment(R.layout.fragment_signup) {
             (activity as? AuthActivity)?.showLogin()
 
         }
+
+
     }
+
+    //uses regex to ensure that the email follows a valid layout
+    //AI assisted with the regex logic for this function
+    fun isValidEmail(email: String): Boolean {
+        return email.matches(Regex("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}$"))
+    }
+
 }
+
