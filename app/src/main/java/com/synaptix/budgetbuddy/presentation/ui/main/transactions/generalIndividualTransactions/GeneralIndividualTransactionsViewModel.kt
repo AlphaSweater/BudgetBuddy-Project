@@ -1,4 +1,4 @@
-package com.synaptix.budgetbuddy.presentation.ui.main.transactions
+package com.synaptix.budgetbuddy.presentation.ui.main.transactions.generalIndividualTransactions
 
 import androidx.lifecycle.ViewModel
 

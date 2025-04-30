@@ -1,0 +1,564 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    tools:context=".presentation.ui.main.home.HomeFragment">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/headerContainer"
+            android:layout_width="match_parent"
+            android:layout_height="155dp"
+            android:background="?attr/bb_surface"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp">
+
+            <ImageButton
+                android:id="@+id/btnBackTransaction"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:layout_marginTop="12dp"
+                android:background="@null"
+                android:src="?attr/actionModeCloseDrawable"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:tint="?attr/bb_primaryText"
+                tools:ignore="TouchTargetSizeCheck" />
+
+            <TextView
+                android:id="@+id/tvCurrency"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="105dp"
+                android:layout_marginTop="16dp"
+                android:text="ZAR"
+                android:textColor="?attr/bb_primaryText"
+                android:textSize="26sp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/tvCurrencyTotal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"
+                android:layout_marginTop="16dp"
+                android:text="12,200"
+                android:textColor="?attr/bb_profit"
+                android:textSize="26sp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toEndOf="@id/tvCurrency"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageView
+                android:id="@+id/ivEye"
+                android:layout_width="47dp"
+                android:layout_height="36dp"
+                android:layout_marginStart="6dp"
+                android:layout_marginTop="16dp"
+                android:src="@android:drawable/ic_menu_view"
+                app:layout_constraintStart_toEndOf="@id/tvCurrencyTotal"
+                app:layout_constraintTop_toTopOf="parent"
+                app:tint="?attr/bb_primaryText" />
+
+            <TextView
+                android:id="@+id/tvTotalBalance"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="Total Balance"
+                android:textColor="?attr/bb_secondaryText"
+                android:textSize="18sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tvCurrencyTotal" />
+
+            <LinearLayout
+                android:id="@+id/linearLayout5"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="horizontal"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tvTotalBalance">
+
+                <androidx.cardview.widget.CardView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginEnd="8dp"
+                    app:cardBackgroundColor="?attr/bb_background"
+                    app:cardCornerRadius="25dp"
+                    app:cardElevation="4dp">
+
+                    <RelativeLayout
+                        android:layout_width="130dp"
+                        android:layout_height="40dp"
+                        android:background="?attr/bb_background"
+                        android:paddingStart="8dp"
+                        android:paddingEnd="8dp">
+
+                        <ImageView
+                            android:id="@+id/ivWalletIcon"
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:layout_alignParentStart="true"
+                            android:layout_centerVertical="true"
+                            android:src="@drawable/ic_account_balance_wallet_24"
+                            app:tint="?attr/bb_button" />
+
+                        <Spinner
+                            android:id="@+id/spinnerWallet"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_toStartOf="@id/arrowIcon4"
+                            android:layout_toEndOf="@id/ivWalletIcon"
+                            android:backgroundTint="?attr/bb_background"
+                            android:gravity="center_vertical"
+                            android:popupBackground="?attr/bb_background"
+                            android:spinnerMode="dropdown" />
+
+                        <ImageView
+                            android:id="@+id/arrowIcon4"
+                            android:layout_width="18dp"
+                            android:layout_height="18dp"
+                            android:layout_alignParentEnd="true"
+                            android:layout_centerVertical="true"
+                            android:src="@android:drawable/arrow_down_float"
+                            app:tint="?attr/bb_primaryText" />
+                    </RelativeLayout>
+                </androidx.cardview.widget.CardView>
+
+                <androidx.cardview.widget.CardView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginEnd="8dp"
+                    app:cardBackgroundColor="?attr/bb_background"
+                    app:cardCornerRadius="25dp"
+                    app:cardElevation="4dp">
+
+                    <FrameLayout
+                        android:layout_width="130dp"
+                        android:layout_height="40dp">
+
+                        <Spinner
+                            android:id="@+id/spinnerTimePeriod"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:background="@android:color/transparent"
+                            android:backgroundTint="?attr/bb_background"
+                            android:paddingStart="16dp"
+                            android:paddingEnd="36dp"
+                            android:popupBackground="?attr/bb_background"
+                            android:spinnerMode="dropdown" />
+
+                        <ImageView
+                            android:id="@+id/arrowIcon2"
+                            android:layout_width="18dp"
+                            android:layout_height="18dp"
+                            android:layout_gravity="end|center_vertical"
+                            android:layout_marginEnd="8dp"
+                            android:src="@android:drawable/arrow_down_float"
+                            app:tint="?attr/bb_primaryText" />
+                    </FrameLayout>
+                </androidx.cardview.widget.CardView>
+            </LinearLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/reportsMaterialCardView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="4dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/txtMonthlyReportOverView"
+            app:cardBackgroundColor="?attr/bb_surface"
+            app:strokeWidth="0dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="4dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/toggle_background"
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    android:padding="4dp">
+
+                    <!-- Expenses Section -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:padding="8dp"
+                        android:orientation="vertical"
+                        android:gravity="center">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:text="Expenses"
+                            android:textStyle="bold"
+                            android:textColor="?attr/bb_primaryText"
+                            android:background="@android:color/transparent" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:textStyle="bold"
+                            android:text="-R 10,203"
+                            android:textColor="?attr/bb_expense"
+                            android:background="@android:color/transparent" />
+                    </LinearLayout>
+
+                    <!-- Income Section -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:background="@drawable/toggle_selected"
+                        android:padding="8dp"
+                        android:gravity="center">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:text="Income"
+                            android:textStyle="bold"
+                            android:textColor="?attr/bb_primaryText" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:textStyle="bold"
+                            android:text="R 21,500"
+                            android:textColor="?attr/bb_profit" />
+
+                    </LinearLayout>
+                </LinearLayout>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:text="@string/category"
+                android:textColor="?attr/bb_primaryText"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                style="@style/RowStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:weightSum="2">
+
+                <ImageView
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:src="@drawable/baseline_fastfood_24"
+                    app:tint="@color/cat_light_pink" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:layout_marginStart="12dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Food And Drinks"
+                        android:textColor="?attr/bb_primaryText"
+                        android:textSize="14sp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="4 transactions"
+                        android:textColor="?attr/bb_primaryText"
+                        android:textSize="12sp" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="right"
+                        android:text="-R 200 (40%)"
+                        android:textColor="?attr/bb_expense"
+                        android:textSize="12sp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="right"
+                        android:text="Last Activity: Today"
+                        android:textColor="?attr/bb_primaryText"
+                        android:textSize="10sp" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                style="@style/RowStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:weightSum="2"
+                android:layout_marginBottom="5dp">
+
+                <ImageView
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:src="@drawable/ic_car_24"
+                    app:tint="@color/cat_light_blue" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:layout_marginStart="12dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Car"
+                        android:textColor="?attr/bb_primaryText"
+                        android:textSize="14sp" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="2 transactions"
+                        android:textColor="?attr/bb_primaryText"
+                        android:textSize="12sp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="right"
+                        android:text="-R 300 (60%)"
+                        android:textColor="?attr/bb_expense"
+                        android:textSize="12sp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="right"
+                        android:text="Last Activity: Yesterday"
+                        android:textColor="?attr/bb_primaryText"
+                        android:textSize="10sp" />
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/reportsMaterialCardView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="4dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/txtMonthlyReportOverView"
+            app:cardBackgroundColor="?attr/bb_surface"
+            app:strokeWidth="0dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="4dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/toggle_background"
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    android:padding="4dp">
+
+                    <!-- Expenses Section -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:padding="8dp"
+                        android:orientation="vertical"
+                        android:gravity="center">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:text="Expenses"
+                            android:textStyle="bold"
+                            android:textColor="?attr/bb_primaryText"
+                            android:background="@android:color/transparent" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:textStyle="bold"
+                            android:text="-R 10,203"
+                            android:textColor="?attr/bb_expense"
+                            android:background="@android:color/transparent" />
+                    </LinearLayout>
+
+                    <!-- Income Section -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:background="@drawable/toggle_selected"
+                        android:padding="8dp"
+                        android:gravity="center">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:text="Income"
+                            android:textStyle="bold"
+                            android:textColor="?attr/bb_primaryText" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:textStyle="bold"
+                            android:text="R 21,500"
+                            android:textColor="?attr/bb_profit" />
+
+                    </LinearLayout>
+                </LinearLayout>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Labels"
+                android:textColor="?attr/bb_primaryText"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="10dp"/>
+
+            <LinearLayout
+                style="@style/RowStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:padding="12dp">
+
+                <ImageView
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:src="@drawable/ic_discount_24"
+                    app:tint="@color/cat_light_pink" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Label Name"
+                        android:textColor="?attr/bb_primaryText"
+                        android:textSize="14sp" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="X transactions"
+                        android:textColor="?attr/bb_secondaryText"
+                        android:textSize="12sp" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="end"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="right"
+                        android:text="-R 5000"
+                        android:textColor="?attr/bb_expense"
+                        android:textSize="12sp" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="right"
+                        android:text="Last Activity: Today"
+                        android:textColor="?attr/bb_secondaryText"
+                        android:textSize="12sp" />
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+
+    </LinearLayout>
+</ScrollView>
