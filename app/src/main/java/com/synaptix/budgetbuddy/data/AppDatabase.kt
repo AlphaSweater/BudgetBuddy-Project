@@ -2,10 +2,10 @@ package com.synaptix.budgetbuddy.data
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
-import com.synaptix.budgetbuddy.data.local.CategoryDao
-import com.synaptix.budgetbuddy.data.local.TransactionDao
-import com.synaptix.budgetbuddy.data.local.UserDao
-import com.synaptix.budgetbuddy.data.local.WalletDao
+import com.synaptix.budgetbuddy.data.local.dao.CategoryDao
+import com.synaptix.budgetbuddy.data.local.dao.TransactionDao
+import com.synaptix.budgetbuddy.data.local.dao.UserDao
+import com.synaptix.budgetbuddy.data.local.dao.WalletDao
 import com.synaptix.budgetbuddy.data.entity.CategoryEntity
 import com.synaptix.budgetbuddy.data.entity.TransactionEntity
 import com.synaptix.budgetbuddy.data.entity.UserEntity

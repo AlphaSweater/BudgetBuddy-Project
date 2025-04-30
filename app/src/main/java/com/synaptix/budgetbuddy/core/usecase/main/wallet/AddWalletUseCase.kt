@@ -1,7 +1,7 @@
 package com.synaptix.budgetbuddy.core.usecase.main.wallet
 
 import com.synaptix.budgetbuddy.data.entity.WalletEntity
-import com.synaptix.budgetbuddy.data.local.WalletDao
+import com.synaptix.budgetbuddy.data.local.dao.WalletDao
 import javax.inject.Inject
 
 class AddWalletUseCase @Inject constructor(

@@ -1,7 +1,7 @@
 package com.synaptix.budgetbuddy.core.model
 
 data class Transaction(
-    val userId: String,
+    val userId: Int,
     val transactionId: String,
     val walletId: String,
     val category: String,
