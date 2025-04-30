@@ -2,8 +2,8 @@ package com.synaptix.budgetbuddy.di
 
 import android.content.Context
 import androidx.room.Room
-import com.synaptix.budgetbuddy.core.repository.UserRepository
-import com.synaptix.budgetbuddy.core.usecase.AddTransactionUseCase
+import com.synaptix.budgetbuddy.data.repository.UserRepository
+import com.synaptix.budgetbuddy.core.usecase.main.transaction.AddTransactionUseCase
 import com.synaptix.budgetbuddy.core.usecase.auth.LoginUseCase
 import com.synaptix.budgetbuddy.data.AppDatabase
 import com.synaptix.budgetbuddy.data.local.UserDao

@@ -1,4 +1,4 @@
-package com.synaptix.budgetbuddy.core.usecase
+package com.synaptix.budgetbuddy.core.usecase.main.transaction
 
 import com.synaptix.budgetbuddy.core.model.Transaction
 

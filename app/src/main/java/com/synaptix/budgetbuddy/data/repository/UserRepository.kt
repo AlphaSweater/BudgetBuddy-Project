@@ -1,7 +1,7 @@
-package com.synaptix.budgetbuddy.core.repository
+package com.synaptix.budgetbuddy.data.repository
 
-import com.synaptix.budgetbuddy.data.local.UserDao
 import com.synaptix.budgetbuddy.data.entity.UserEntity
+import com.synaptix.budgetbuddy.data.local.UserDao
 import javax.inject.Inject
 
 class UserRepository @Inject constructor(
