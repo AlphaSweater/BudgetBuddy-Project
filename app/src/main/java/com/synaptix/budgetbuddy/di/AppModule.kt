@@ -7,6 +7,7 @@ import com.synaptix.budgetbuddy.core.usecase.main.transaction.AddTransactionUseC
 import com.synaptix.budgetbuddy.core.usecase.auth.LoginUseCase
 import com.synaptix.budgetbuddy.data.AppDatabase
 import com.synaptix.budgetbuddy.data.local.UserDao
+import com.synaptix.budgetbuddy.data.local.WalletDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -38,7 +39,8 @@ object AppModule {
             context,
             AppDatabase::class.java,
             "budgetbuddy_db"
-        ).build()
+        )   .fallbackToDestructiveMigration()
+            .build()
     }
 
     @Provides
@@ -52,4 +54,11 @@ object AppModule {
     fun provideLoginUseCase(repository: UserRepository): LoginUseCase {
         return LoginUseCase(repository)
     }
+
+    @Provides
+    @Singleton
+    fun provideWalletDao(appDatabase: AppDatabase): WalletDao {
+        return appDatabase.walletDao()
+    }
+
 }
