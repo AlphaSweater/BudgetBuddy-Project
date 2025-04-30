@@ -413,7 +413,7 @@
 
         </LinearLayout>
         <com.google.android.material.card.MaterialCardView
-            android:id="@+id/reportsMaterialCardView"
+            android:id="@+id/reportsMaterialCardView2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="16dp"
