@@ -59,4 +59,15 @@
         <style name="FullScreenBottomSheetStyle" parent="Widget.Design.BottomSheet.Modal">
             <item name="android:layout_height">match_parent</item>
         </style>
+
+    <!-- Recurrence Option Style -->
+    <style name="RecurrenceOption">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:padding">16dp</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:textColor">?attr/bb_primaryText</item>
+        <item name="android:background">?attr/selectableItemBackground</item>
+    </style>
+
 </resources>
