@@ -70,7 +70,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:text="Total Balance"
+                android:text="@string/total_balance"
                 android:textColor="?attr/bb_secondaryText"
                 android:textSize="18sp"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -229,7 +229,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:gravity="center"
-                            android:text="Expenses"
+                            android:text="@string/expenses"
                             android:textStyle="bold"
                             android:textColor="?attr/bb_primaryText"
                             android:background="@android:color/transparent" />
@@ -258,7 +258,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:gravity="center"
-                            android:text="Income"
+                            android:text="@string/income"
                             android:textStyle="bold"
                             android:textColor="?attr/bb_primaryText" />
 
@@ -452,7 +452,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:gravity="center"
-                            android:text="Expenses"
+                            android:text="@string/expenses"
                             android:textStyle="bold"
                             android:textColor="?attr/bb_primaryText"
                             android:background="@android:color/transparent" />
@@ -481,7 +481,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:gravity="center"
-                            android:text="Income"
+                            android:text="@string/income"
                             android:textStyle="bold"
                             android:textColor="?attr/bb_primaryText" />
 
@@ -506,7 +506,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Labels"
+                android:text="@string/labels"
                 android:textColor="?attr/bb_primaryText"
                 android:textSize="20sp"
                 android:textStyle="bold"
