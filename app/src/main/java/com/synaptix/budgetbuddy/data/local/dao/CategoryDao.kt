@@ -9,7 +9,7 @@ import com.synaptix.budgetbuddy.data.entity.CategoryEntity
 @Dao
 interface CategoryDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun insert(category: CategoryEntity): Long
+    suspend fun insertCategory(category: CategoryEntity): Long
 
     //sql query to grab a category based on category ID
     @Query("SELECT * FROM category_table WHERE category_id = :categoryId")

@@ -1,8 +1,10 @@
 package com.synaptix.budgetbuddy.core.usecase.auth
 
 import com.synaptix.budgetbuddy.data.repository.UserRepository
+import org.mindrot.jbcrypt.BCrypt
 import javax.inject.Inject
 
+//AI assisted with this
 sealed class LoginResult {
     object Success : LoginResult()
     object UserNotFound : LoginResult()
@@ -17,9 +19,8 @@ class LoginUserUseCase @Inject constructor(
         return try {
             val user = userRepository.getUserByEmail(email)
                 ?: return LoginResult.UserNotFound
-
-            // TODO: ⚠️ WARNING: Replace with secure password hashing later
-            return if (user.password == password) {
+            
+            return if (BCrypt.checkpw(password, user.password )) {
                 userRepository.setUserSession(user)
                 LoginResult.Success
             } else {
@@ -29,4 +30,5 @@ class LoginUserUseCase @Inject constructor(
             LoginResult.Error(e.localizedMessage ?: "Unknown error")
         }
     }
+
 }
