@@ -39,7 +39,7 @@ class WalletMainFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.buttonAdd.setOnClickListener{
+        binding.btnAdd.setOnClickListener{
             (activity as? AuthActivity)?.showLogin()
         }
         setupOnClickListeners()
@@ -50,8 +50,13 @@ class WalletMainFragment : Fragment() {
             findNavController().popBackStack()
         }
 
-        binding.buttonAdd.setOnClickListener {
+        binding.btnAdd.setOnClickListener {
             findNavController().navigate(R.id.action_walletMainFragment_to_addWalletFragment)
         }
+
+        binding.cardViewWallet1.setOnClickListener {
+            findNavController().navigate(R.id.action_walletMainFragment_to_walletReportFragment)
+        }
+
     }
 }

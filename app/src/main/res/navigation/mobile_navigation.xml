@@ -108,7 +108,30 @@
         tools:layout="@layout/fragment_add_wallet">
 
         <action
-            android:id="@+id/action_walletMainFragment_to_addWalletFragment"
+            android:id="@+id/action_addWalletFragment_to_newWalletCategoryFragment"
+            app:destination="@id/navigation_new_wallet_category"
+            app:enterAnim="@anim/slide_in_up"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/slide_out_down"/>
+
+        <action
+            android:id="@+id/action_addWalletFragment_to_walletMainFragment"
+            app:destination="@id/navigation_wallet_main"
+            app:enterAnim="@anim/slide_in_up"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/slide_out_down"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/navigation_new_wallet_category"
+        android:name="com.synaptix.budgetbuddy.presentation.ui.main.wallet.addWallet.ChangeWalletIcon.NewWalletCategoryFragment"
+        android:label="New Wallet Category"
+        tools:layout="@layout/fragment_new_wallet_category">
+
+        <action
+            android:id="@+id/action_newWalletCategoryFragment_to_addWalletFragment"
             app:destination="@id/navigation_wallet_add"
             app:enterAnim="@anim/slide_in_up"
             app:exitAnim="@anim/fade_out"
@@ -116,7 +139,6 @@
             app:popExitAnim="@anim/slide_out_down"/>
 
     </fragment>
-
 
     <fragment
         android:id="@+id/navigation_wallet_report"
