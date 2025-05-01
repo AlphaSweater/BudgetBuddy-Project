@@ -8,6 +8,7 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.synaptix.budgetbuddy.R
@@ -16,6 +17,7 @@ import com.synaptix.budgetbuddy.core.usecase.auth.GetUserIdUseCase
 import com.synaptix.budgetbuddy.databinding.FragmentSelectCategoryBinding
 import com.synaptix.budgetbuddy.presentation.ui.main.addTransaction.AddTransactionViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -98,12 +100,17 @@ class CategorySelectorFragment : Fragment() {
         _binding = null
     }
 
-    private suspend fun getUserId(): Int {
-        return getUserIdUseCase.execute()
+
+    private fun getUserId(): Int {
+        var userid = 0
+        lifecycleScope.launch {
+             userid = getUserIdUseCase.execute()
+        }
+        return userid
     }
 
     private fun instantiateDBS() {
-        categoryViewmodel.loadCategories(1)
+        categoryViewmodel.loadCategories(getUserId())
 
         categoryViewmodel.categories.observe(viewLifecycleOwner) { categoryEntities ->
             val categories = categoryEntities.map {
@@ -128,6 +135,7 @@ class CategorySelectorFragment : Fragment() {
         }
 
     }
+
     fun getDrawableId(name: String): Int {
         val cleanName = name.removePrefix("@drawable/")
         return resources.getIdentifier(cleanName, "drawable", requireContext().packageName)
