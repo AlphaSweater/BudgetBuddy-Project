@@ -7,34 +7,28 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.synaptix.budgetbuddy.R
 import com.synaptix.budgetbuddy.core.model.Category
+import com.synaptix.budgetbuddy.core.usecase.auth.GetUserIdUseCase
 import com.synaptix.budgetbuddy.databinding.FragmentSelectCategoryBinding
 import com.synaptix.budgetbuddy.presentation.ui.main.addTransaction.AddTransactionViewModel
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class CategorySelectorFragment : Fragment() {
 
+    @Inject
+    lateinit var getUserIdUseCase: GetUserIdUseCase
     private var _binding: FragmentSelectCategoryBinding? = null
     private val binding get() = _binding!!
 
     private val viewModel: AddTransactionViewModel by activityViewModels()
+    private val categoryViewmodel: CategorySelectorViewModel by viewModels()
 
-    //test data
-    private val expenseCategories = listOf(
-        Category(1, 1, "Food And Drinks", "Expense", R.drawable.baseline_fastfood_24, R.color.cat_yellow),
-        Category(2, 1, "Transport", "Expense", R.drawable.baseline_local_gas_station_24, R.color.cat_dark_blue),
-        Category(3, 1, "Shopping", "Expense", R.drawable.baseline_shopping_bag_24, R.color.cat_dark_green),
-        Category(4, 1, "Education", "Expense", R.drawable.ic_add_alert_24, R.color.cat_orange),
-        Category(5, 1, "Rent And Mortgage", "Expense", R.drawable.ic_add_alert_24, R.color.cat_light_pink)
-    )
-
-    // sample income data
-    private val incomeCategories = listOf(
-        Category(6, 1, "Salary", "Income", R.drawable.ic_account_balance_wallet_24, R.color.cat_light_green),
-        Category(7, 1, "Freelance", "Income", R.drawable.ic_attach_money_24, R.color.cat_light_blue)
-    )
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -50,24 +44,14 @@ class CategorySelectorFragment : Fragment() {
         setupRecyclerViews()
         setupOnClickListeners()
         showExpenseCategories()
+        instantiateDBS()
     }
+
 
     private fun setupRecyclerViews() {
-        binding.recyclerViewExpenseCategory.apply {
-            layoutManager = LinearLayoutManager(requireContext())
-            adapter = CategoryAdapter(expenseCategories) { category ->
-                viewModel.categoryId.value = category.categoryId
-            }
-        }
-
-        binding.recyclerViewIncomeCategory.apply {
-            layoutManager = LinearLayoutManager(requireContext())
-            adapter = CategoryAdapter(incomeCategories) { category ->
-                viewModel.categoryId.value = category.categoryId
-            }
-        }
+        binding.recyclerViewExpenseCategory.layoutManager = LinearLayoutManager(requireContext())
+        binding.recyclerViewIncomeCategory.layoutManager = LinearLayoutManager(requireContext())
     }
-
     private fun setupOnClickListeners() {
         binding.btnGoBack.setOnClickListener {
             findNavController().popBackStack()
@@ -112,5 +96,45 @@ class CategorySelectorFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    private suspend fun getUserId(): Int {
+        return getUserIdUseCase.execute()
+    }
+
+    private fun instantiateDBS() {
+        categoryViewmodel.loadCategories(1)
+
+        categoryViewmodel.categories.observe(viewLifecycleOwner) { categoryEntities ->
+            val categories = categoryEntities.map {
+                Category(
+                    it.category_id,
+                    it.user_id ?: 0,
+                    it.name,
+                    it.type,
+                    getDrawableId(it.icon),
+                    getColorId(it.colour)
+                )
+            }
+            val (expenseCategories, incomeCategories) = categories.partition { it.categoryType == "expense" }
+
+            binding.recyclerViewExpenseCategory.adapter = CategoryAdapter(expenseCategories) { category ->
+                viewModel.categoryId.value = category.categoryId
+            }
+
+            binding.recyclerViewIncomeCategory.adapter = CategoryAdapter(incomeCategories) { category ->
+                viewModel.categoryId.value = category.categoryId
+            }
+        }
+
+    }
+    fun getDrawableId(name: String): Int {
+        val cleanName = name.removePrefix("@drawable/")
+        return resources.getIdentifier(cleanName, "drawable", requireContext().packageName)
+    }
+
+    fun getColorId(name: String): Int {
+        val cleanName = name.removePrefix("@color/")
+        return resources.getIdentifier(cleanName, "color", requireContext().packageName)
     }
 }

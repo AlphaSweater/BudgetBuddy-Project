@@ -45,5 +45,6 @@ class CategoryAdapter(
                 onCategoryClick(category)
             }
         }
+
     }
 }
