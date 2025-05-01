@@ -12,6 +12,6 @@ data class Transaction(
     val date: String,
     val note: String?,
     val selectedLabels: List<Label> = mutableListOf(),
-    val photo: String?,
+    val photo: ByteArray?,
     val recurrenceRate: String?
 ) : Serializable

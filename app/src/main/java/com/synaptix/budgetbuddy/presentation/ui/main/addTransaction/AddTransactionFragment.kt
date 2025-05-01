@@ -1,6 +1,7 @@
 package com.synaptix.budgetbuddy.presentation.ui.main.addTransaction
 
 import android.app.DatePickerDialog
+import android.content.ContentValues
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.icu.util.Calendar
@@ -12,6 +13,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
@@ -28,6 +30,15 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Locale
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.ImageDecoder
+import android.net.Uri
+import android.os.Build
+import android.provider.MediaStore
+import androidx.activity.result.contract.ActivityResultContracts
+import java.io.ByteArrayOutputStream
+
 
 @AndroidEntryPoint
 class AddTransactionFragment : Fragment() {
@@ -36,6 +47,10 @@ class AddTransactionFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val viewModel: AddTransactionViewModel by activityViewModels()
+
+    private lateinit var takePictureLauncher: ActivityResultLauncher<Uri>
+    private lateinit var pickImageLauncher: ActivityResultLauncher<String>
+    private var tempImageUri: Uri? = null
 
     // --- Lifecycle ---
     override fun onCreateView(
@@ -50,6 +65,7 @@ class AddTransactionFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupUI()
+        setupCameraStuff()
         observeViewModel()
     }
 
@@ -117,11 +133,70 @@ class AddTransactionFragment : Fragment() {
         binding.rowSelectDate.setOnClickListener { openDatePicker() }
         binding.edtTextDate.setOnClickListener { openDatePicker() }
 
+        binding.rowSelectPhoto.setOnClickListener { showImageSourceDialog() }
 
         binding.btnSave.setOnClickListener { saveTransaction() }
 
         binding.btnGoBack.setOnClickListener { findNavController().popBackStack() }
     }
+
+    private fun setupCameraStuff() {
+        takePictureLauncher = registerForActivityResult(ActivityResultContracts.TakePicture()) { success ->
+            if (success && tempImageUri != null) {
+                val bytes = uriToByteArray(tempImageUri!!)
+                viewModel.setImageBytes(bytes)
+            }
+        }
+
+        pickImageLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+            uri?.let {
+                val bytes = uriToByteArray(it)
+                viewModel.setImageBytes(bytes)
+            }
+        }
+
+    }
+
+    private fun uriToByteArray(uri: Uri): ByteArray? {
+        val bitmap = if (Build.VERSION.SDK_INT < 28) {
+            MediaStore.Images.Media.getBitmap(requireContext().contentResolver, uri)
+        } else {
+            val source = ImageDecoder.createSource(requireContext().contentResolver, uri)
+            ImageDecoder.decodeBitmap(source)
+        }
+        val outputStream = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 80, outputStream)
+        return outputStream.toByteArray()
+    }
+
+    private fun showImageSourceDialog() {
+        val options = arrayOf("Take Photo", "Choose from Gallery")
+        androidx.appcompat.app.AlertDialog.Builder(requireContext())
+            .setTitle("Add Image")
+            .setItems(options) { _, which ->
+                when (which) {
+                    0 -> {
+                        val contentValues = ContentValues().apply {
+                            put(MediaStore.Images.Media.DISPLAY_NAME, "transaction_${System.currentTimeMillis()}.jpg")
+                            put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
+                        }
+                        tempImageUri = requireContext().contentResolver.insert(
+                            MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                            contentValues
+                        )
+                        if (tempImageUri != null) {
+                            takePictureLauncher.launch(tempImageUri!!)
+                        } else {
+                            Toast.makeText(requireContext(), "Failed to prepare image location.", Toast.LENGTH_SHORT).show()
+                        }
+
+                    }
+                    1 -> pickImageLauncher.launch("image/*")
+                }
+            }.show()
+    }
+
+
 
     private fun updateSelectedLabelChips(labels: List<Label>) {
         val selectedLabels = labels.filter { it.isSelected }
@@ -248,5 +323,17 @@ class AddTransactionFragment : Fragment() {
             Log.d("Note", "Entered Note: $note")
             // Update UI based on the entered note
         }
+
+        viewModel.imageBytes.observe(viewLifecycleOwner) { bytes ->
+            if (bytes != null) {
+                val bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
+                binding.imagePreview.setImageBitmap(bitmap)
+                binding.imagePreview.visibility = View.VISIBLE
+            } else {
+                binding.imagePreview.setImageDrawable(null)
+                binding.imagePreview.visibility = View.GONE
+            }
+        }
+
     }
 }

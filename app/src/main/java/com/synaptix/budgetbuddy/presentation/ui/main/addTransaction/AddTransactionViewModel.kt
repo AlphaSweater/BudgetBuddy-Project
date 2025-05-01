@@ -1,5 +1,6 @@
 package com.synaptix.budgetbuddy.presentation.ui.main.addTransaction
 
+import androidx.lifecycle.LiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import androidx.lifecycle.MutableLiveData
@@ -22,7 +23,8 @@ class AddTransactionViewModel @Inject constructor(
     val date = MutableLiveData<String>()
     val note = MutableLiveData<String?>()
     var selectedLabels = MutableLiveData<List<Label>>(emptyList())
-    val photo = MutableLiveData<String?>()
+    private val _imageBytes = MutableLiveData<ByteArray?>()
+    val imageBytes: LiveData<ByteArray?> = _imageBytes
     val recurrenceRate = MutableLiveData<String?>()
 
     suspend fun addTransaction() {
@@ -35,9 +37,13 @@ class AddTransactionViewModel @Inject constructor(
             date = date.value ?: "",
             note = note.value,
             selectedLabels = selectedLabels.value ?: emptyList<Label>(),
-            photo = photo.value,
+            photo = imageBytes.value,
             recurrenceRate = recurrenceRate.value
         )
         addTransactionUseCase.execute(transaction)
+    }
+
+    fun setImageBytes(bytes: ByteArray?) {
+        _imageBytes.value = bytes
     }
 }
