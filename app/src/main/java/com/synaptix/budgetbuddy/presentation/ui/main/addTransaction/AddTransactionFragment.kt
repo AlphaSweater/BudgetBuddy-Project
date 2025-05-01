@@ -90,7 +90,7 @@ class AddTransactionFragment : Fragment() {
         val adapter = ArrayAdapter(
             requireContext(),
             R.layout.spinner_item,
-            listOf("Currency", "USD", "EUR", "GBP")
+            listOf("ZAR", "USD", "EUR", "GBP")
         )
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         binding.spinnerCurrency.adapter = adapter
@@ -195,8 +195,6 @@ class AddTransactionFragment : Fragment() {
                 }
             }.show()
     }
-
-
 
     private fun updateSelectedLabelChips(labels: List<Label>) {
         val selectedLabels = labels.filter { it.isSelected }
@@ -329,6 +327,7 @@ class AddTransactionFragment : Fragment() {
                 val bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
                 binding.imagePreview.setImageBitmap(bitmap)
                 binding.imagePreview.visibility = View.VISIBLE
+                Log.d("Image", "Image Preview: ${bitmap.width}x${bitmap.height}")
             } else {
                 binding.imagePreview.setImageDrawable(null)
                 binding.imagePreview.visibility = View.GONE
