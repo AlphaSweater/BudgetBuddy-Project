@@ -32,7 +32,7 @@
                 android:id="@+id/ivWalletIcon"
                 android:layout_width="70dp"
                 android:layout_height="70dp"
-                android:src="@drawable/ic_circle_24"
+                android:src="@drawable/ic_account_balance_wallet_24"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:tint="@color/cat_light_brown" />
