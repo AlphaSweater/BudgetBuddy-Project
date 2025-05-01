@@ -60,4 +60,12 @@
         android:label="Select Category"
         tools:layout="@layout/fragment_select_category" />
 
+    <fragment
+        android:id="@+id/navigation_add_new_category"
+        android:name="com.synaptix.budgetbuddy.presentation.ui.main.addTransaction.addTransactionCat.addNewCat.AddNewCategoryFragment"
+        android:label="Add Category"
+        tools:layout="@layout/fragment_add_new_category" />
+
+
+
 </navigation>
