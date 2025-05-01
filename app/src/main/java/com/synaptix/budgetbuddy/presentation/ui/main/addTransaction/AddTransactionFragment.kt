@@ -94,7 +94,7 @@ class AddTransactionFragment : Fragment() {
         }
 
         binding.rowSelectCategory.setOnClickListener {
-            // TODO: Navigate to category selector
+            showCategorySelector()
         }
 
         val openDatePicker = {
@@ -212,6 +212,10 @@ class AddTransactionFragment : Fragment() {
     private fun showWalletSelector() {
         val bottomSheet = WalletSelectorBottomSheetFragment()
         bottomSheet.show(parentFragmentManager, bottomSheet.tag)
+    }
+
+    private fun showCategorySelector(){
+        findNavController().navigate(R.id.action_addTransactionFragment_to_categorySelectorFragment)
     }
 
     // --- Observers ---
