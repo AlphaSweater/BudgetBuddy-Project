@@ -24,7 +24,7 @@
     <ImageView
         android:id="@+id/imgBuddy"
         android:layout_width="match_parent"
-        android:layout_height="300dp"
+        android:layout_height="200dp"
         android:layout_marginStart="30dp"
         android:layout_marginTop="58dp"
         android:layout_marginEnd="30dp"
@@ -52,7 +52,7 @@
         android:id="@+id/btnLogin"
         android:layout_width="268dp"
         android:layout_height="68dp"
-        android:layout_marginTop="30dp"
+        android:layout_marginTop="15dp"
         android:background="@android:color/transparent"
         android:text="@string/loginText"
         android:textColor="?attr/bb_accent"
