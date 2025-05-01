@@ -6,26 +6,49 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.synaptix.budgetbuddy.R
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.synaptix.budgetbuddy.core.model.ListItem
+import com.synaptix.budgetbuddy.databinding.FragmentBudgetReportBinding
 
 class BudgetReportFragment : Fragment() {
 
-    companion object {
-        fun newInstance() = BudgetReportFragment()
-    }
+    //binding. Pretty straight forward
+    private var _binding: FragmentBudgetReportBinding? = null
+    private val binding get() = _binding!!
 
     private val viewModel: BudgetReportViewModel by viewModels()
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        // TODO: Use the ViewModel
-    }
+    private lateinit var budgetAdapter: BudgetAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        return inflater.inflate(R.layout.fragment_budget_report, container, false)
+        _binding = FragmentBudgetReportBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    //This is the test data that uses the adapter and the ItemList core thingy -- this might be the issue but to be honest I am so cooked rn
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        budgetAdapter = BudgetAdapter()
+
+        val itemList = listOf(
+            ListItem.TransactionItem("Today", "18", "April 2025", "-R200"),
+            ListItem.CategoryItem("Groceries", "5 transactions", "-R550", "Last Saturday")
+        )
+
+        // hmmm binding
+        binding.recyclerViewBudgetReport.apply {
+            layoutManager = LinearLayoutManager(requireContext())
+            adapter = budgetAdapter
+        }
+
+        budgetAdapter.submitList(itemList)
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }

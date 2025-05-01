@@ -145,7 +145,7 @@
 
         <!-- Budget Item Container -->
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/budget_item_container"
+            android:id="@+id/btnBudgetReportItem"
             android:layout_width="match_parent"
             android:layout_height="77dp"
             android:padding="16dp">
@@ -168,10 +168,10 @@
                 android:id="@+id/budget_details"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
                 android:layout_marginStart="12dp"
+                android:orientation="vertical"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/arrow_icon"
+                app:layout_constraintEnd_toStartOf="@+id/btnBudgetReport"
                 app:layout_constraintStart_toEndOf="@id/budget_icon"
                 app:layout_constraintTop_toTopOf="parent">
 
@@ -194,7 +194,7 @@
 
             <!-- Navigation Arrow -->
             <ImageView
-                android:id="@+id/arrow_icon"
+                android:id="@+id/btnBudgetReport"
                 android:layout_width="32dp"
                 android:layout_height="32dp"
                 android:contentDescription="Navigate"
