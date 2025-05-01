@@ -6,19 +6,25 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.synaptix.budgetbuddy.core.model.Label
+import com.synaptix.budgetbuddy.data.entity.LabelEntity
 import com.synaptix.budgetbuddy.databinding.FragmentSelectLabelBinding
 import com.synaptix.budgetbuddy.presentation.ui.main.addTransaction.AddTransactionViewModel
+import dagger.hilt.android.AndroidEntryPoint
 import kotlin.getValue
 
+@AndroidEntryPoint
 class LabelSelectorFragment : Fragment() {
 
     private var _binding: FragmentSelectLabelBinding? = null
     private val binding get() = _binding!!
 
     private val viewModel: AddTransactionViewModel by activityViewModels()
+    private val labelViewModel: LabelSelectorViewModel by viewModels()
 
     private lateinit var labelAdapter: LabelAdapter
 
@@ -37,6 +43,14 @@ class LabelSelectorFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setupRecyclerView()
         setupOnClickListeners()
+
+        labelViewModel.loadLabelsForUser(userId = 1)
+
+        lifecycleScope.launchWhenStarted {
+            labelViewModel.labels.collect { labels ->
+                updateLabels(labels)
+            }
+        }
     }
 
     private fun setupRecyclerView() {
@@ -72,4 +86,22 @@ class LabelSelectorFragment : Fragment() {
         _binding = null
     }
 
+    // This function is called when the labels are loaded from the database
+    // AI assisted with this function to update the labels in the adapter
+    private fun updateLabels(entities: List<LabelEntity>) {
+        val selectedLabels = viewModel.selectedLabels.value ?: emptyList()
+
+        val labelList = entities.map { entity ->
+            val isSelected = selectedLabels.any { it.labelName == entity.name && it.isSelected }
+            Label(
+                labelName = entity.name,
+                transactionInfo = "0 transactions in 0 wallets",
+                isSelected = isSelected
+            )
+        }
+
+        labelAdapter.updateLabels(labelList)
+    }
+    
+    
 }
