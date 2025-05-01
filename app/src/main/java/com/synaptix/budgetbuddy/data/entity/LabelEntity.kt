@@ -16,6 +16,6 @@ import androidx.room.PrimaryKey
 )
 data class LabelEntity (
     @PrimaryKey(autoGenerate = true) val label_id: Int,
-    val user_id: Int,
+    val user_id: Int?, //nullable to allow for default labels to be globally accessible
     val name: String,
 )

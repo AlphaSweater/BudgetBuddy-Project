@@ -11,10 +11,13 @@ import com.synaptix.budgetbuddy.core.usecase.auth.LoginUserUseCase
 import com.synaptix.budgetbuddy.data.AppDatabase
 import com.synaptix.budgetbuddy.data.entity.CategoryEntity
 import com.synaptix.budgetbuddy.data.local.CategoryDatabaseCallback
+import com.synaptix.budgetbuddy.data.local.LabelDatabaseCallback
 import com.synaptix.budgetbuddy.data.local.dao.CategoryDao
+import com.synaptix.budgetbuddy.data.local.dao.LabelDao
 import com.synaptix.budgetbuddy.data.local.dao.UserDao
 import com.synaptix.budgetbuddy.data.local.dao.WalletDao
 import com.synaptix.budgetbuddy.data.local.datastore.DataStoreManager
+import com.synaptix.budgetbuddy.data.repository.LabelRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -63,6 +66,7 @@ object AppModule {
 
             //AI assisted with callback to allow for default categories to be added to the database on creation
             .addCallback(CategoryDatabaseCallback { db })
+            .addCallback(LabelDatabaseCallback {db})
             .build()
         return db
     }
@@ -97,5 +101,15 @@ object AppModule {
         return appDatabase.categoryDao()
     }
 
+    @Provides
+    @Singleton
+    fun provideLabelDao(appDatabase: AppDatabase): LabelDao {
+        return appDatabase.labelDao()
+    }
 
+    @Provides
+    @Singleton
+    fun providelabelrepository(labelDao: LabelDao): LabelRepository {
+        return LabelRepository(labelDao)
+    }
 }
