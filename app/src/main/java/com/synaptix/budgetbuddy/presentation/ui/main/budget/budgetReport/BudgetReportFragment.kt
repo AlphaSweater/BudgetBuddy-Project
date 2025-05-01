@@ -7,44 +7,55 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.synaptix.budgetbuddy.core.model.ListItem
+import androidx.recyclerview.widget.RecyclerView
+import com.synaptix.budgetbuddy.R
+import com.synaptix.budgetbuddy.core.model.BudgetReportListItems
 import com.synaptix.budgetbuddy.databinding.FragmentBudgetReportBinding
 
 class BudgetReportFragment : Fragment() {
 
-    //binding. Pretty straight forward
     private var _binding: FragmentBudgetReportBinding? = null
     private val binding get() = _binding!!
 
     private val viewModel: BudgetReportViewModel by viewModels()
-    private lateinit var budgetAdapter: BudgetAdapter
+
+    private lateinit var budgetReportAdapter: BudgetReportAdapter
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentBudgetReportBinding.inflate(inflater, container, false)
         return binding.root
     }
 
-    //This is the test data that uses the adapter and the ItemList core thingy -- this might be the issue but to be honest I am so cooked rn
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        setupRecyclers()
+    }
 
-        budgetAdapter = BudgetAdapter()
+    private fun setupRecyclers() {
+        transactionRecycler()
+    }
 
-        val itemList = listOf(
-            ListItem.TransactionItem("Today", "18", "April 2025", "-R200"),
-            ListItem.CategoryItem("Groceries", "5 transactions", "-R550", "Last Saturday")
+    private fun transactionRecycler() {
+        // Code for the transaction recycler
+        val items = listOf(
+            BudgetReportListItems.DateHeader("1", "Monday", "May 2025", -2000.00),
+            BudgetReportListItems.TransactionItem("Lunchhh", R.drawable.ic_car_24, R.color.cat_orange, 200.00, "Cash", null, "Today"),
+            BudgetReportListItems.TransactionItem("Lunch", R.drawable.ic_car_24, R.color.cat_orange, 200.00, "Cash", null, "Today"),
+            BudgetReportListItems.DateHeader("1", "Monday", "April 2025", -4000.00),
+            BudgetReportListItems.TransactionItem("Lunch", R.drawable.ic_car_24, R.color.cat_orange, 200.00, "Cash", null, "Today"),
+            BudgetReportListItems.TransactionItem("Lunch", R.drawable.ic_car_24, R.color.cat_orange, 200.00, "Cash", null, "Today"),
         )
 
-        // hmmm binding
-        binding.recyclerViewBudgetReport.apply {
-            layoutManager = LinearLayoutManager(requireContext())
-            adapter = budgetAdapter
-        }
+        budgetReportAdapter = BudgetReportAdapter(items)
 
-        budgetAdapter.submitList(itemList)
+        binding.recyclerViewTransactions.apply {
+            layoutManager = LinearLayoutManager(requireContext())
+            adapter = budgetReportAdapter
+        }
     }
 
     override fun onDestroyView() {
