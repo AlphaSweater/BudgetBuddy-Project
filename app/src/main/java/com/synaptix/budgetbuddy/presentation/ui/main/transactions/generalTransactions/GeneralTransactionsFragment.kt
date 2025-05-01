@@ -6,13 +6,14 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.navigation.fragment.findNavController
 import com.synaptix.budgetbuddy.R
+import com.synaptix.budgetbuddy.databinding.FragmentGeneralTransactionsBinding
 
 class GeneralTransactionsFragment : Fragment() {
 
-    companion object {
-        fun newInstance() = GeneralTransactionsFragment()
-    }
+    private var _binding: FragmentGeneralTransactionsBinding? = null
+    private val binding get() = _binding!!
 
     private val viewModel: GeneralTransactionsViewModel by viewModels()
 
@@ -26,6 +27,13 @@ class GeneralTransactionsFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        return inflater.inflate(R.layout.fragment_general_transactions, container, false)
+        _binding = FragmentGeneralTransactionsBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        binding.btnGoBack.setOnClickListener { findNavController().popBackStack() }
     }
 }
