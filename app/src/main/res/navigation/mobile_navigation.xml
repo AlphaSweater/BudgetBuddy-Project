@@ -96,5 +96,10 @@
         android:label="General Reports"
         tools:layout="@layout/fragment_general_reports" />
 
+    <fragment
+        android:id="@+id/navigation_category_selector"
+        android:name="com.synaptix.budgetbuddy.presentation.ui.main.addTransaction.categorySelectorPopUp.CategorySelectorFragment"
+        android:label="Select Category"
+        tools:layout="@layout/fragment_select_category" />
 
 </navigation>
