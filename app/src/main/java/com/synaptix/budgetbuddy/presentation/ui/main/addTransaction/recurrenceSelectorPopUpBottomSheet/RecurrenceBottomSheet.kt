@@ -6,11 +6,11 @@ import android.view.View
 import android.view.ViewGroup
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import com.synaptix.budgetbuddy.databinding.FragmentRecurrenceBottomSheetBinding
+import com.synaptix.budgetbuddy.databinding.FragmentSelectRecurrenceBottomSheetBinding
 
 class RecurrenceBottomSheet : BottomSheetDialogFragment() {
 
-    private var _binding: FragmentRecurrenceBottomSheetBinding? = null
+    private var _binding: FragmentSelectRecurrenceBottomSheetBinding? = null
     private val binding get() = _binding!!
 
     override fun onStart() {
@@ -26,7 +26,7 @@ class RecurrenceBottomSheet : BottomSheetDialogFragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentRecurrenceBottomSheetBinding.inflate(inflater, container, false)
+        _binding = FragmentSelectRecurrenceBottomSheetBinding.inflate(inflater, container, false)
 
         binding.optionEveryDay.setOnClickListener {
             // Handle "Every day" click

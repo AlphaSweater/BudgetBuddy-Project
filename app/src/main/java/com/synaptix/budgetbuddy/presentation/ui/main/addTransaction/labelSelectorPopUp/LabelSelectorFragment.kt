@@ -1,18 +1,24 @@
-package com.synaptix.budgetbuddy.presentation.ui.main.addTransaction.labelSelector
+package com.synaptix.budgetbuddy.presentation.ui.main.addTransaction.labelSelectorPopUp
 
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.synaptix.budgetbuddy.databinding.FragmentLabelSelectorBinding
+import com.synaptix.budgetbuddy.core.model.Label
+import com.synaptix.budgetbuddy.databinding.FragmentSelectLabelBinding
+import com.synaptix.budgetbuddy.presentation.ui.main.addTransaction.AddTransactionViewModel
+import kotlin.getValue
 
 class LabelSelectorFragment : Fragment() {
 
-    private var _binding: FragmentLabelSelectorBinding? = null
+    private var _binding: FragmentSelectLabelBinding? = null
     private val binding get() = _binding!!
+
+    private val viewModel: AddTransactionViewModel by activityViewModels()
 
     private lateinit var labelAdapter: LabelAdapter
 
@@ -23,7 +29,7 @@ class LabelSelectorFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentLabelSelectorBinding.inflate(inflater, container, false)
+        _binding = FragmentSelectLabelBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -34,7 +40,7 @@ class LabelSelectorFragment : Fragment() {
     }
 
     private fun setupRecyclerView() {
-        val selectedLabels = arguments?.getSerializable("currentLabels") as? ArrayList<Label> ?: arrayListOf()
+        val selectedLabels = viewModel.selectedLabels.value ?: listOf<Label>() // Default to an empty list if null
 
         val labels = baseLabelNames.map { labelName ->
             val isSelected = selectedLabels.any { it.labelName == labelName && it.isSelected }
@@ -45,9 +51,7 @@ class LabelSelectorFragment : Fragment() {
             )
         }.toMutableList()
 
-        labelAdapter = LabelAdapter(labels) {
-            // Optional: handle live preview updates
-        }
+        labelAdapter = LabelAdapter(labels) {}
 
         binding.recyclerViewLabels.apply {
             layoutManager = LinearLayoutManager(requireContext())
@@ -64,10 +68,7 @@ class LabelSelectorFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         val selected = ArrayList(labelAdapter.getSelectedLabels())
-        val result = Bundle().apply {
-            putSerializable("selectedLabels", selected)
-        }
-        parentFragmentManager.setFragmentResult("labelSelectorResult", result)
+        viewModel.selectedLabels.value = selected
         _binding = null
     }
 

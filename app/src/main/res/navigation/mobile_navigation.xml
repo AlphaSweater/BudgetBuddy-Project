@@ -37,13 +37,14 @@
             app:exitAnim="@anim/fade_out"
             app:popEnterAnim="@anim/fade_in"
             app:popExitAnim="@anim/slide_out_down" />
+
     </fragment>
 
     <fragment
         android:id="@+id/navigation_label_selector"
-        android:name="com.synaptix.budgetbuddy.presentation.ui.main.addTransaction.labelSelector.LabelSelectorFragment"
+        android:name="com.synaptix.budgetbuddy.presentation.ui.main.addTransaction.labelSelectorPopUp.LabelSelectorFragment"
         android:label="Select Labels"
-        tools:layout="@layout/fragment_label_selector" />
+        tools:layout="@layout/fragment_select_label" />
 
 
 </navigation>
