@@ -80,6 +80,10 @@ class CategorySelectorFragment : Fragment() {
         binding.btnIncomeToggle.setOnClickListener {
             showIncomeCategories()
         }
+
+        binding.btnAddCategory.setOnClickListener {
+
+        }
     }
 
     private fun showExpenseCategories() {
