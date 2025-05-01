@@ -7,86 +7,28 @@
     tools:context=".presentation.ui.main.budget.budgetHomePage.BudgetHomeFragment">
 
         <!-- Container for Current Budgets -->
-        <LinearLayout
-            android:id="@+id/current_budgets_container"
-            android:layout_width="0dp"
+    <LinearLayout
+        android:id="@+id/current_budgets_container"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="?attr/bb_surface"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <!-- Title -->
+        <TextView
+            android:id="@+id/current_budgets_title"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="?attr/bb_surface"
-            android:orientation="vertical"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
-
-            <!-- Title -->
-            <TextView
-                android:id="@+id/current_budgets_title"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:padding="16dp"
-                android:text="Current Budgets"
-                android:textStyle="bold"
-                android:textColor="?attr/bb_primaryText"
-                android:textSize="20sp" />
-
-            <!-- Horizontal Layout for Columns -->
-            <LinearLayout
-                android:id="@+id/columns_container"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:paddingTop="16dp">
-
-                <!-- Column 01/2025 -->
-                <TextView
-                    android:id="@+id/column_012025"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:text="01/2025"
-                    android:textColor="?attr/bb_primaryText"
-                    android:textSize="16sp" />
-
-                <!-- Column LAST MONTH -->
-                <TextView
-                    android:id="@+id/column_last_month"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:text="LAST MONTH"
-                    android:textColor="?attr/bb_primaryText"
-                    android:textSize="16sp" />
-
-                <!-- Column THIS MONTH -->
-                <LinearLayout
-                    android:id="@+id/column_this_month_container"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:id="@+id/column_this_month"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:text="THIS MONTH"
-                        android:textColor="?attr/bb_primaryText"
-                        android:textSize="16sp" />
-
-                    <!-- Underline -->
-                    <View
-                        android:id="@+id/underline"
-                        android:layout_width="match_parent"
-                        android:layout_height="2dp"
-                        android:layout_marginTop="4dp"
-                        android:background="?attr/bb_primaryText" />
-                </LinearLayout>
-            </LinearLayout>
-        </LinearLayout>
+            android:layout_gravity="center_horizontal"
+            android:padding="20dp"
+            android:text="Current Budgets"
+            android:textColor="?attr/bb_primaryText"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+    </LinearLayout>
 
     <!-- Create Budget Button -->
     <LinearLayout

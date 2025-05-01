@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:maxHeight="600dp"
+    android:orientation="vertical"
+    android:padding="24dp"
+    android:background="?attr/bb_surface">
+
+    <TextView
+        android:id="@+id/title_select_wallet"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Select Wallet"
+        android:textColor="?attr/bb_primaryText"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:paddingBottom="16dp" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/walletRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp" />
+</LinearLayout>

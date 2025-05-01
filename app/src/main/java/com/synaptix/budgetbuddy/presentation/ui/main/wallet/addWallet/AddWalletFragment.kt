@@ -8,7 +8,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
+import com.synaptix.budgetbuddy.R
 import com.synaptix.budgetbuddy.databinding.FragmentAddWalletBinding
+import com.synaptix.budgetbuddy.presentation.ui.auth.AuthActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -93,6 +96,22 @@ class AddWalletFragment : Fragment() {
                 }
             }
         }
+        setupOnClickListeners()
+    }
+
+    private fun setupOnClickListeners() {
+        binding.btnGoBack.setOnClickListener {
+            findNavController().popBackStack()
+        }
+
+        binding.btnWalletEdit.setOnClickListener {
+            findNavController().navigate(R.id.action_addWalletFragment_to_newWalletCategoryFragment)
+        }
+
+        binding.btnSave.setOnClickListener {
+            findNavController().navigate(R.id.action_addWalletFragment_to_walletMainFragment)
+        }
+
     }
 
 }
