@@ -24,11 +24,6 @@ class WalletSelectorBottomSheetFragment : BottomSheetDialogFragment() {
     private val walletViewModel: WalletSelectorBottomSheetViewModel by viewModels()
     private lateinit var walletAdapter: WalletAdapter
 
-//    private val walletList = listOf(
-//        Wallet(1, 1, "Main Wallet", "ZAR", 1200.50),
-//        Wallet(2, 1, "Savings", "ZAR", 8500.00),
-//        Wallet(3, 1, "Crypto", "ZAR", 0.004)
-//    )
 
     override fun onStart() {
         super.onStart()
@@ -71,17 +66,6 @@ class WalletSelectorBottomSheetFragment : BottomSheetDialogFragment() {
         }
     }
 
-//    private fun setupRecyclerView() {
-//        walletAdapter = WalletAdapter(walletList) { walletId ->
-//            viewModel.walletId.value = walletId // Update ViewModel with selected wallet ID
-//            dismiss()
-//        }
-//
-//        binding.walletRecyclerView.apply {
-//            layoutManager = LinearLayoutManager(requireContext())
-//            adapter = walletAdapter
-//        }
-//    }
 private fun setupRecyclerView() {
     binding.walletRecyclerView.layoutManager = LinearLayoutManager(requireContext())
 }

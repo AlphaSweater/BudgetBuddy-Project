@@ -27,6 +27,7 @@ class WalletSelectorBottomSheetViewModel @Inject constructor(
             val userId = getUserIdUseCase.execute()
             val walletEntities = getWalletUseCase.execute(userId)
 
+            //maps out the walletEntities to a list of Wallet objects
             _wallets.value = walletEntities.map {
                 Wallet(
                     it.wallet_id,
