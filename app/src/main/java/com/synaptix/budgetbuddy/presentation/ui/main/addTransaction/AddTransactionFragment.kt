@@ -156,10 +156,6 @@ class AddTransactionFragment : Fragment() {
     // --- Save Logic ---
     private fun saveTransaction() {
         // TODO: Replace with actual data from UI
-        viewModel.categoryId.value = 1
-        viewModel.walletId.value = 1
-        viewModel.currency.value = "Test Currency"
-
         val amount = binding.edtTextAmount.text.toString().toDoubleOrNull() ?: 0.0
         viewModel.amount.value = amount
 
@@ -167,8 +163,6 @@ class AddTransactionFragment : Fragment() {
         viewModel.date.value = date
 
         viewModel.note.value = binding.edtTextNote.text.toString()
-        viewModel.photo.value = "Test Photo" // Replace with actual photo
-        viewModel.recurrenceRate.value = "Weekly" // Replace with actual rate
 
         // Validate input
         if (viewModel.categoryId.value != null  ||

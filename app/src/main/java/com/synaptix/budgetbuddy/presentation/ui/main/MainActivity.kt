@@ -2,16 +2,13 @@ package com.synaptix.budgetbuddy.presentation.ui.main
 
 import android.os.Bundle
 import android.view.View
-import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.NavController
 import androidx.navigation.NavOptions
 import androidx.navigation.findNavController
-import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.setupWithNavController
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.synaptix.budgetbuddy.R
 import com.synaptix.budgetbuddy.databinding.ActivityMainBinding
-import com.synaptix.budgetbuddy.presentation.ui.main.wallet.addWallet.AddWalletFragment
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

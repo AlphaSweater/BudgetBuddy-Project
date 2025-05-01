@@ -293,7 +293,7 @@
         android:paddingHorizontal="32dp"
         android:paddingVertical="12dp"
         android:text="@string/save"
-        android:textColor="?attr/bb_primaryText"
+        android:textColor="@android:color/white"
         android:textSize="18sp"
         app:backgroundTint="?attr/bb_button"
         app:cornerRadius="24dp"
