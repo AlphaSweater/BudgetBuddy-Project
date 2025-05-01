@@ -6,6 +6,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.navigation.fragment.findNavController
 import com.synaptix.budgetbuddy.databinding.FragmentWalletMainBinding
 import com.synaptix.budgetbuddy.presentation.ui.auth.AuthActivity
 
@@ -40,5 +41,8 @@ class WalletMainFragment : Fragment() {
         binding.buttonAdd.setOnClickListener{
             (activity as? AuthActivity)?.showLogin()
         }
+
+        binding.btnGoBack.setOnClickListener { findNavController().popBackStack() }
     }
+
 }
