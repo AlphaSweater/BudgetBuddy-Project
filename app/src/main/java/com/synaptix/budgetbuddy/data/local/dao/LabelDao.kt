@@ -16,6 +16,6 @@ interface LabelDao {
     suspend fun getLabelById(labelId: Int): LabelEntity?
 
     //sql query to grab all labels for a specific user
-    @androidx.room.Query("SELECT * FROM label_table WHERE user_id = :userId")
+    @androidx.room.Query("SELECT * FROM label_table WHERE user_id = :userId OR user_id IS null")
     suspend fun getLabelsForUser(userId: Int): List<LabelEntity>
 }

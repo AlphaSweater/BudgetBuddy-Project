@@ -10,7 +10,7 @@ import com.synaptix.budgetbuddy.R
 import com.synaptix.budgetbuddy.core.model.Label
 
 class LabelAdapter(
-    private val labels: List<Label>,
+    private var labels: List<Label>,
     private val onSelectionChanged: (List<Label>) -> Unit
 ) : RecyclerView.Adapter<LabelAdapter.LabelViewHolder>() {
 
@@ -25,6 +25,11 @@ class LabelAdapter(
     }
 
     override fun getItemCount(): Int = labels.size
+
+    fun updateLabels(newLabels: List<Label>) {
+        labels = newLabels
+        notifyDataSetChanged()
+    }
 
     inner class LabelViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         private val labelTitle: TextView = view.findViewById(R.id.textLabelTitle)
