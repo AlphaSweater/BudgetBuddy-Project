@@ -82,7 +82,7 @@ class CategorySelectorFragment : Fragment() {
         }
 
         binding.btnAddCategory.setOnClickListener {
-
+            showAddCategory()
         }
     }
 
@@ -103,6 +103,10 @@ class CategorySelectorFragment : Fragment() {
     private fun highlightToggle(selected: TextView, unselected: TextView) {
         selected.setBackgroundResource(R.drawable.toggle_selected)
         unselected.setBackgroundResource(android.R.color.transparent)
+    }
+
+    private fun showAddCategory() {
+        findNavController().navigate(R.id.navigation_add_new_category)
     }
 
     override fun onDestroyView() {
