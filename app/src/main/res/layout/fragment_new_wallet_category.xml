@@ -6,6 +6,8 @@
     android:layout_height="match_parent"
     android:paddingTop="15dp">
 
+    <!-- COMING SOON IN PART 3 -->
+
     <TextView
         android:id="@+id/textView"
         android:layout_width="wrap_content"

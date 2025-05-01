@@ -132,7 +132,7 @@
         app:layout_constraintTop_toBottomOf="@+id/budget_container" />
 
     <com.google.android.material.card.MaterialCardView
-        android:id="@+id/budget_card"
+        android:id="@+id/budgetCard"
         android:layout_width="384dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="18dp"
@@ -145,14 +145,14 @@
 
         <!-- Budget Item Container -->
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/budget_item_container"
+            android:id="@+id/budgetItemContainer"
             android:layout_width="match_parent"
             android:layout_height="77dp"
             android:padding="16dp">
 
             <!-- Icon (Burger) -->
             <ImageView
-                android:id="@+id/budget_icon"
+                android:id="@+id/budgetIcon"
                 android:layout_width="36dp"
                 android:layout_height="36dp"
                 android:contentDescription="Budget Icon"
@@ -165,18 +165,18 @@
 
             <!-- Budget Info -->
             <LinearLayout
-                android:id="@+id/budget_details"
+                android:id="@+id/budgetDetails"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:layout_marginStart="12dp"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/arrow_icon"
-                app:layout_constraintStart_toEndOf="@id/budget_icon"
+                app:layout_constraintEnd_toStartOf="@id/arrowIconBudget"
+                app:layout_constraintStart_toEndOf="@id/budgetIcon"
                 app:layout_constraintTop_toTopOf="parent">
 
                 <TextView
-                    android:id="@+id/budget_title"
+                    android:id="@+id/budgetTitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Food And Drinks"
@@ -184,7 +184,7 @@
                     android:textSize="18sp" />
 
                 <TextView
-                    android:id="@+id/budget_status"
+                    android:id="@+id/budgetStatus"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="R 1,500 spent of R 2,000"
@@ -194,7 +194,7 @@
 
             <!-- Navigation Arrow -->
             <ImageView
-                android:id="@+id/arrow_icon"
+                android:id="@+id/arrowIconBudget"
                 android:layout_width="32dp"
                 android:layout_height="32dp"
                 android:contentDescription="Navigate"

@@ -58,7 +58,7 @@
 
         <!-- Budget Details Section -->
         <LinearLayout
-            android:id="@+id/budget_details"
+            android:id="@+id/budgetDetails"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"

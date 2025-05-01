@@ -86,8 +86,8 @@
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:layout_marginStart="8dp"
-                    android:src="?attr/actionModeCloseDrawable"
-                    android:rotation="180"
+                    android:src="@drawable/baseline_arrow_forward_ios_24"
+                    app:tint="?attr/bb_secondaryText"
                     android:background="@null" />
             </LinearLayout>
 
@@ -205,8 +205,8 @@
                         android:layout_width="24dp"
                         android:layout_height="24dp"
                         android:layout_marginStart="8dp"
-                        android:src="?attr/actionModeCloseDrawable"
-                        android:rotation="180"
+                        android:src="@drawable/baseline_arrow_forward_ios_24"
+                        app:tint="?attr/bb_secondaryText"
                         android:background="@null" />
                 </LinearLayout>
 
@@ -248,8 +248,8 @@
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:layout_marginStart="8dp"
-                    android:src="?attr/actionModeCloseDrawable"
-                    android:rotation="180"
+                    android:src="@drawable/baseline_arrow_forward_ios_24"
+                    app:tint="?attr/bb_secondaryText"
                     android:background="@null" />
             </LinearLayout>
 
@@ -277,8 +277,8 @@
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:layout_marginStart="8dp"
-                    android:src="?attr/actionModeCloseDrawable"
-                    android:rotation="180"
+                    android:src="@drawable/baseline_arrow_forward_ios_24"
+                    app:tint="?attr/bb_secondaryText"
                     android:background="@null" />
             </LinearLayout>
         </LinearLayout>
