@@ -1,4 +1,4 @@
-package com.synaptix.budgetbuddy.presentation.ui.main.addTransaction.labelSelector
+package com.synaptix.budgetbuddy.presentation.ui.main.addTransaction.labelSelectorPopUp
 
 import android.view.LayoutInflater
 import android.view.View
@@ -7,7 +7,7 @@ import android.widget.CheckBox
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.synaptix.budgetbuddy.R
-import java.io.Serializable
+import com.synaptix.budgetbuddy.core.model.Label
 
 class LabelAdapter(
     private val labels: List<Label>,
@@ -51,9 +51,3 @@ class LabelAdapter(
 
     fun getSelectedLabels(): List<Label> = labels.filter { it.isSelected }
 }
-
-data class Label(
-    val labelName: String,
-    val transactionInfo: String,
-    var isSelected: Boolean = false
-) : Serializable

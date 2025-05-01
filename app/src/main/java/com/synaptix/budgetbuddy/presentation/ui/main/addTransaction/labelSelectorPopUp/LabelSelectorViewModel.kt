@@ -1,4 +1,4 @@
-package com.synaptix.budgetbuddy.presentation.ui.main.addTransaction.labelSelector
+package com.synaptix.budgetbuddy.presentation.ui.main.addTransaction.labelSelectorPopUp
 
 import androidx.lifecycle.ViewModel
 

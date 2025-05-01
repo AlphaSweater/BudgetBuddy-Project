@@ -6,12 +6,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.ImageButton
-import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.synaptix.budgetbuddy.R
-import com.synaptix.budgetbuddy.databinding.FragmentRecurrenceBottomSheetBinding
 
-class budgetForBottomSheet : BottomSheetDialogFragment() {
+class BudgetForBottomSheet : BottomSheetDialogFragment() {
 
     private lateinit var checkBoxSelectAll: CheckBox
     private lateinit var categoryCheckboxes: List<CheckBox>
