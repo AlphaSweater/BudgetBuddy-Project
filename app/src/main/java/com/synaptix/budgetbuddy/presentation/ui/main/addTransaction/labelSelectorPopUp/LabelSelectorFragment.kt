@@ -86,6 +86,8 @@ class LabelSelectorFragment : Fragment() {
         _binding = null
     }
 
+    // This function is called when the labels are loaded from the database
+    // AI assisted with this function to update the labels in the adapter
     private fun updateLabels(entities: List<LabelEntity>) {
         val selectedLabels = viewModel.selectedLabels.value ?: emptyList()
 
