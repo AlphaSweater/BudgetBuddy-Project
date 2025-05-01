@@ -4,6 +4,7 @@ import android.app.DatePickerDialog
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.icu.util.Calendar
+import android.icu.util.TimeZone
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -11,19 +12,22 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.Toast
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.chip.Chip
 import com.google.android.material.color.MaterialColors
+import com.google.android.material.datepicker.MaterialDatePicker
 import com.synaptix.budgetbuddy.R
+import com.synaptix.budgetbuddy.core.model.Label
 import com.synaptix.budgetbuddy.databinding.FragmentAddTransactionBinding
-import com.synaptix.budgetbuddy.presentation.ui.main.addTransaction.labelSelector.Label
+import com.synaptix.budgetbuddy.presentation.ui.main.addTransaction.walletSelectorPopUpBottomSheet.WalletSelectorBottomSheetFragment
 import com.synaptix.budgetbuddy.ui.recurrence.RecurrenceBottomSheet
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 @AndroidEntryPoint
 class AddTransactionFragment : Fragment() {
@@ -31,7 +35,7 @@ class AddTransactionFragment : Fragment() {
     private var _binding: FragmentAddTransactionBinding? = null
     private val binding get() = _binding!!
 
-    private val viewModel: AddTransactionViewModel by viewModels()
+    private val viewModel: AddTransactionViewModel by activityViewModels()
 
     // --- Lifecycle ---
     override fun onCreateView(
@@ -47,7 +51,11 @@ class AddTransactionFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setupUI()
         observeViewModel()
-        setupFragmentResultListener()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        observeViewModel() // Re-observe ViewModel data to update UI
     }
 
     override fun onDestroyView() {
@@ -77,6 +85,10 @@ class AddTransactionFragment : Fragment() {
             RecurrenceBottomSheet().show(parentFragmentManager, "RecurrenceBottomSheet")
         }
 
+        binding.rowSelectWallet.setOnClickListener {
+            showWalletSelector()
+        }
+
         binding.rowSelectLabel.setOnClickListener {
             showLabelSelector()
         }
@@ -86,38 +98,29 @@ class AddTransactionFragment : Fragment() {
         }
 
         val openDatePicker = {
-            val calendar = Calendar.getInstance()
-            val datePickerDialog = DatePickerDialog(
-                requireContext(),
-                R.style.CustomDatePickerDialog,
-                { _, year, month, dayOfMonth ->
-                    val formattedDate = "$dayOfMonth/${month + 1}/$year"
-                    binding.edtTextDate.setText(formattedDate)
-                },
-                calendar.get(Calendar.YEAR),
-                calendar.get(Calendar.MONTH),
-                calendar.get(Calendar.DAY_OF_MONTH)
-            )
-            datePickerDialog.show()
+            val picker = MaterialDatePicker.Builder.datePicker()
+                .setTitleText("Select Date")
+                .setSelection(MaterialDatePicker.todayInUtcMilliseconds())
+                .build()
+
+            picker.addOnPositiveButtonClickListener { selection ->
+                // Convert selection (epoch millis) to readable date
+                val calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
+                calendar.timeInMillis = selection
+                val formattedDate = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(calendar.time)
+                binding.edtTextDate.setText(formattedDate)
+            }
+
+            picker.show(parentFragmentManager, "MATERIAL_DATE_PICKER")
         }
 
         binding.rowSelectDate.setOnClickListener { openDatePicker() }
         binding.edtTextDate.setOnClickListener { openDatePicker() }
 
+
         binding.btnSave.setOnClickListener { saveTransaction() }
 
         binding.btnGoBack.setOnClickListener { findNavController().popBackStack() }
-    }
-
-    private fun setupFragmentResultListener() {
-        parentFragmentManager.setFragmentResultListener(
-            "labelSelectorResult",
-            viewLifecycleOwner
-        ) { _, bundle ->
-            @Suppress("DEPRECATION")
-            val selectedLabels = bundle.getSerializable("selectedLabels") as? ArrayList<Label> ?: arrayListOf()
-            viewModel.labels.value = selectedLabels
-        }
     }
 
     private fun updateSelectedLabelChips(labels: List<Label>) {
@@ -150,12 +153,11 @@ class AddTransactionFragment : Fragment() {
         }
     }
 
-
     // --- Save Logic ---
     private fun saveTransaction() {
         // TODO: Replace with actual data from UI
-        viewModel.category.value = "Test Category"
-        viewModel.walletId.value = "Test Wallet"
+        viewModel.categoryId.value = 1
+        viewModel.walletId.value = 1
         viewModel.currency.value = "Test Currency"
 
         val amount = binding.edtTextAmount.text.toString().toDoubleOrNull() ?: 0.0
@@ -169,8 +171,8 @@ class AddTransactionFragment : Fragment() {
         viewModel.recurrenceRate.value = "Weekly" // Replace with actual rate
 
         // Validate input
-        if (viewModel.category.value.isNullOrBlank() ||
-            viewModel.walletId.value.isNullOrBlank() ||
+        if (viewModel.categoryId.value != null  ||
+            viewModel.walletId.value != null ||
             viewModel.currency.value.isNullOrBlank() ||
             amount <= 0.0 ||
             date.isBlank()
@@ -202,24 +204,51 @@ class AddTransactionFragment : Fragment() {
         }
     }
 
-    // --- Label Navigation ---
+    // --- Popup Navigation ---
     private fun showLabelSelector() {
-        val currentLabels = viewModel.labels.value ?: emptyList()
-        val bundle = Bundle().apply {
-            putSerializable("currentLabels", ArrayList(viewModel.labels.value))
-        }
-        findNavController().navigate(
-            R.id.action_addTransactionFragment_to_labelSelectorFragment,
-            bundle
-        )
+        findNavController().navigate(R.id.action_addTransactionFragment_to_labelSelectorFragment)
+    }
+
+    private fun showWalletSelector() {
+        val bottomSheet = WalletSelectorBottomSheetFragment()
+        bottomSheet.show(parentFragmentManager, bottomSheet.tag)
     }
 
     // --- Observers ---
     private fun observeViewModel() {
-        viewModel.labels.observe(viewLifecycleOwner) { selectedLabels ->
-            Log.d("Labels", selectedLabels.toString())
-            updateSelectedLabelChips(viewModel.labels.value?: emptyList())
-            // TODO: Show labels as chips or in a list
+        viewModel.selectedLabels.observe(viewLifecycleOwner) { selectedLabels ->
+            Log.d("ViewModelsLabels", selectedLabels.toString())
+            updateSelectedLabelChips(selectedLabels)
+        }
+
+        viewModel.walletId.observe(viewLifecycleOwner) { walletId ->
+            Log.d("Wallet", "Selected Wallet ID: $walletId")
+            // Update UI based on the selected wallet
+        }
+
+        viewModel.categoryId.observe(viewLifecycleOwner) { categoryId ->
+            Log.d("Category", "Selected Category ID: $categoryId")
+            // Update UI based on the selected category
+        }
+
+        viewModel.currency.observe(viewLifecycleOwner) { currency ->
+            Log.d("Currency", "Selected Currency: $currency")
+            // Update UI based on the selected currency
+        }
+
+        viewModel.amount.observe(viewLifecycleOwner) { amount ->
+            Log.d("Amount", "Entered Amount: $amount")
+            // Update UI based on the entered amount
+        }
+
+        viewModel.date.observe(viewLifecycleOwner) { date ->
+            Log.d("Date", "Selected Date: $date")
+            // Update UI based on the selected date
+        }
+
+        viewModel.note.observe(viewLifecycleOwner) { note ->
+            Log.d("Note", "Entered Note: $note")
+            // Update UI based on the entered note
         }
     }
 }

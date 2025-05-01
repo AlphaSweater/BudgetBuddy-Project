@@ -69,5 +69,4 @@
         <item name="android:textColor">?attr/bb_primaryText</item>
         <item name="android:background">?attr/selectableItemBackground</item>
     </style>
-
 </resources>

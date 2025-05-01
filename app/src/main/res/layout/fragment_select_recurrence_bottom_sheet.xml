@@ -3,13 +3,14 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/rounded_top_bg"
+    android:background="@drawable/bg_rounded_top"
     android:elevation="8dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
+        android:background="@android:color/transparent"
         android:padding="24dp">
 
         <!-- Back Button -->
