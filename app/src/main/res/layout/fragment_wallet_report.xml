@@ -10,7 +10,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/headerContainer"
         android:layout_width="0dp"
-        android:layout_height="195dp"
+        android:layout_height="155dp"
         android:paddingStart="16dp"
         android:paddingEnd="16dp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -203,17 +203,6 @@
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/linearLayout5">
-
-        <!-- Tab Layout for selecting tabs like "Summary", "Expenses", "Income" -->
-        <com.google.android.material.tabs.TabLayout
-            android:id="@+id/tabLayout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            app:tabIndicatorColor="?attr/bb_primaryText"
-            app:tabIndicatorHeight="2dp"
-            app:tabSelectedTextColor="?attr/bb_primaryText"
-            app:tabTextColor="?attr/bb_primaryText" />
     </LinearLayout>
 
     <!-- Holds the transaction history of the chosen wallet -->
