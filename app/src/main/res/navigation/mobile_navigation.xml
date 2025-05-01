@@ -23,18 +23,6 @@
         android:id="@+id/action_homeFragment_to_generalReportsFragment"
         app:destination="@id/navigation_general_reports" />
 
-    <fragment
-        android:id="@+id/navigation_dashboard"
-        android:name="com.synaptix.budgetbuddy.presentation.ui.main.dashboard.DashboardFragment"
-        android:label="@string/title_dashboard"
-        tools:layout="@layout/fragment_dashboard" />
-
-    <fragment
-        android:id="@+id/navigation_notifications"
-        android:name="com.synaptix.budgetbuddy.presentation.ui.main.notifications.NotificationsFragment"
-        android:label="@string/title_notifications"
-        tools:layout="@layout/fragment_notifications" />
-
     <!-- AddTransactionFragment -->
     <fragment
         android:id="@+id/navigation_add_transaction"
@@ -159,5 +147,12 @@
         android:name="com.synaptix.budgetbuddy.presentation.ui.main.transactions.generalReports.GeneralReportsFragment"
         android:label="General Reports"
         tools:layout="@layout/fragment_general_reports" />
+
+    <fragment
+        android:id="@+id/navigation_budget_main"
+        android:name="com.synaptix.budgetbuddy.presentation.ui.main.budget.budgetHomePage.BudgetHomeFragment"
+        android:label="Budgets"
+        tools:layout="@layout/fragment_wallet_main">
+    </fragment>
 
 </navigation>
