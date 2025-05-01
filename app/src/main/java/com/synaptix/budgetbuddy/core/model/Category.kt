@@ -7,6 +7,6 @@ data class Category (
     val userId: Int?,
     val categoryName: String,
     val categoryType: String,
-    val categoryIcon: String,
-    val categoryColor: String
+    val categoryIcon: Int,
+    val categoryColor: Int
 ) : Serializable
