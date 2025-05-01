@@ -5,27 +5,25 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.synaptix.budgetbuddy.core.model.Wallet
 import com.synaptix.budgetbuddy.databinding.FragmentSelectWalletBottomSheetBinding
 import com.synaptix.budgetbuddy.presentation.ui.main.addTransaction.AddTransactionViewModel
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class WalletSelectorBottomSheetFragment : BottomSheetDialogFragment() {
 
     private var _binding: FragmentSelectWalletBottomSheetBinding? = null
     private val binding get() = _binding!!
 
     private val viewModel: AddTransactionViewModel by activityViewModels()
-
+    private val walletViewModel: WalletSelectorBottomSheetViewModel by viewModels()
     private lateinit var walletAdapter: WalletAdapter
 
-    private val walletList = listOf(
-        Wallet(1, 1, "Main Wallet", "ZAR", 1200.50),
-        Wallet(2, 1, "Savings", "ZAR", 8500.00),
-        Wallet(3, 1, "Crypto", "ZAR", 0.004)
-    )
 
     override fun onStart() {
         super.onStart()
@@ -56,19 +54,21 @@ class WalletSelectorBottomSheetFragment : BottomSheetDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupRecyclerView()
-    }
 
-    private fun setupRecyclerView() {
-        walletAdapter = WalletAdapter(walletList) { walletId ->
-            viewModel.walletId.value = walletId // Update ViewModel with selected wallet ID
-            dismiss()
-        }
-
-        binding.walletRecyclerView.apply {
-            layoutManager = LinearLayoutManager(requireContext())
-            adapter = walletAdapter
+        walletViewModel.loadWallets()
+        //AI assisted with this which calls the function in the viewModel and passes the data to the adapter
+        walletViewModel.wallets.observe(viewLifecycleOwner) { walletList ->
+            walletAdapter = WalletAdapter(walletList) { walletId ->
+                viewModel.walletId.value = walletId
+                dismiss()
+            }
+            binding.walletRecyclerView.adapter = walletAdapter
         }
     }
+
+private fun setupRecyclerView() {
+    binding.walletRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+}
 
     override fun onDestroyView() {
         super.onDestroyView()
