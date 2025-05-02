@@ -10,7 +10,7 @@ import com.synaptix.budgetbuddy.core.model.Wallet
 
 class TransactionSelectWalletAdapter(
     private val wallets: List<Wallet>,
-    private val onWalletClick: (Int) -> Unit // Callback with selected wallet ID
+    private val onWalletClick: (Wallet) -> Unit // Callback with selected wallet
 ) : RecyclerView.Adapter<TransactionSelectWalletAdapter.WalletViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): WalletViewHolder {
@@ -34,7 +34,7 @@ class TransactionSelectWalletAdapter(
             balance.text = "R %.2f".format(wallet.walletBalance)
 
             itemView.setOnClickListener {
-                onWalletClick(wallet.walletId)
+                onWalletClick(wallet)
 
             }
         }

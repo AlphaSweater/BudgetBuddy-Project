@@ -25,6 +25,8 @@ class BudgetReportAdapter(private val items: List<BudgetReportListItems>) : Recy
             is BudgetReportListItems.DateHeader -> VIEW_TYPE_HEADER
             is BudgetReportListItems.TransactionItem -> VIEW_TYPE_TRANSACTION
             is BudgetReportListItems.CategoryItems -> VIEW_TYPE_CATEGORY
+            else -> throw IllegalArgumentException("Invalid item type at position $position")
+
         }
     }
     //took out if else statement this could be broken so note that
@@ -54,6 +56,7 @@ class BudgetReportAdapter(private val items: List<BudgetReportListItems>) : Recy
             is BudgetReportListItems.DateHeader -> (holder as DateHeaderViewHolder).bind(item)
             is BudgetReportListItems.TransactionItem -> (holder as TransactionViewHolder).bind(item)
             is BudgetReportListItems.CategoryItems -> (holder as CategoryViewHolder).bind(item)
+            else -> throw IllegalArgumentException("Unexpected item type at position $position: ${item::class.simpleName}")
         }
     }
 

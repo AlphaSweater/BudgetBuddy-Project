@@ -39,4 +39,13 @@ sealed class BudgetReportListItems {
         val walletIcon: Int,
         var walletBalance: Double
     )
+
+    data class LabelItems(
+        val labelName: String,
+        val labelIcon: Int,
+        val labelColour: Int,
+        val transactionCount: Int,
+        val amount: String,
+        val relativeDate: String,
+    ) : BudgetReportListItems()
 }

@@ -42,8 +42,8 @@
         tools:layout="@layout/fragment_transaction_add">
 
         <action
-            android:id="@+id/action_transactionAddFragment_to_transactionSelectLabelFragment"
-            app:destination="@id/navigation_transaction_select_label"
+            android:id="@+id/action_transactionAddFragment_to_transactionSelectWalletFragment"
+            app:destination="@id/navigation_transaction_select_wallet"
             app:enterAnim="@anim/slide_in_up"
             app:exitAnim="@anim/fade_out"
             app:popEnterAnim="@anim/fade_in"
@@ -57,7 +57,35 @@
             app:popEnterAnim="@anim/fade_in"
             app:popExitAnim="@anim/slide_out_down" />
 
+        <action
+            android:id="@+id/action_transactionAddFragment_to_transactionSelectLabelFragment"
+            app:destination="@id/navigation_transaction_select_label"
+            app:enterAnim="@anim/slide_in_up"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/slide_out_down" />
+
+        <action
+            android:id="@+id/action_transactionAddFragment_to_transactionSelectRecurrenceFragment"
+            app:destination="@id/navigation_transaction_select_recurrence"
+            app:enterAnim="@anim/slide_in_up"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/slide_out_down" />
+
     </fragment>
+
+    <fragment
+        android:id="@+id/navigation_transaction_select_category"
+        android:name="com.synaptix.budgetbuddy.presentation.ui.main.transaction.transactionSelectCategoryPopUp.TransactionSelectCategoryFragment"
+        android:label="Select Category"
+        tools:layout="@layout/fragment_transaction_select_category" />
+
+    <fragment
+        android:id="@+id/navigation_transaction_select_wallet"
+        android:name="com.synaptix.budgetbuddy.presentation.ui.main.transaction.transactionSelectWalletPopUp.TransactionSelectWalletFragment"
+        android:label="Select Wallet"
+        tools:layout="@layout/fragment_transaction_select_wallet" />
 
     <fragment
         android:id="@+id/navigation_transaction_select_label"
@@ -66,11 +94,10 @@
         tools:layout="@layout/fragment_transaction_select_label" />
 
     <fragment
-        android:id="@+id/navigation_transaction_select_category"
-        android:name="com.synaptix.budgetbuddy.presentation.ui.main.transaction.transactionSelectCategoryPopUp.TransactionSelectCategoryFragment"
-        android:label="Select Category"
-        tools:layout="@layout/fragment_transaction_select_category" />
-
+        android:id="@+id/navigation_transaction_select_recurrence"
+        android:name="com.synaptix.budgetbuddy.presentation.ui.main.transaction.transactionSelectRecurrencePopUp.TransactionSelectRecurrenceFragment"
+        android:label="Select Recurrence"
+        tools:layout="@layout/fragment_transaction_select_recurrence" />
 
     <!-- Add New Category Fragment Navigation -->
     <fragment
@@ -80,7 +107,7 @@
         tools:layout="@layout/fragment_category_add_new" />
 
 
-    <!-- Walet Fragments Navigation -->
+    <!-- Wallet Fragments Navigation -->
     <fragment
         android:id="@+id/navigation_wallet_main"
         android:name="com.synaptix.budgetbuddy.presentation.ui.main.wallet.WalletMainFragment"
