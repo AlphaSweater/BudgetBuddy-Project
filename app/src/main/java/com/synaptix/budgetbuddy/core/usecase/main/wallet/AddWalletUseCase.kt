@@ -1,6 +1,5 @@
 package com.synaptix.budgetbuddy.core.usecase.main.wallet
 
-import com.synaptix.budgetbuddy.core.model.Wallet
 import com.synaptix.budgetbuddy.core.model.WalletIn
 
 import com.synaptix.budgetbuddy.data.local.dao.WalletDao
