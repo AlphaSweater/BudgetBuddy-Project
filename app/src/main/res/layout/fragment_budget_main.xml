@@ -6,29 +6,21 @@
     android:layout_height="match_parent"
     tools:context=".presentation.ui.main.budget.BudgetMainFragment">
 
-        <!-- Container for Current Budgets -->
-    <LinearLayout
-        android:id="@+id/current_budgets_container"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:background="?attr/bb_surface"
-        android:orientation="vertical"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
 
         <!-- Title -->
-        <TextView
-            android:id="@+id/current_budgets_title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:padding="20dp"
-            android:text="Current Budgets"
-            android:textColor="?attr/bb_primaryText"
-            android:textSize="20sp"
-            android:textStyle="bold" />
-    </LinearLayout>
+    <TextView
+        android:id="@+id/current_budgets_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:padding="20dp"
+        android:text="Current Budgets"
+        android:textColor="?attr/bb_primaryText"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/monthlySpendingGoalCard"
@@ -208,78 +200,15 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/monthlySpendingGoalCard" />
 
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/budget_card"
-        android:layout_width="384dp"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerViewBudgetMain"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:backgroundTint="?attr/bb_surface"
-        app:cardCornerRadius="16dp"
-        app:cardElevation="4dp"
+        android:layout_weight="1"
+        android:visibility="visible"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/create_budget_button">
+        app:layout_constraintTop_toBottomOf="@+id/create_budget_button" />
 
-        <!-- Budget Item Container -->
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/budgetItemContainer"
-            android:layout_width="match_parent"
-            android:layout_height="77dp"
-            android:padding="16dp">
-
-            <!-- Icon (Burger) -->
-            <ImageView
-                android:id="@+id/budgetIcon"
-                android:layout_width="36dp"
-                android:layout_height="36dp"
-                android:contentDescription="Budget Icon"
-                android:paddingRight="8dp"
-                android:src="@drawable/baseline_fastfood_24"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:tint="?attr/colorOnPrimary" />
-
-            <!-- Budget Info -->
-            <LinearLayout
-                android:id="@+id/budgetDetails"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="12dp"
-                android:orientation="vertical"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/arrowIconBudget"
-                app:layout_constraintStart_toEndOf="@id/budgetIcon"
-                app:layout_constraintTop_toTopOf="parent">
-
-                <TextView
-                    android:id="@+id/budgetTitle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Food And Drinks"
-                    android:textColor="?attr/bb_primaryText"
-                    android:textSize="18sp" />
-
-                <TextView
-                    android:id="@+id/budgetStatus"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="R 1,500 spent of R 2,000"
-                    android:textColor="?attr/bb_secondaryText"
-                    android:textSize="14sp" />
-            </LinearLayout>
-
-            <!-- Navigation Arrow -->
-            <ImageView
-                android:id="@+id/arrowIconBudget"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:contentDescription="Navigate"
-                android:src="@drawable/baseline_arrow_forward_ios_24"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:tint="?attr/colorOnPrimary" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
-    </com.google.android.material.card.MaterialCardView>
-    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

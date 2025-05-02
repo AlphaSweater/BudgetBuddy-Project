@@ -23,8 +23,8 @@ import com.google.android.material.datepicker.MaterialDatePicker
 import com.synaptix.budgetbuddy.R
 import com.synaptix.budgetbuddy.core.model.Label
 import com.synaptix.budgetbuddy.databinding.FragmentTransactionAddBinding
-import com.synaptix.budgetbuddy.presentation.ui.main.transaction.transactionSelectWalletPopUp.TransactionSelectWalletBottomSheet
-//import com.synaptix.budgetbuddy.presentation.ui.main.transaction.transactionSelectRecurrencePopUp.TransactionSelectRecurrenceBottomSheet
+import com.synaptix.budgetbuddy.presentation.ui.main.transaction.transactionSelectWalletPopUp.TransactionSelectWalletFragment
+import com.synaptix.budgetbuddy.presentation.ui.main.transaction.transactionSelectRecurrencePopUp.TransactionSelectRecurrenceBottomSheet
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -90,16 +90,16 @@ class TransactionAddFragment : Fragment() {
         val adapter = ArrayAdapter(
             requireContext(),
             R.layout.spinner_item,
-            listOf("ZAR")
+            listOf("ZAR", "USD", "EUR", "GBP")
         )
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         binding.spinnerCurrency.adapter = adapter
     }
 
     private fun setupClickListeners() {
-//        binding.rowSelectRecurrenceRate.setOnClickListener {
-//            TransactionSelectRecurrenceBottomSheet().show(parentFragmentManager, "RecurrenceBottomSheet")
-//        }
+        binding.rowSelectRecurrenceRate.setOnClickListener {
+            TransactionSelectRecurrenceBottomSheet().show(parentFragmentManager, "RecurrenceBottomSheet")
+        }
 
         binding.rowSelectWallet.setOnClickListener {
             showWalletSelector()
@@ -196,6 +196,16 @@ class TransactionAddFragment : Fragment() {
             }.show()
     }
 
+    // --- Update Methods ---
+
+    private fun updateSelectedCategory(categoryName: String) {
+        binding.textSelectedCategoryName.text = categoryName
+    }
+
+    private fun updateSelectedWallet(walletName: String) {
+        binding.textSelectedWalletName.text = walletName
+    }
+
     private fun updateSelectedLabelChips(labels: List<Label>) {
         val selectedLabels = labels.filter { it.isSelected }
 
@@ -241,7 +251,7 @@ class TransactionAddFragment : Fragment() {
 
         // Validate input
         if (viewModel.category.value != null  ||
-            viewModel.walletId.value != null ||
+            viewModel.wallet.value != null ||
             viewModel.currency.value.isNullOrBlank() ||
             amount <= 0.0 ||
             date.isBlank()
@@ -279,8 +289,7 @@ class TransactionAddFragment : Fragment() {
     }
 
     private fun showWalletSelector() {
-        val bottomSheet = TransactionSelectWalletBottomSheet()
-        bottomSheet.show(parentFragmentManager, bottomSheet.tag)
+        findNavController().navigate(R.id.action_transactionAddFragment_to_transactionSelectWalletFragment)
     }
 
     private fun showCategorySelector(){
@@ -292,16 +301,19 @@ class TransactionAddFragment : Fragment() {
         viewModel.selectedLabels.observe(viewLifecycleOwner) { selectedLabels ->
             Log.d("ViewModelsLabels", selectedLabels.toString())
             updateSelectedLabelChips(selectedLabels)
-        }
 
-        viewModel.walletId.observe(viewLifecycleOwner) { walletId ->
-            Log.d("Wallet", "Selected Wallet ID: $walletId")
-            // Update UI based on the selected wallet
         }
 
         viewModel.category.observe(viewLifecycleOwner) { category ->
-            Log.d("Category", "Selected Category: $category")
             // Update UI based on the selected category
+            updateSelectedCategory(category.categoryName)
+            Log.d("Category", "Selected Category: $category")
+        }
+
+        viewModel.wallet.observe(viewLifecycleOwner) { wallet ->
+            // Update UI based on the selected wallet
+            updateSelectedWallet(wallet.walletName)
+            Log.d("Wallet", "Selected Wallet ID: $wallet")
         }
 
         viewModel.currency.observe(viewLifecycleOwner) { currency ->
