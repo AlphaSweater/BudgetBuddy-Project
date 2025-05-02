@@ -20,6 +20,7 @@
             android:paddingVertical="8dp">
 
             <ImageView
+                android:id="@+id/iconCategory"
                 android:layout_width="36dp"
                 android:layout_height="36dp"
                 android:layout_marginEnd="12dp"
@@ -32,6 +33,7 @@
                 android:orientation="vertical">
 
                 <TextView
+                    android:id="@+id/txtWalletName"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Text"
@@ -40,6 +42,7 @@
                     android:textStyle="bold" />
 
                 <TextView
+                    android:id="@+id/txtRelativeDay"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Last Activity: Today"
@@ -48,6 +51,7 @@
             </LinearLayout>
 
             <TextView
+                android:id="@+id/txtAmount"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="ZAR X"

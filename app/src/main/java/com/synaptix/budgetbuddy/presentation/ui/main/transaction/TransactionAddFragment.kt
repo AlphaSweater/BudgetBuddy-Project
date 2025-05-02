@@ -88,7 +88,7 @@ class TransactionAddFragment : Fragment() {
         val adapter = ArrayAdapter(
             requireContext(),
             R.layout.spinner_item,
-            listOf("ZAR", "USD", "EUR", "GBP")
+            listOf("ZAR")
         )
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         binding.spinnerCurrency.adapter = adapter
@@ -103,33 +103,42 @@ class TransactionAddFragment : Fragment() {
             showWalletSelector()
         }
 
-        binding.rowSelectLabel.setOnClickListener {
-            showLabelSelector()
-        }
+//        binding.rowSelectLabel.setOnClickListener {
+//            showLabelSelector()
+//        }
 
         binding.rowSelectCategory.setOnClickListener {
             showCategorySelector()
         }
 
-        val openDatePicker = {
-            val picker = MaterialDatePicker.Builder.datePicker()
-                .setTitleText("Select Date")
-                .setSelection(MaterialDatePicker.todayInUtcMilliseconds())
+        val openDateRangePicker = {
+            val picker = MaterialDatePicker.Builder.dateRangePicker()
+                .setTitleText("Select Date Range")
                 .build()
 
             picker.addOnPositiveButtonClickListener { selection ->
-                // Convert selection (epoch millis) to readable date
+                // selection is a Pair<Long, Long> for start and end dates
+                val startDate = selection.first
+                val endDate = selection.second
+
                 val calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
-                calendar.timeInMillis = selection
-                val formattedDate = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(calendar.time)
-                binding.edtTextDate.setText(formattedDate)
+                val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+
+                calendar.timeInMillis = startDate
+                val formattedStartDate = dateFormat.format(calendar.time)
+
+                calendar.timeInMillis = endDate
+                val formattedEndDate = dateFormat.format(calendar.time)
+
+                val combinedDate = "$formattedStartDate - $formattedEndDate"
+                binding.edtTextDate.setText(combinedDate)
             }
 
-            picker.show(parentFragmentManager, "MATERIAL_DATE_PICKER")
+            picker.show(parentFragmentManager, "MATERIAL_DATE_RANGE_PICKER")
         }
 
-        binding.rowSelectDate.setOnClickListener { openDatePicker() }
-        binding.edtTextDate.setOnClickListener { openDatePicker() }
+        binding.rowSelectDate.setOnClickListener { openDateRangePicker() }
+        binding.edtTextDate.setOnClickListener { openDateRangePicker() }
 
         binding.rowSelectPhoto.setOnClickListener { showImageSourceDialog() }
 
@@ -197,41 +206,28 @@ class TransactionAddFragment : Fragment() {
     // --- Update Methods ---
 
     private fun updateSelectedCategory(categoryName: String) {
+        if (categoryName.isBlank()) {
+            binding.textSelectedCategoryName.text = "No category selected"
+            return
+        }
         binding.textSelectedCategoryName.text = categoryName
     }
 
     private fun updateSelectedWallet(walletName: String) {
+        if (walletName.isBlank()) {
+            binding.textSelectedWalletName.text = "No wallet selected"
+            return
+        }
         binding.textSelectedWalletName.text = walletName
     }
 
-    private fun updateSelectedLabelChips(labels: List<Label>) {
-        val selectedLabels = labels.filter { it.isSelected }
 
-        val chipGroup = binding.chipGroupLabels
-        chipGroup.removeAllViews()
-
-        if (selectedLabels.isEmpty()) {
-            chipGroup.visibility = View.GONE
+    private fun updateSelectedRecurrenceRate(recurrenceRate: String?) {
+        if (recurrenceRate.isNullOrBlank()){
+            binding.textSelectedRecurrenceRate.text = "No recurrence rate selected"
             return
         }
-
-        chipGroup.visibility = View.VISIBLE
-
-        selectedLabels.forEach { label ->
-            val chip = Chip(requireContext()).apply {
-                text = label.labelName
-                isClickable = false
-                isCheckable = false
-
-                // Resolve the color from the theme attribute
-                val chipBackgroundColor = MaterialColors.getColor(this.context, R.attr.bb_surfaceAlt, Color.TRANSPARENT)
-                setChipBackgroundColor(ColorStateList.valueOf(chipBackgroundColor))
-
-                val textColor = MaterialColors.getColor(this.context, R.attr.bb_primaryText, Color.TRANSPARENT)
-                setTextColor(textColor)
-            }
-            chipGroup.addView(chip)
-        }
+        binding.textSelectedRecurrenceRate.text = recurrenceRate
     }
 
     // --- Save Logic ---
@@ -248,11 +244,11 @@ class TransactionAddFragment : Fragment() {
         viewModel.currency.value = binding.spinnerCurrency.selectedItem.toString()
 
         // Validate input
-        if (viewModel.category.value != null  ||
-            viewModel.wallet.value != null ||
+        if (viewModel.category.value == null  ||
+            viewModel.wallet.value == null ||
             viewModel.currency.value.isNullOrBlank() ||
-            amount <= 0.0 ||
-            date.isBlank()
+            viewModel.amount.value!! <= 0.0 ||
+            viewModel.date.value?.isBlank() == true
         ) {
             Toast.makeText(
                 requireContext(),
@@ -271,6 +267,8 @@ class TransactionAddFragment : Fragment() {
                     "Transaction saved successfully!",
                     Toast.LENGTH_SHORT
                 ).show()
+                viewModel.reset()
+                findNavController().popBackStack()
             } catch (e: Exception) {
                 Toast.makeText(
                     requireContext(),
@@ -300,21 +298,21 @@ class TransactionAddFragment : Fragment() {
 
     // --- Observers ---
     private fun observeViewModel() {
-        viewModel.selectedLabels.observe(viewLifecycleOwner) { selectedLabels ->
-            Log.d("ViewModelsLabels", selectedLabels.toString())
-            updateSelectedLabelChips(selectedLabels)
-
-        }
+//        viewModel.selectedLabels.observe(viewLifecycleOwner) { selectedLabels ->
+//            Log.d("ViewModelsLabels", selectedLabels.toString())
+//            updateSelectedLabelChips(selectedLabels)
+//
+//        }
 
         viewModel.category.observe(viewLifecycleOwner) { category ->
             // Update UI based on the selected category
-            updateSelectedCategory(category.categoryName)
+            updateSelectedCategory(category?.categoryName ?: "")
             Log.d("Category", "Selected Category: $category")
         }
 
         viewModel.wallet.observe(viewLifecycleOwner) { wallet ->
             // Update UI based on the selected wallet
-            updateSelectedWallet(wallet.walletName)
+            updateSelectedWallet(wallet?.walletName ?: "")
             Log.d("Wallet", "Selected Wallet ID: $wallet")
         }
 
@@ -336,6 +334,12 @@ class TransactionAddFragment : Fragment() {
         viewModel.note.observe(viewLifecycleOwner) { note ->
             Log.d("Note", "Entered Note: $note")
             // Update UI based on the entered note
+        }
+
+        viewModel.recurrenceRate.observe(viewLifecycleOwner) { recurrenceRate ->
+            updateSelectedRecurrenceRate(recurrenceRate)
+            Log.d("RecurrenceRate", "Selected Recurrence Rate: $recurrenceRate")
+            // Update UI based on the selected recurrence rate
         }
 
         viewModel.imageBytes.observe(viewLifecycleOwner) { bytes ->

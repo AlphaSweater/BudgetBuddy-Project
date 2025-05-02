@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true"
+    android:background="?attr/bb_background"
     tools:context=".presentation.ui.main.home.HomeMainFragment">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -149,117 +150,17 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView3"
-        app:strokeColor="?attr/bb_surface"
+        app:strokeColor="@android:color/transparent"
+        android:backgroundTint="?attr/bb_surface"
         app:strokeWidth="0dp">
 
-        <LinearLayout
-            android:layout_width="396dp"
-            android:layout_height="151dp"
-            android:background="?attr/bb_surface"
-            android:orientation="vertical"
-            android:padding="16dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            tools:layout_editor_absoluteY="216dp">
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerViewHomeWalletOverview"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:visibility="visible" />
 
-            <!-- First Wallet -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:paddingVertical="8dp">
-
-                <ImageView
-                    android:layout_width="36dp"
-                    android:layout_height="36dp"
-                    android:layout_marginEnd="12dp"
-                    android:src="@drawable/ic_account_balance_wallet_24"
-                    app:tint="?attr/colorOnPrimary" />
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Cash"
-                        android:textColor="?attr/bb_primaryText"
-                        android:textSize="16sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Last Activity: Today"
-                        android:textColor="?attr/bb_secondaryText"
-                        android:textSize="12sp" />
-                </LinearLayout>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="ZAR 12,200"
-                    android:textColor="?attr/bb_profit"
-                    android:textSize="14sp" />
-            </LinearLayout>
-
-            <!-- Divider -->
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginVertical="4dp"
-                android:background="?attr/bb_secondaryText" />
-
-            <!-- Second Wallet -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:paddingVertical="8dp">
-
-                <ImageView
-                    android:layout_width="36dp"
-                    android:layout_height="36dp"
-                    android:layout_marginEnd="12dp"
-                    android:src="@drawable/baseline_savings_24"
-                    app:tint="?attr/colorOnPrimary" />
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="PC Savings"
-                        android:textColor="?attr/bb_primaryText"
-                        android:textSize="16sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Last Activity: Today"
-                        android:textColor="?attr/bb_secondaryText"
-                        android:textSize="12sp" />
-                </LinearLayout>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="ZAR 12,200"
-                    android:textColor="?attr/bb_profit"
-                    android:textSize="14sp" />
-            </LinearLayout>
-
-        </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 
         <TextView
@@ -376,7 +277,7 @@
             android:layout_marginStart="16dp"
             android:layout_marginTop="32dp"
             android:layout_weight="1"
-            android:text="@string/spending_details"
+            android:text="Filtering"
             android:textColor="?attr/bb_primaryText"
             android:textSize="18sp"
             android:textStyle="bold"
@@ -396,111 +297,81 @@
             app:layout_constraintTop_toBottomOf="@+id/reportsMaterialCardView" />
 
         <com.google.android.material.card.MaterialCardView
-        android:id="@+id/materialCardView4"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="16dp"
-        app:cardBackgroundColor="?attr/bb_surface"
-        app:cardCornerRadius="16dp"
-        app:cardElevation="4dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/txtTopSpendingOverView">
-
-        <LinearLayout
+            android:id="@+id/materialCardView4"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="16dp">
+            android:layout_margin="16dp"
+            app:cardBackgroundColor="?attr/bb_surface"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="6dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/txtTopSpendingOverView">
 
-            <!-- Toggle Button -->
+            <!-- Outer LinearLayout for vertical layout -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/toggle_background"
-                android:gravity="center"
-                android:orientation="horizontal"
-                android:padding="4dp">
+                android:orientation="vertical"
+                android:padding="12dp"
+                android:gravity="center_vertical">
 
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:background="@android:color/transparent"
-                    android:gravity="center"
-                    android:padding="8dp"
-                    android:text="@string/week"
-                    android:textColor="?attr/bb_primaryText" />
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:background="@drawable/toggle_selected"
-                    android:gravity="center"
-                    android:padding="8dp"
-                    android:text="@string/month"
-                    android:textColor="?attr/bb_primaryText" />
-            </LinearLayout>
-
-            <!-- Repeated Items -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:orientation="vertical">
-
-                <!-- Repeat this block for each item -->
+                <!-- Horizontal LinearLayout containing EditText, Spinner, and Button -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:paddingVertical="8dp">
+                    android:gravity="center_vertical">
 
-                    <!-- Food & Drink and Expense Info -->
-                    <View
-                        android:layout_width="36dp"
-                        android:layout_height="36dp"
-                        android:layout_gravity="center"
-                        android:layout_marginEnd="12dp"
-                        android:background="@drawable/circle_button_background" />
-
-                    <LinearLayout
+                    <!-- Start Date EditText -->
+                    <EditText
+                        android:id="@+id/editTextDate2"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:orientation="vertical">
+                        android:hint="Start - End Date"
+                        android:textSize="14sp"
+                        android:inputType="date"
+                        android:padding="10dp"
+                        android:layout_marginEnd="8dp"
+                        android:backgroundTint="?attr/colorControlNormal"
+                        android:textColor="?android:textColorPrimary" />
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Food And Drink"
-                            android:textColor="?attr/bb_primaryText"
-                            android:textSize="14sp"
-                            android:textStyle="bold" />
+                    <!-- Category Spinner -->
+                    <Spinner
+                        android:id="@+id/spinner"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:padding="10dp"
+                        android:layout_marginEnd="8dp" />
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Last Activity: Today"
-                            android:textColor="?attr/bb_secondaryText"
-                            android:textSize="12sp" />
-                    </LinearLayout>
-
-                    <!-- Amount -->
-                    <TextView
+                    <!-- Filter Button -->
+                    <Button
+                        android:id="@+id/button3"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
-                        android:text="-R 178  (80%)"
-                        android:textColor="?attr/bb_expense"
-                        android:textSize="14sp"
-                        android:textStyle="bold" />
-                </LinearLayout>
+                        android:text="Filter"
+                        android:textColor="?attr/bb_primaryText"
+                        android:layout_weight="0"
+                        android:layout_gravity="center"
+                        android:backgroundTint="?attr/colorPrimary"
+                        android:paddingHorizontal="16dp"
+                        android:paddingVertical="10dp"
+                        android:layout_marginEnd="8dp" />
 
-            </LinearLayout>
-        </LinearLayout>
-    </com.google.android.material.card.MaterialCardView>
+                </LinearLayout>
+                <!-- End of Horizontal LinearLayout -->
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recyclerViewCaregoryDate"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:visibility="visible" />
+            </LinearLayout> <!-- End of Outer Vertical LinearLayout -->
+
+        </com.google.android.material.card.MaterialCardView>
+
 
         <TextView
             android:id="@+id/txtRecentTransactionsOverView"
@@ -541,135 +412,13 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
 
-            <LinearLayout
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerViewHomeTransactionOverview"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="?attr/bb_surface"
-                android:orientation="vertical"
-                android:padding="16dp">
+                android:layout_marginTop="16dp"
+                android:visibility="visible" />
 
-                <!-- First Wallet -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
-                    android:paddingVertical="8dp">
-
-                    <ImageView
-                        android:layout_width="36dp"
-                        android:layout_height="36dp"
-                        android:layout_marginEnd="12dp"
-                        android:src="@drawable/ic_attach_money_24"
-                        app:tint="?attr/colorOnPrimary" />
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Bills And Fees"
-                            android:textColor="?attr/bb_primaryText"
-                            android:textSize="16sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Cash Wallet"
-                            android:textColor="?attr/bb_secondaryText"
-                            android:textSize="12sp" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Bills And Fees"
-                            android:textColor="?attr/bb_secondaryText"
-                            android:textSize="12sp" />
-                    </LinearLayout>
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="-R 800"
-                        android:textColor="?attr/bb_expense"
-                        android:textSize="14sp" />
-                </LinearLayout>
-
-                <!-- Divider -->
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:layout_marginVertical="4dp"
-                    android:background="?attr/bb_secondaryText" />
-
-                <!-- Second Wallet -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
-                    android:paddingVertical="8dp">
-
-                    <ImageView
-                        android:layout_width="36dp"
-                        android:layout_height="36dp"
-                        android:layout_marginEnd="12dp"
-                        android:src="@drawable/baseline_local_gas_station_24"
-                        app:tint="?attr/colorOnPrimary" />
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Car"
-                            android:textColor="?attr/bb_primaryText"
-                            android:textSize="16sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Cash Wallet"
-                            android:textColor="?attr/bb_secondaryText"
-                            android:textSize="12sp" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Petrol"
-                            android:textColor="?attr/bb_secondaryText"
-                            android:textSize="12sp" />
-                    </LinearLayout>
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="-R 1,000"
-                        android:textColor="?attr/bb_expense"
-                        android:textSize="14sp" />
-                </LinearLayout>
-
-            </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
-
-
-        <Space
-            android:layout_width="0dp"
-            android:layout_height="90dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/materialCardView2" />
-
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

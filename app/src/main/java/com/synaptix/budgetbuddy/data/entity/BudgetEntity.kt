@@ -18,6 +18,11 @@ import androidx.room.PrimaryKey
             parentColumns = ["wallet_id"],
             childColumns = ["wallet_id"]
         ),
+        ForeignKey(
+            entity = CategoryEntity::class,
+            parentColumns = ["category_id"],
+            childColumns = ["category_id"]
+        )
     ]
 
 )
@@ -25,7 +30,8 @@ data class BudgetEntity (
     @PrimaryKey(autoGenerate = true) val budget_id: Int,
     val user_id: Int,
     val wallet_id: Int,
+    val category_id: Int,
     val name: String,
-    val minAmount: Double,
-    val maxAmount: Double
+    val amount: Double,
+    val spent: Double
 )

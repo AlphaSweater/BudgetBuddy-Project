@@ -1,4 +1,4 @@
-package com.synaptix.budgetbuddy.presentation.ui.main.general.generalIndividualTransactions
+package com.synaptix.budgetbuddy.presentation.ui.main.profile
 
 import androidx.fragment.app.viewModels
 import android.os.Bundle
@@ -8,13 +8,13 @@ import android.view.View
 import android.view.ViewGroup
 import com.synaptix.budgetbuddy.R
 
-class GeneralIndividualTransactionsFragment : Fragment() {
+class ProfileFragment : Fragment() {
 
     companion object {
-        fun newInstance() = GeneralIndividualTransactionsFragment()
+        fun newInstance() = ProfileFragment()
     }
 
-    private val viewModel: GeneralIndividualTransactionsViewModel by viewModels()
+    private val viewModel: ProfileViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -26,6 +26,6 @@ class GeneralIndividualTransactionsFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        return inflater.inflate(R.layout.fragment_general_individual_transactions, container, false)
+        return inflater.inflate(R.layout.fragment_profile, container, false)
     }
 }
