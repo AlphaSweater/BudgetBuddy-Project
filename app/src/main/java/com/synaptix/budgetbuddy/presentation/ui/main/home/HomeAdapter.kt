@@ -9,12 +9,16 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.RecyclerView
 import com.synaptix.budgetbuddy.R
+import androidx.fragment.app.activityViewModels
 import com.synaptix.budgetbuddy.core.model.BudgetReportListItems
 import com.synaptix.budgetbuddy.core.model.BudgetReportListItems.CategoryItems
 import com.synaptix.budgetbuddy.core.model.BudgetReportListItems.HomeWalletItem
 import com.synaptix.budgetbuddy.core.model.BudgetReportListItems.TransactionItem
+import com.synaptix.budgetbuddy.core.model.Transaction
+import kotlin.getValue
 
 class HomeAdapter(private val items: List<BudgetReportListItems>) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
