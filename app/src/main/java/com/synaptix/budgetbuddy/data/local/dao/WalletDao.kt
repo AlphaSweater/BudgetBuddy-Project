@@ -5,6 +5,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.synaptix.budgetbuddy.data.entity.WalletEntity
+import com.synaptix.budgetbuddy.data.entity.relations.WalletWithUser
 
 @Dao
 interface WalletDao {
@@ -17,5 +18,5 @@ interface WalletDao {
 
     //sql query to grab all wallets based on user ID
     @Query("SELECT * FROM wallet_table WHERE user_id = :userId")
-    suspend fun getWalletsByUserId(userId: Int): List<WalletEntity>
+    suspend fun getWalletsByUserId(userId: Int): List<WalletWithUser>
 }

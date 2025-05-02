@@ -5,8 +5,11 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.synaptix.budgetbuddy.core.model.Category
 import com.synaptix.budgetbuddy.core.model.Label
 import com.synaptix.budgetbuddy.core.model.Transaction
+import com.synaptix.budgetbuddy.core.model.TransactionIn
+import com.synaptix.budgetbuddy.core.model.Wallet
 import com.synaptix.budgetbuddy.core.usecase.auth.GetUserIdUseCase
 import com.synaptix.budgetbuddy.core.usecase.main.transaction.AddTransactionUseCase
 
@@ -16,8 +19,8 @@ class TransactionAddViewModel @Inject constructor(
     private val getUserIdUseCase: GetUserIdUseCase
 ) : ViewModel() {
 
-    val categoryId = MutableLiveData<Int>()
-    val walletId = MutableLiveData<Int>()
+    val category = MutableLiveData<Category>()
+    val wallet = MutableLiveData<Wallet>()
     val currency = MutableLiveData<String>()
     val amount = MutableLiveData<Double>()
     val date = MutableLiveData<String>()
@@ -29,10 +32,10 @@ class TransactionAddViewModel @Inject constructor(
 
 
     suspend fun addTransaction() {
-        val transaction = Transaction(
+        val transaction = TransactionIn(
             userId = getUserIdUseCase.execute(),
-            categoryId = categoryId.value ?: 0,
-            walletId = walletId.value ?: 0,
+            categoryId = category.value?.categoryId ?: 0,
+            walletId = wallet.value?.walletId ?: 0,
             currencyType = currency.value ?: "",
             amount = amount.value ?: 0.0,
             date = date.value ?: "",
