@@ -3,93 +3,78 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="?attr/selectableItemBackground"
     android:orientation="vertical"
-    android:paddingHorizontal="8dp"
-    android:paddingVertical="16dp">
+    android:padding="16dp">
 
-    <androidx.cardview.widget.CardView
-        android:id="@+id/cardView_wallet"
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/budgetCard"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="16dp"
-        android:backgroundTint="?attr/bb_surface"
-        app:cardCornerRadius="12dp"
-        app:cardElevation="6dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvTotalBalance">
+        app:cardCornerRadius="16dp"
+        app:cardElevation="4dp"
+        android:backgroundTint="?attr/bb_surface">
 
+        <!-- Budget Item Container -->
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/walletRow"
+            android:id="@+id/budgetItemContainer"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="?attr/bb_surface"
+            android:layout_height="77dp"
             android:padding="16dp">
 
-            <!-- Wallet Icon -->
+            <!-- Icon (Burger) -->
             <ImageView
-                android:id="@+id/ivWalletIcon"
-                android:layout_width="70dp"
-                android:layout_height="70dp"
+                android:id="@+id/walletIcon"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:contentDescription="Wallet Icon"
+                android:paddingRight="8dp"
                 android:src="@drawable/ic_account_balance_wallet_24"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:tint="@color/cat_light_brown" />
+                app:tint="?attr/colorOnPrimary" />
 
-            <!-- Wallet Name (e.g., Cash Wallet) -->
-            <TextView
-                android:id="@+id/tvWalletName"
-                android:layout_width="wrap_content"
+            <!-- Budget Info -->
+            <LinearLayout
+                android:id="@+id/walletDetails"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="50dp"
-                android:fontFamily="@font/roboto_medium"
-                android:text="Wallet Name"
-                android:textColor="?attr/bb_primaryText"
-                android:textSize="20dp"
-                android:textStyle="bold"
-                app:layout_constraintStart_toEndOf="@id/ivWalletIcon"
-                app:layout_constraintTop_toTopOf="parent" />
+                android:orientation="vertical"
+                android:layout_marginStart="12dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@id/walletIcon"
+                app:layout_constraintTop_toTopOf="parent">
 
-            <!-- Wallet Currency Label -->
-            <TextView
-                android:id="@+id/tvCurrency"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="50dp"
-                android:layout_marginTop="6dp"
-                android:text="Currency"
-                android:textColor="?attr/bb_primaryText"
-                android:textSize="26sp"
-                android:textStyle="bold"
-                app:layout_constraintStart_toEndOf="@id/ivWalletIcon"
-                app:layout_constraintTop_toBottomOf="@id/tvWalletName" />
+                <TextView
+                    android:id="@+id/walletName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Wallet Name"
+                    android:textColor="?attr/bb_primaryText"
+                    android:textSize="18sp" />
 
-            <!-- Wallet Amount -->
-            <TextView
-                android:id="@+id/tvWalletAmount"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="5dp"
-                android:layout_marginTop="6dp"
-                android:text="X"
-                android:textColor="?attr/bb_profit"
-                android:textSize="26sp"
-                android:textStyle="bold"
-                app:layout_constraintStart_toEndOf="@id/tvCurrency"
-                app:layout_constraintTop_toBottomOf="@id/tvWalletName" />
+                <TextView
+                    android:id="@+id/walletBalance"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Amount"
+                    android:textColor="?attr/bb_secondaryText"
+                    android:textSize="14sp" />
+            </LinearLayout>
 
-            <!-- Arrow Icon in Wallet Card -->
+            <!-- Navigation Arrow -->
             <ImageView
-                android:id="@+id/arrowIcon"
-                android:layout_width="28dp"
-                android:layout_height="28dp"
-                android:rotation="270"
-                android:src="@android:drawable/arrow_down_float"
+                android:id="@+id/arrowIconWallet"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:contentDescription="Navigate"
+                android:src="@drawable/baseline_arrow_forward_ios_24"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:tint="?attr/bb_primaryText" />
+                app:tint="?attr/colorOnPrimary" />
         </androidx.constraintlayout.widget.ConstraintLayout>
-    </androidx.cardview.widget.CardView>
+
+    </com.google.android.material.card.MaterialCardView>
+
 </LinearLayout>
