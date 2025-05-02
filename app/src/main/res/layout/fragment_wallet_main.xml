@@ -59,19 +59,33 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tvCurrencyTotal" />
 
+    <!-- Wallet Create Button-->
+    <Button
+        android:id="@+id/btnCreateWallet"
+        android:layout_width="180dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="20dp"
+        android:text="Create Wallet"
+        android:textColor="@android:color/white"
+        app:backgroundTint="?attr/bb_button"
+        app:cornerRadius="24dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvTotalBalance" />
+
     <!-- Card: Wallet Info -->
     <androidx.cardview.widget.CardView
         android:id="@+id/cardView_wallet1"
         android:layout_width="0dp"
         android:layout_height="100dp"
         android:layout_marginHorizontal="16dp"
-        android:layout_marginTop="50dp"
+        android:layout_marginTop="20dp"
         android:backgroundTint="?attr/bb_surface"
         app:cardCornerRadius="12dp"
         app:cardElevation="6dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvTotalBalance">
+        app:layout_constraintTop_toBottomOf="@+id/btnCreateWallet">
 
         <!-- Inside the Wallet Card -->
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -145,29 +159,4 @@
                 app:tint="?attr/bb_primaryText" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>
-
-    <!-- Add Button (Floating Style Button) -->
-    <Button
-        android:id="@+id/btnAdd"
-        android:layout_width="50dp"
-        android:layout_height="60dp"
-        android:layout_marginEnd="20dp"
-        android:layout_marginBottom="80dp"
-        android:backgroundTint="?attr/bb_button"
-        android:tint="?attr/bb_button"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
-
-    <!-- Add Icon inside Button -->
-    <ImageView
-        android:id="@+id/ivAddButton"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:src="@android:drawable/ic_input_add"
-        app:tint="?attr/bb_primaryText"
-        app:layout_constraintBottom_toBottomOf="@+id/btnAdd"
-        app:layout_constraintEnd_toEndOf="@+id/btnAdd"
-        app:layout_constraintStart_toStartOf="@+id/btnAdd"
-        app:layout_constraintTop_toTopOf="@+id/btnAdd" />
-
 </androidx.constraintlayout.widget.ConstraintLayout>
