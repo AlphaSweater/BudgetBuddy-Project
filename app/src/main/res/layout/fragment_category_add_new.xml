@@ -164,8 +164,7 @@
         android:layout_height="115dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/btnGoBack"
-        app:srcCompat="@drawable/ic_circle_24"
-        app:tint="?attr/bb_surface" />
+        app:srcCompat="@drawable/ic_circle_24"/>
 
 
     <EditText
@@ -212,7 +211,7 @@
                 android:paddingBottom="20dp">
 
                 <ImageView
-                    android:id="@+id/imageView4"
+                    android:id="@+id/btnFastFood"
                     android:layout_width="wrap_content"
                     android:layout_height="40dp"
                     android:layout_weight="1"
@@ -220,7 +219,7 @@
                     app:tint="?attr/colorOnPrimary" />
 
                 <ImageView
-                    android:id="@+id/imageView5"
+                    android:id="@+id/btnLightBulb"
                     android:layout_width="wrap_content"
                     android:layout_height="40dp"
                     android:layout_weight="1"
@@ -228,7 +227,7 @@
                     app:tint="?attr/colorOnPrimary" />
 
                 <ImageView
-                    android:id="@+id/imageView7"
+                    android:id="@+id/btnGas"
                     android:layout_width="wrap_content"
                     android:layout_height="40dp"
                     android:layout_weight="1"
@@ -236,7 +235,7 @@
                     app:tint="?attr/colorOnPrimary" />
 
                 <ImageView
-                    android:id="@+id/imageView8"
+                    android:id="@+id/btnShopping"
                     android:layout_width="wrap_content"
                     android:layout_height="40dp"
                     android:layout_weight="1"
