@@ -250,7 +250,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:hint="@string/write_a_note"
+                        android:hint="Description"
                         android:inputType="text"
                         android:textColor="?attr/bb_primaryText"
                         android:textColorHint="?attr/bb_primaryText" />
