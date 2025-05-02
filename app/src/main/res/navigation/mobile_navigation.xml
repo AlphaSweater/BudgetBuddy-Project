@@ -80,7 +80,7 @@
         tools:layout="@layout/fragment_category_add_new" />
 
 
-    <!-- Walet Fragments Navigation -->
+    <!-- Wallet Fragments Navigation -->
     <fragment
         android:id="@+id/navigation_wallet_main"
         android:name="com.synaptix.budgetbuddy.presentation.ui.main.wallet.WalletMainFragment"
