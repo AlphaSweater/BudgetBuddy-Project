@@ -128,4 +128,11 @@ sealed class BudgetReportListItems {
         // The relative date for the label item
         val relativeDate: String,
     ) : BudgetReportListItems()
+
+    data class HomeWalletItem(
+        val walletName: String,
+        val walletIcon: Int,
+        var walletBalance: Double,
+        val relativeDate: String,
+    ) : BudgetReportListItems()
 }
