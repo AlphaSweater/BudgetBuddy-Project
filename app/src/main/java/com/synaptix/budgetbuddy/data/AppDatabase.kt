@@ -19,7 +19,7 @@ import com.synaptix.budgetbuddy.data.local.dao.LabelDao
 //Ai assisted with the creation of this database
 @Database(
     entities = [UserEntity::class, TransactionEntity::class, WalletEntity::class, CategoryEntity::class, BudgetEntity::class, LabelEntity::class, TransactionLabelEntity::class],
-    version = 7
+    version = 8
 )
 
 

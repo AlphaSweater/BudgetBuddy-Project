@@ -40,38 +40,27 @@ class BudgetMainFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setupRecyclers()
         setupOnClickListeners()
+
+
+        viewModel.loadBudgets()
     }
 
     private fun setupRecyclers() {
         recyclerViewBudgetMain()
     }
     private fun recyclerViewBudgetMain() {
-        val budgetItems = listOf(
-            BudgetReportListItems.BudgetItem(
-                title = "Groceries",
-                status = "R1,200 spent of R2,000",
-                categoryIcon = R.drawable.baseline_shopping_bag_24),
-            BudgetReportListItems.BudgetItem(
-                title = "Transport",
-                status = "R300 spent of R1,000",
-                categoryIcon = R.drawable.ic_car_24),
-            BudgetReportListItems.BudgetItem(
-                title = "Eating Out",
-                status = "R850 spent of R900",
-                categoryIcon = R.drawable.baseline_fastfood_24),
-            BudgetReportListItems.BudgetItem(
-                title = "Subscriptions",
-                status = "R500 spent of R600",
-                categoryIcon = R.drawable.baseline_computer_24)
-        )
-
-        budgetMainAdapter = BudgetMainAdapter(budgetItems) { item ->
-            findNavController().navigate(R.id.action_budgetMainFragment_to_budgetReportFragment)
-        }
-
-        binding.recyclerViewBudgetMain.apply {
-            layoutManager = LinearLayoutManager(requireContext())
-            adapter = budgetMainAdapter
+        viewModel.budgets.observe(viewLifecycleOwner) { budgetList ->
+            val items = budgetList.map { budget ->
+                BudgetReportListItems.BudgetItem(
+                    title = budget.budgetName,
+                    status = "R0 spent of R${budget.amount}", // Replace R0 with calculated amount spent
+                    categoryIcon = R.drawable.baseline_shopping_bag_24
+                )
+            }
+            budgetMainAdapter = BudgetMainAdapter(items) { item ->
+                findNavController().navigate(R.id.action_budgetMainFragment_to_budgetReportFragment)
+            }
+            binding.recyclerViewBudgetMain.adapter = budgetMainAdapter
         }
     }
 
