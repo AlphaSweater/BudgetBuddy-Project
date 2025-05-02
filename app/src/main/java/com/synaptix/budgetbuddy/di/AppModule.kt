@@ -36,6 +36,7 @@ import com.synaptix.budgetbuddy.data.local.LabelDatabaseCallback
 import com.synaptix.budgetbuddy.data.local.dao.BudgetDao
 import com.synaptix.budgetbuddy.data.local.dao.CategoryDao
 import com.synaptix.budgetbuddy.data.local.dao.LabelDao
+import com.synaptix.budgetbuddy.data.local.dao.MinMaxGoalsDao
 import com.synaptix.budgetbuddy.data.local.dao.TransactionDao
 import com.synaptix.budgetbuddy.data.local.dao.UserDao
 import com.synaptix.budgetbuddy.data.local.dao.WalletDao
@@ -176,4 +177,12 @@ object AppModule {
     fun provideBudgetRepository(budgetDao: BudgetDao): BudgetRepository {
         return BudgetRepository(budgetDao)
     }
+
+    @Provides
+    @Singleton
+    fun provideMinMaxGoalsDao(appDatabase: AppDatabase): MinMaxGoalsDao {
+        return appDatabase.minMaxGoalsDao()
+    }
+
+
 }

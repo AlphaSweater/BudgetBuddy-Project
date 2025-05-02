@@ -22,6 +22,9 @@
 package com.synaptix.budgetbuddy.data.repository
 
 import com.synaptix.budgetbuddy.core.model.Category
+import com.synaptix.budgetbuddy.core.model.CategoryIn
+import com.synaptix.budgetbuddy.data.entity.CategoryEntity
+import com.synaptix.budgetbuddy.data.entity.TransactionEntity
 import com.synaptix.budgetbuddy.data.local.dao.CategoryDao
 import com.synaptix.budgetbuddy.data.local.dao.UserDao
 import com.synaptix.budgetbuddy.data.entity.mapper.toDomain
@@ -42,5 +45,9 @@ class CategoryRepository @Inject constructor(
     suspend fun getCategoriesByUserId(userId: Int): List<Category> {
         val categories = categoryDao.getCategoriesByUserId(userId)
         return categories.map { it.toDomain() }
+    }
+
+    suspend fun addCategory(entity: CategoryEntity): Long {
+        return categoryDao.insertCategory(entity)
     }
 }
