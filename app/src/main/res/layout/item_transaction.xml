@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@android:color/transparent"
+    android:padding="12dp">
+
+    <!-- Circular Icon -->
+    <LinearLayout
+        android:id="@+id/iconCategoryContainer"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_margin="4dp"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:background="@drawable/bg_circle_shape"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/iconCategory"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:scaleType="fitCenter"
+            app:tint="?attr/bb_primaryText" />
+    </LinearLayout>
+
+
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/iconCategoryContainer"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <!-- Category Title (e.g., "Car") -->
+        <TextView
+            android:id="@+id/textCategoryName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Car"
+            android:textColor="?attr/bb_primaryText"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toEndOf="@id/iconCategory"
+            app:layout_constraintTop_toTopOf="@id/iconCategory" />
+
+        <!-- Wallet Text -->
+        <LinearLayout
+            android:id="@+id/row_wallet"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginTop="4dp">
+
+            <ImageView
+                android:layout_width="17dp"
+                android:layout_height="17dp"
+                android:src="@drawable/ic_account_balance_wallet_24"
+                android:contentDescription="Wallet Icon"
+                app:tint="?attr/bb_primaryText"/>
+
+            <TextView
+                android:id="@+id/textWalletName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Cash Wallet"
+                android:textColor="?attr/bb_primaryText"
+                android:textSize="10sp"
+                android:layout_marginStart="2dp"/>
+        </LinearLayout>
+
+        <!-- Description Text -->
+        <LinearLayout
+            android:id="@+id/rowNote"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginTop="2dp"
+            android:visibility="visible">
+
+            <ImageView
+                android:layout_width="17dp"
+                android:layout_height="17dp"
+                android:src="@drawable/ic_edit_24"
+                android:contentDescription="Wallet Icon"
+                app:tint="?attr/bb_primaryText" />
+
+            <TextView
+                android:id="@+id/textNote"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Cash Wallet"
+                android:textColor="?attr/bb_primaryText"
+                android:textSize="10sp"
+                android:layout_marginStart="2dp"/>
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="right"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <!-- Amount -->
+        <TextView
+            android:id="@+id/text_amount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="-R 1,500"
+            android:textColor="?attr/bb_expense"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <!-- Relative Date -->
+        <TextView
+            android:id="@+id/text_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:text="Yesterday"
+            android:textColor="?attr/bb_secondaryText"
+            android:textSize="14sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/text_amount" />
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

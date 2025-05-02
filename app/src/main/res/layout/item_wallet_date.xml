@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <!-- TextView displaying the day of the month -->
+        <TextView
+            android:id="@+id/txtNumberDay"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="X"
+            android:textColor="?attr/bb_primaryText"
+            android:textSize="24sp" />
+
+        <!-- Nested LinearLayout to hold more detailed date info like "Today" and "March 2025" -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/txtDay"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Day"
+                android:textColor="?attr/bb_primaryText"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/txtMonthYear"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Month + Year"
+                android:textColor="?attr/bb_primaryText"
+                android:textSize="12sp" />
+        </LinearLayout>
+
+        <!-- TextView displaying the transaction amount -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Amount"
+            android:textColor="@android:color/holo_red_light"
+            android:textSize="14sp" />
+    </LinearLayout>
+</LinearLayout>
