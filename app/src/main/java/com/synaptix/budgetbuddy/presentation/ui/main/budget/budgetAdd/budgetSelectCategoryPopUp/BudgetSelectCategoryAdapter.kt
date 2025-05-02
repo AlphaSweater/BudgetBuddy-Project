@@ -1,0 +1,48 @@
+package com.synaptix.budgetbuddy.presentation.ui.main.budget.budgetAdd.budgetSelectCategoryPopUp
+
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.TextView
+import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.RecyclerView
+import com.synaptix.budgetbuddy.R
+import com.synaptix.budgetbuddy.core.model.Category
+
+class BudgetSelectCategoryAdapter(
+    private val categories: List<Category>,
+    private val onCategoryClick: (Category) -> Unit
+) : RecyclerView.Adapter<BudgetSelectCategoryAdapter.CategoryViewHolder>() {
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CategoryViewHolder {
+        val view = LayoutInflater.from(parent.context)
+            .inflate(R.layout.item_expense, parent, false)
+        return CategoryViewHolder(view)
+    }
+
+    override fun onBindViewHolder(holder: CategoryViewHolder, position: Int) {
+        holder.bind(categories[position])
+    }
+
+    override fun getItemCount(): Int = categories.size
+
+    inner class CategoryViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        private val categoryIcon: ImageView = itemView.findViewById(R.id.imgCategoryIcon)
+        private val categoryName: TextView = itemView.findViewById(R.id.txtCategoryName)
+
+        fun bind(category: Category) {
+            val context = itemView.context
+
+            categoryName.text = category.categoryName
+            categoryIcon.setImageResource(category.categoryIcon)
+            val colorInt = ContextCompat.getColor(context, category.categoryColor)
+            categoryIcon.setColorFilter(colorInt)
+
+            itemView.setOnClickListener {
+                onCategoryClick(category)
+            }
+        }
+
+    }
+}

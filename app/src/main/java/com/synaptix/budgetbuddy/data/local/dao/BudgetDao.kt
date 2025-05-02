@@ -5,7 +5,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.synaptix.budgetbuddy.data.entity.BudgetEntity
-import com.synaptix.budgetbuddy.data.entity.relations.BudgetWithUser
+import com.synaptix.budgetbuddy.data.entity.relations.BudgetWithDetail
 
 
 @Dao
@@ -19,7 +19,7 @@ interface BudgetDao {
 
     //sql query to grab all budgets for a user
     @Query("SELECT * FROM budget_table WHERE user_id = :userId")
-    suspend fun getBudgetsByUser(userId: Int): List<BudgetWithUser>
+    suspend fun getBudgetsByUserId(userId: Int): List<BudgetWithDetail>
 
     //sql query to grab all budgets for a wallet
     @Query("SELECT * FROM budget_table WHERE wallet_id = :walletId")

@@ -65,24 +65,124 @@
             android:padding="16dp">
 
             <!-- Budget Name -->
-        <LinearLayout
-            android:id="@+id/rowSelectBudgetName"
-            style="@style/RowStyle">
+            <LinearLayout
+                android:id="@+id/rowSelectBudgetName"
+                style="@style/RowStyle">
 
-            <ImageView
-                style="@style/RowIconStyle"
-                app:tint="?attr/bb_button"
-                android:src="@drawable/ic_account_balance_wallet_24" />
+                <ImageView
+                    style="@style/RowIconStyle"
+                    app:tint="?attr/bb_button"
+                    android:src="@drawable/baseline_savings_24" />
 
-            <EditText
-                android:id="@+id/budget_name"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/budget_name"
-                android:textColor="?attr/bb_primaryText"
-                android:textColorHint="?attr/bb_primaryText"
-                android:textSize="16sp"/>
-        </LinearLayout>
+                <EditText
+                    android:id="@+id/budget_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/budget_name"
+                    android:textColor="?attr/bb_primaryText"
+                    android:textColorHint="?attr/bb_primaryText"
+                    android:textSize="16sp"/>
+            </LinearLayout>
+
+            <!-- Wallet Row -->
+            <LinearLayout
+                android:id="@+id/rowSelectWallet"
+                style="@style/RowStyle"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingVertical="8dp">
+
+                <ImageView
+                    style="@style/RowIconStyle"
+                    android:src="@drawable/ic_account_balance_wallet_24"
+                    app:tint="?attr/bb_button" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:layout_marginStart="12dp">
+
+                    <!-- Top Label -->
+                    <TextView
+                        android:id="@+id/textWalletLabel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/wallet"
+                        android:textColor="?attr/bb_primaryText"
+                        android:textSize="18sp" />
+
+                    <!-- Selected wallet name -->
+                    <TextView
+                        android:id="@+id/textSelectedWalletName"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="No wallet selected"
+                        android:textColor="?attr/bb_secondaryText"
+                        android:textSize="14sp"
+                        android:visibility="visible"
+                        android:paddingTop="2dp" />
+                </LinearLayout>
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_marginStart="8dp"
+                    android:background="@null"
+                    android:rotation="180"
+                    android:src="?attr/actionModeCloseDrawable" />
+            </LinearLayout>
+
+            <!-- Budget Category -->
+            <LinearLayout
+                android:id="@+id/rowSelectCategory"
+                style="@style/RowStyle"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingVertical="8dp">
+
+                <ImageView
+                    style="@style/RowIconStyle"
+                    android:src="@drawable/ic_edit_note_24"
+                    app:tint="?attr/bb_button" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:layout_marginStart="12dp">
+
+                    <!-- Top Label -->
+                    <TextView
+                        android:id="@+id/textCategoryLabel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Budget for"
+                        android:textColor="?attr/bb_primaryText"
+                        android:textSize="18sp" />
+
+                    <!-- Selected wallet name -->
+                    <TextView
+                        android:id="@+id/textSelectedCategoryName"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="No category selected"
+                        android:textColor="?attr/bb_secondaryText"
+                        android:textSize="14sp"
+                        android:visibility="visible"
+                        android:paddingTop="2dp" />
+                </LinearLayout>
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_marginStart="8dp"
+                    android:background="@null"
+                    android:rotation="180"
+                    android:src="?attr/actionModeCloseDrawable" />
+            </LinearLayout>
 
             <!-- Amount and Currency -->
             <LinearLayout
@@ -92,7 +192,7 @@
                 <ImageView
                     style="@style/RowIconStyle"
                     app:tint="?attr/bb_button"
-                    android:src="@drawable/baseline_savings_24" />
+                    android:src="@drawable/ic_attach_money_24" />
 
                 <EditText
                     android:id="@+id/amount"
@@ -111,42 +211,6 @@
                     android:layout_height="wrap_content"
                     android:paddingStart="16dp"
                     android:spinnerMode="dropdown"/>
-            </LinearLayout>
-
-            <!-- Budget Category -->
-            <LinearLayout
-                android:id="@+id/rowBudgetFor"
-                style="@style/RowStyle">
-
-                <ImageView
-                    style="@style/RowIconStyle"
-                    app:tint="?attr/bb_button"
-                    android:src="@drawable/ic_edit_note_24" />
-
-                <TextView
-                    android:id="@+id/budget_for_label"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="12dp"
-                    android:layout_weight="1"
-                    android:text="Budget for"
-                    android:textColor="?attr/bb_primaryText"
-                    android:textSize="16sp"/>
-
-                <TextView
-                    android:id="@+id/budget_for_value"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="?attr/bb_secondaryText"
-                    android:text="All Expenses"/>
-
-                <ImageView
-                    android:id="@+id/budget_for_arrow"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/baseline_arrow_forward_ios_24"
-                    android:contentDescription="Arrow"
-                    app:tint="?attr/colorOnPrimary"/>
             </LinearLayout>
 
 <!--             Recurrence -->
@@ -184,42 +248,6 @@
 <!--                    app:tint="?attr/colorOnPrimary"-->
 <!--                    android:contentDescription="Arrow"/>-->
 <!--            </LinearLayout>-->
-
-            <!-- Start Date -->
-            <LinearLayout
-                android:id="@+id/rowStartDate"
-                style="@style/RowStyle">
-
-                <ImageView
-                    style="@style/RowIconStyle"
-                    app:tint="?attr/bb_button"
-                    android:src="@drawable/ic_calendar_month_24" />
-
-                <TextView
-                    android:id="@+id/start_date_label"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/start_date"
-                    android:textColor="?attr/bb_primaryText"
-                    android:layout_marginStart="12dp"
-                    android:textSize="16sp"/>
-
-                <TextView
-                    android:id="@+id/start_date_value"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="?attr/bb_secondaryText"
-                    android:text="Today"/>
-
-                <ImageView
-                    android:id="@+id/start_date_arrow"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/baseline_arrow_forward_ios_24"
-                    app:tint="?attr/colorOnPrimary"
-                    android:contentDescription="Arrow"/>
-            </LinearLayout>
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 

@@ -86,6 +86,7 @@ sealed class BudgetReportListItems {
 
     // Data class for a budget item in the budget report
     data class BudgetItem(
+        val id: Int,
         // The title of the budget item
         val title: String,
 
