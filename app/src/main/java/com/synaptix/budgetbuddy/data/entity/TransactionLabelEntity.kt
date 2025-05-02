@@ -9,6 +9,6 @@ import androidx.room.Entity
 
 )
 class TransactionLabelEntity {
-    val transaction_id: Int
-    val label_id: Int
+    val transaction_id: Int = 0
+    val label_id: Int = 0
 }
