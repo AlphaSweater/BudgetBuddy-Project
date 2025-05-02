@@ -24,7 +24,7 @@ import com.synaptix.budgetbuddy.R
 import com.synaptix.budgetbuddy.core.model.Label
 import com.synaptix.budgetbuddy.databinding.FragmentTransactionAddBinding
 import com.synaptix.budgetbuddy.presentation.ui.main.transaction.transactionSelectWalletPopUp.TransactionSelectWalletBottomSheet
-import com.synaptix.budgetbuddy.presentation.ui.main.transaction.transactionSelectRecurrencePopUp.TransactionSelectRecurrenceBottomSheet
+//import com.synaptix.budgetbuddy.presentation.ui.main.transaction.transactionSelectRecurrencePopUp.TransactionSelectRecurrenceBottomSheet
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -90,16 +90,16 @@ class TransactionAddFragment : Fragment() {
         val adapter = ArrayAdapter(
             requireContext(),
             R.layout.spinner_item,
-            listOf("ZAR", "USD", "EUR", "GBP")
+            listOf("ZAR")
         )
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         binding.spinnerCurrency.adapter = adapter
     }
 
     private fun setupClickListeners() {
-        binding.rowSelectRecurrenceRate.setOnClickListener {
-            TransactionSelectRecurrenceBottomSheet().show(parentFragmentManager, "RecurrenceBottomSheet")
-        }
+//        binding.rowSelectRecurrenceRate.setOnClickListener {
+//            TransactionSelectRecurrenceBottomSheet().show(parentFragmentManager, "RecurrenceBottomSheet")
+//        }
 
         binding.rowSelectWallet.setOnClickListener {
             showWalletSelector()
