@@ -4,15 +4,21 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 
-
+//
+// ================================
+// Budget Entity
+// ================================
+// Represents a budget assigned to a user and linked to a wallet.
 @Entity(
     tableName = "budget_table",
     foreignKeys = [
+        // Links budget to UserEntity
         ForeignKey(
             entity = UserEntity::class,
             parentColumns = ["user_id"],
             childColumns = ["user_id"]
         ),
+        // Links budget to WalletEntity
         ForeignKey(
             entity = WalletEntity::class,
             parentColumns = ["wallet_id"],
@@ -24,7 +30,6 @@ import androidx.room.PrimaryKey
             childColumns = ["category_id"]
         )
     ]
-
 )
 data class BudgetEntity (
     @PrimaryKey(autoGenerate = true) val budget_id: Int,
