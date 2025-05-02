@@ -7,47 +7,45 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
-import com.synaptix.budgetbuddy.R
 import com.synaptix.budgetbuddy.databinding.FragmentBudgetAddBinding
-import com.synaptix.budgetbuddy.presentation.ui.main.transaction.transactionSelectRecurrencePopUp.TransactionSelectRecurrenceBottomSheet
+import com.synaptix.budgetbuddy.presentation.ui.main.transaction.transactionSelectRecurrencePopUp.TransactionSelectRecurrenceFragment
+import androidx.navigation.fragment.findNavController
+import com.synaptix.budgetbuddy.R
 
 class BudgetAddFragment : Fragment() {
 
     private var _binding: FragmentBudgetAddBinding? = null
     private val binding get() = _binding!!
 
-    companion object {
-        fun newInstance() = BudgetAddFragment()
-    }
-
     private val viewModel: BudgetAddViewModel by viewModels()
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        // TODO: Use the ViewModel
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        _binding = FragmentBudgetAddBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View {
-        return inflater.inflate(R.layout.fragment_budget_add, container, false)
-
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         setupCurrencySpinner()
         setupClickListeners()
     }
 
-
     private fun setupCurrencySpinner() {
-        val currencies = arrayOf("ZAR", "USD", "EUR", "GBP")
+        val currencies = arrayOf("ZAR")
         val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, currencies)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         binding.currencySpinner.adapter = adapter
     }
 
     private fun setupClickListeners() {
-        binding.rowRecurrence.setOnClickListener {
-            TransactionSelectRecurrenceBottomSheet().show(parentFragmentManager, "RecurrenceBottomSheet")
-        }
+//        binding.rowRecurrence.setOnClickListener {
+//            // Navigate to Recurrence Fragment instead of BottomSheet
+//            findNavController().navigate(R.id.action_budgetAddFragment_to_transactionSelectRecurrenceFragment)
+//        }
     }
 
     override fun onDestroyView() {
