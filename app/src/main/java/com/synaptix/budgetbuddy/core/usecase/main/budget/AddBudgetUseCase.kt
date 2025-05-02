@@ -8,7 +8,8 @@ import javax.inject.Inject
 class AddBudgetUseCase @Inject constructor(
     private val budgetRepository: BudgetRepository
 ) {
-    suspend operator fun invoke(budgetIn: BudgetIn) {
-        budgetRepository.insertBudget(budgetIn.toEntity())
+    suspend fun execute(budget: BudgetIn) {
+        val entity = budget.toEntity()
+        budgetRepository.insertBudget(entity)
     }
 }

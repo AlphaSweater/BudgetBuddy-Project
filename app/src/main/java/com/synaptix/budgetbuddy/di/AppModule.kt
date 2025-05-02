@@ -12,12 +12,14 @@ import com.synaptix.budgetbuddy.data.AppDatabase
 import com.synaptix.budgetbuddy.data.entity.CategoryEntity
 import com.synaptix.budgetbuddy.data.local.CategoryDatabaseCallback
 import com.synaptix.budgetbuddy.data.local.LabelDatabaseCallback
+import com.synaptix.budgetbuddy.data.local.dao.BudgetDao
 import com.synaptix.budgetbuddy.data.local.dao.CategoryDao
 import com.synaptix.budgetbuddy.data.local.dao.LabelDao
 import com.synaptix.budgetbuddy.data.local.dao.TransactionDao
 import com.synaptix.budgetbuddy.data.local.dao.UserDao
 import com.synaptix.budgetbuddy.data.local.dao.WalletDao
 import com.synaptix.budgetbuddy.data.local.datastore.DataStoreManager
+import com.synaptix.budgetbuddy.data.repository.BudgetRepository
 import com.synaptix.budgetbuddy.data.repository.LabelRepository
 import com.synaptix.budgetbuddy.data.repository.TransactionRepository
 import dagger.Module
@@ -126,4 +128,17 @@ object AppModule {
     fun provideTransactionRepository(transactionDao: TransactionDao): TransactionRepository {
         return TransactionRepository(transactionDao)
     }
+
+    @Provides
+    @Singleton
+    fun provideBudgetDao(appDatabase: AppDatabase): BudgetDao {
+        return appDatabase.budgetDao()
+    }
+
+    @Provides
+    @Singleton
+    fun provideBudgetRepository(budgetDao: BudgetDao): BudgetRepository {
+        return BudgetRepository(budgetDao)
+    }
+
 }
