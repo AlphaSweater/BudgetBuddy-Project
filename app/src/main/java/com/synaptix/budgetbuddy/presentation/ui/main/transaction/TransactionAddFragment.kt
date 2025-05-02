@@ -23,8 +23,6 @@ import com.google.android.material.datepicker.MaterialDatePicker
 import com.synaptix.budgetbuddy.R
 import com.synaptix.budgetbuddy.core.model.Label
 import com.synaptix.budgetbuddy.databinding.FragmentTransactionAddBinding
-import com.synaptix.budgetbuddy.presentation.ui.main.transaction.transactionSelectWalletPopUp.TransactionSelectWalletFragment
-import com.synaptix.budgetbuddy.presentation.ui.main.transaction.transactionSelectRecurrencePopUp.TransactionSelectRecurrenceBottomSheet
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -98,7 +96,7 @@ class TransactionAddFragment : Fragment() {
 
     private fun setupClickListeners() {
         binding.rowSelectRecurrenceRate.setOnClickListener {
-            TransactionSelectRecurrenceBottomSheet().show(parentFragmentManager, "RecurrenceBottomSheet")
+            showRecurrenceSelector()
         }
 
         binding.rowSelectWallet.setOnClickListener {
@@ -294,6 +292,10 @@ class TransactionAddFragment : Fragment() {
 
     private fun showCategorySelector(){
         findNavController().navigate(R.id.action_transactionAddFragment_to_transactionSelectCategoryFragment)
+    }
+
+    private fun showRecurrenceSelector(){
+        findNavController().navigate(R.id.action_transactionAddFragment_to_transactionSelectRecurrenceFragment)
     }
 
     // --- Observers ---
