@@ -5,7 +5,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.synaptix.budgetbuddy.data.entity.TransactionEntity
-import com.synaptix.budgetbuddy.data.entity.relations.TransactionWithLabels
+import com.synaptix.budgetbuddy.data.entity.relations.TransactionWithDetail
 
 @Dao
 interface TransactionDao {
@@ -17,5 +17,5 @@ interface TransactionDao {
     suspend fun getTransactionsForUser(userId: Int): List<TransactionEntity>
 
     @Query("SELECT * FROM transaction_table WHERE user_id = :userId")
-    suspend fun getTransactionsWithLabels(userId: Int): List<TransactionWithLabels>
+    suspend fun getTransactionsWithDetail(userId: Int): List<TransactionWithDetail>
 }

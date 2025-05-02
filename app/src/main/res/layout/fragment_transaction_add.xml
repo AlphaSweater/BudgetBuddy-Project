@@ -9,17 +9,41 @@
     android:padding="16dp"
     tools:context=".presentation.ui.main.transaction.TransactionAddFragment">
 
-    <!-- Back Button -->
+    <!-- Top Bar (Back Arrow + Title) -->
+    <LinearLayout
+        android:id="@+id/top_bar"
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:orientation="horizontal"
+        android:gravity="center"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/add_new_transaction"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="?attr/bb_primaryText"
+            android:layout_marginStart="16dp"/>
+    </LinearLayout>
+
     <ImageButton
         android:id="@+id/btnGoBack"
         android:layout_width="44dp"
         android:layout_height="44dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
         android:background="@null"
         android:contentDescription="@string/back"
         android:src="?attr/actionModeCloseDrawable"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:tint="?attr/bb_primaryText" />
+
 
     <!-- Main Card -->
     <ScrollView
@@ -233,52 +257,52 @@
                 </LinearLayout>
 
                 <!-- Label Row -->
-                <LinearLayout
-                    android:id="@+id/rowSelectLabel"
-                    style="@style/RowStyle"
-                    android:orientation="vertical">
+<!--                <LinearLayout-->
+<!--                    android:id="@+id/rowSelectLabel"-->
+<!--                    style="@style/RowStyle"-->
+<!--                    android:orientation="vertical">-->
 
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal">
+<!--                    <LinearLayout-->
+<!--                        android:layout_width="match_parent"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:orientation="horizontal">-->
 
-                        <ImageView
-                            style="@style/RowIconStyle"
-                            android:src="@drawable/ic_discount_24"
-                            app:tint="?attr/bb_button" />
+<!--                        <ImageView-->
+<!--                            style="@style/RowIconStyle"-->
+<!--                            android:src="@drawable/ic_discount_24"-->
+<!--                            app:tint="?attr/bb_button" />-->
 
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="12dp"
-                            android:layout_weight="1"
-                            android:gravity="center_vertical"
-                            android:text="@string/label"
-                            android:textColor="?attr/bb_primaryText"
-                            android:textSize="18sp" />
+<!--                        <TextView-->
+<!--                            android:layout_width="0dp"-->
+<!--                            android:layout_height="wrap_content"-->
+<!--                            android:layout_marginStart="12dp"-->
+<!--                            android:layout_weight="1"-->
+<!--                            android:gravity="center_vertical"-->
+<!--                            android:text="@string/label"-->
+<!--                            android:textColor="?attr/bb_primaryText"-->
+<!--                            android:textSize="18sp" />-->
 
-                        <ImageView
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:layout_marginStart="8dp"
-                            android:background="@null"
-                            android:rotation="180"
-                            android:src="?attr/actionModeCloseDrawable" />
-                    </LinearLayout>
+<!--                        <ImageView-->
+<!--                            android:layout_width="24dp"-->
+<!--                            android:layout_height="24dp"-->
+<!--                            android:layout_marginStart="8dp"-->
+<!--                            android:background="@null"-->
+<!--                            android:rotation="180"-->
+<!--                            android:src="?attr/actionModeCloseDrawable" />-->
+<!--                    </LinearLayout>-->
 
-                    <!-- Chip Group for Selected Labels -->
-                    <com.google.android.material.chip.ChipGroup
-                        android:id="@+id/chipGroupLabels"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="48dp"
-                        android:layout_marginTop="4dp"
-                        android:layout_marginEnd="8dp"
-                        android:visibility="gone"
-                        app:chipSpacing="4dp"
-                        app:singleLine="false" />
-                </LinearLayout>
+<!--                    &lt;!&ndash; Chip Group for Selected Labels &ndash;&gt;-->
+<!--                    <com.google.android.material.chip.ChipGroup-->
+<!--                        android:id="@+id/chipGroupLabels"-->
+<!--                        android:layout_width="match_parent"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:layout_marginStart="48dp"-->
+<!--                        android:layout_marginTop="4dp"-->
+<!--                        android:layout_marginEnd="8dp"-->
+<!--                        android:visibility="gone"-->
+<!--                        app:chipSpacing="4dp"-->
+<!--                        app:singleLine="false" />-->
+<!--                </LinearLayout>-->
 
                 <!-- Recurrence Row -->
                 <LinearLayout
@@ -290,15 +314,33 @@
                         android:src="@drawable/ic_autorenew_24"
                         app:tint="?attr/bb_button" />
 
-                    <TextView
+                    <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="12dp"
                         android:layout_weight="1"
-                        android:gravity="center_vertical"
-                        android:text="@string/recurrence"
-                        android:textColor="?attr/bb_primaryText"
-                        android:textSize="18sp" />
+                        android:orientation="vertical"
+                        android:layout_marginStart="12dp">
+
+                        <!-- Top Label -->
+                        <TextView
+                            android:id="@+id/textRecurrenceRateLabel"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/recurrence"
+                            android:textColor="?attr/bb_primaryText"
+                            android:textSize="18sp" />
+
+                        <!-- Selected wallet name -->
+                        <TextView
+                            android:id="@+id/textSelectedRecurrenceRate"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="No selected recurrence rate"
+                            android:textColor="?attr/bb_secondaryText"
+                            android:textSize="14sp"
+                            android:visibility="visible"
+                            android:paddingTop="2dp" />
+                    </LinearLayout>
 
                     <ImageView
                         android:layout_width="24dp"
