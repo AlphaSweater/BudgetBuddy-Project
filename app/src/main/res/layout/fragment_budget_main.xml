@@ -185,7 +185,6 @@
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 
-    <!-- Create Budget Button -->
     <Button
         android:id="@+id/create_budget_button"
         android:layout_width="wrap_content"
