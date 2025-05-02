@@ -27,6 +27,7 @@ class TransactionAddViewModel @Inject constructor(
     val imageBytes: LiveData<ByteArray?> = _imageBytes
     val recurrenceRate = MutableLiveData<String?>()
 
+
     suspend fun addTransaction() {
         val transaction = Transaction(
             userId = getUserIdUseCase.execute(),
