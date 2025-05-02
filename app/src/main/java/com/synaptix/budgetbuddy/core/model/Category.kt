@@ -31,7 +31,7 @@ data class CategoryWithUser(
     val user: UserEntity?
 )
 
-// Extension to map CategoryWithUser to CategoryFull
+//convert CategoryWithUser to CategoryFull
 fun CategoryWithUser.toCategoryFull(): CategoryFull {
     return CategoryFull(
         category = category,
