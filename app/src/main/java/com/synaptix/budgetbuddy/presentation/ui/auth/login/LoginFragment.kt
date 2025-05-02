@@ -7,20 +7,20 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.synaptix.budgetbuddy.R
-import com.synaptix.budgetbuddy.databinding.FragmentLoginBinding
+import com.synaptix.budgetbuddy.databinding.FragmentAuthLoginBinding
 import com.synaptix.budgetbuddy.presentation.ui.main.MainActivity
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class LoginFragment : Fragment(R.layout.fragment_login) {
+class LoginFragment : Fragment(R.layout.fragment_auth_login) {
 
-    private lateinit var binding: FragmentLoginBinding
+    private lateinit var binding: FragmentAuthLoginBinding
     private val viewModel: LoginViewModel by viewModels()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding = FragmentLoginBinding.bind(view)
+        binding = FragmentAuthLoginBinding.bind(view)
 
         // Observe login state
         viewModel.loginState.observe(viewLifecycleOwner) { state ->
