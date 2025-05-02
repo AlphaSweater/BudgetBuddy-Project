@@ -21,6 +21,8 @@ data class Transaction(
     val photo: ByteArray?,
     val recurrenceRate: String?
 ) : Serializable
+
+//AI assisted with the creation of this data class
 data class TransactionFull(
     val id: Int,
     val amount: Double,
@@ -56,6 +58,8 @@ data class TransactionWithDetails(
     )
     val category: CategoryEntity
 )
+
+// AI assisted with the creation of this function
 fun TransactionWithDetails.toTransactionFull(): TransactionFull {
     return TransactionFull(
         id = transaction.transaction_id,
