@@ -5,12 +5,18 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
+import androidx.navigation.fragment.findNavController
 import com.synaptix.budgetbuddy.databinding.FragmentTransactionSelectRecurrenceBinding
+import com.synaptix.budgetbuddy.presentation.ui.main.transaction.TransactionAddViewModel
+import kotlin.getValue
 
 class TransactionSelectRecurrenceFragment : Fragment() {
 
     private var _binding: FragmentTransactionSelectRecurrenceBinding? = null
     private val binding get() = _binding!!
+
+    private val viewModel: TransactionAddViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -27,19 +33,24 @@ class TransactionSelectRecurrenceFragment : Fragment() {
     }
 
     private fun setupOnClickListeners() {
-        binding.optionEveryDay.setOnClickListener {
-            // Handle "Every day" click
-            requireActivity().onBackPressedDispatcher.onBackPressed()
+        binding.btnDaily.setOnClickListener {
+            viewModel.recurrenceRate.value = "Daily"
+            findNavController().popBackStack()
         }
 
-        binding.optionEveryWeek.setOnClickListener {
-            // Handle "Every week" click
-            requireActivity().onBackPressedDispatcher.onBackPressed()
+        binding.btnWeekly.setOnClickListener {
+            viewModel.recurrenceRate.value = "Weekly"
+            findNavController().popBackStack()
         }
 
-        binding.optionEveryWeek2.setOnClickListener {
-            // Handle "Every 2 weeks" click
-            requireActivity().onBackPressedDispatcher.onBackPressed()
+        binding.btnMonthly.setOnClickListener {
+            viewModel.recurrenceRate.value = "Monthly"
+            findNavController().popBackStack()
+        }
+
+        binding.btnYearly.setOnClickListener {
+            viewModel.recurrenceRate.value = "Yearly"
+            findNavController().popBackStack()
         }
     }
 

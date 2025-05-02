@@ -88,7 +88,7 @@ class TransactionAddFragment : Fragment() {
         val adapter = ArrayAdapter(
             requireContext(),
             R.layout.spinner_item,
-            listOf("ZAR", "USD", "EUR", "GBP")
+            listOf("ZAR")
         )
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         binding.spinnerCurrency.adapter = adapter
@@ -234,6 +234,12 @@ class TransactionAddFragment : Fragment() {
         }
     }
 
+    private fun updateSelectedRecurrenceRate(recurrenceRate: String?) {
+        if (!recurrenceRate.isNullOrBlank()){
+            binding.textSelectedRecurrenceRate.text = recurrenceRate
+        }
+    }
+
     // --- Save Logic ---
     private fun saveTransaction() {
         // TODO: Replace with actual data from UI
@@ -248,11 +254,11 @@ class TransactionAddFragment : Fragment() {
         viewModel.currency.value = binding.spinnerCurrency.selectedItem.toString()
 
         // Validate input
-        if (viewModel.category.value != null  ||
-            viewModel.wallet.value != null ||
+        if (viewModel.category.value == null  ||
+            viewModel.wallet.value == null ||
             viewModel.currency.value.isNullOrBlank() ||
-            amount <= 0.0 ||
-            date.isBlank()
+            viewModel.amount.value!! <= 0.0 ||
+            viewModel.date.value?.isBlank() == true
         ) {
             Toast.makeText(
                 requireContext(),
@@ -336,6 +342,12 @@ class TransactionAddFragment : Fragment() {
         viewModel.note.observe(viewLifecycleOwner) { note ->
             Log.d("Note", "Entered Note: $note")
             // Update UI based on the entered note
+        }
+
+        viewModel.recurrenceRate.observe(viewLifecycleOwner) { recurrenceRate ->
+            updateSelectedRecurrenceRate(recurrenceRate)
+            Log.d("RecurrenceRate", "Selected Recurrence Rate: $recurrenceRate")
+            // Update UI based on the selected recurrence rate
         }
 
         viewModel.imageBytes.observe(viewLifecycleOwner) { bytes ->

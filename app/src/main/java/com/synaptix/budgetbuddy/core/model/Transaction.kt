@@ -59,20 +59,3 @@ data class TransactionWithDetails(
     val category: CategoryEntity
 )
 
-// AI assisted with the creation of this function
-fun TransactionWithDetails.toTransaction(): Transaction {
-    return Transaction(
-        id = transaction.transaction_id,
-        amount = transaction.amount,
-        date = transaction.date,
-        note = transaction.note,
-        currency = transaction.currency,
-        label = transaction.label,
-        image = transaction.image,
-        recurrence = transaction.recurrence,
-
-        user = user,
-        wallet = wallet,
-        category = category
-    )
-}

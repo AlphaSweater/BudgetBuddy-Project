@@ -290,15 +290,33 @@
                         android:src="@drawable/ic_autorenew_24"
                         app:tint="?attr/bb_button" />
 
-                    <TextView
+                    <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="12dp"
                         android:layout_weight="1"
-                        android:gravity="center_vertical"
-                        android:text="@string/recurrence"
-                        android:textColor="?attr/bb_primaryText"
-                        android:textSize="18sp" />
+                        android:orientation="vertical"
+                        android:layout_marginStart="12dp">
+
+                        <!-- Top Label -->
+                        <TextView
+                            android:id="@+id/textRecurrenceRateLabel"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/recurrence"
+                            android:textColor="?attr/bb_primaryText"
+                            android:textSize="18sp" />
+
+                        <!-- Selected wallet name -->
+                        <TextView
+                            android:id="@+id/textSelectedRecurrenceRate"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="No selected recurrence rate"
+                            android:textColor="?attr/bb_secondaryText"
+                            android:textSize="14sp"
+                            android:visibility="visible"
+                            android:paddingTop="2dp" />
+                    </LinearLayout>
 
                     <ImageView
                         android:layout_width="24dp"
