@@ -5,6 +5,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.synaptix.budgetbuddy.core.model.Category
 import com.synaptix.budgetbuddy.core.model.Label
 import com.synaptix.budgetbuddy.core.model.Transaction
 import com.synaptix.budgetbuddy.core.model.TransactionIn
@@ -17,7 +18,7 @@ class TransactionAddViewModel @Inject constructor(
     private val getUserIdUseCase: GetUserIdUseCase
 ) : ViewModel() {
 
-    val categoryId = MutableLiveData<Int>()
+    val category = MutableLiveData<Category>()
     val walletId = MutableLiveData<Int>()
     val currency = MutableLiveData<String>()
     val amount = MutableLiveData<Double>()
@@ -32,7 +33,7 @@ class TransactionAddViewModel @Inject constructor(
     suspend fun addTransaction() {
         val transaction = TransactionIn(
             userId = getUserIdUseCase.execute(),
-            categoryId = categoryId.value ?: 0,
+            categoryId = category.value?.categoryId ?: 0,
             walletId = walletId.value ?: 0,
             currencyType = currency.value ?: "",
             amount = amount.value ?: 0.0,

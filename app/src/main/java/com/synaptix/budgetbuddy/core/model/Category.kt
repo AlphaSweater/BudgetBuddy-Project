@@ -1,9 +1,5 @@
 package com.synaptix.budgetbuddy.core.model
 
-import androidx.room.Embedded
-import androidx.room.Relation
-import com.synaptix.budgetbuddy.data.entity.CategoryEntity
-import com.synaptix.budgetbuddy.data.entity.UserEntity
 import java.io.Serializable
 
 data class CategoryIn (
@@ -16,25 +12,10 @@ data class CategoryIn (
 ) : Serializable
 
 data class Category(
-    val category: CategoryEntity,
-    val user: UserEntity?
+    val categoryId: Int = 0,
+    val user: User?,
+    val categoryName: String,
+    val categoryType: String,
+    val categoryIcon: Int,
+    val categoryColor: Int
 )
-
-// Room entity with relations
-data class CategoryWithUser(
-    @Embedded val category: CategoryEntity,
-
-    @Relation(
-        parentColumn = "user_id",
-        entityColumn = "user_id"
-    )
-    val user: UserEntity?
-)
-
-//convert CategoryWithUser to Category
-fun CategoryWithUser.toCategory(): Category {
-    return Category(
-        category = category,
-        user = user
-    )
-}

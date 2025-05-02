@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.synaptix.budgetbuddy.core.model.Category
 import com.synaptix.budgetbuddy.core.usecase.main.transaction.GetCategoriesUseCase
 import com.synaptix.budgetbuddy.data.entity.CategoryEntity
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -14,8 +15,8 @@ import javax.inject.Inject
 class TransactionSelectCategoryViewModel @Inject constructor(
     private val getCategoriesUseCase: GetCategoriesUseCase
 ): ViewModel() {
-    private val _categories = MutableLiveData<List<CategoryEntity>>()
-    val categories: LiveData<List<CategoryEntity>> get() = _categories
+    private val _categories = MutableLiveData<List<Category>>()
+    val categories: LiveData<List<Category>> get() = _categories
 
     fun loadCategories(userId: Int) {
         viewModelScope.launch {
