@@ -1,4 +1,4 @@
-package com.synaptix.budgetbuddy.presentation.ui.main.budget.budgetReport
+package com.synaptix.budgetbuddy.presentation.ui.main.general.generalTransactions
 
 import android.graphics.drawable.GradientDrawable
 import android.view.LayoutInflater
@@ -12,48 +12,41 @@ import androidx.recyclerview.widget.RecyclerView
 import com.synaptix.budgetbuddy.R
 import com.synaptix.budgetbuddy.core.model.BudgetReportListItems
 
-class BudgetReportAdapter(private val items: List<BudgetReportListItems>) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class GeneralTransactionsAdapter(private val items: List<BudgetReportListItems>) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     companion object {
         private const val VIEW_TYPE_HEADER = 0
         private const val VIEW_TYPE_TRANSACTION = 1
-        private const val VIEW_TYPE_CATEGORY = 2
     }
 
     override fun getItemViewType(position: Int): Int {
         return when (items[position]) {
             is BudgetReportListItems.DateHeader -> VIEW_TYPE_HEADER
             is BudgetReportListItems.TransactionItem -> VIEW_TYPE_TRANSACTION
-            is BudgetReportListItems.CategoryItems -> VIEW_TYPE_CATEGORY
+            else -> throw IllegalArgumentException("Unsupported item type at position $position")
         }
     }
     //took out if else statement this could be broken so note that
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
-            VIEW_TYPE_HEADER -> {
+            GeneralTransactionsAdapter.VIEW_TYPE_HEADER -> {
                 val view = LayoutInflater.from(parent.context).inflate(R.layout.item_date_header, parent, false)
                 DateHeaderViewHolder(view)
             }
-            VIEW_TYPE_TRANSACTION -> {
+            GeneralTransactionsAdapter.VIEW_TYPE_TRANSACTION -> {
                 val view = LayoutInflater.from(parent.context).inflate(R.layout.item_transaction, parent, false)
                 TransactionViewHolder(view)
-            }
-            VIEW_TYPE_CATEGORY -> {
-                val view = LayoutInflater.from(parent.context).inflate(R.layout.item_budget_report, parent, false)
-                CategoryViewHolder(view)
             }
             else -> throw IllegalArgumentException("Unknown view type")
         }
     }
-
     override fun getItemCount() = items.size
 
-    //Calls the ItemList
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (val item = items[position]) {
             is BudgetReportListItems.DateHeader -> (holder as DateHeaderViewHolder).bind(item)
             is BudgetReportListItems.TransactionItem -> (holder as TransactionViewHolder).bind(item)
-            is BudgetReportListItems.CategoryItems -> (holder as CategoryViewHolder).bind(item)
+            else -> throw IllegalArgumentException("Unsupported item type at position $position")
         }
     }
 
@@ -92,24 +85,4 @@ class BudgetReportAdapter(private val items: List<BudgetReportListItems>) : Recy
             }
         }
     }
-
-    class CategoryViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        fun bind(item: BudgetReportListItems.CategoryItems) {
-            val iconView = itemView.findViewById<ImageView>(R.id.iconCategory)
-            val iconContainer = itemView.findViewById<LinearLayout>(R.id.iconCategoryContainer)
-
-            //Convert resource ID to actual color
-            val resolvedColor = ContextCompat.getColor(itemView.context, item.categoryColour)
-            (iconContainer.background.mutate() as GradientDrawable).setColor(resolvedColor)
-
-            //set icon
-            iconView.setImageResource(item.categoryIcon)
-
-            itemView.findViewById<TextView>(R.id.txtCategoryName).text = item.categoryName
-            itemView.findViewById<TextView>(R.id.txtTransactions).text = "${item.transactionCount} transactions"
-            itemView.findViewById<TextView>(R.id.txtAmount).text = item.amount
-            itemView.findViewById<TextView>(R.id.txtDate).text = item.relativeDate
-        }
-    }
-
 }
