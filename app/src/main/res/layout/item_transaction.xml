@@ -113,7 +113,8 @@
                 android:layout_height="17dp"
                 android:contentDescription="Note Icon"
                 android:src="@drawable/ic_edit_24"
-                app:tint="?attr/bb_primaryText" />
+                app:tint="?attr/bb_primaryText"
+                android:visibility="gone"/>
 
             <TextView
                 android:id="@+id/textNote"
@@ -122,7 +123,8 @@
                 android:layout_marginStart="2dp"
                 android:text="Label"
                 android:textColor="?attr/bb_primaryText"
-                android:textSize="10sp" />
+                android:textSize="10sp"
+                android:visibility="gone"/>
         </LinearLayout>
     </LinearLayout>
 
