@@ -15,6 +15,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import com.synaptix.budgetbuddy.presentation.ui.main.home.HomeAdapter
 import com.synaptix.budgetbuddy.presentation.ui.main.home.HomeMainViewModel
 
+@AndroidEntryPoint
 class HomeMainFragment : Fragment() {
 
     private var _binding: FragmentHomeBinding? = null
