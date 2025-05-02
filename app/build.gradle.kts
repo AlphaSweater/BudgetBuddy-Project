@@ -58,6 +58,10 @@ dependencies {
     implementation(libs.androidx.activity)
     implementation(libs.androidx.material3.android)
 
+    // Picture dependencies
+    implementation(libs.coil.kt.coil)
+    implementation(libs.androidx.activity.ktx)
+
     // Material Components
     implementation(libs.material)
 
