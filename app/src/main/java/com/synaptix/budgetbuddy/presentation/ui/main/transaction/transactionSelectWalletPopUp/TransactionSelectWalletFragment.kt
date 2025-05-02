@@ -39,8 +39,8 @@ class TransactionSelectWalletFragment : Fragment() {
 
         walletViewModel.loadWallets()
         walletViewModel.wallets.observe(viewLifecycleOwner) { walletList ->
-            transactionSelectWalletAdapter = TransactionSelectWalletAdapter(walletList) { walletId ->
-                viewModel.walletId.value = walletId
+            transactionSelectWalletAdapter = TransactionSelectWalletAdapter(walletList) { wallet ->
+                viewModel.wallet.value = wallet
                 findNavController().popBackStack()
             }
             binding.walletRecyclerView.adapter = transactionSelectWalletAdapter
