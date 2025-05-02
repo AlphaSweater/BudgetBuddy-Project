@@ -15,6 +15,7 @@ class GeneralReportsFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val viewModel: GeneralReportsViewModel by viewModels()
+    private lateinit var generalReportsAdapter: GeneralReportsAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,9 +31,25 @@ class GeneralReportsFragment : Fragment() {
         return binding.root
     }
 
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        setupRecyclerView()
+        setupOnClickListeners()
 
-        binding.btnGoBack.setOnClickListener { findNavController().popBackStack() }
+        //Allows the user to go back to the previous fragment
+        binding.btnGoBack.setOnClickListener {
+            findNavController().popBackStack()
+        }
+
+        //Allows to toggle to the expense
+        binding.btnExpenseToggle.setOnClickListener {
+            showExpenseCategories()
+        }
+
+        //Allows user to toggle to income
+        binding.btnIncomeToggle.setOnClickListener {
+            showIncomeCategories()
+        }
     }
 }

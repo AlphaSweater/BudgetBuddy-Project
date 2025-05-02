@@ -200,7 +200,7 @@
                 android:layout_marginLeft="16dp"/>
 
         <com.google.android.material.card.MaterialCardView
-            android:id="@+id/reportsMaterialCardView"
+            android:id="@+id/categoryToggle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="16dp"
@@ -308,9 +308,11 @@
                 android:textColor="?attr/bb_primaryText"
                 android:textSize="20sp"
                 android:textStyle="bold"
+                android:layout_marginLeft="16dp"
                 android:layout_marginBottom="10dp"/>
+
         <com.google.android.material.card.MaterialCardView
-            android:id="@+id/reportsMaterialCardView2"
+            android:id="@+id/labelToggle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="16dp"
