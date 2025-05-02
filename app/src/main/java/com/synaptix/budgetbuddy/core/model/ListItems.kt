@@ -27,4 +27,16 @@ sealed class BudgetReportListItems {
         val amount: String,
         val relativeDate: String,
     ) : BudgetReportListItems()
+
+    data class BudgetItem(
+        val title: String,
+        val status: String,
+        val categoryIcon: Int // Drawable resource ID for the icon (e.g., R.drawable.ic_circle_24)
+    )
+
+    data class WalletItem(
+        val walletName: String,
+        val walletIcon: Int,
+        var walletBalance: Double
+    )
 }
