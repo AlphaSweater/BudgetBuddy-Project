@@ -8,6 +8,7 @@ import com.synaptix.budgetbuddy.core.usecase.auth.GetUserIdUseCase
 import com.synaptix.budgetbuddy.data.repository.UserRepository
 import com.synaptix.budgetbuddy.core.usecase.main.transaction.AddTransactionUseCase
 import com.synaptix.budgetbuddy.core.usecase.auth.LoginUserUseCase
+import com.synaptix.budgetbuddy.core.usecase.main.transaction.GetCategoriesUseCase
 import com.synaptix.budgetbuddy.data.AppDatabase
 import com.synaptix.budgetbuddy.data.entity.CategoryEntity
 import com.synaptix.budgetbuddy.data.local.CategoryDatabaseCallback
@@ -20,6 +21,7 @@ import com.synaptix.budgetbuddy.data.local.dao.UserDao
 import com.synaptix.budgetbuddy.data.local.dao.WalletDao
 import com.synaptix.budgetbuddy.data.local.datastore.DataStoreManager
 import com.synaptix.budgetbuddy.data.repository.BudgetRepository
+import com.synaptix.budgetbuddy.data.repository.CategoryRepository
 import com.synaptix.budgetbuddy.data.repository.LabelRepository
 import com.synaptix.budgetbuddy.data.repository.TransactionRepository
 import dagger.Module
@@ -139,6 +141,18 @@ object AppModule {
     @Singleton
     fun provideBudgetRepository(budgetDao: BudgetDao): BudgetRepository {
         return BudgetRepository(budgetDao)
+    }
+
+    @Provides
+    @Singleton
+    fun provideCategoryRepository(categoryDao: CategoryDao, userDao: UserDao): CategoryRepository {
+        return CategoryRepository(categoryDao, userDao)
+    }
+
+    @Provides
+    @Singleton
+    fun provideGetCategoriesUseCase(categoryRepository: CategoryRepository) : GetCategoriesUseCase {
+        return GetCategoriesUseCase(categoryRepository)
     }
 
 }
