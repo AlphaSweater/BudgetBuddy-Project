@@ -28,12 +28,35 @@ Ensure that you have Android Studio installed on your computer.
 
 ## How to Compile and Run The Application
 
-1. Once Visual Studio is installed and working fine, go to the GitHub Repository page for this project by using the following link https://github.com/MCCLUCKY415/ST10256859_PROG6221_POE
-2. After clicking the link you should be on the Github Repository page for the project, just go ahead and click the green "Code" button on the right and then click "Download ZIP".
-3. Once the ZIP file is downloaded, extract it to your location of choice on your computer.
-4. Open Visual Studio and click on "Open a project or solution".
-5. Navigate your way to where you extracted the ZIP file, double click on the folder "ST10256859_PRO6221_POE-master", and then select the file ending with ".sln", then click "Open".
-6. Once the project opens, select the project ending "wpf", then click on the "Start" button at the top with a green play sign on it. The project should then start up and you'll see the application appear with the menu for the Recipe Creating Application. From there you can start creating and managing your recipes.
+1. Download and install Android Studio (Giraffe or newer) from the official site:
+https://developer.android.com/studio
+
+2. Open Android Studio on your computer.
+
+3. Get the project files:
+
+- Option 1 - Clone the Repository: Click "Get from Version Control" in the github repository and paste the repository link:
+https://github.com/AlphaSweater/BudgetBuddy-Project.git
+
+- Option 2 - Download Zip File: If you downloaded a ZIP file, extract it, then click "Open" in Android Studio and select the extracted project folder.
+
+- Wait for Gradle sync to complete. Android Studio will automatically download required dependencies.
+(This may take a few minutes the first time.)
+
+- Ensure you have the correct SDK versions installed:
+
+- Minimum SDK version neede is 25 (35+ recommended)
+(You can check or install SDKs via SDK Manager in Android Studio.)
+
+4. Connect a device to run the app:
+
+- Option 1: Plug in a physical Android device with USB debugging enabled.
+
+- Option 2: Create and start an Android Emulator via Device Manager in Android Studio.
+
+5. Click the green "Run" button at the top (or press Shift + F10) to build and launch the app.
+
+6. The app will install and launch on your selected device, showing the BudgetBuddy application.
 
 ## References
 
