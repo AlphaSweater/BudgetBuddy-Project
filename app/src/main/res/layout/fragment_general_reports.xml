@@ -228,9 +228,11 @@
 
                     <!-- Expenses Section -->
                     <LinearLayout
+                        android:id="@+id/btnCategoryExpenseToggle"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
+                        android:background="@drawable/toggle_selected"
                         android:padding="8dp"
                         android:orientation="vertical"
                         android:gravity="center">
@@ -256,11 +258,11 @@
 
                     <!-- Income Section -->
                     <LinearLayout
+                        android:id="@+id/btnCategoryIncomeToggle"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:orientation="vertical"
-                        android:background="@drawable/toggle_selected"
                         android:padding="8dp"
                         android:gravity="center">
 
@@ -340,10 +342,12 @@
 
                     <!-- Expenses Section -->
                     <LinearLayout
+                        android:id="@+id/btnLabelExpenseToggle"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:padding="8dp"
+                        android:background="@drawable/toggle_selected"
                         android:orientation="vertical"
                         android:gravity="center">
 
@@ -368,11 +372,11 @@
 
                     <!-- Income Section -->
                     <LinearLayout
+                        android:id="@+id/btnLabelIncomeToggle"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:orientation="vertical"
-                        android:background="@drawable/toggle_selected"
                         android:padding="8dp"
                         android:gravity="center">
 

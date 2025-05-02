@@ -38,7 +38,7 @@ class HomeMainFragment : Fragment() {
 
         binding.txtSeeMonthlyReportOverView.setOnClickListener {
             val navController = findNavController()
-            navController.navigate(R.id.action_homeFragment_to_generalTransactionsFragment)
+            navController.navigate(R.id.action_homeFragment_to_generalReportsFragment)
         }
     }
 
