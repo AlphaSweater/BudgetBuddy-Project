@@ -136,6 +136,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="6dp"
+                    android:gravity="left"
                     android:orientation="vertical">
 
                     <!-- Currency label -->
@@ -148,14 +149,13 @@
                         android:textSize="14dp" />
 
                     <!-- Currency input field -->
-                    <EditText
-                        android:id="@+id/edtCurrency"
-                        android:layout_width="80dp"
+
+                    <Spinner
+                        android:id="@+id/spinnerCurrency"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:backgroundTint="?attr/bb_primaryText"
-                        android:hint="ZAR"
-                        android:inputType="text"
-                        app:layout_constraintEnd_toEndOf="parent" />
+                        android:spinnerMode="dropdown"
+                        tools:ignore="TouchTargetSizeCheck" />
                 </LinearLayout>
             </LinearLayout>
 

@@ -119,8 +119,8 @@ class TransactionSelectCategoryFragment : Fragment() {
                     it.user_id ?: 0,
                     it.name,
                     it.type,
-                    getDrawableId(it.icon),
-                    getColorId(it.colour)
+                    it.icon,
+                    it.colour
                 )
             }
             val (expenseCategories, incomeCategories) = categories.partition { it.categoryType == "expense" }
