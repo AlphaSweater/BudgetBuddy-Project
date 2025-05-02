@@ -271,7 +271,7 @@
 
         <TextView
             android:id="@+id/txtCategoriesOverView"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginTop="32dp"
@@ -288,7 +288,6 @@
             android:layout_width="0dp"
             android:layout_height="400dp"
             android:layout_margin="16dp"
-            android:nestedScrollingEnabled="true"
             app:cardCornerRadius="16dp"
             app:cardElevation="4dp"
             app:layout_constraintEnd_toEndOf="parent"
@@ -309,11 +308,9 @@
 
         <TextView
             android:id="@+id/txtRecentTransactionsOverView"
-            android:layout_width="0dp"
-            android:layout_height="400dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_margin="16dp"
-            android:layout_marginTop="32dp"
-            android:layout_weight="1"
             android:text="Transactions"
             android:textColor="?attr/bb_primaryText"
             android:textSize="18sp"
@@ -324,9 +321,8 @@
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/materialCardView2"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="400dp"
             android:layout_margin="16dp"
-            android:layout_marginBottom="40dp"
             app:cardCornerRadius="16dp"
             app:cardElevation="4dp"
             app:strokeColor="?attr/bb_surface"
@@ -339,9 +335,13 @@
                 android:id="@+id/recyclerViewHomeTransactionOverview"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
                 android:visibility="visible" />
 
         </com.google.android.material.card.MaterialCardView>
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="70dp"
+            app:layout_constraintTop_toBottomOf="@+id/materialCardView2" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>
