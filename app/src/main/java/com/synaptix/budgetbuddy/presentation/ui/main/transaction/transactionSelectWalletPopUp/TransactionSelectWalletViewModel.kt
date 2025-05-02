@@ -20,23 +20,12 @@ class TransactionSelectWalletViewModel @Inject constructor(
     private val _wallets = MutableLiveData<List<Wallet>>()
     val wallets: LiveData<List<Wallet>> = _wallets
 
-    //AI assisted with logic for this function
-    // This function loads the wallets for the user based on userID and updates the LiveData
     fun loadWallets() {
         viewModelScope.launch {
             val userId = getUserIdUseCase.execute()
-            val walletEntities = getWalletUseCase.execute(userId)
+            val walletsList = getWalletUseCase.execute(userId)
 
-            //maps out the walletEntities to a list of Wallet objects
-            _wallets.value = walletEntities.map {
-                Wallet(
-                    it.wallet_id,
-                    it.user_id,
-                    it.name,
-                    it.currency,
-                    it.balance
-                )
-            }
+            _wallets.value = walletsList
         }
     }
 }

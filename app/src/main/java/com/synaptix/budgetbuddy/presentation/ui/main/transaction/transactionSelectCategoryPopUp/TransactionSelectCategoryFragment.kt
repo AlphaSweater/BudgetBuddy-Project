@@ -101,17 +101,8 @@ class TransactionSelectCategoryFragment : Fragment() {
         _binding = null
     }
 
-
-    private fun getUserId(): Int {
-        var userid = 0
-        lifecycleScope.launch {
-             userid = getUserIdUseCase.execute()
-        }
-        return userid
-    }
-
     private fun instantiateDBS() {
-        categoryViewmodel.loadCategories(getUserId())
+        categoryViewmodel.loadCategories()
 
         categoryViewmodel.categories.observe(viewLifecycleOwner) { categories ->
 
@@ -119,12 +110,13 @@ class TransactionSelectCategoryFragment : Fragment() {
 
             binding.recyclerViewExpenseCategory.adapter = TransactionSelectCategoryAdapter(expenseCategories) { category ->
                 viewModel.category.value = category
+                findNavController().popBackStack()
             }
 
             binding.recyclerViewIncomeCategory.adapter = TransactionSelectCategoryAdapter(incomeCategories) { category ->
                 viewModel.category.value = category
+                findNavController().popBackStack()
             }
         }
-
     }
 }
