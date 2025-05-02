@@ -11,11 +11,8 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.synaptix.budgetbuddy.R
 import com.synaptix.budgetbuddy.core.model.BudgetReportListItems
-import com.synaptix.budgetbuddy.core.model.Wallet
 import com.synaptix.budgetbuddy.databinding.FragmentHomeBinding
 import dagger.hilt.android.AndroidEntryPoint
-import com.synaptix.budgetbuddy.presentation.ui.main.home.HomeAdapter
-import com.synaptix.budgetbuddy.presentation.ui.main.home.HomeMainViewModel
 
 @AndroidEntryPoint
 class HomeMainFragment : Fragment() {
@@ -26,57 +23,67 @@ class HomeMainFragment : Fragment() {
     private val viewModel: HomeMainViewModel by viewModels()
     private lateinit var homeAdapter: HomeAdapter
 
+    private val TAG = "HomeMainFragment"
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        Log.d(TAG, "onCreateView: Inflating layout")
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        Log.d(TAG, "onViewCreated: Fragment view created")
 
-        // Load wallets from the ViewModel
         viewModel.loadWallets()
+        Log.d(TAG, "onViewCreated: Requested to load wallets")
 
-        // Observe the wallets data (LiveData) from ViewModel
         viewModel.wallets.observe(viewLifecycleOwner) { walletList ->
+            Log.d(TAG, "wallets.observe: Received ${walletList.size} wallets")
+
             val homeWalletItems = walletList.map { wallet ->
+                Log.d(TAG, "Mapping wallet: ${wallet.walletName}, Balance: ${wallet.walletBalance}")
                 BudgetReportListItems.HomeWalletItem(
                     walletName = wallet.walletName,
-                    walletIcon = R.drawable.baseline_shopping_bag_24, // Sample icon
+                    walletIcon = R.drawable.baseline_shopping_bag_24,
                     walletBalance = wallet.walletBalance,
-                    relativeDate = "Recent" // You can adjust the relativeDate based on your logic
+                    relativeDate = "Recent"
                 )
             }
-            setupWalletRecycler(homeWalletItems) // Call method with correctly mapped items
+
+            setupWalletRecycler(homeWalletItems)
         }
 
-        // Set up navigation actions
         binding.txtWallet.setOnClickListener {
+            Log.d(TAG, "Navigating to WalletMainFragment")
             findNavController().navigate(R.id.action_homeFragment_to_walletMainFragment)
         }
 
         binding.txtShowMoreTransactions.setOnClickListener {
+            Log.d(TAG, "Navigating to GeneralTransactionsFragment")
             findNavController().navigate(R.id.action_homeFragment_to_generalTransactionsFragment)
         }
 
         binding.txtSeeMonthlyReportOverView.setOnClickListener {
+            Log.d(TAG, "Navigating to GeneralReportsFragment")
             findNavController().navigate(R.id.action_homeFragment_to_generalReportsFragment)
         }
     }
 
     private fun setupWalletRecycler(walletList: List<BudgetReportListItems.HomeWalletItem>) {
+        Log.d(TAG, "Setting up RecyclerView with ${walletList.size} items")
         binding.recyclerViewHomeWalletOverview.layoutManager = LinearLayoutManager(requireContext())
-        homeAdapter = HomeAdapter(walletList) // Set the adapter with HomeWalletItem list
-        binding.recyclerViewHomeWalletOverview.adapter = homeAdapter // Set the adapter to the RecyclerView
+        homeAdapter = HomeAdapter(walletList)
+        binding.recyclerViewHomeWalletOverview.adapter = homeAdapter
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
+        Log.d(TAG, "onDestroyView: Cleaning up binding")
         _binding = null
     }
 }
-

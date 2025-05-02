@@ -12,20 +12,33 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-    @HiltViewModel
-    class HomeMainViewModel @Inject constructor(
-        private val getWalletUseCase: GetWalletUseCase,
-        private val getUserIdUseCase: GetUserIdUseCase
-    ) : ViewModel() {
+@HiltViewModel
+class HomeMainViewModel @Inject constructor(
+    private val getWalletUseCase: GetWalletUseCase,
+    private val getUserIdUseCase: GetUserIdUseCase
+) : ViewModel() {
 
-        private val _wallets = MutableLiveData<List<Wallet>>()
-        val wallets: LiveData<List<Wallet>> = _wallets
+    companion object {
+        private const val TAG = "HomeMainViewModel"
+    }
 
-        fun loadWallets() {
-            viewModelScope.launch {
+    private val _wallets = MutableLiveData<List<Wallet>>()
+    val wallets: LiveData<List<Wallet>> = _wallets
+
+    fun loadWallets() {
+        Log.d(TAG, "loadWallets() called")
+        viewModelScope.launch {
+            try {
                 val userId = getUserIdUseCase.execute()
+                Log.d(TAG, "Retrieved userId: $userId")
+
                 val walletList = getWalletUseCase.execute(userId)
+                Log.d(TAG, "Fetched ${walletList.size} wallets for user")
+
                 _wallets.value = walletList
+            } catch (e: Exception) {
+                Log.e(TAG, "Error loading wallets: ${e.message}", e)
             }
         }
     }
+}
