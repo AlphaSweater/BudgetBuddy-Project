@@ -64,7 +64,7 @@ class BudgetMainFragment : Fragment() {
         }
 
         budgetMainAdapter = BudgetMainAdapter(budgetItems) { item ->
-            findNavController().navigate(R.id.action_budgetMainFragment_to_budgetReportFragment)
+//            findNavController().navigate(R.id.action_budgetMainFragment_to_budgetReportFragment)
         }
 
         binding.recyclerViewBudgetMain.apply {

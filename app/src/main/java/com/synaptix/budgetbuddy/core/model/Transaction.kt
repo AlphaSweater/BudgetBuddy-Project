@@ -32,7 +32,6 @@ data class Transaction(
     val amount: Double,
     val date: String,
     val note: String?,
-//    val label: String,
     val photo: ByteArray?,
     val recurrenceRate: String?
 )
