@@ -7,21 +7,21 @@ import android.view.View
 import androidx.lifecycle.lifecycleScope
 import com.synaptix.budgetbuddy.presentation.ui.auth.AuthActivity
 import com.synaptix.budgetbuddy.R
-import com.synaptix.budgetbuddy.databinding.FragmentSignupBinding
+import com.synaptix.budgetbuddy.databinding.FragmentAuthSignupBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class SignupFragment : Fragment(R.layout.fragment_signup) {
+class SignupFragment : Fragment(R.layout.fragment_auth_signup) {
 
-    private lateinit var binding: FragmentSignupBinding
+    private lateinit var binding: FragmentAuthSignupBinding
     private val viewModel: SignupViewModel by viewModels()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         // Inflate ViewBinding
-        binding = FragmentSignupBinding.bind(view)
+        binding = FragmentAuthSignupBinding.bind(view)
 
         // Handle back button
         binding.btnBackSignup.setOnClickListener {

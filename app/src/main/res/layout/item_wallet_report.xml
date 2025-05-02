@@ -26,6 +26,7 @@
             android:orientation="vertical">
 
             <TextView
+                android:id="@+id/tvTransactionName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Name of Transaction"
@@ -33,6 +34,7 @@
                 android:textSize="14sp" />
 
             <TextView
+                android:id="@+id/tvTransactionCategory"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Category"
@@ -40,6 +42,7 @@
                 android:textSize="12sp" />
 
             <TextView
+                android:id="@+id/tvWallet"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Wallet"
@@ -55,6 +58,7 @@
             android:orientation="vertical">
 
             <TextView
+                android:id="@+id/tvTransactionAmount"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Amount"
@@ -63,6 +67,7 @@
                 android:textSize="14sp" />
 
             <TextView
+                android:id="@+id/tvTransactionDay"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Day"

@@ -19,8 +19,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var navView: BottomNavigationView
 
     private val hiddenBottomNavFragments = setOf(
-        R.id.navigation_label_selector,
-        R.id.navigation_add_transaction,
+        R.id.navigation_transaction_select_label,
+        R.id.navigation_transaction_add,
         R.id.navigation_wallet_add
         // add others here
     )
@@ -58,7 +58,7 @@ class MainActivity : AppCompatActivity() {
 
         // ✅ Navigate to add transaction screen from FAB
         binding.fabAddTransaction.setOnClickListener {
-            navController.navigate(R.id.navigation_add_transaction)
+            navController.navigate(R.id.navigation_transaction_add)
         }
 
         // ✅ Hide bottom nav on certain fragments

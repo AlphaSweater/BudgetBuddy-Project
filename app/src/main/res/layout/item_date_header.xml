@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="72dp"
+    android:background="?attr/bb_surface"
+    android:padding="12dp">
+
+    <!-- Date Number -->
+    <TextView
+        android:id="@+id/textDayNumber"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="16"
+        android:textColor="?attr/bb_primaryText"
+        android:textSize="28sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@id/textDayNumber"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <!-- "Yesterday" Label -->
+        <TextView
+            android:id="@+id/textRelativeDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Yesterday"
+            android:textColor="?attr/bb_primaryText"
+            android:textSize="18sp" />
+
+        <!-- "March 2025" Label -->
+        <TextView
+            android:id="@+id/textMonthYearDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="March 2025"
+            android:textColor="?attr/bb_secondaryText"
+            android:textSize="12sp"
+            app:layout_constraintStart_toStartOf="@id/textRelativeDate"
+            app:layout_constraintTop_toBottomOf="@id/textRelativeDate" />
+    </LinearLayout>
+
+    <!-- Amount in Red -->
+    <TextView
+        android:id="@+id/textTotalAmount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="-R 4,800"
+        android:textColor="?attr/bb_expense"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+</androidx.constraintlayout.widget.ConstraintLayout>

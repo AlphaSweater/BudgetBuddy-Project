@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".presentation.ui.main.transactions.generalReports.GeneralReportsFragment">
+    tools:context=".presentation.ui.main.general.generalReports.GeneralReportsFragment">
 
     <!-- Header Container (Holds top balance summary and back button) -->
     <androidx.constraintlayout.widget.ConstraintLayout
