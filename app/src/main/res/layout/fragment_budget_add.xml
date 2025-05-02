@@ -149,41 +149,48 @@
                     app:tint="?attr/colorOnPrimary"/>
             </LinearLayout>
 
-            <!-- Recurrence -->
             <LinearLayout
-                android:id="@+id/rowRecurrence"
+                android:id="@+id/rowMinGoalLayout"
                 style="@style/RowStyle">
 
-                <ImageView
-                    style="@style/RowIconStyle"
-                    app:tint="?attr/bb_button"
-                    android:src="@drawable/ic_autorenew_24" />
 
-                <TextView
-                    android:id="@+id/recurrence_label"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="12dp"
-                    android:layout_weight="1"
-                    android:text="@string/recurrence"
-                    android:textColor="?attr/bb_primaryText"
-                    android:textSize="16sp"/>
-
-                <TextView
-                    android:id="@+id/recurrence_value"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="?attr/bb_secondaryText"
-                    android:text="Monthly"/>
-
-                <ImageView
-                    android:id="@+id/recurrence_arrow"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/baseline_arrow_forward_ios_24"
-                    app:tint="?attr/colorOnPrimary"
-                    android:contentDescription="Arrow"/>
             </LinearLayout>
+
+<!--             Recurrence -->
+<!--            <LinearLayout-->
+<!--                android:id="@+id/rowRecurrence"-->
+<!--                style="@style/RowStyle">-->
+
+<!--                <ImageView-->
+<!--                    style="@style/RowIconStyle"-->
+<!--                    app:tint="?attr/bb_button"-->
+<!--                    android:src="@drawable/ic_autorenew_24" />-->
+
+<!--                <TextView-->
+<!--                    android:id="@+id/recurrence_label"-->
+<!--                    android:layout_width="0dp"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_marginStart="12dp"-->
+<!--                    android:layout_weight="1"-->
+<!--                    android:text="@string/recurrence"-->
+<!--                    android:textColor="?attr/bb_primaryText"-->
+<!--                    android:textSize="16sp"/>-->
+
+<!--                <TextView-->
+<!--                    android:id="@+id/recurrence_value"-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:textColor="?attr/bb_secondaryText"-->
+<!--                    android:text="Monthly"/>-->
+
+<!--                <ImageView-->
+<!--                    android:id="@+id/recurrence_arrow"-->
+<!--                    android:layout_width="24dp"-->
+<!--                    android:layout_height="24dp"-->
+<!--                    android:src="@drawable/baseline_arrow_forward_ios_24"-->
+<!--                    app:tint="?attr/colorOnPrimary"-->
+<!--                    android:contentDescription="Arrow"/>-->
+<!--            </LinearLayout>-->
 
             <!-- Start Date -->
             <LinearLayout
