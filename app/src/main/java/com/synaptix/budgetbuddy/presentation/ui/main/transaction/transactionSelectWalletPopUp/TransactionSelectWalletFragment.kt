@@ -4,18 +4,17 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.google.android.material.bottomsheet.BottomSheetBehavior
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.synaptix.budgetbuddy.databinding.FragmentTransactionSelectWalletBinding
 import com.synaptix.budgetbuddy.presentation.ui.main.transaction.TransactionAddViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import com.google.android.material.R
 
 @AndroidEntryPoint
-class TransactionSelectWalletBottomSheet : BottomSheetDialogFragment() {
+class TransactionSelectWalletFragment : Fragment() {
 
     private var _binding: FragmentTransactionSelectWalletBinding? = null
     private val binding get() = _binding!!
@@ -23,23 +22,6 @@ class TransactionSelectWalletBottomSheet : BottomSheetDialogFragment() {
     private val viewModel: TransactionAddViewModel by activityViewModels()
     private val walletViewModel: TransactionSelectWalletViewModel by viewModels()
     private lateinit var transactionSelectWalletAdapter: TransactionSelectWalletAdapter
-
-
-    override fun onStart() {
-        super.onStart()
-
-        val bottomSheet = dialog?.findViewById<View>(R.id.design_bottom_sheet)
-        bottomSheet?.let {
-            val behavior = BottomSheetBehavior.from(it)
-            val halfScreenHeight = (resources.displayMetrics.heightPixels * 0.5).toInt()
-
-            it.layoutParams.height = halfScreenHeight
-            it.requestLayout()
-
-            behavior.peekHeight = halfScreenHeight
-            behavior.state = BottomSheetBehavior.STATE_COLLAPSED
-        }
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -50,25 +32,31 @@ class TransactionSelectWalletBottomSheet : BottomSheetDialogFragment() {
         return binding.root
     }
 
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupRecyclerView()
+        setupOnClickListeners()
 
         walletViewModel.loadWallets()
-        //AI assisted with this which calls the function in the viewModel and passes the data to the adapter
         walletViewModel.wallets.observe(viewLifecycleOwner) { walletList ->
             transactionSelectWalletAdapter = TransactionSelectWalletAdapter(walletList) { walletId ->
                 viewModel.walletId.value = walletId
-                dismiss()
+                findNavController().popBackStack()
             }
             binding.walletRecyclerView.adapter = transactionSelectWalletAdapter
         }
     }
 
-private fun setupRecyclerView() {
-    binding.walletRecyclerView.layoutManager = LinearLayoutManager(requireContext())
-}
+    private fun setupRecyclerView() {
+        binding.walletRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+    }
+
+    private fun setupOnClickListeners() {
+        // Add this if you want a "back" button like in the Category fragment
+        binding.btnGoBack?.setOnClickListener {
+            findNavController().popBackStack()
+        }
+    }
 
     override fun onDestroyView() {
         super.onDestroyView()

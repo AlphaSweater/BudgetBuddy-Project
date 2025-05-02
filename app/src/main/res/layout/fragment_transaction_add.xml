@@ -68,22 +68,44 @@
                 <!-- Wallet Row -->
                 <LinearLayout
                     android:id="@+id/rowSelectWallet"
-                    style="@style/RowStyle">
+                    style="@style/RowStyle"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:paddingVertical="8dp">
 
                     <ImageView
                         style="@style/RowIconStyle"
                         android:src="@drawable/ic_account_balance_wallet_24"
                         app:tint="?attr/bb_button" />
 
-                    <TextView
+                    <!-- Container for Wallet title and selected name -->
+                    <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="12dp"
                         android:layout_weight="1"
-                        android:gravity="center_vertical"
-                        android:text="@string/wallet"
-                        android:textColor="?attr/bb_primaryText"
-                        android:textSize="18sp" />
+                        android:orientation="vertical"
+                        android:layout_marginStart="12dp">
+
+                        <!-- Top Label -->
+                        <TextView
+                            android:id="@+id/textWalletLabel"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/wallet"
+                            android:textColor="?attr/bb_primaryText"
+                            android:textSize="18sp" />
+
+                        <!-- Selected wallet name -->
+                        <TextView
+                            android:id="@+id/textSelectedWalletName"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="No wallet selected"
+                            android:textColor="?attr/bb_secondaryText"
+                            android:textSize="14sp"
+                            android:visibility="visible"
+                            android:paddingTop="2dp" />
+                    </LinearLayout>
 
                     <ImageView
                         android:layout_width="24dp"
