@@ -1,8 +1,8 @@
-package com.synaptix.budgetbuddy.data.local.mapper
+package com.synaptix.budgetbuddy.data.entity.mapper
 
+import android.util.Base64
 import com.synaptix.budgetbuddy.core.model.Category
 import com.synaptix.budgetbuddy.core.model.CategoryIn
-import com.synaptix.budgetbuddy.core.model.Transaction
 import com.synaptix.budgetbuddy.core.model.TransactionIn
 import com.synaptix.budgetbuddy.core.model.User
 import com.synaptix.budgetbuddy.core.model.Wallet
@@ -25,7 +25,7 @@ fun TransactionIn.toEntity(): TransactionEntity {
         note = this.note ?: "",
         currency = this.currencyType,
         label = this.selectedLabels.joinToString(",") { it.labelName },
-        image = this.photo?.let { android.util.Base64.encodeToString(it, android.util.Base64.DEFAULT) } ?: "",
+        image = this.photo?.let { Base64.encodeToString(it, Base64.DEFAULT) } ?: "",
         recurrence = this.recurrenceRate ?: ""
     )
 }
