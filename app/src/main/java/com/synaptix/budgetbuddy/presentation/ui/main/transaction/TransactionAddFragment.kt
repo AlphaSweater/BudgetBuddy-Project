@@ -23,7 +23,7 @@ import com.google.android.material.datepicker.MaterialDatePicker
 import com.synaptix.budgetbuddy.R
 import com.synaptix.budgetbuddy.core.model.Label
 import com.synaptix.budgetbuddy.databinding.FragmentTransactionAddBinding
-import com.synaptix.budgetbuddy.presentation.ui.main.transaction.transactionSelectWalletPopUp.TransactionSelectWalletBottomSheet
+import com.synaptix.budgetbuddy.presentation.ui.main.transaction.transactionSelectWalletPopUp.TransactionSelectWalletFragment
 import com.synaptix.budgetbuddy.presentation.ui.main.transaction.transactionSelectRecurrencePopUp.TransactionSelectRecurrenceBottomSheet
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -279,8 +279,7 @@ class TransactionAddFragment : Fragment() {
     }
 
     private fun showWalletSelector() {
-        val bottomSheet = TransactionSelectWalletBottomSheet()
-        bottomSheet.show(parentFragmentManager, bottomSheet.tag)
+        findNavController().navigate(R.id.action_transactionAddFragment_to_transactionSelectWalletFragment)
     }
 
     private fun showCategorySelector(){

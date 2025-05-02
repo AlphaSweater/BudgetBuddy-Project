@@ -121,11 +121,6 @@ class WalletAddFragment : Fragment() {
 
     // --- Observers ---
     private fun observeViewModel() {
-        viewModel.walletId.observe(viewLifecycleOwner) { walletId ->
-            Log.d("Wallet", "Selected Wallet ID: $walletId")
-            // Update UI based on the selected wallet
-        }
-
         viewModel.walletName.observe(viewLifecycleOwner) { walletName ->
             Log.d("Wallet", "Selected Wallet Name: $walletName")
             // Update UI based on the selected wallet
