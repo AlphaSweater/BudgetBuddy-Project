@@ -3,7 +3,7 @@ package com.synaptix.budgetbuddy.core.model
 import java.io.Serializable
 
 data class BudgetIn (
-    val budgetId: Int? = null,
+    val budgetId: Int = 0,
     val userId: Int,
     val walletId: Int,
     val budgetName: String,
@@ -12,8 +12,8 @@ data class BudgetIn (
 ) : Serializable
 
 data class Budget (
-    val budgetId: Int? = null,
-    val user: User,
+    val budgetId: Int = 0,
+    val user: User?,
     val walletId: Int,
     val budgetName: String,
     val goalMinAmount: Double,
