@@ -92,7 +92,7 @@ class TransactionSelectCategoryFragment : Fragment() {
     }
 
     private fun showAddCategory() {
-        findNavController().navigate(R.id.navigation_add_new_category)
+        findNavController().navigate(R.id.navigation_category_add_new)
     }
 
     override fun onDestroyView() {

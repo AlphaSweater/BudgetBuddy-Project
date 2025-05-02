@@ -104,11 +104,11 @@ class WalletAddFragment : Fragment() {
         }
 
         binding.btnWalletEdit.setOnClickListener {
-            findNavController().navigate(R.id.action_addWalletFragment_to_newWalletCategoryFragment)
+            findNavController().navigate(R.id.action_walletAddFragment_to_walletSelectIconFragment)
         }
 
         binding.btnSave.setOnClickListener {
-            findNavController().navigate(R.id.action_addWalletFragment_to_walletMainFragment)
+            findNavController().popBackStack()
         }
 
     }

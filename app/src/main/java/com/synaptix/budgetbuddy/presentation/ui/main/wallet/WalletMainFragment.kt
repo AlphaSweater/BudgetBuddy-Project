@@ -46,10 +46,6 @@ class WalletMainFragment : Fragment() {
     }
 
     private fun setupOnClickListeners() {
-        binding.btnGoBack.setOnClickListener {
-            findNavController().popBackStack()
-        }
-
         binding.btnAdd.setOnClickListener {
             findNavController().navigate(R.id.action_walletMainFragment_to_addWalletFragment)
         }

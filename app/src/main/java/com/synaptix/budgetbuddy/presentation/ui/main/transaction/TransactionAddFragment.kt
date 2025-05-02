@@ -205,7 +205,7 @@ class TransactionAddFragment : Fragment() {
 
     // --- Popup Navigation ---
     private fun showLabelSelector() {
-        findNavController().navigate(R.id.action_addTransactionFragment_to_labelSelectorFragment)
+        findNavController().navigate(R.id.action_transactionAddFragment_to_transactionSelectLabelFragment)
     }
 
     private fun showWalletSelector() {
@@ -214,7 +214,7 @@ class TransactionAddFragment : Fragment() {
     }
 
     private fun showCategorySelector(){
-        findNavController().navigate(R.id.action_addTransactionFragment_to_categorySelectorFragment)
+        findNavController().navigate(R.id.action_transactionAddFragment_to_transactionSelectCategoryFragment)
     }
 
     // --- Observers ---
