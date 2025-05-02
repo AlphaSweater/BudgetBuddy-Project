@@ -42,10 +42,16 @@ class BudgetAddFragment : Fragment() {
     }
 
     private fun setupClickListeners() {
-//        binding.rowRecurrence.setOnClickListener {
-//            // Navigate to Recurrence Fragment instead of BottomSheet
-//            findNavController().navigate(R.id.action_budgetAddFragment_to_transactionSelectRecurrenceFragment)
-//        }
+        binding.btnSave.setOnClickListener {
+            // Update ViewModel LiveData
+            viewModel.budgetName.value = binding.budgetName.text.toString()
+            viewModel.budgetAmount.value = binding.amount.text.toString().toDoubleOrNull() ?: 0.0
+            viewModel.walletId.value = 1
+
+            // Call function to save budget
+            viewModel.addBudget()
+
+        }
     }
 
     override fun onDestroyView() {

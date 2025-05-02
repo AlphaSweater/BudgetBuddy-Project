@@ -3,7 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/bg_rounded_top"
+    android:padding="16dp"
+    android:background="?attr/bb_background"
     android:elevation="8dp">
 
     <LinearLayout
@@ -11,7 +12,7 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:background="@android:color/transparent"
-        android:padding="24dp">
+>
 
         <!-- Back Button -->
         <ImageButton
@@ -35,34 +36,44 @@
             android:layout_marginTop="12dp"
             android:layout_marginBottom="16dp" />
 
-        <!-- Scrollable Options -->
-        <ScrollView
+        <!-- Recurrence Options -->
+        <com.google.android.material.button.MaterialButtonToggleGroup
+            android:id="@+id/toggleRecurrenceGroup"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:maxHeight="400dp">
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="16dp"
+            app:singleSelection="true"
+            app:selectionRequired="true">
 
-            <LinearLayout
-                android:layout_width="match_parent"
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnDaily"
+                android:layout_width="0dp"
+                android:layout_weight="1"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:divider="?android:attr/dividerHorizontal"
-                android:showDividers="middle"
-                android:dividerPadding="8dp">
+                android:text="Daily" />
 
-                <!-- Reusable styled recurrence options -->
-                <TextView android:id="@+id/optionEveryDay" style="@style/RecurrenceOption" android:text="Every day" />
-                <TextView android:id="@+id/optionEveryTwoDays" style="@style/RecurrenceOption" android:text="Every 2 days" />
-                <TextView android:id="@+id/optionEveryWorkDay" style="@style/RecurrenceOption" android:text="Every work day" />
-                <TextView android:id="@+id/optionEveryWeek" style="@style/RecurrenceOption" android:text="Every week" />
-                <TextView android:id="@+id/optionEveryWeek2" style="@style/RecurrenceOption" android:text="Every 2 weeks" />
-                <TextView android:id="@+id/optionEveryWeek4" style="@style/RecurrenceOption" android:text="Every 4 weeks" />
-                <TextView android:id="@+id/optionEveryMonth" style="@style/RecurrenceOption" android:text="Every month" />
-                <TextView android:id="@+id/optionEveryMonth2" style="@style/RecurrenceOption" android:text="Every 2 months" />
-                <TextView android:id="@+id/optionEveryMonth3" style="@style/RecurrenceOption" android:text="Every 3 months" />
-                <TextView android:id="@+id/optionEveryMonth6" style="@style/RecurrenceOption" android:text="Every 6 months" />
-                <TextView android:id="@+id/optionEveryYear" style="@style/RecurrenceOption" android:text="Every year" />
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnWeekly"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="Weekly" />
 
-            </LinearLayout>
-        </ScrollView>
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnMonthly"
+                android:layout_width="0dp"
+                android:layout_weight="1.1"
+                android:layout_height="wrap_content"
+                android:text="Monthly" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnYearly"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="Yearly" />
+        </com.google.android.material.button.MaterialButtonToggleGroup>
+
     </LinearLayout>
 </FrameLayout>

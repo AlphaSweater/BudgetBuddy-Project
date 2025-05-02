@@ -5,6 +5,7 @@ import com.synaptix.budgetbuddy.core.model.Budget
 import com.synaptix.budgetbuddy.core.model.BudgetIn
 import com.synaptix.budgetbuddy.core.model.Category
 import com.synaptix.budgetbuddy.core.model.CategoryIn
+import com.synaptix.budgetbuddy.core.model.Transaction
 import com.synaptix.budgetbuddy.core.model.TransactionIn
 import com.synaptix.budgetbuddy.core.model.User
 import com.synaptix.budgetbuddy.core.model.Wallet
@@ -16,6 +17,7 @@ import com.synaptix.budgetbuddy.data.entity.UserEntity
 import com.synaptix.budgetbuddy.data.entity.WalletEntity
 import com.synaptix.budgetbuddy.data.entity.relations.BudgetWithUser
 import com.synaptix.budgetbuddy.data.entity.relations.CategoryWithUser
+import com.synaptix.budgetbuddy.data.entity.relations.TransactionWithDetail
 import com.synaptix.budgetbuddy.data.entity.relations.WalletWithUser
 
 
@@ -30,10 +32,30 @@ fun TransactionIn.toEntity(): TransactionEntity {
         date = this.date,
         note = this.note ?: "",
         currency = this.currencyType,
-        label = this.selectedLabels.joinToString(",") { it.labelName },
-        image = this.photo?.let { Base64.encodeToString(it, Base64.DEFAULT) } ?: "",
+//        label = this.selectedLabels.joinToString(",") { it.labelName },
+        image = photo,
         recurrence = this.recurrenceRate ?: ""
     )
+}
+
+fun TransactionEntity.toDomain(user: User?, wallet: Wallet?, category: Category?): Transaction {
+    return Transaction(
+        transactionId = transaction_id,
+        user = user,
+        wallet = wallet,
+        category = category,
+        currencyType = currency,
+        amount = amount,
+        date = date,
+        note = note,
+        photo = image,
+        recurrenceRate = recurrence
+    )
+}
+
+// Relation
+fun TransactionWithDetail.toDomain(): Transaction {
+    return transaction.toDomain(user?.toDomain(), wallet?.toDomain(user?.toDomain()), category?.toDomain(user?.toDomain()))
 }
 
 fun CategoryIn.toEntity(): CategoryEntity {
@@ -113,8 +135,7 @@ fun BudgetIn.toEntity(): BudgetEntity{
         user_id = this.userId,
         wallet_id = this.walletId,
         name = this.budgetName,
-        minAmount = this.goalMinAmount,
-        maxAmount = this.goalMaxAmount
+        amount = this.amount
     )
 }
 
@@ -124,8 +145,7 @@ fun BudgetEntity.toDomain(user: User?): Budget {
         user = user,
         walletId = wallet_id,
         budgetName = name,
-        goalMinAmount = minAmount,
-        goalMaxAmount = maxAmount
+        amount = amount
     )
 }
 
