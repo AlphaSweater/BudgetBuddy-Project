@@ -22,7 +22,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- Create Budget Button -->
     <LinearLayout
         android:id="@+id/budget_container"
         android:layout_width="0dp"
@@ -110,6 +109,7 @@
         </LinearLayout>
     </LinearLayout>
 
+    <!-- Create Budget Button -->
     <Button
         android:id="@+id/create_budget_button"
         android:layout_width="180dp"
