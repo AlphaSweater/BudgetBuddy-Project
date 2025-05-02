@@ -147,7 +147,6 @@
                     android:id="@+id/monthlyGoalTitle"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="5dp"
                     android:layout_weight="1"
                     android:gravity="center"
                     android:text="Monthly Spending Goal"
@@ -155,14 +154,18 @@
                     android:textSize="16sp"
                     android:textStyle="bold" />
 
-                <ImageView
-                    android:id="@+id/editGoalIcon"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:layout_marginBottom="5dp"
-                    android:contentDescription="Edit Goal"
-                    android:src="@drawable/ic_edit_24"
-                    app:tint="?attr/bb_primaryText" />
+                <!-- Save Button -->
+                <Button
+                    android:id="@+id/saveButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@android:color/white"
+                    app:backgroundTint="?attr/bb_button"
+                    app:cornerRadius="24dp"
+                    android:text="Save"
+                    app:layout_constraintStart_toStartOf="parent" />
+
+
             </LinearLayout>
 
             <!-- Min - Max Range Row -->
@@ -180,13 +183,18 @@
                     android:textColor="?attr/bb_primaryText"
                     android:textSize="14sp" />
 
-                <TextView
+                <!-- Min Goal Input -->
+
+                <EditText
+                    android:id="@+id/inputMinGoal"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="4dp"
-                    android:layout_marginEnd="8dp"
-                    android:text="R 500"
-                    android:textColor="?attr/bb_primaryText"
+                    android:layout_marginEnd="4dp"
+                    android:hint="R 500"
+                    android:backgroundTint="?attr/bb_primaryText"
+                    android:inputType="numberDecimal|numberSigned"
+                    android:textColorHint="?attr/bb_primaryText"
                     android:textSize="14sp" />
 
                 <TextView
@@ -196,12 +204,17 @@
                     android:textColor="?attr/bb_primaryText"
                     android:textSize="14sp" />
 
-                <TextView
+                <!-- Max Goal Input -->
+                <EditText
+                    android:id="@+id/inputMaxGoal"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
+                    android:layout_marginStart="4dp"
                     android:layout_marginEnd="4dp"
-                    android:text="R 5,000"
+                    android:hint="R 5,000"
+                    android:textColorHint="?attr/bb_primaryText"
+                    android:backgroundTint="?attr/bb_primaryText"
+                    android:inputType="numberDecimal|numberSigned"
                     android:textColor="?attr/bb_primaryText"
                     android:textSize="14sp" />
 
@@ -241,6 +254,7 @@
                     android:textSize="14sp" />
 
                 <TextView
+                    android:id="@+id/minValueSpent"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="2dp"
@@ -257,6 +271,7 @@
                     android:textSize="14sp" />
 
                 <TextView
+                    android:id="@+id/minValueTotal"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="2dp"

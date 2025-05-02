@@ -194,6 +194,21 @@
             app:exitAnim="@anim/fade_out"
             app:popEnterAnim="@anim/fade_in"
             app:popExitAnim="@anim/slide_out_down" />
+
+        <action
+            android:id="@+id/action_budgetMainFragment_to_budgetGoalsFragment"
+            app:destination="@id/navigation_budget_goals"
+            app:enterAnim="@anim/slide_in_up"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/slide_out_down"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/navigation_budget_goals"
+        android:name="com.synaptix.budgetbuddy.presentation.ui.main.budget.budgetGoals.BudgetGoalsFragment"
+        android:label="Budget Goals"
+        tools:layout="@layout/fragment_budget_main">
     </fragment>
 
     <fragment

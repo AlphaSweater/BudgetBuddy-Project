@@ -13,7 +13,9 @@ import com.synaptix.budgetbuddy.core.model.BudgetReportListItems
 import com.synaptix.budgetbuddy.databinding.FragmentBudgetMainBinding
 import com.synaptix.budgetbuddy.databinding.FragmentGeneralTransactionsBinding
 import com.synaptix.budgetbuddy.presentation.ui.main.general.generalTransactions.GeneralTransactionsAdapter
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class BudgetMainFragment : Fragment() {
 
     private var _binding: FragmentBudgetMainBinding? = null
