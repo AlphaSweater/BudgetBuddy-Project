@@ -196,6 +196,16 @@ class TransactionAddFragment : Fragment() {
             }.show()
     }
 
+    // --- Update Methods ---
+
+    private fun updateSelectedCategory(categoryName: String) {
+        binding.textSelectedCategoryName.text = categoryName
+    }
+
+    private fun updateSelectedWallet(walletName: String) {
+        binding.textSelectedWalletName.text = walletName
+    }
+
     private fun updateSelectedLabelChips(labels: List<Label>) {
         val selectedLabels = labels.filter { it.isSelected }
 
@@ -241,7 +251,7 @@ class TransactionAddFragment : Fragment() {
 
         // Validate input
         if (viewModel.category.value != null  ||
-            viewModel.walletId.value != null ||
+            viewModel.wallet.value != null ||
             viewModel.currency.value.isNullOrBlank() ||
             amount <= 0.0 ||
             date.isBlank()
@@ -291,16 +301,19 @@ class TransactionAddFragment : Fragment() {
         viewModel.selectedLabels.observe(viewLifecycleOwner) { selectedLabels ->
             Log.d("ViewModelsLabels", selectedLabels.toString())
             updateSelectedLabelChips(selectedLabels)
-        }
 
-        viewModel.walletId.observe(viewLifecycleOwner) { walletId ->
-            Log.d("Wallet", "Selected Wallet ID: $walletId")
-            // Update UI based on the selected wallet
         }
 
         viewModel.category.observe(viewLifecycleOwner) { category ->
-            Log.d("Category", "Selected Category: $category")
             // Update UI based on the selected category
+            updateSelectedCategory(category.categoryName)
+            Log.d("Category", "Selected Category: $category")
+        }
+
+        viewModel.wallet.observe(viewLifecycleOwner) { wallet ->
+            // Update UI based on the selected wallet
+            updateSelectedWallet(wallet.walletName)
+            Log.d("Wallet", "Selected Wallet ID: $wallet")
         }
 
         viewModel.currency.observe(viewLifecycleOwner) { currency ->

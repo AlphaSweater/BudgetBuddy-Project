@@ -9,6 +9,7 @@ import com.synaptix.budgetbuddy.core.model.Category
 import com.synaptix.budgetbuddy.core.model.Label
 import com.synaptix.budgetbuddy.core.model.Transaction
 import com.synaptix.budgetbuddy.core.model.TransactionIn
+import com.synaptix.budgetbuddy.core.model.Wallet
 import com.synaptix.budgetbuddy.core.usecase.auth.GetUserIdUseCase
 import com.synaptix.budgetbuddy.core.usecase.main.transaction.AddTransactionUseCase
 
@@ -19,7 +20,7 @@ class TransactionAddViewModel @Inject constructor(
 ) : ViewModel() {
 
     val category = MutableLiveData<Category>()
-    val walletId = MutableLiveData<Int>()
+    val wallet = MutableLiveData<Wallet>()
     val currency = MutableLiveData<String>()
     val amount = MutableLiveData<Double>()
     val date = MutableLiveData<String>()
@@ -34,7 +35,7 @@ class TransactionAddViewModel @Inject constructor(
         val transaction = TransactionIn(
             userId = getUserIdUseCase.execute(),
             categoryId = category.value?.categoryId ?: 0,
-            walletId = walletId.value ?: 0,
+            walletId = wallet.value?.walletId ?: 0,
             currencyType = currency.value ?: "",
             amount = amount.value ?: 0.0,
             date = date.value ?: "",
