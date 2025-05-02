@@ -6,52 +6,6 @@
     android:layout_height="match_parent"
     tools:context=".presentation.ui.main.general.generalIndividualTransactions.GeneralIndividualTransactionsFragment">
 
-    <LinearLayout
-        android:id="@+id/top_bar"
-        android:layout_width="match_parent"
-        android:layout_height="70dp"
-        android:orientation="vertical"
-        android:gravity="center"
-        android:background="?attr/bb_expense"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
-
-        <TextView
-            android:id="@+id/individualCategoryName"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Transaction Name"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:textColor="?attr/bb_primaryText"
-            android:layout_marginStart="16dp"/>
-
-        <TextView
-            android:id="@+id/amount"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Amount"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:textColor="?attr/bb_primaryText"
-            android:layout_marginStart="16dp"/>
-
-    </LinearLayout>
-
-    <ImageButton
-        android:id="@+id/btnGoBack"
-        android:layout_width="44dp"
-        android:layout_height="44dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:background="@null"
-        android:contentDescription="@string/back"
-        android:src="?attr/actionModeCloseDrawable"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:tint="?attr/bb_primaryText" />
-
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewIndividualTransaction"
@@ -59,7 +13,7 @@
         android:layout_height="0dp"
         android:layout_weight="1"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/top_bar"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="1.0"
         tools:layout_editor_absoluteX="0dp" />
 
