@@ -19,7 +19,7 @@
 
         <!-- Back Button -->
         <ImageButton
-            android:id="@+id/btnBackTransaction"
+            android:id="@+id/btnGoBack"
             android:layout_width="44dp"
             android:layout_height="44dp"
             android:layout_marginTop="12dp"
@@ -210,7 +210,8 @@
         android:id="@+id/scrollContent"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@+id/headerContainer">
+        app:layout_constraintTop_toBottomOf="@+id/headerContainer"
+        android:padding="16dp">
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerViewWalletReport"
