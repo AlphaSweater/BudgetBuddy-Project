@@ -71,7 +71,7 @@ class TransactionAddFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        observeViewModel() // Re-observe ViewModel data to update UI
+        observeViewModel()
     }
 
     override fun onDestroyView() {
@@ -236,6 +236,8 @@ class TransactionAddFragment : Fragment() {
         viewModel.date.value = date
 
         viewModel.note.value = binding.edtTextNote.text.toString()
+
+        viewModel.currency.value = binding.spinnerCurrency.selectedItem.toString()
 
         // Validate input
         if (viewModel.categoryId.value != null  ||

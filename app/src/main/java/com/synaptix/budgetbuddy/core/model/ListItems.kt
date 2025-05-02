@@ -18,4 +18,13 @@ sealed class BudgetReportListItems {
         val note: String?,
         val relativeDate: String
     ) : BudgetReportListItems()
+
+    data class CategoryItems(
+        val categoryName: String,
+        val categoryIcon: Int,
+        val categoryColour: Int,
+        val transactionCount: Int,
+        val amount: String,
+        val relativeDate: String,
+    ) : BudgetReportListItems()
 }
