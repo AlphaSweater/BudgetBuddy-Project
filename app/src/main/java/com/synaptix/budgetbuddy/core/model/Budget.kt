@@ -10,3 +10,12 @@ data class BudgetIn (
     val goalMinAmount: Double,
     val goalMaxAmount: Double
 ) : Serializable
+
+data class Budget (
+    val budgetId: Int? = null,
+    val user: User,
+    val walletId: Int,
+    val budgetName: String,
+    val goalMinAmount: Double,
+    val goalMaxAmount: Double
+)

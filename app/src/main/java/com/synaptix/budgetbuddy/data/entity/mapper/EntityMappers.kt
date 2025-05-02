@@ -6,11 +6,13 @@ import com.synaptix.budgetbuddy.core.model.CategoryIn
 import com.synaptix.budgetbuddy.core.model.TransactionIn
 import com.synaptix.budgetbuddy.core.model.User
 import com.synaptix.budgetbuddy.core.model.Wallet
+import com.synaptix.budgetbuddy.core.model.WalletIn
 import com.synaptix.budgetbuddy.data.entity.CategoryEntity
 import com.synaptix.budgetbuddy.data.entity.TransactionEntity
 import com.synaptix.budgetbuddy.data.entity.UserEntity
 import com.synaptix.budgetbuddy.data.entity.WalletEntity
 import com.synaptix.budgetbuddy.data.entity.relations.CategoryWithUser
+import com.synaptix.budgetbuddy.data.entity.relations.WalletWithUser
 
 
 //AI assisted with the logic behind mapper
@@ -77,7 +79,7 @@ fun UserEntity.toDomain(): User {
     )
 }
 
-fun Wallet.toEntity(): WalletEntity {
+fun WalletIn.toEntity(): WalletEntity {
     return WalletEntity(
         wallet_id = this.walletId,
         user_id = this.userId,
@@ -85,4 +87,18 @@ fun Wallet.toEntity(): WalletEntity {
         currency = this.walletCurrency,
         balance = this.walletBalance
     )
+}
+
+fun WalletEntity.toDomain(user: User?): Wallet {
+    return Wallet(
+        walletId = wallet_id,
+        user = user,
+        walletName = name,
+        walletCurrency = currency,
+        walletBalance = balance
+    )
+}
+
+fun WalletWithUser.toDomain(): Wallet {
+    return wallet.toDomain(user?.toDomain())
 }
