@@ -215,13 +215,47 @@
         android:id="@+id/navigation_budget_add"
         android:name="com.synaptix.budgetbuddy.presentation.ui.main.budget.budgetAdd.BudgetAddFragment"
         android:label="Add Budget"
-        tools:layout="@layout/fragment_budget_add" />
+        tools:layout="@layout/fragment_budget_add">
+
+        <action
+            android:id="@+id/action_budgetAddFragment_to_budgetSelectCategoryFragment"
+            app:destination="@id/navigation_budget_select_category"
+            app:enterAnim="@anim/slide_in_up"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/slide_out_down" />
+
+        <action
+            android:id="@+id/action_budgetAddFragment_to_budgetSelectWalletFragment"
+            app:destination="@id/navigation_budget_select_wallet"
+            app:enterAnim="@anim/slide_in_up"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/slide_out_down" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/navigation_budget_select_category"
+        android:name="com.synaptix.budgetbuddy.presentation.ui.main.budget.budgetAdd.budgetSelectCategoryPopUp.BudgetSelectCategoryFragment"
+        android:label="Select Category"
+        tools:layout="@layout/fragment_budget_select_category" />
+
+    <fragment
+        android:id="@+id/navigation_budget_select_wallet"
+        android:name="com.synaptix.budgetbuddy.presentation.ui.main.budget.budgetAdd.budgetSelectWalletPopUp.BudgetSelectWalletFragment"
+        android:label="Select Wallet"
+        tools:layout="@layout/fragment_budget_select_wallet" />
 
     <fragment
         android:id="@+id/navigation_budget_report"
         android:name="com.synaptix.budgetbuddy.presentation.ui.main.budget.budgetReport.BudgetReportFragment"
         android:label="Budget Report"
-        tools:layout="@layout/fragment_budget_report" />
+        tools:layout="@layout/fragment_budget_report">
+
+        <argument
+            android:name="walletId"
+            app:argType="integer" />
+    </fragment>
 
 
 </navigation>

@@ -21,10 +21,24 @@
 
 package com.synaptix.budgetbuddy.data.entity.mapper
 
-import android.util.Base64
-import com.synaptix.budgetbuddy.core.model.*
-import com.synaptix.budgetbuddy.data.entity.*
-import com.synaptix.budgetbuddy.data.entity.relations.*
+import com.synaptix.budgetbuddy.core.model.Budget
+import com.synaptix.budgetbuddy.core.model.BudgetIn
+import com.synaptix.budgetbuddy.core.model.Category
+import com.synaptix.budgetbuddy.core.model.CategoryIn
+import com.synaptix.budgetbuddy.core.model.Transaction
+import com.synaptix.budgetbuddy.core.model.TransactionIn
+import com.synaptix.budgetbuddy.core.model.User
+import com.synaptix.budgetbuddy.core.model.Wallet
+import com.synaptix.budgetbuddy.core.model.WalletIn
+import com.synaptix.budgetbuddy.data.entity.BudgetEntity
+import com.synaptix.budgetbuddy.data.entity.CategoryEntity
+import com.synaptix.budgetbuddy.data.entity.TransactionEntity
+import com.synaptix.budgetbuddy.data.entity.UserEntity
+import com.synaptix.budgetbuddy.data.entity.WalletEntity
+import com.synaptix.budgetbuddy.data.entity.relations.BudgetWithDetail
+import com.synaptix.budgetbuddy.data.entity.relations.CategoryWithUser
+import com.synaptix.budgetbuddy.data.entity.relations.TransactionWithDetail
+import com.synaptix.budgetbuddy.data.entity.relations.WalletWithUser
 
 //
 // ================================
@@ -41,6 +55,7 @@ fun TransactionIn.toEntity(): TransactionEntity {
         date = this.date,
         note = this.note ?: "",
         currency = this.currencyType,
+//        label = this.selectedLabels.joinToString(",") { it.labelName },
         image = photo,
         recurrence = this.recurrenceRate ?: ""
     )
@@ -167,23 +182,25 @@ fun BudgetIn.toEntity(): BudgetEntity {
         budget_id = this.budgetId,
         user_id = this.userId,
         wallet_id = this.walletId,
+        category_id = this.categoryId,
         name = this.budgetName,
-        amount = this.amount
+        amount = this.amount,
+        spent = this.spent
     )
 }
 
-// Maps from Budget entity to domain model
-fun BudgetEntity.toDomain(user: User?): Budget {
+fun BudgetEntity.toDomain(user: User?, wallet: Wallet?, category: Category?): Budget {
     return Budget(
         budgetId = budget_id,
         user = user,
-        walletId = wallet_id,
+        wallet = wallet,
+        category = category,
         budgetName = name,
-        amount = amount
+        amount = amount,
+        spent = spent
     )
 }
 
-// Maps from BudgetWithUser relation to domain model
-fun BudgetWithUser.toDomain(): Budget {
-    return budget.toDomain(user?.toDomain())
+fun BudgetWithDetail.toDomain(): Budget {
+    return budget.toDomain(user?.toDomain(), wallet?.toDomain(user?.toDomain()), category?.toDomain(user?.toDomain()))
 }
