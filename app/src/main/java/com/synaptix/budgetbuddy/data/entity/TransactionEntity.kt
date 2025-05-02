@@ -32,10 +32,9 @@ data class TransactionEntity (
     val category_id: Int,
     val amount: Double,
     val date: String,
-    val note: String,
+    val note: String?,
     val currency: String,
-    val label: String,
-    val image: String,
-    val recurrence: String
+    val image: ByteArray?,
+    val recurrence: String?
 
 )

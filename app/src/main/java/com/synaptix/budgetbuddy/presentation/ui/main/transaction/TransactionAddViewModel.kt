@@ -19,11 +19,11 @@ class TransactionAddViewModel @Inject constructor(
     private val getUserIdUseCase: GetUserIdUseCase
 ) : ViewModel() {
 
-    val category = MutableLiveData<Category>()
-    val wallet = MutableLiveData<Wallet>()
-    val currency = MutableLiveData<String>()
-    val amount = MutableLiveData<Double>()
-    val date = MutableLiveData<String>()
+    val category = MutableLiveData<Category?>()
+    val wallet = MutableLiveData<Wallet?>()
+    val currency = MutableLiveData<String?>()
+    val amount = MutableLiveData<Double?>()
+    val date = MutableLiveData<String?>()
     val note = MutableLiveData<String?>()
     var selectedLabels = MutableLiveData<List<Label>>(emptyList())
     private val _imageBytes = MutableLiveData<ByteArray?>()
@@ -40,7 +40,7 @@ class TransactionAddViewModel @Inject constructor(
             amount = amount.value ?: 0.0,
             date = date.value ?: "",
             note = note.value,
-            selectedLabels = selectedLabels.value ?: emptyList<Label>(),
+//            selectedLabels = selectedLabels.value ?: emptyList<Label>(),
             photo = imageBytes.value,
             recurrenceRate = recurrenceRate.value
         )
@@ -50,4 +50,16 @@ class TransactionAddViewModel @Inject constructor(
     fun setImageBytes(bytes: ByteArray?) {
         _imageBytes.value = bytes
     }
+
+    fun reset() {
+        amount.value = null
+        date.value = null
+        note.value = null
+        currency.value = null
+        category.value = null
+        wallet.value = null
+        _imageBytes.value = null
+        recurrenceRate.value = null
+    }
+
 }

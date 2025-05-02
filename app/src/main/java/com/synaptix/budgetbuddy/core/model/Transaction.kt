@@ -17,62 +17,22 @@ data class TransactionIn(
     val amount: Double,
     val date: String,
     val note: String?,
-    val selectedLabels: List<Label> = mutableListOf(),
+//    val selectedLabels: List<Label> = mutableListOf(), WIP
     val photo: ByteArray?,
     val recurrenceRate: String?
 ) : Serializable
 
 //AI assisted with the creation of this data class
 data class Transaction(
-    val id: Int,
+    val transactionId: Int,
+    val user: User?,
+    val wallet: Wallet?,
+    val category: Category?,
+    val currencyType: String,
     val amount: Double,
     val date: String,
-    val note: String,
-    val currency: String,
-    val label: String,
-    val image: String,
-    val recurrence: String,
-
-    val user: UserEntity,
-    val wallet: WalletEntity,
-    val category: CategoryEntity
+    val note: String?,
+//    val label: String,
+    val photo: ByteArray?,
+    val recurrenceRate: String?
 )
-data class TransactionWithDetails(
-    @Embedded val transaction: TransactionEntity,
-
-    @Relation(
-        parentColumn = "user_id",
-        entityColumn = "user_id"
-    )
-    val user: UserEntity,
-
-    @Relation(
-        parentColumn = "wallet_id",
-        entityColumn = "wallet_id"
-    )
-    val wallet: WalletEntity,
-
-    @Relation(
-        parentColumn = "category_id",
-        entityColumn = "category_id"
-    )
-    val category: CategoryEntity
-)
-
-// AI assisted with the creation of this function
-fun TransactionWithDetails.toTransaction(): Transaction {
-    return Transaction(
-        id = transaction.transaction_id,
-        amount = transaction.amount,
-        date = transaction.date,
-        note = transaction.note,
-        currency = transaction.currency,
-        label = transaction.label,
-        image = transaction.image,
-        recurrence = transaction.recurrence,
-
-        user = user,
-        wallet = wallet,
-        category = category
-    )
-}

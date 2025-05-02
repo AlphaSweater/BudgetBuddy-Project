@@ -41,15 +41,24 @@ data class BudgetWithUser(
     val user: UserEntity?
 )
 
-/// Relation for Transaction with label due to many to many relationship
-// AI assisted with the creation of this data class
-data class TransactionWithLabels(
+data class TransactionWithDetail(
     @Embedded val transaction: TransactionEntity,
 
     @Relation(
-        parentColumn = "transaction_id",
-        entityColumn = "label_id",
-        associateBy = Junction(TransactionLabelEntity::class)
+        parentColumn = "user_id",
+        entityColumn = "user_id"
     )
-    val labels: List<LabelEntity>
+    val user: UserEntity?,
+
+    @Relation(
+        parentColumn = "wallet_id",
+        entityColumn = "wallet_id"
+    )
+    val wallet: WalletEntity?,
+
+    @Relation(
+        parentColumn = "category_id",
+        entityColumn = "category_id"
+    )
+    val category: CategoryEntity?
 )

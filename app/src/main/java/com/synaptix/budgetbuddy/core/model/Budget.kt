@@ -7,8 +7,7 @@ data class BudgetIn (
     val userId: Int,
     val walletId: Int,
     val budgetName: String,
-    val goalMinAmount: Double,
-    val goalMaxAmount: Double
+    val amount: Double
 ) : Serializable
 
 data class Budget (
@@ -16,6 +15,5 @@ data class Budget (
     val user: User?,
     val walletId: Int,
     val budgetName: String,
-    val goalMinAmount: Double,
-    val goalMaxAmount: Double
+    val amount: Double
 )

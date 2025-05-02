@@ -10,7 +10,7 @@ import com.synaptix.budgetbuddy.data.entity.BudgetEntity
 @Dao
 interface BudgetDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun insert(budget: BudgetEntity): Long
+    suspend fun insertBudget(budget: BudgetEntity): Long
 
     //sql query to grab a budget based on budget ID
     @Query("SELECT * FROM budget_table WHERE budget_id = :budgetid")
