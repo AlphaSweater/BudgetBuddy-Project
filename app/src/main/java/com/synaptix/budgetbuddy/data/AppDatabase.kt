@@ -9,17 +9,19 @@ import com.synaptix.budgetbuddy.data.local.dao.UserDao
 import com.synaptix.budgetbuddy.data.local.dao.WalletDao
 import com.synaptix.budgetbuddy.data.entity.CategoryEntity
 import com.synaptix.budgetbuddy.data.entity.LabelEntity
+import com.synaptix.budgetbuddy.data.entity.MinMaxGoalEntity
 import com.synaptix.budgetbuddy.data.entity.TransactionEntity
 import com.synaptix.budgetbuddy.data.entity.TransactionLabelEntity
 import com.synaptix.budgetbuddy.data.entity.UserEntity
 import com.synaptix.budgetbuddy.data.entity.WalletEntity
 import com.synaptix.budgetbuddy.data.local.dao.BudgetDao
 import com.synaptix.budgetbuddy.data.local.dao.LabelDao
+import com.synaptix.budgetbuddy.data.local.dao.MinMaxGoalsDao
 
 //Ai assisted with the creation of this database
 @Database(
-    entities = [UserEntity::class, TransactionEntity::class, WalletEntity::class, CategoryEntity::class, BudgetEntity::class, LabelEntity::class, TransactionLabelEntity::class],
-    version = 9
+    entities = [UserEntity::class, TransactionEntity::class, WalletEntity::class, CategoryEntity::class, BudgetEntity::class, LabelEntity::class, TransactionLabelEntity::class, MinMaxGoalEntity::class],
+    version = 11
 )
 
 
@@ -31,4 +33,5 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun categoryDao(): CategoryDao
     abstract fun budgetDao(): BudgetDao
     abstract fun labelDao(): LabelDao
+    abstract fun minMaxGoalsDao(): MinMaxGoalsDao
 }

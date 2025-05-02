@@ -1,3 +1,24 @@
+// ======================================================================================
+// Group 2 - Group Members:
+// ======================================================================================
+// * Chad Fairlie ST10269509
+// * Dhiren Ruthenavelu ST10256859
+// * Kayla Ferreira ST10259527
+// * Nathan Teixeira ST10249266
+// ======================================================================================
+// Declaration:
+// ======================================================================================
+// We declare that this work is our own original work and that no part of it has been
+// copied from any other source, except where explicitly acknowledged.
+// ======================================================================================
+// References:
+// ======================================================================================
+// * ChatGPT was used to help with the design and planning. As well as assisted with
+//   finding and fixing errors in the code.
+// * ChatGPT also helped with the forming of comments for the code.
+// * https://www.youtube.com/watch?v=A_tPafV23DM&list=PLPgs125_L-X9H6J7x4beRU-AxJ4mXe5vX
+// ======================================================================================
+
 package com.synaptix.budgetbuddy.data.entity.mapper
 
 import com.synaptix.budgetbuddy.core.model.Budget
@@ -19,8 +40,11 @@ import com.synaptix.budgetbuddy.data.entity.relations.CategoryWithUser
 import com.synaptix.budgetbuddy.data.entity.relations.TransactionWithDetail
 import com.synaptix.budgetbuddy.data.entity.relations.WalletWithUser
 
-
-//AI assisted with the logic behind mapper
+//
+// ================================
+// Transaction Mappers
+// ================================
+// Maps from Transaction input model to database entity
 fun TransactionIn.toEntity(): TransactionEntity {
     return TransactionEntity(
         transaction_id = this.transactionId ?: 0,
@@ -37,6 +61,7 @@ fun TransactionIn.toEntity(): TransactionEntity {
     )
 }
 
+// Maps from Transaction entity to domain model
 fun TransactionEntity.toDomain(user: User?, wallet: Wallet?, category: Category?): Transaction {
     return Transaction(
         transactionId = transaction_id,
@@ -52,11 +77,16 @@ fun TransactionEntity.toDomain(user: User?, wallet: Wallet?, category: Category?
     )
 }
 
-// Relation
+// Maps from TransactionWithDetail relation to domain model
 fun TransactionWithDetail.toDomain(): Transaction {
     return transaction.toDomain(user?.toDomain(), wallet?.toDomain(user?.toDomain()), category?.toDomain(user?.toDomain()))
 }
 
+//
+// ================================
+// Category Mappers
+// ================================
+// Maps from Category input model to database entity
 fun CategoryIn.toEntity(): CategoryEntity {
     return CategoryEntity(
         category_id = categoryId,
@@ -68,6 +98,7 @@ fun CategoryIn.toEntity(): CategoryEntity {
     )
 }
 
+// Maps from Category entity to domain model
 fun CategoryEntity.toDomain(user: User?): Category {
     return Category(
         categoryId = category_id,
@@ -79,11 +110,16 @@ fun CategoryEntity.toDomain(user: User?): Category {
     )
 }
 
-// Relation
+// Maps from CategoryWithUser relation to domain model
 fun CategoryWithUser.toDomain(): Category {
     return category.toDomain(user?.toDomain())
 }
 
+//
+// ================================
+// User Mappers
+// ================================
+// Maps from User domain model to entity
 fun User.toEntity(): UserEntity {
     return UserEntity(
         user_id = this.userId,
@@ -94,6 +130,7 @@ fun User.toEntity(): UserEntity {
     )
 }
 
+// Maps from User entity to domain model
 fun UserEntity.toDomain(): User {
     return User(
         userId = user_id,
@@ -104,6 +141,11 @@ fun UserEntity.toDomain(): User {
     )
 }
 
+//
+// ================================
+// Wallet Mappers
+// ================================
+// Maps from Wallet input model to entity
 fun WalletIn.toEntity(): WalletEntity {
     return WalletEntity(
         wallet_id = this.walletId,
@@ -114,6 +156,7 @@ fun WalletIn.toEntity(): WalletEntity {
     )
 }
 
+// Maps from Wallet entity to domain model
 fun WalletEntity.toDomain(user: User?): Wallet {
     return Wallet(
         walletId = wallet_id,
@@ -124,11 +167,17 @@ fun WalletEntity.toDomain(user: User?): Wallet {
     )
 }
 
+// Maps from WalletWithUser relation to domain model
 fun WalletWithUser.toDomain(): Wallet {
     return wallet.toDomain(user?.toDomain())
 }
 
-fun BudgetIn.toEntity(): BudgetEntity{
+//
+// ================================
+// Budget Mappers
+// ================================
+// Maps from Budget input model to entity
+fun BudgetIn.toEntity(): BudgetEntity {
     return BudgetEntity(
         budget_id = this.budgetId,
         user_id = this.userId,

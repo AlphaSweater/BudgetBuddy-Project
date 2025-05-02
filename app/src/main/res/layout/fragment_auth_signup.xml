@@ -34,72 +34,23 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-
-    <!-- ==================================== Google button ====================================== -->
-    <LinearLayout
-        android:id="@+id/btnLoginGoogle"
-        android:layout_width="250dp"
-        android:layout_height="48dp"
-        android:layout_gravity="center"
-        android:layout_marginTop="42dp"
-        android:clickable="true"
-        android:focusable="true"
-        android:gravity="center_vertical"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/lblSignup">
-
-        <include layout="@layout/component_google_style_button" />
-    </LinearLayout>
-
-
-    <!-- ================================== Microsoft button ==================================== -->
-    <LinearLayout
-        android:id="@+id/btnLoginMicrosoft"
-        android:layout_width="250dp"
-        android:layout_height="48dp"
-        android:layout_gravity="center"
-        android:layout_marginTop="20dp"
-        android:clickable="true"
-        android:focusable="true"
-        android:gravity="center_vertical"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btnLoginGoogle">
-
-        <include layout="@layout/component_google_style_button" />
-    </LinearLayout>
-
-
-    <!-- ================================== Divider ==================================== -->
-    <View
-        android:id="@+id/divider"
-        android:layout_height="4dp"
-        android:layout_width="match_parent"
-        android:layout_marginTop="50dp"
-        android:background="?attr/bb_surface"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btnLoginMicrosoft" />
-
-
     <!-- ================================ Email input and Label ================================= -->
     <TextView
         android:id="@+id/lblEmail"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="12dp"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="20dp"
         android:text="@string/email"
         android:textSize="20sp"
         app:layout_constraintStart_toStartOf="@+id/edtEmailAddress"
-        app:layout_constraintTop_toBottomOf="@+id/divider" />
+        app:layout_constraintTop_toBottomOf="@+id/lblSignup" />
 
     <EditText
         android:id="@+id/edtEmailAddress"
         android:layout_width="362dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="3dp"
+        android:layout_marginTop="7dp"
         android:background="@drawable/bg_rounded_edit_grey"
         android:ems="10"
         android:inputType="textEmailAddress"
