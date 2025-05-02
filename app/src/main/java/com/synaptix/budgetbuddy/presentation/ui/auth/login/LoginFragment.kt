@@ -1,3 +1,24 @@
+//======================================================================================
+//Group 2 - Group Members:
+//======================================================================================
+//* Chad Fairlie ST10269509
+//* Dhiren Ruthenavelu ST10256859
+//* Kayla Ferreira ST10259527
+//* Nathan Teixeira ST10249266
+//======================================================================================
+//Declaration:
+//======================================================================================
+//We declare that this work is our own original work and that no part of it has been
+//copied from any other source, except where explicitly acknowledged.
+//======================================================================================
+//References:
+//======================================================================================
+//* ChatGPT was used to help with the design and planning. As well as assisted with
+//finding and fixing errors in the code.
+//* ChatGPT also helped with the forming of comments for the code.
+//* https://www.youtube.com/watch?v=A_tPafV23DM&list=PLPgs125_L-X9H6J7x4beRU-AxJ4mXe5vX
+//======================================================================================
+
 package com.synaptix.budgetbuddy.presentation.ui.auth.login
 
 import android.content.Intent
@@ -17,12 +38,13 @@ class LoginFragment : Fragment(R.layout.fragment_auth_login) {
     private lateinit var binding: FragmentAuthLoginBinding
     private val viewModel: LoginViewModel by viewModels()
 
+    // Called when the view is created
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         binding = FragmentAuthLoginBinding.bind(view)
 
-        // Observe login state
+        // Observe login state changes and handle UI updates accordingly
         viewModel.loginState.observe(viewLifecycleOwner) { state ->
             when (state) {
                 is LoginUiState.Idle -> {
@@ -37,7 +59,7 @@ class LoginFragment : Fragment(R.layout.fragment_auth_login) {
                     binding.progressSpinner.visibility = View.GONE
                     Toast.makeText(requireContext(), "Login successful", Toast.LENGTH_SHORT).show()
 
-                    // Navigate to main screen
+                    // Navigate to main screen after successful login
                     val intent = Intent(requireContext(), MainActivity::class.java)
                     startActivity(intent)
                     requireActivity().finish()
@@ -62,12 +84,13 @@ class LoginFragment : Fragment(R.layout.fragment_auth_login) {
             }
         }
 
-        // Handle back button
+        // Handle back button click
         binding.btnBackLogin.setOnClickListener {
             requireActivity().onBackPressedDispatcher.onBackPressed()
         }
     }
 
+    // Enable or disable input fields based on the login state
     private fun enableInputs(enabled: Boolean) {
         binding.edtEmailAddress.isEnabled = enabled
         binding.edtPassword.isEnabled = enabled
