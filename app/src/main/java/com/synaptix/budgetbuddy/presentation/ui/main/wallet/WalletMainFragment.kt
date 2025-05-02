@@ -41,11 +41,13 @@ class WalletMainFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupRecyclers()
+        setupClickListeners()
     }
 
     private fun setupRecyclers() {
         recyclerViewWalletMain()
     }
+
     private fun recyclerViewWalletMain() {
         val walletItems = listOf(
             BudgetReportListItems.WalletItem(
@@ -69,6 +71,12 @@ class WalletMainFragment : Fragment() {
         binding.recyclerViewWalletMain.apply {
             layoutManager = LinearLayoutManager(requireContext())
             adapter = walletMainAdapter
+        }
+    }
+
+    private fun setupClickListeners() {
+        binding.btnCreateWallet.setOnClickListener {
+            findNavController().navigate(R.id.action_walletMainFragment_to_addWalletFragment)
         }
     }
 
