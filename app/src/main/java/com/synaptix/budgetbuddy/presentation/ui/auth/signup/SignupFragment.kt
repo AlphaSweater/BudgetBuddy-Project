@@ -1,3 +1,24 @@
+//======================================================================================
+//Group 2 - Group Members:
+//======================================================================================
+//* Chad Fairlie ST10269509
+//* Dhiren Ruthenavelu ST10256859
+//* Kayla Ferreira ST10259527
+//* Nathan Teixeira ST10249266
+//======================================================================================
+//Declaration:
+//======================================================================================
+//We declare that this work is our own original work and that no part of it has been
+//copied from any other source, except where explicitly acknowledged.
+//======================================================================================
+//References:
+//======================================================================================
+//* ChatGPT was used to help with the design and planning. As well as assisted with
+//finding and fixing errors in the code.
+//* ChatGPT also helped with the forming of comments for the code.
+//* https://www.youtube.com/watch?v=A_tPafV23DM&list=PLPgs125_L-X9H6J7x4beRU-AxJ4mXe5vX
+//======================================================================================
+
 package com.synaptix.budgetbuddy.presentation.ui.auth.signup
 
 import androidx.fragment.app.viewModels
@@ -28,62 +49,57 @@ class SignupFragment : Fragment(R.layout.fragment_auth_signup) {
             requireActivity().onBackPressedDispatcher.onBackPressed()
         }
 
-        //binding data and passing data to viewModel
+        // Handle sign-up button click
         binding.btnSignup.setOnClickListener {
             val email = binding.edtEmailAddress.text.toString()
             val password = binding.edtPassword.text.toString()
             val confirmPassword = binding.edtTxtPasswordConfirm.text.toString()
 
-            //checks to ensure email is valid
+            // Validate email format
             if (!isValidEmail(email)) {
                 binding.edtEmailAddress.error = "Invalid email address"
                 return@setOnClickListener
             }
 
-            //checks to see if email is already in database
+            // Check if the email already exists (check database)
+            // Placeholder logic for email existence check (future implementation)
 
-
-            //checks to ensure password has more than 8 characters and has 1no, 1upper, 1special
+            // Validate password complexity
             if (password.length < 8
                 || !password.matches(Regex(".*[0-9].*"))
                 || !password.matches(Regex(".*[A-Z].*"))
                 || !password.matches(Regex(".*[!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>\\/?].*"))
             ) {
-
                 binding.edtPassword.error =
-                    "Password must be at least 8 characters and contain 1 number, capital and special character"
+                    "Password must be at least 8 characters and contain 1 number, capital letter, and special character"
                 return@setOnClickListener
             }
 
-            // Check if password and confirm password match
+            // Ensure password and confirm password match
             if (password != confirmPassword) {
                 binding.edtTxtPasswordConfirm.error = "Passwords do not match"
                 return@setOnClickListener
             }
 
-
+            // If all checks pass, proceed with sign-up
             lifecycleScope.launch {
+                // Check if the email already exists
                 val emailExists = viewModel.checkEmailExists(email)
                 if (emailExists) {
                     binding.edtEmailAddress.error = "Email already in use"
                     return@launch
                 }
-                // Call the ViewModel to handle signup
+                // Call ViewModel to handle the sign-up process
                 viewModel.signUp(email, password)
+                // Navigate to login screen after successful sign-up
                 (activity as? AuthActivity)?.showLogin()
-
             }
-
-
         }
-
-
-
     }
-    //uses regex to ensure that the email follows a valid layout
-    //AI assisted with the regex logic for this function
+
+    // Utility function to validate email format using regex
+    // AI assisted with the regex logic for this function
     private fun isValidEmail(email: String): Boolean {
         return email.matches(Regex("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}$"))
     }
 }
-
