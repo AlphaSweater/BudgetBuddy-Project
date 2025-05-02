@@ -2,7 +2,6 @@
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@android:color/transparent"
@@ -13,10 +12,9 @@
         android:id="@+id/iconCategoryContainer"
         android:layout_width="60dp"
         android:layout_height="60dp"
-        android:layout_margin="4dp"
-        android:orientation="vertical"
-        android:gravity="center"
         android:background="@drawable/bg_circle_shape"
+        android:gravity="center"
+        android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -29,53 +27,53 @@
             app:tint="?attr/bb_primaryText" />
     </LinearLayout>
 
-
-
+    <!-- Category and Text Information -->
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
+        android:layout_marginStart="12dp"
         android:orientation="vertical"
+        android:weightSum="1"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/iconCategoryContainer"
+        app:layout_constraintEnd_toStartOf="@+id/linearLayout3"
+        app:layout_constraintStart_toEndOf="@id/iconCategoryContainer"
         app:layout_constraintTop_toTopOf="parent">
 
-        <!-- Category Title (e.g., "Car") -->
+        <!-- Category Title -->
         <TextView
             android:id="@+id/textCategoryName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Car"
             android:textColor="?attr/bb_primaryText"
-            android:textSize="22sp"
+            android:textSize="18sp"
             android:textStyle="bold"
-            app:layout_constraintStart_toEndOf="@id/iconCategory"
-            app:layout_constraintTop_toTopOf="@id/iconCategory" />
+            app:layout_constraintTop_toTopOf="parent" />
 
-        <!-- Wallet Text -->
+        <!-- Wallet Info -->
         <LinearLayout
             android:id="@+id/row_wallet"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
+            android:layout_marginTop="4dp"
             android:gravity="center_vertical"
-            android:layout_marginTop="4dp">
+            android:orientation="horizontal">
 
             <ImageView
                 android:layout_width="17dp"
                 android:layout_height="17dp"
-                android:src="@drawable/ic_account_balance_wallet_24"
                 android:contentDescription="Wallet Icon"
-                app:tint="?attr/bb_primaryText"/>
+                android:src="@drawable/ic_account_balance_wallet_24"
+                app:tint="?attr/bb_primaryText" />
 
             <TextView
                 android:id="@+id/textWalletName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="2dp"
                 android:text="Cash Wallet"
                 android:textColor="?attr/bb_primaryText"
-                android:textSize="10sp"
-                android:layout_marginStart="2dp"/>
+                android:textSize="10sp" />
         </LinearLayout>
 
         <!-- Description Text -->
@@ -83,34 +81,37 @@
             android:id="@+id/rowNote"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
             android:layout_marginTop="2dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
             android:visibility="visible">
 
             <ImageView
                 android:layout_width="17dp"
                 android:layout_height="17dp"
+                android:contentDescription="Note Icon"
                 android:src="@drawable/ic_edit_24"
-                android:contentDescription="Wallet Icon"
                 app:tint="?attr/bb_primaryText" />
 
             <TextView
                 android:id="@+id/textNote"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Cash Wallet"
+                android:layout_marginStart="2dp"
+                android:text="Label"
                 android:textColor="?attr/bb_primaryText"
-                android:textSize="10sp"
-                android:layout_marginStart="2dp"/>
+                android:textSize="10sp" />
         </LinearLayout>
     </LinearLayout>
 
+    <!-- Amount and Date -->
     <LinearLayout
+        android:id="@+id/linearLayout3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:gravity="right"
+        android:gravity="end"
         android:orientation="vertical"
+        android:paddingEnd="12dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -122,12 +123,12 @@
             android:layout_height="wrap_content"
             android:text="-R 1,500"
             android:textColor="?attr/bb_expense"
-            android:textSize="18sp"
+            android:textSize="16sp"
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <!-- Relative Date -->
+        <!-- Date -->
         <TextView
             android:id="@+id/text_date"
             android:layout_width="wrap_content"
@@ -135,7 +136,7 @@
             android:layout_marginTop="5dp"
             android:text="Yesterday"
             android:textColor="?attr/bb_secondaryText"
-            android:textSize="14sp"
+            android:textSize="10sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/text_amount" />
     </LinearLayout>
