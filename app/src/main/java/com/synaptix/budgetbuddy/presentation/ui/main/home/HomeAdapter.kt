@@ -90,10 +90,11 @@ class HomeAdapter(private val items: List<BudgetReportListItems>) : RecyclerView
             val iconView = itemView.findViewById<ImageView>(R.id.iconCategory)
             val iconContainer = itemView.findViewById<LinearLayout>(R.id.iconCategoryContainer)
 
-            val nameText = itemView.findViewById<TextView>(R.id.txtCategoryName)
-            val amountText = itemView.findViewById<TextView>(R.id.txtAmount)
-            val dateText = itemView.findViewById<TextView>(R.id.txtDate)
-            val walletText = itemView.findViewById<TextView>(R.id.txtTransactions)
+            val nameText = itemView.findViewById<TextView>(R.id.textCategoryName)
+            val amountText = itemView.findViewById<TextView>(R.id.text_amount)
+            val dateText = itemView.findViewById<TextView>(R.id.text_date)
+            val walletText = itemView.findViewById<TextView>(R.id.textWalletName)
+
 
             val resolvedColor = ContextCompat.getColor(itemView.context, item.categoryColour)
             (iconContainer.background.mutate() as GradientDrawable).setColor(resolvedColor)

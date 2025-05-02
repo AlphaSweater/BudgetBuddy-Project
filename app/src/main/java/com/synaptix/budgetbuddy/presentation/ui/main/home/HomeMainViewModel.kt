@@ -37,6 +37,20 @@ class HomeMainViewModel @Inject constructor(
     private val _categories = MutableLiveData<List<Category>>()
     val categories: LiveData<List<Category>> = _categories
 
+    private var _selectedStartDate: String = ""
+    var selectedStartDate: String
+        get() = _selectedStartDate
+        set(value) {
+            _selectedStartDate = value
+        }
+    private var _selectedEndDate: String = ""
+    var selectedEndDate: String
+        get() = _selectedEndDate
+        set(value) {
+            _selectedEndDate = value
+        }
+
+
     private val _selectedTransaction = MutableLiveData<Transaction>()
     val selectedTransaction: LiveData<Transaction> = _selectedTransaction
 

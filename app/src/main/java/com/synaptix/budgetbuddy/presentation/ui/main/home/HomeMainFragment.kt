@@ -1,5 +1,7 @@
 package com.synaptix.budgetbuddy.presentation.ui.main.home
 
+import android.icu.util.Calendar
+import android.icu.util.TimeZone
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -9,10 +11,13 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.datepicker.MaterialDatePicker
 import com.synaptix.budgetbuddy.R
 import com.synaptix.budgetbuddy.core.model.BudgetReportListItems
 import com.synaptix.budgetbuddy.databinding.FragmentHomeBinding
 import dagger.hilt.android.AndroidEntryPoint
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 @AndroidEntryPoint
 class HomeMainFragment : Fragment() {
@@ -101,6 +106,11 @@ class HomeMainFragment : Fragment() {
 
             setupCategoryRecycler(categoryItems)
         }
+
+        binding.editTextDate2.setOnClickListener {
+            Log.d(TAG, "Date picker clicked")
+            openDateRangePicker()
+        }
     }
 
     private fun setupWalletRecycler(walletList: List<BudgetReportListItems.HomeWalletItem>) {
@@ -122,6 +132,32 @@ class HomeMainFragment : Fragment() {
         binding.recyclerViewHomeCategoryOverview.layoutManager = LinearLayoutManager(requireContext())
         homeAdapter = HomeAdapter(categoryList)
         binding.recyclerViewHomeCategoryOverview.adapter = homeAdapter
+    }
+
+    val openDateRangePicker = {
+        val picker = MaterialDatePicker.Builder.dateRangePicker()
+            .setTitleText("Select Date Range")
+            .build()
+
+        picker.addOnPositiveButtonClickListener { selection ->
+            // selection is a Pair<Long, Long> for start and end dates
+            val startDate = selection.first
+            val endDate = selection.second
+
+            val calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
+            val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+
+            calendar.timeInMillis = startDate
+            val formattedStartDate = dateFormat.format(calendar.time)
+
+            calendar.timeInMillis = endDate
+            val formattedEndDate = dateFormat.format(calendar.time)
+
+            val combinedDate = "$formattedStartDate - $formattedEndDate"
+            binding.editTextDate2.setText(combinedDate)
+        }
+
+        picker.show(parentFragmentManager, "MATERIAL_DATE_RANGE_PICKER")
     }
 
     override fun onDestroyView() {
