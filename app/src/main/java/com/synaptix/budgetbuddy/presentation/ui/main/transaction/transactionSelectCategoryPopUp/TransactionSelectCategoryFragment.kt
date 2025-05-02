@@ -13,6 +13,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.synaptix.budgetbuddy.R
 import com.synaptix.budgetbuddy.core.model.Category
+import com.synaptix.budgetbuddy.core.model.CategoryIn
 import com.synaptix.budgetbuddy.core.usecase.auth.GetUserIdUseCase
 import com.synaptix.budgetbuddy.databinding.FragmentTransactionSelectCategoryBinding
 import com.synaptix.budgetbuddy.presentation.ui.main.transaction.TransactionAddViewModel
@@ -112,37 +113,18 @@ class TransactionSelectCategoryFragment : Fragment() {
     private fun instantiateDBS() {
         categoryViewmodel.loadCategories(getUserId())
 
-        categoryViewmodel.categories.observe(viewLifecycleOwner) { categoryEntities ->
-            val categories = categoryEntities.map {
-                Category(
-                    it.category_id,
-                    it.user_id ?: 0,
-                    it.name,
-                    it.type,
-                    it.icon,
-                    it.colour
-                )
-            }
+        categoryViewmodel.categories.observe(viewLifecycleOwner) { categories ->
+
             val (expenseCategories, incomeCategories) = categories.partition { it.categoryType == "expense" }
 
             binding.recyclerViewExpenseCategory.adapter = TransactionSelectCategoryAdapter(expenseCategories) { category ->
-                viewModel.categoryId.value = category.categoryId
+                viewModel.category.value = category
             }
 
             binding.recyclerViewIncomeCategory.adapter = TransactionSelectCategoryAdapter(incomeCategories) { category ->
-                viewModel.categoryId.value = category.categoryId
+                viewModel.category.value = category
             }
         }
 
-    }
-
-    fun getDrawableId(name: String): Int {
-        val cleanName = name.removePrefix("@drawable/")
-        return resources.getIdentifier(cleanName, "drawable", requireContext().packageName)
-    }
-
-    fun getColorId(name: String): Int {
-        val cleanName = name.removePrefix("@color/")
-        return resources.getIdentifier(cleanName, "color", requireContext().packageName)
     }
 }

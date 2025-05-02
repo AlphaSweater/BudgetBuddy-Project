@@ -240,7 +240,7 @@ class TransactionAddFragment : Fragment() {
         viewModel.currency.value = binding.spinnerCurrency.selectedItem.toString()
 
         // Validate input
-        if (viewModel.categoryId.value != null  ||
+        if (viewModel.category.value != null  ||
             viewModel.walletId.value != null ||
             viewModel.currency.value.isNullOrBlank() ||
             amount <= 0.0 ||
@@ -299,8 +299,8 @@ class TransactionAddFragment : Fragment() {
             // Update UI based on the selected wallet
         }
 
-        viewModel.categoryId.observe(viewLifecycleOwner) { categoryId ->
-            Log.d("Category", "Selected Category ID: $categoryId")
+        viewModel.category.observe(viewLifecycleOwner) { category ->
+            Log.d("Category", "Selected Category: $category")
             // Update UI based on the selected category
         }
 

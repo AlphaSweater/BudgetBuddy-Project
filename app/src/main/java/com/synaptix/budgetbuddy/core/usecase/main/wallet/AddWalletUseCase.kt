@@ -3,7 +3,7 @@ package com.synaptix.budgetbuddy.core.usecase.main.wallet
 import com.synaptix.budgetbuddy.core.model.Wallet
 
 import com.synaptix.budgetbuddy.data.local.dao.WalletDao
-import com.synaptix.budgetbuddy.data.local.mapper.toEntity
+import com.synaptix.budgetbuddy.data.entity.mapper.toEntity
 
 import javax.inject.Inject
 

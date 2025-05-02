@@ -9,6 +9,7 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.synaptix.budgetbuddy.R
 import com.synaptix.budgetbuddy.core.model.Category
+import com.synaptix.budgetbuddy.core.model.CategoryIn
 
 class TransactionSelectCategoryAdapter(
     private val categories: List<Category>,
