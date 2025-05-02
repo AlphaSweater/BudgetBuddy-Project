@@ -48,4 +48,11 @@ sealed class BudgetReportListItems {
         val amount: String,
         val relativeDate: String,
     ) : BudgetReportListItems()
+
+    data class HomeWalletItem(
+        val walletName: String,
+        val walletIcon: Int,
+        var walletBalance: Double,
+        val relativeDate: String,
+    ) : BudgetReportListItems()
 }

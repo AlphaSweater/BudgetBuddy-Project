@@ -152,114 +152,13 @@
         app:strokeColor="?attr/bb_surface"
         app:strokeWidth="0dp">
 
-        <LinearLayout
-            android:layout_width="396dp"
-            android:layout_height="151dp"
-            android:background="?attr/bb_surface"
-            android:orientation="vertical"
-            android:padding="16dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            tools:layout_editor_absoluteY="216dp">
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerViewHomeWalletOverview"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:visibility="visible" />
 
-            <!-- First Wallet -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:paddingVertical="8dp">
-
-                <ImageView
-                    android:layout_width="36dp"
-                    android:layout_height="36dp"
-                    android:layout_marginEnd="12dp"
-                    android:src="@drawable/ic_account_balance_wallet_24"
-                    app:tint="?attr/colorOnPrimary" />
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Cash"
-                        android:textColor="?attr/bb_primaryText"
-                        android:textSize="16sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Last Activity: Today"
-                        android:textColor="?attr/bb_secondaryText"
-                        android:textSize="12sp" />
-                </LinearLayout>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="ZAR 12,200"
-                    android:textColor="?attr/bb_profit"
-                    android:textSize="14sp" />
-            </LinearLayout>
-
-            <!-- Divider -->
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginVertical="4dp"
-                android:background="?attr/bb_secondaryText" />
-
-            <!-- Second Wallet -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:paddingVertical="8dp">
-
-                <ImageView
-                    android:layout_width="36dp"
-                    android:layout_height="36dp"
-                    android:layout_marginEnd="12dp"
-                    android:src="@drawable/baseline_savings_24"
-                    app:tint="?attr/colorOnPrimary" />
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="PC Savings"
-                        android:textColor="?attr/bb_primaryText"
-                        android:textSize="16sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Last Activity: Today"
-                        android:textColor="?attr/bb_secondaryText"
-                        android:textSize="12sp" />
-                </LinearLayout>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="ZAR 12,200"
-                    android:textColor="?attr/bb_profit"
-                    android:textSize="14sp" />
-            </LinearLayout>
-
-        </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 
         <TextView
@@ -541,135 +440,13 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
 
-            <LinearLayout
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerViewHomeTransactionOverview"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="?attr/bb_surface"
-                android:orientation="vertical"
-                android:padding="16dp">
+                android:layout_marginTop="16dp"
+                android:visibility="visible" />
 
-                <!-- First Wallet -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
-                    android:paddingVertical="8dp">
-
-                    <ImageView
-                        android:layout_width="36dp"
-                        android:layout_height="36dp"
-                        android:layout_marginEnd="12dp"
-                        android:src="@drawable/ic_attach_money_24"
-                        app:tint="?attr/colorOnPrimary" />
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Bills And Fees"
-                            android:textColor="?attr/bb_primaryText"
-                            android:textSize="16sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Cash Wallet"
-                            android:textColor="?attr/bb_secondaryText"
-                            android:textSize="12sp" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Bills And Fees"
-                            android:textColor="?attr/bb_secondaryText"
-                            android:textSize="12sp" />
-                    </LinearLayout>
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="-R 800"
-                        android:textColor="?attr/bb_expense"
-                        android:textSize="14sp" />
-                </LinearLayout>
-
-                <!-- Divider -->
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:layout_marginVertical="4dp"
-                    android:background="?attr/bb_secondaryText" />
-
-                <!-- Second Wallet -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
-                    android:paddingVertical="8dp">
-
-                    <ImageView
-                        android:layout_width="36dp"
-                        android:layout_height="36dp"
-                        android:layout_marginEnd="12dp"
-                        android:src="@drawable/baseline_local_gas_station_24"
-                        app:tint="?attr/colorOnPrimary" />
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Car"
-                            android:textColor="?attr/bb_primaryText"
-                            android:textSize="16sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Cash Wallet"
-                            android:textColor="?attr/bb_secondaryText"
-                            android:textSize="12sp" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Petrol"
-                            android:textColor="?attr/bb_secondaryText"
-                            android:textSize="12sp" />
-                    </LinearLayout>
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="-R 1,000"
-                        android:textColor="?attr/bb_expense"
-                        android:textSize="14sp" />
-                </LinearLayout>
-
-            </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
-
-
-        <Space
-            android:layout_width="0dp"
-            android:layout_height="90dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/materialCardView2" />
-
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>
