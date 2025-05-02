@@ -1,6 +1,7 @@
 package com.synaptix.budgetbuddy.data.entity
 
 import androidx.room.Entity
+import androidx.room.PrimaryKey
 
 
 @Entity(
@@ -8,7 +9,7 @@ import androidx.room.Entity
     primaryKeys = ["transaction_id", "label_id"],
 
 )
-class TransactionLabelEntity {
-    val transaction_id: Int = 0
+data class TransactionLabelEntity (
+    val transaction_id: Int = 0,
     val label_id: Int = 0
-}
+)
