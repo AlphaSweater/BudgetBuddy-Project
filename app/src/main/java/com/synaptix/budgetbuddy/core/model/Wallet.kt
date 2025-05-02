@@ -7,6 +7,5 @@ data class Wallet (
     val userId: Int,
     val walletName: String,
     val walletCurrency: String,
-    var walletBalance: Double,
-    var isSelected: Boolean = false
+    var walletBalance: Double
 ) : Serializable
