@@ -16,9 +16,9 @@ import androidx.room.PrimaryKey
         ]
     )
 
-    class MinMaxGoalEntity {
-    @PrimaryKey(autoGenerate = true) var minMaxGoalId: Int = 0
-    var user_id: Int = 0
-    var minGoal: Double = 0.0
-    var maxGoal: Double = 0.0
-}
+class MinMaxGoalEntity (
+    @PrimaryKey(autoGenerate = true) var minMaxGoalId: Int,
+    var user_id: Int,
+    var minGoal: Double,
+    var maxGoal: Double
+)

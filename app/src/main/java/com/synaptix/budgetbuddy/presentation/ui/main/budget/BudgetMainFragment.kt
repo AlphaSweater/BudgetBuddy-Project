@@ -46,6 +46,17 @@ class BudgetMainFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         viewModel.fetchBudgets()
 
+
+        viewModel.minMaxGoal.observe(viewLifecycleOwner) { minMaxGoal ->
+            if (minMaxGoal != null) {
+                binding.minValueSpent.text = "R%.2f".format(minMaxGoal.minGoal)
+                binding.minValueTotal.text = "R%.2f".format(minMaxGoal.maxGoal)
+            } else {
+                binding.minValueSpent.text = "N/A"
+                binding.minValueTotal.text = "N/A"
+            }
+        }
+
         viewModel.budgets.observe(viewLifecycleOwner) { budgetList ->
             setupRecyclerView(budgetList)
         }
@@ -77,8 +88,26 @@ class BudgetMainFragment : Fragment() {
         binding.createBudgetButton.setOnClickListener {
             findNavController().navigate(R.id.action_budgetMainFragment_to_budgetAddFragment)
         }
-    }
+        binding.saveButton.setOnClickListener {
+            val minGoalText = binding.inputMinGoal.text.toString()
+            val maxGoalText = binding.inputMaxGoal.text.toString()
 
+            val minGoal = minGoalText.toDoubleOrNull()
+            val maxGoal = maxGoalText.toDoubleOrNull()
+
+            if (minGoal == null || maxGoal == null) {
+                Toast.makeText(
+                    requireContext(),
+                    "Please enter valid goal values.",
+                    Toast.LENGTH_SHORT
+                ).show()
+                return@setOnClickListener
+            }
+            viewModel.saveMinMaxGoals(minGoal, maxGoal)
+        }
+
+
+    }
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
