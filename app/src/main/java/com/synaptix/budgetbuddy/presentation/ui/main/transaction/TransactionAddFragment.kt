@@ -111,34 +111,25 @@ class TransactionAddFragment : Fragment() {
             showCategorySelector()
         }
 
-        val openDateRangePicker = {
-            val picker = MaterialDatePicker.Builder.dateRangePicker()
-                .setTitleText("Select Date Range")
+        val openDatePicker = {
+            val picker = MaterialDatePicker.Builder.datePicker()
+                .setTitleText("Select Date")
+                .setSelection(MaterialDatePicker.todayInUtcMilliseconds())
                 .build()
 
             picker.addOnPositiveButtonClickListener { selection ->
-                // selection is a Pair<Long, Long> for start and end dates
-                val startDate = selection.first
-                val endDate = selection.second
-
+                // Convert selection (epoch millis) to readable date
                 val calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
-                val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-
-                calendar.timeInMillis = startDate
-                val formattedStartDate = dateFormat.format(calendar.time)
-
-                calendar.timeInMillis = endDate
-                val formattedEndDate = dateFormat.format(calendar.time)
-
-                val combinedDate = "$formattedStartDate - $formattedEndDate"
-                binding.edtTextDate.setText(combinedDate)
+                calendar.timeInMillis = selection
+                val formattedDate = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(calendar.time)
+                binding.edtTextDate.setText(formattedDate)
             }
 
-            picker.show(parentFragmentManager, "MATERIAL_DATE_RANGE_PICKER")
+            picker.show(parentFragmentManager, "MATERIAL_DATE_PICKER")
         }
 
-        binding.rowSelectDate.setOnClickListener { openDateRangePicker() }
-        binding.edtTextDate.setOnClickListener { openDateRangePicker() }
+        binding.rowSelectDate.setOnClickListener { openDatePicker() }
+        binding.edtTextDate.setOnClickListener { openDatePicker() }
 
         binding.rowSelectPhoto.setOnClickListener { showImageSourceDialog() }
 

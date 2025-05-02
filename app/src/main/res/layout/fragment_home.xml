@@ -83,84 +83,19 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView_currency_total" />
 
-        <TextView
-            android:id="@+id/textView3"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="32dp"
-            android:layout_weight="1"
-            android:text="@string/my_wallet"
-            android:textColor="?attr/bb_primaryText"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/cardView_overview" />
-
-        <TextView
-            android:id="@+id/txtWallet"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="36dp"
-            android:layout_marginEnd="32dp"
-            android:text="@string/see_all"
-            android:textColor="?attr/bb_linkText"
-            android:textSize="14sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/cardView_overview" />
-
-        <androidx.cardview.widget.CardView
-        android:id="@+id/cardView_overview"
-        android:layout_width="200dp"
+    <TextView
+        android:id="@+id/textView3"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="16dp"
-        android:layout_marginTop="110dp"
-        android:backgroundTint="?attr/bb_surface"
-        android:padding="12dp"
-        app:cardCornerRadius="16dp"
-        app:cardElevation="4dp"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="32dp"
+        android:layout_weight="1"
+        android:text="@string/my_wallet"
+        android:textColor="?attr/bb_primaryText"
+        android:textSize="18sp"
+        android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <TextView
-                android:id="@+id/textView_spending_overview"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingTop="5dp"
-                android:paddingBottom="5dp"
-                android:text="@string/spending_overview"
-                android:textColor="?attr/bb_primaryText"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.262"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.0" />
-
-            <ImageView
-                android:id="@+id/arrowIcon1"
-                android:layout_width="22dp"
-                android:layout_height="22dp"
-                android:layout_marginEnd="4dp"
-                android:paddingTop="5dp"
-                android:paddingBottom="5dp"
-                android:rotation="270"
-                android:src="@android:drawable/arrow_down_float"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:tint="?attr/bb_primaryText" />
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-    </androidx.cardview.widget.CardView>
+        app:layout_constraintTop_toBottomOf="@+id/textView_total_balance" />
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/materialCardView"
@@ -197,18 +132,6 @@
             android:textSize="18sp"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/materialCardView" />
-
-        <TextView
-            android:id="@+id/txtSeeMonthlyReportOverView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="36dp"
-            android:layout_marginEnd="24dp"
-            android:text="@string/see_reports"
-            android:textColor="?attr/bb_linkText"
-            android:textSize="14sp"
-            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/materialCardView" />
 
         <com.google.android.material.card.MaterialCardView
@@ -306,18 +229,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/reportsMaterialCardView" />
 
-        <TextView
-            android:id="@+id/txtSeeDetails"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="36dp"
-            android:layout_marginEnd="24dp"
-            android:text="@string/see_details"
-            android:textColor="?attr/bb_linkText"
-            android:textSize="14sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/reportsMaterialCardView" />
-
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/materialCardView4"
             android:layout_width="match_parent"
@@ -359,15 +270,6 @@
                         android:backgroundTint="?attr/colorControlNormal"
                         android:textColor="?android:textColorPrimary" />
 
-                    <!-- Category Spinner -->
-                    <Spinner
-                        android:id="@+id/spinner"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:padding="10dp"
-                        android:layout_marginEnd="8dp" />
-
                     <!-- Filter Button -->
                     <Button
                         android:id="@+id/button3"
@@ -384,47 +286,64 @@
 
                 </LinearLayout>
                 <!-- End of Horizontal LinearLayout -->
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/recyclerViewCaregoryDate"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:visibility="visible" />
             </LinearLayout> <!-- End of Outer Vertical LinearLayout -->
 
         </com.google.android.material.card.MaterialCardView>
 
 
         <TextView
-            android:id="@+id/txtRecentTransactionsOverView"
-            android:layout_width="0dp"
+            android:id="@+id/txtCategoriesOverView"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginTop="32dp"
             android:layout_weight="1"
-            android:text="@string/recent_transactions"
+            android:text="Categories"
             android:textColor="?attr/bb_primaryText"
             android:textSize="18sp"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/materialCardView4" />
 
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/materialCardView5"
+            android:layout_width="0dp"
+            android:layout_height="400dp"
+            android:layout_margin="16dp"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="4dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/txtCategoriesOverView"
+            app:strokeColor="?attr/bb_surface"
+            app:strokeWidth="0dp">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerViewHomeCategoryOverview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:nestedScrollingEnabled="false"
+                android:visibility="visible" />
+
+        </com.google.android.material.card.MaterialCardView>
+
         <TextView
-            android:id="@+id/txtShowMoreTransactions"
+            android:id="@+id/txtRecentTransactionsOverView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="36dp"
-            android:layout_marginEnd="24dp"
-            android:text="@string/show_more"
-            android:textColor="?attr/bb_linkText"
-            android:textSize="14sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/materialCardView4" />
+            android:layout_margin="16dp"
+            android:text="Transactions"
+            android:textColor="?attr/bb_primaryText"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/materialCardView5" />
 
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/materialCardView2"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="400dp"
             android:layout_margin="16dp"
             app:cardCornerRadius="16dp"
             app:cardElevation="4dp"
@@ -438,9 +357,13 @@
                 android:id="@+id/recyclerViewHomeTransactionOverview"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
                 android:visibility="visible" />
 
         </com.google.android.material.card.MaterialCardView>
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="70dp"
+            app:layout_constraintTop_toBottomOf="@+id/materialCardView2" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

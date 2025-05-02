@@ -9,63 +9,64 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.RecyclerView
 import com.synaptix.budgetbuddy.R
+import androidx.fragment.app.activityViewModels
 import com.synaptix.budgetbuddy.core.model.BudgetReportListItems
+import com.synaptix.budgetbuddy.core.model.BudgetReportListItems.CategoryItems
 import com.synaptix.budgetbuddy.core.model.BudgetReportListItems.HomeWalletItem
 import com.synaptix.budgetbuddy.core.model.BudgetReportListItems.TransactionItem
+import com.synaptix.budgetbuddy.core.model.Transaction
+import kotlin.getValue
 
 class HomeAdapter(private val items: List<BudgetReportListItems>) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     companion object {
         private const val VIEW_TYPE_WALLET = 0
         private const val VIEW_TYPE_TRANSACTION = 1
+        private const val VIEW_TYPE_CATEGORY = 2
         private const val TAG = "HomeAdapter"
     }
 
     override fun getItemViewType(position: Int): Int {
-        val type = when (items[position]) {
+        return when (items[position]) {
             is HomeWalletItem -> VIEW_TYPE_WALLET
             is TransactionItem -> VIEW_TYPE_TRANSACTION
+            is CategoryItems -> VIEW_TYPE_CATEGORY
             else -> throw IllegalArgumentException("Invalid item type at position $position")
         }
-        Log.d(TAG, "getItemViewType: position=$position, type=$type")
-        return type
     }
 
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        Log.d(TAG, "onCreateViewHolder: viewType=$viewType")
-        val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_home_wallet, parent, false)
         return when (viewType) {
             VIEW_TYPE_WALLET -> {
-                Log.d(TAG, "Creating WalletViewHolder")
+                val view = LayoutInflater.from(parent.context).inflate(R.layout.item_home_wallet, parent, false)
                 WalletViewHolder(view)
             }
             VIEW_TYPE_TRANSACTION -> {
-                Log.d(TAG, "Creating TransactionViewHolder")
+                val view = LayoutInflater.from(parent.context).inflate(R.layout.item_transaction, parent, false)
                 TransactionViewHolder(view)
+            }
+            VIEW_TYPE_CATEGORY -> {
+                val view = LayoutInflater.from(parent.context).inflate(R.layout.item_budget_report, parent, false)
+                CategoryViewHolder(view)
             }
             else -> throw IllegalArgumentException("Unknown view type: $viewType")
         }
     }
 
+
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (val item = items[position]) {
-            is HomeWalletItem -> {
-                Log.d(TAG, "Binding HomeWalletItem at position $position: ${item.walletName}, Balance: ${item.walletBalance}")
-                (holder as WalletViewHolder).bind(item)
-            }
-            is TransactionItem -> {
-                Log.d(TAG, "Binding TransactionItem at position $position: ${item.categoryName}, Amount: ${item.amount}")
-                (holder as TransactionViewHolder).bind(item)
-            }
-            else -> {
-                Log.e(TAG, "Unexpected item type at $position")
-                throw IllegalArgumentException("Unexpected item type at $position")
-            }
+            is HomeWalletItem -> (holder as WalletViewHolder).bind(item)
+            is TransactionItem -> (holder as TransactionViewHolder).bind(item)
+            is CategoryItems -> (holder as CategoryViewHolder).bind(item)
+            else -> throw IllegalArgumentException("Unexpected item type at $position")
         }
     }
+
 
     override fun getItemCount(): Int {
         Log.d(TAG, "getItemCount: ${items.size}")
@@ -93,10 +94,11 @@ class HomeAdapter(private val items: List<BudgetReportListItems>) : RecyclerView
             val iconView = itemView.findViewById<ImageView>(R.id.iconCategory)
             val iconContainer = itemView.findViewById<LinearLayout>(R.id.iconCategoryContainer)
 
-            val nameText = itemView.findViewById<TextView>(R.id.txtCategoryName)
-            val amountText = itemView.findViewById<TextView>(R.id.txtAmount)
-            val dateText = itemView.findViewById<TextView>(R.id.txtDate)
-            val walletText = itemView.findViewById<TextView>(R.id.txtTransactions)
+            val nameText = itemView.findViewById<TextView>(R.id.textCategoryName)
+            val amountText = itemView.findViewById<TextView>(R.id.text_amount)
+            val dateText = itemView.findViewById<TextView>(R.id.text_date)
+            val walletText = itemView.findViewById<TextView>(R.id.textWalletName)
+
 
             val resolvedColor = ContextCompat.getColor(itemView.context, item.categoryColour)
             (iconContainer.background.mutate() as GradientDrawable).setColor(resolvedColor)
@@ -108,4 +110,24 @@ class HomeAdapter(private val items: List<BudgetReportListItems>) : RecyclerView
             walletText.text = item.walletName
         }
     }
+
+    class CategoryViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        fun bind(item: CategoryItems) {
+            val iconView = itemView.findViewById<ImageView>(R.id.iconCategory)
+            val iconContainer = itemView.findViewById<LinearLayout>(R.id.iconCategoryContainer)
+
+            //Convert resource ID to actual color
+            val resolvedColor = ContextCompat.getColor(itemView.context, item.categoryColour)
+            (iconContainer.background.mutate() as GradientDrawable).setColor(resolvedColor)
+
+            //set icon
+            iconView.setImageResource(item.categoryIcon)
+
+            itemView.findViewById<TextView>(R.id.txtCategoryName).text = item.categoryName
+            itemView.findViewById<TextView>(R.id.txtTransactions).text = "${item.transactionCount} transactions"
+            itemView.findViewById<TextView>(R.id.txtAmount).text = item.amount
+            itemView.findViewById<TextView>(R.id.txtDate).text = item.relativeDate
+        }
+    }
+
 }
