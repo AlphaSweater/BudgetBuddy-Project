@@ -111,25 +111,34 @@ class TransactionAddFragment : Fragment() {
             showCategorySelector()
         }
 
-        val openDatePicker = {
-            val picker = MaterialDatePicker.Builder.datePicker()
-                .setTitleText("Select Date")
-                .setSelection(MaterialDatePicker.todayInUtcMilliseconds())
+        val openDateRangePicker = {
+            val picker = MaterialDatePicker.Builder.dateRangePicker()
+                .setTitleText("Select Date Range")
                 .build()
 
             picker.addOnPositiveButtonClickListener { selection ->
-                // Convert selection (epoch millis) to readable date
+                // selection is a Pair<Long, Long> for start and end dates
+                val startDate = selection.first
+                val endDate = selection.second
+
                 val calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
-                calendar.timeInMillis = selection
-                val formattedDate = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(calendar.time)
-                binding.edtTextDate.setText(formattedDate)
+                val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+
+                calendar.timeInMillis = startDate
+                val formattedStartDate = dateFormat.format(calendar.time)
+
+                calendar.timeInMillis = endDate
+                val formattedEndDate = dateFormat.format(calendar.time)
+
+                val combinedDate = "$formattedStartDate - $formattedEndDate"
+                binding.edtTextDate.setText(combinedDate)
             }
 
-            picker.show(parentFragmentManager, "MATERIAL_DATE_PICKER")
+            picker.show(parentFragmentManager, "MATERIAL_DATE_RANGE_PICKER")
         }
 
-        binding.rowSelectDate.setOnClickListener { openDatePicker() }
-        binding.edtTextDate.setOnClickListener { openDatePicker() }
+        binding.rowSelectDate.setOnClickListener { openDateRangePicker() }
+        binding.edtTextDate.setOnClickListener { openDateRangePicker() }
 
         binding.rowSelectPhoto.setOnClickListener { showImageSourceDialog() }
 
@@ -212,35 +221,6 @@ class TransactionAddFragment : Fragment() {
         binding.textSelectedWalletName.text = walletName
     }
 
-//    private fun updateSelectedLabelChips(labels: List<Label>) {
-//        val selectedLabels = labels.filter { it.isSelected }
-//
-//        val chipGroup = binding.chipGroupLabels
-//        chipGroup.removeAllViews()
-//
-//        if (selectedLabels.isEmpty()) {
-//            chipGroup.visibility = View.GONE
-//            return
-//        }
-//
-//        chipGroup.visibility = View.VISIBLE
-//
-//        selectedLabels.forEach { label ->
-//            val chip = Chip(requireContext()).apply {
-//                text = label.labelName
-//                isClickable = false
-//                isCheckable = false
-//
-//                // Resolve the color from the theme attribute
-//                val chipBackgroundColor = MaterialColors.getColor(this.context, R.attr.bb_surfaceAlt, Color.TRANSPARENT)
-//                setChipBackgroundColor(ColorStateList.valueOf(chipBackgroundColor))
-//
-//                val textColor = MaterialColors.getColor(this.context, R.attr.bb_primaryText, Color.TRANSPARENT)
-//                setTextColor(textColor)
-//            }
-//            chipGroup.addView(chip)
-//        }
-//    }
 
     private fun updateSelectedRecurrenceRate(recurrenceRate: String?) {
         if (recurrenceRate.isNullOrBlank()){

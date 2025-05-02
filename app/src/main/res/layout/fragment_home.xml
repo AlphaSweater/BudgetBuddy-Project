@@ -277,7 +277,7 @@
             android:layout_marginStart="16dp"
             android:layout_marginTop="32dp"
             android:layout_weight="1"
-            android:text="@string/spending_details"
+            android:text="Filtering"
             android:textColor="?attr/bb_primaryText"
             android:textSize="18sp"
             android:textStyle="bold"
@@ -297,111 +297,81 @@
             app:layout_constraintTop_toBottomOf="@+id/reportsMaterialCardView" />
 
         <com.google.android.material.card.MaterialCardView
-        android:id="@+id/materialCardView4"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="16dp"
-        app:cardBackgroundColor="?attr/bb_surface"
-        app:cardCornerRadius="16dp"
-        app:cardElevation="4dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/txtTopSpendingOverView">
-
-        <LinearLayout
+            android:id="@+id/materialCardView4"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="16dp">
+            android:layout_margin="16dp"
+            app:cardBackgroundColor="?attr/bb_surface"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="6dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/txtTopSpendingOverView">
 
-            <!-- Toggle Button -->
+            <!-- Outer LinearLayout for vertical layout -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/toggle_background"
-                android:gravity="center"
-                android:orientation="horizontal"
-                android:padding="4dp">
+                android:orientation="vertical"
+                android:padding="12dp"
+                android:gravity="center_vertical">
 
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:background="@android:color/transparent"
-                    android:gravity="center"
-                    android:padding="8dp"
-                    android:text="@string/week"
-                    android:textColor="?attr/bb_primaryText" />
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:background="@drawable/toggle_selected"
-                    android:gravity="center"
-                    android:padding="8dp"
-                    android:text="@string/month"
-                    android:textColor="?attr/bb_primaryText" />
-            </LinearLayout>
-
-            <!-- Repeated Items -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:orientation="vertical">
-
-                <!-- Repeat this block for each item -->
+                <!-- Horizontal LinearLayout containing EditText, Spinner, and Button -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:paddingVertical="8dp">
+                    android:gravity="center_vertical">
 
-                    <!-- Food & Drink and Expense Info -->
-                    <View
-                        android:layout_width="36dp"
-                        android:layout_height="36dp"
-                        android:layout_gravity="center"
-                        android:layout_marginEnd="12dp"
-                        android:background="@drawable/circle_button_background" />
-
-                    <LinearLayout
+                    <!-- Start Date EditText -->
+                    <EditText
+                        android:id="@+id/editTextDate2"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:orientation="vertical">
+                        android:hint="Start - End Date"
+                        android:textSize="14sp"
+                        android:inputType="date"
+                        android:padding="10dp"
+                        android:layout_marginEnd="8dp"
+                        android:backgroundTint="?attr/colorControlNormal"
+                        android:textColor="?android:textColorPrimary" />
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Food And Drink"
-                            android:textColor="?attr/bb_primaryText"
-                            android:textSize="14sp"
-                            android:textStyle="bold" />
+                    <!-- Category Spinner -->
+                    <Spinner
+                        android:id="@+id/spinner"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:padding="10dp"
+                        android:layout_marginEnd="8dp" />
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Last Activity: Today"
-                            android:textColor="?attr/bb_secondaryText"
-                            android:textSize="12sp" />
-                    </LinearLayout>
-
-                    <!-- Amount -->
-                    <TextView
+                    <!-- Filter Button -->
+                    <Button
+                        android:id="@+id/button3"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
-                        android:text="-R 178  (80%)"
-                        android:textColor="?attr/bb_expense"
-                        android:textSize="14sp"
-                        android:textStyle="bold" />
-                </LinearLayout>
+                        android:text="Filter"
+                        android:textColor="@android:color/white"
+                        android:layout_weight="0"
+                        android:layout_gravity="center"
+                        android:backgroundTint="?attr/colorPrimary"
+                        android:paddingHorizontal="16dp"
+                        android:paddingVertical="10dp"
+                        android:layout_marginEnd="8dp" />
 
-            </LinearLayout>
-        </LinearLayout>
-    </com.google.android.material.card.MaterialCardView>
+                </LinearLayout>
+                <!-- End of Horizontal LinearLayout -->
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recyclerViewCaregoryDate"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:visibility="visible" />
+            </LinearLayout> <!-- End of Outer Vertical LinearLayout -->
+
+        </com.google.android.material.card.MaterialCardView>
+
 
         <TextView
             android:id="@+id/txtRecentTransactionsOverView"
