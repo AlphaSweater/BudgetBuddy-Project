@@ -273,8 +273,9 @@
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 
+    <!-- Create Budget Button -->
     <Button
-        android:id="@+id/create_budget_button"
+        android:id="@+id/createBudgetButton"
         android:layout_width="wrap_content"
         android:layout_height="48dp"
         android:layout_marginTop="20dp"
@@ -297,6 +298,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/create_budget_button" />
+        app:layout_constraintTop_toBottomOf="@+id/createBudgetButton" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
