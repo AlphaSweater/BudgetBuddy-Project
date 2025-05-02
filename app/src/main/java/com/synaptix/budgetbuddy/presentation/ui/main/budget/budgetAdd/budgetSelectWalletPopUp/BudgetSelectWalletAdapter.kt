@@ -1,0 +1,47 @@
+package com.synaptix.budgetbuddy.presentation.ui.main.budget.budgetAdd.budgetSelectWalletPopUp
+
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.TextView
+import androidx.recyclerview.widget.RecyclerView
+import com.synaptix.budgetbuddy.R
+import com.synaptix.budgetbuddy.core.model.Wallet
+
+class BudgetSelectWalletAdapter(
+    private var wallets: List<Wallet>,
+    private val onWalletClick: (Wallet) -> Unit // Callback with selected wallet
+) : RecyclerView.Adapter<BudgetSelectWalletAdapter.WalletViewHolder>() {
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): WalletViewHolder {
+        val view = LayoutInflater.from(parent.context)
+            .inflate(R.layout.item_wallet, parent, false)
+        return WalletViewHolder(view)
+    }
+
+    override fun onBindViewHolder(holder: WalletViewHolder, position: Int) {
+        holder.bind(wallets[position])
+    }
+
+    override fun getItemCount(): Int = wallets.size
+
+    inner class WalletViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        private val name: TextView = itemView.findViewById(R.id.walletName)
+        private val balance: TextView = itemView.findViewById(R.id.walletBalance)
+
+        fun bind(wallet: Wallet) {
+            name.text = wallet.walletName
+            balance.text = "R %.2f".format(wallet.walletBalance)
+
+            itemView.setOnClickListener {
+                onWalletClick(wallet)
+
+            }
+        }
+    }
+
+    fun updateData(newList: List<Wallet>) {
+        wallets = newList
+        notifyDataSetChanged()
+    }
+}

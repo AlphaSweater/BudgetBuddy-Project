@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".presentation.ui.main.general.generalIndividualTransactions.GeneralIndividualTransactionsFragment">
+    tools:context=".presentation.ui.main.general.generalIndividualTransaction.GeneralIndividualTransactionFragment">
 
 
     <!-- Top Bar (no padding) -->
@@ -84,6 +84,7 @@
                 app:tint="?attr/bb_expense" />
 
             <TextView
+                android:id="@+id/walletName"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="12dp"
@@ -120,6 +121,7 @@
                 android:textSize="18sp" />
 
             <TextView
+                android:id="@+id/textAmount"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="12dp"
@@ -145,6 +147,7 @@
                 app:tint="?attr/bb_expense" />
 
             <TextView
+                android:id="@+id/textNote"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="12dp"
@@ -170,6 +173,7 @@
                 app:tint="?attr/bb_expense" />
 
             <TextView
+                android:id="@+id/textStartDate"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="12dp"
@@ -195,6 +199,7 @@
                 app:tint="?attr/bb_expense" />
 
             <TextView
+                android:id="@+id/textRecurrence"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="12dp"
@@ -231,7 +236,7 @@
         </LinearLayout>
 
         <ImageView
-            android:id="@+id/imageView3"
+            android:id="@+id/transactionImage"
             android:layout_width="343dp"
             android:layout_height="304dp"
             android:layout_marginTop="32dp"

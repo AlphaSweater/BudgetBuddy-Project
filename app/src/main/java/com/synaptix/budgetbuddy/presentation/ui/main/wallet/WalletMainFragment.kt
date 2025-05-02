@@ -64,7 +64,7 @@ class WalletMainFragment : Fragment() {
         }
 
         val walletMainAdapter = WalletMainAdapter(walletItems) {
-            findNavController().navigate(R.id.action_walletMainFragment_to_walletReportFragment)
+//            findNavController().navigate(R.id.action_walletMainFragment_to_walletReportFragment)
         }
 
         binding.recyclerViewWalletMain.apply {
