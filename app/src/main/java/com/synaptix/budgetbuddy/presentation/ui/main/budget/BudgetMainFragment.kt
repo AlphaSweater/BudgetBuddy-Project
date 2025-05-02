@@ -53,8 +53,8 @@ class BudgetMainFragment : Fragment() {
             val items = budgetList.map { budget ->
                 BudgetReportListItems.BudgetItem(
                     title = budget.budgetName,
-                    status = "R0 spent of R${budget.amount}", // Replace R0 with calculated amount spent if needed
-                    categoryIcon = R.drawable.baseline_shopping_bag_24 // You can improve this logic later
+                    status = "R0 spent of R${budget.amount}", // Replace R0 with calculated amount spent
+                    categoryIcon = R.drawable.baseline_shopping_bag_24
                 )
             }
             budgetMainAdapter = BudgetMainAdapter(items) { item ->
@@ -75,32 +75,3 @@ class BudgetMainFragment : Fragment() {
         _binding = null
     }
 }
-//private fun recyclerViewBudgetMain() {
-//    val budgetItems = listOf(
-//        BudgetReportListItems.BudgetItem(
-//            title = "Groceries",
-//            status = "R1,200 spent of R2,000",
-//            categoryIcon = R.drawable.baseline_shopping_bag_24),
-//        BudgetReportListItems.BudgetItem(
-//            title = "Transport",
-//            status = "R300 spent of R1,000",
-//            categoryIcon = R.drawable.ic_car_24),
-//        BudgetReportListItems.BudgetItem(
-//            title = "Eating Out",
-//            status = "R850 spent of R900",
-//            categoryIcon = R.drawable.baseline_fastfood_24),
-//        BudgetReportListItems.BudgetItem(
-//            title = "Subscriptions",
-//            status = "R500 spent of R600",
-//            categoryIcon = R.drawable.baseline_computer_24)
-//    )
-//
-//    budgetMainAdapter = BudgetMainAdapter(budgetItems) { item ->
-//        findNavController().navigate(R.id.action_budgetMainFragment_to_budgetReportFragment)
-//    }
-//
-//    binding.recyclerViewBudgetMain.apply {
-//        layoutManager = LinearLayoutManager(requireContext())
-//        adapter = budgetMainAdapter
-//    }
-//}
