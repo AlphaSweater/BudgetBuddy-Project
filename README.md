@@ -69,10 +69,16 @@ https://github.com/AlphaSweater/BudgetBuddy-Project.git
 
 ## References
 
-- reference
-- reference
-- reference
-- reference
+- https://www.youtube.com/watch?v=A_tPafV23DM&list=PLPgs125_L-X9H6J7x4beRU-AxJ4mXe5vX
+- https://www.geeksforgeeks.org/kotlin-android-tutorial/
+- https://www.geeksforgeeks.org/textview-in-kotlin/
+- https://www.geeksforgeeks.org/scrollview-in-android/
+- https://www.geeksforgeeks.org/horizontalscrollview-in-kotlin/
+- https://www.geeksforgeeks.org/cardview-in-android-with-example/
+- https://www.geeksforgeeks.org/switch-in-kotlin/
+- https://www.geeksforgeeks.org/spinner-in-kotlin/
+- ChatGPT was used to help with the design and planning. As well as assisted with finding and fixing errors in the code.
+- ChatGPT also helped with the forming of comments for the code.
 
 
 ## Authors
