@@ -67,6 +67,13 @@ https://github.com/AlphaSweater/BudgetBuddy-Project.git
 6. The app will install and launch on your selected device, showing the BudgetBuddy application.
 
 
+## YouTube Video Demonstration
+
+Below is the link for our YouTube video:
+
+- https://www.youtube.com/watch?v=SFQ90baMvlU
+
+
 ## References
 
 - https://www.youtube.com/watch?v=A_tPafV23DM&list=PLPgs125_L-X9H6J7x4beRU-AxJ4mXe5vX
