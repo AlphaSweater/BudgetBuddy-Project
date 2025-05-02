@@ -52,17 +52,16 @@ class HomeAdapter(private val items: List<BudgetReportListItems>) : RecyclerView
 
     class WalletViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         fun bind(item: HomeWalletItem) {
-            val iconView = itemView.findViewById<ImageView>(R.id.iconCategory)
-            val nameText = itemView.findViewById<TextView>(R.id.txtCategoryName)
+            val nameText = itemView.findViewById<TextView>(R.id.txtWalletName)
             val balanceText = itemView.findViewById<TextView>(R.id.txtAmount)
-            val dateText = itemView.findViewById<TextView>(R.id.txtDate)
-            val transactionsText = itemView.findViewById<TextView>(R.id.txtTransactions)
+            val dateText = itemView.findViewById<TextView>(R.id.txtRelativeDay)
 
-            iconView.setImageResource(item.walletIcon)
+
+//            iconView.setImageResource(item.walletIcon)
             nameText.text = item.walletName
             balanceText.text = "R${item.walletBalance}"
             dateText.text = item.relativeDate
-            transactionsText.text = "Wallet"
+//            transactionsText.text = "Wallet"
         }
     }
 

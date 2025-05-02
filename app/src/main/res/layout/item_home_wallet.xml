@@ -20,6 +20,7 @@
             android:paddingVertical="8dp">
 
             <ImageView
+                android:id="@+id/iconCategory"
                 android:layout_width="36dp"
                 android:layout_height="36dp"
                 android:layout_marginEnd="12dp"

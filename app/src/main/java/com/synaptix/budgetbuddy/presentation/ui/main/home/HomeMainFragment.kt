@@ -1,12 +1,14 @@
 package com.synaptix.budgetbuddy.presentation.ui.main.home
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.synaptix.budgetbuddy.R
 import com.synaptix.budgetbuddy.core.model.BudgetReportListItems
 import com.synaptix.budgetbuddy.core.model.Wallet
@@ -67,6 +69,7 @@ class HomeMainFragment : Fragment() {
     }
 
     private fun setupWalletRecycler(walletList: List<BudgetReportListItems.HomeWalletItem>) {
+        binding.recyclerViewHomeWalletOverview.layoutManager = LinearLayoutManager(requireContext())
         homeAdapter = HomeAdapter(walletList) // Set the adapter with HomeWalletItem list
         binding.recyclerViewHomeWalletOverview.adapter = homeAdapter // Set the adapter to the RecyclerView
     }
