@@ -73,3 +73,11 @@ https://github.com/AlphaSweater/BudgetBuddy-Project.git
 - reference
 - reference
 - reference
+
+
+## Authors
+
+- Chad Fairlie ST10269509
+- Dhiren Ruthenavelu ST10256859
+- Kayla Ferreira ST10259527
+- Nathan Teixeira ST10249266
