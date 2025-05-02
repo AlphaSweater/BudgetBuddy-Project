@@ -12,6 +12,7 @@ import com.synaptix.budgetbuddy.databinding.FragmentWalletMainBinding
 import com.synaptix.budgetbuddy.presentation.ui.auth.AuthActivity
 import com.synaptix.budgetbuddy.R
 import com.synaptix.budgetbuddy.core.model.BudgetReportListItems
+import com.synaptix.budgetbuddy.core.model.Wallet
 
 class WalletMainFragment : Fragment() {
 
@@ -40,29 +41,25 @@ class WalletMainFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setupRecyclers()
+
+        val userId = 1
+        viewModel.fetchWallets(userId)
+
+        viewModel.wallets.observe(viewLifecycleOwner) { walletList ->
+            setupRecyclerView(walletList)
+        }
     }
 
-    private fun setupRecyclers() {
-        recyclerViewWalletMain()
-    }
-    private fun recyclerViewWalletMain() {
-        val walletItems = listOf(
+    private fun setupRecyclerView(walletList: List<Wallet>) {
+        val walletItems = walletList.map { wallet ->
             BudgetReportListItems.WalletItem(
-                walletName = "Groceries",
-                walletBalance = 5000.00,
-                walletIcon = R.drawable.baseline_shopping_bag_24),
-            BudgetReportListItems.WalletItem(
-                walletName = "Groceries",
-                walletBalance = 5000.00,
-                walletIcon = R.drawable.baseline_shopping_bag_24),
-            BudgetReportListItems.WalletItem(
-                walletName = "Groceries",
-                walletBalance = 5000.00,
-                walletIcon = R.drawable.baseline_shopping_bag_24)
-        )
+                walletName = wallet.walletName,
+                walletBalance = wallet.walletBalance,
+                walletIcon = R.drawable.baseline_shopping_bag_24 //All wallets have same logo
+            )
+        }
 
-        val walletMainAdapter = WalletMainAdapter(walletItems) { item ->
+        val walletMainAdapter = WalletMainAdapter(walletItems) {
             findNavController().navigate(R.id.action_walletMainFragment_to_walletReportFragment)
         }
 
@@ -77,3 +74,28 @@ class WalletMainFragment : Fragment() {
         _binding = null
     }
 }
+//private fun recyclerViewWalletMain() {
+//    val walletItems = listOf(
+//        BudgetReportListItems.WalletItem(
+//            walletName = "Groceries",
+//            walletBalance = 5000.00,
+//            walletIcon = R.drawable.baseline_shopping_bag_24),
+//        BudgetReportListItems.WalletItem(
+//            walletName = "Groceries",
+//            walletBalance = 5000.00,
+//            walletIcon = R.drawable.baseline_shopping_bag_24),
+//        BudgetReportListItems.WalletItem(
+//            walletName = "Groceries",
+//            walletBalance = 5000.00,
+//            walletIcon = R.drawable.baseline_shopping_bag_24)
+//    )
+//
+//    val walletMainAdapter = WalletMainAdapter(walletItems) { item ->
+//        findNavController().navigate(R.id.action_walletMainFragment_to_walletReportFragment)
+//    }
+//
+//    binding.recyclerViewWalletMain.apply {
+//        layoutManager = LinearLayoutManager(requireContext())
+//        adapter = walletMainAdapter
+//    }
+//}
