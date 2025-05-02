@@ -6,10 +6,15 @@ BudgetBuddy is a user-friendly personal budget tracker app designed to help indi
 ## The Application's Features
 
 - **SignUp and Login**: Users can securely create an account and log in to access their personal budget data from anywhere. This ensures that all financial information is protected and personalized for each user.
+  
 - **Create Categories and Entries**: Users can easily organize their finances by creating custom categories (e.g., Food, Transport, Entertainment) and adding income or expense entries under each category. This helps users track where their money is going in a structured way.
+  
 - **Take and Store Photos**: Users can capture and attach photos of receipts, invoices, or any related documents to your entries. This feature helps users keep a visual record of their transactions for better tracking and accountability.
+  
 - **Set Minimum and Maximum Goals**: Set financial goals by setting minimum and maximum spending limits. This allows users to stick to their budget and avoid overspending.
+  
 - **View List of Entries in a Period**: View a detailed list of all income and expense entries within a selected date range. This makes it easy to review and analyze user financial activity over days, weeks, or months.
+  
 - **View Category Totals in a Period**: Get a clear summary of total spending and earnings per category within a specific time period. This feature provides insights into user's spending habits and helps adjust their budget as needed.
 
 ## Before You Can Compile and Run The Application
@@ -18,6 +23,7 @@ BudgetBuddy is a user-friendly personal budget tracker app designed to help indi
 Ensure that you have Android Studio installed on your computer.
 
 2. If you do not have Android Studio, you can download it here:
+   
 👉 https://developer.android.com/studio
 
 3. Make sure you have the following installed within Android Studio:
