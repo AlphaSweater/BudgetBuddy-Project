@@ -39,6 +39,7 @@ class BudgetMainFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupRecyclers()
+        setupOnClickListeners()
     }
 
     private fun setupRecyclers() {
@@ -71,6 +72,12 @@ class BudgetMainFragment : Fragment() {
         binding.recyclerViewBudgetMain.apply {
             layoutManager = LinearLayoutManager(requireContext())
             adapter = budgetMainAdapter
+        }
+    }
+
+    private fun setupOnClickListeners() {
+        binding.createBudgetButton.setOnClickListener {
+            findNavController().navigate(R.id.action_budgetMainFragment_to_budgetAddFragment)
         }
     }
 
