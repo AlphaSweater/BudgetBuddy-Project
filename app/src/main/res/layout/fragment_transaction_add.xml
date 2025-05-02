@@ -9,17 +9,41 @@
     android:padding="16dp"
     tools:context=".presentation.ui.main.transaction.TransactionAddFragment">
 
-    <!-- Back Button -->
+    <!-- Top Bar (Back Arrow + Title) -->
+    <LinearLayout
+        android:id="@+id/top_bar"
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:orientation="horizontal"
+        android:gravity="center"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/add_new_transaction"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="?attr/bb_primaryText"
+            android:layout_marginStart="16dp"/>
+    </LinearLayout>
+
     <ImageButton
         android:id="@+id/btnGoBack"
         android:layout_width="44dp"
         android:layout_height="44dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
         android:background="@null"
         android:contentDescription="@string/back"
         android:src="?attr/actionModeCloseDrawable"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:tint="?attr/bb_primaryText" />
+
 
     <!-- Main Card -->
     <ScrollView
