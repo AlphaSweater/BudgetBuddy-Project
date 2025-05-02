@@ -29,6 +29,7 @@ sealed class BudgetReportListItems {
     ) : BudgetReportListItems()
 
     data class BudgetItem(
+        val id: Int,
         val title: String,
         val status: String,
         val categoryIcon: Int // Drawable resource ID for the icon (e.g., R.drawable.ic_circle_24)

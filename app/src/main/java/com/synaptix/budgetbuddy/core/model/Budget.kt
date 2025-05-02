@@ -5,15 +5,19 @@ import java.io.Serializable
 data class BudgetIn (
     val budgetId: Int = 0,
     val userId: Int,
-    val walletId: Int,
     val budgetName: String,
-    val amount: Double
+    val walletId: Int,
+    val categoryId: Int,
+    val amount: Double,
+    val spent: Double
 ) : Serializable
 
 data class Budget (
     val budgetId: Int = 0,
     val user: User?,
-    val walletId: Int,
     val budgetName: String,
-    val amount: Double
+    val wallet: Wallet?,
+    val category: Category?,
+    val amount: Double,
+    val spent: Double
 )

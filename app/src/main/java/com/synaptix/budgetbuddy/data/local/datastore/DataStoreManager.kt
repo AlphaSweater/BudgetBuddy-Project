@@ -30,6 +30,9 @@ class DataStoreManager @Inject constructor(
         val USER_FIRSTNAME = stringPreferencesKey("user_firstname")
         val USER_LASTNAME = stringPreferencesKey("user_lastname")
         val USER_EMAIL = stringPreferencesKey("user_email")
+
+        val SELECTED_WALLET_ID = intPreferencesKey("selected_wallet_id")
+        val SELECTED_BUDGET_ID = intPreferencesKey("selected_budget_id")
     }
 
     // ✅ Save only non-sensitive info
@@ -41,6 +44,30 @@ class DataStoreManager @Inject constructor(
             prefs[PreferencesKeys.USER_EMAIL] = user.email
         }
     }
+
+    suspend fun saveSelectedWalletId(walletId: Int) {
+        dataStore.edit { prefs ->
+            prefs[PreferencesKeys.SELECTED_WALLET_ID] = walletId
+        }
+    }
+
+    suspend fun saveSelectedBudgetId(budgetId: Int) {
+        dataStore.edit { prefs ->
+            prefs[PreferencesKeys.SELECTED_BUDGET_ID] = budgetId
+        }
+    }
+
+    suspend fun getSelectedWalletId(): Int? {
+        val prefs = dataStore.data.first()
+        return prefs[PreferencesKeys.SELECTED_WALLET_ID]
+    }
+
+    suspend fun getSelectedBudgetId(): Int? {
+        val prefs = dataStore.data.first()
+        return prefs[PreferencesKeys.SELECTED_BUDGET_ID]
+    }
+
+
 
     // Fetch user ID
     suspend fun getUserId(): Int {

@@ -6,14 +6,20 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.synaptix.budgetbuddy.R
+import com.synaptix.budgetbuddy.core.model.Budget
 import com.synaptix.budgetbuddy.core.model.BudgetReportListItems
 import com.synaptix.budgetbuddy.databinding.FragmentBudgetMainBinding
 import com.synaptix.budgetbuddy.databinding.FragmentGeneralTransactionsBinding
 import com.synaptix.budgetbuddy.presentation.ui.main.general.generalTransactions.GeneralTransactionsAdapter
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class BudgetMainFragment : Fragment() {
 
     private var _binding: FragmentBudgetMainBinding? = null
@@ -38,32 +44,24 @@ class BudgetMainFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setupRecyclers()
+        viewModel.fetchBudgets()
+
+        viewModel.budgets.observe(viewLifecycleOwner) { budgetList ->
+            setupRecyclerView(budgetList)
+        }
         setupOnClickListeners()
     }
 
-    private fun setupRecyclers() {
-        recyclerViewBudgetMain()
-    }
-    private fun recyclerViewBudgetMain() {
-        val budgetItems = listOf(
+    private fun setupRecyclerView(budgetList: List<Budget>) {
+
+        val budgetItems = budgetList.map { budget ->
             BudgetReportListItems.BudgetItem(
-                title = "Groceries",
-                status = "R1,200 spent of R2,000",
-                categoryIcon = R.drawable.baseline_shopping_bag_24),
-            BudgetReportListItems.BudgetItem(
-                title = "Transport",
-                status = "R300 spent of R1,000",
-                categoryIcon = R.drawable.ic_car_24),
-            BudgetReportListItems.BudgetItem(
-                title = "Eating Out",
-                status = "R850 spent of R900",
-                categoryIcon = R.drawable.baseline_fastfood_24),
-            BudgetReportListItems.BudgetItem(
-                title = "Subscriptions",
-                status = "R500 spent of R600",
-                categoryIcon = R.drawable.baseline_computer_24)
-        )
+                id = budget.budgetId,
+                title = budget.budgetName,
+                status = "R ${budget.spent} spent of R ${budget.amount}",
+                categoryIcon = R.drawable.baseline_shopping_bag_24
+            )
+        }
 
         budgetMainAdapter = BudgetMainAdapter(budgetItems) { item ->
             findNavController().navigate(R.id.action_budgetMainFragment_to_budgetReportFragment)
