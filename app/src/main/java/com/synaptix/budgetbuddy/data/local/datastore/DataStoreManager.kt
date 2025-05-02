@@ -1,12 +1,28 @@
+//======================================================================================
+//Group 2 - Group Members:
+//======================================================================================
+//* Chad Fairlie ST10269509
+//* Dhiren Ruthenavelu ST10256859
+//* Kayla Ferreira ST10259527
+//* Nathan Teixeira ST10249266
+//======================================================================================
+//Declaration:
+//======================================================================================
+//We declare that this work is our own original work and that no part of it has been
+//copied from any other source, except where explicitly acknowledged.
+//======================================================================================
+//References:
+//======================================================================================
+//* ChatGPT was used to help with the design and planning. As well as assisted with
+//finding and fixing errors in the code.
+//* ChatGPT also helped with the forming of comments for the code.
+//* https://www.youtube.com/watch?v=A_tPafV23DM&list=PLPgs125_L-X9H6J7x4beRU-AxJ4mXe5vX
+//======================================================================================
+
 package com.synaptix.budgetbuddy.data.local.datastore
 
 import android.content.Context
-
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.emptyPreferences
-import androidx.datastore.preferences.core.intPreferencesKey
-import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.datastore.preferences.core.*
 import androidx.datastore.preferences.preferencesDataStore
 import com.synaptix.budgetbuddy.data.entity.UserEntity
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -15,6 +31,9 @@ import java.io.IOException
 import javax.inject.Inject
 import javax.inject.Singleton
 
+// ===================================
+// DataStore Setup
+// ===================================
 private const val USER_PREFERENCES_NAME = "user_preferences"
 private val Context.dataStore by preferencesDataStore(name = USER_PREFERENCES_NAME)
 
@@ -24,7 +43,9 @@ class DataStoreManager @Inject constructor(
 ) {
     private val dataStore = context.dataStore
 
-    // 🔐 Keep keys private to avoid accidental misuse
+    // ===================================
+    // Preference Keys (Private)
+    // ===================================
     private object PreferencesKeys {
         val USER_ID = intPreferencesKey("user_id")
         val USER_FIRSTNAME = stringPreferencesKey("user_firstname")
@@ -35,7 +56,9 @@ class DataStoreManager @Inject constructor(
         val SELECTED_BUDGET_ID = intPreferencesKey("selected_budget_id")
     }
 
-    // ✅ Save only non-sensitive info
+    // ===================================
+    // Save User to DataStore
+    // ===================================
     suspend fun saveUser(user: UserEntity) {
         dataStore.edit { prefs ->
             prefs[PreferencesKeys.USER_ID] = user.user_id
@@ -45,41 +68,58 @@ class DataStoreManager @Inject constructor(
         }
     }
 
+    // ===================================
+    // Save Selected Wallet ID
+    // ===================================
     suspend fun saveSelectedWalletId(walletId: Int) {
         dataStore.edit { prefs ->
             prefs[PreferencesKeys.SELECTED_WALLET_ID] = walletId
         }
     }
 
+    // ===================================
+    // Save Selected Budget ID
+    // ===================================
     suspend fun saveSelectedBudgetId(budgetId: Int) {
         dataStore.edit { prefs ->
             prefs[PreferencesKeys.SELECTED_BUDGET_ID] = budgetId
         }
     }
 
+    // ===================================
+    // Get Selected Wallet ID
+    // ===================================
     suspend fun getSelectedWalletId(): Int? {
         val prefs = dataStore.data.first()
         return prefs[PreferencesKeys.SELECTED_WALLET_ID]
     }
 
+    // ===================================
+    // Get Selected Budget ID
+    // ===================================
     suspend fun getSelectedBudgetId(): Int? {
         val prefs = dataStore.data.first()
         return prefs[PreferencesKeys.SELECTED_BUDGET_ID]
     }
 
-
-
-    // Fetch user ID
+    // ===================================
+    // Get User ID
+    // ===================================
     suspend fun getUserId(): Int {
         val preferences = dataStore.data.first()
         return preferences[PreferencesKeys.USER_ID] ?: 0 // Default to 0 if null
     }
 
+    // ===================================
+    // Clear User Data
+    // ===================================
     suspend fun clearUser() {
         dataStore.edit { it.clear() }
     }
 
-    // 🔄 Safe Flow with basic error handling
+    // ===================================
+    // User Flow (Reactive Stream)
+    // ===================================
     val userFlow: Flow<UserEntity?> = dataStore.data
         .catch { e ->
             if (e is IOException) emit(emptyPreferences()) else throw e
