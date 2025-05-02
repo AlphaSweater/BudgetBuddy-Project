@@ -24,4 +24,7 @@ interface BudgetDao {
     //sql query to grab all budgets for a wallet
     @Query("SELECT * FROM budget_table WHERE wallet_id = :walletId")
     suspend fun getBudgetsByWalletId(walletId: Int): List<BudgetEntity>
+
+    @Query("UPDATE budget_table SET amount = :amount WHERE wallet_id = :budgetId")
+    suspend fun updateAmount(budgetId: Long, amount: Double)
 }

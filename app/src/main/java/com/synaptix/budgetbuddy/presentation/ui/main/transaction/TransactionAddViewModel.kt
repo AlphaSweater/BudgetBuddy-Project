@@ -1,10 +1,12 @@
 package com.synaptix.budgetbuddy.presentation.ui.main.transaction
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.synaptix.budgetbuddy.core.model.Category
 import com.synaptix.budgetbuddy.core.model.Label
 import com.synaptix.budgetbuddy.core.model.Transaction
@@ -12,6 +14,8 @@ import com.synaptix.budgetbuddy.core.model.TransactionIn
 import com.synaptix.budgetbuddy.core.model.Wallet
 import com.synaptix.budgetbuddy.core.usecase.auth.GetUserIdUseCase
 import com.synaptix.budgetbuddy.core.usecase.main.transaction.AddTransactionUseCase
+import com.synaptix.budgetbuddy.data.repository.BudgetRepository
+import kotlinx.coroutines.launch
 
 @HiltViewModel
 class TransactionAddViewModel @Inject constructor(
@@ -60,6 +64,22 @@ class TransactionAddViewModel @Inject constructor(
         wallet.value = null
         _imageBytes.value = null
         recurrenceRate.value = null
+    }
+
+    fun updateBudgetAmount(amount: Double) {
+        // Ensure that the budgetId is not null or invalid
+        if (budgetId.value != null) {
+            viewModelScope.launch {
+                try {
+                    budgetRepository.updateBudgetAmount(budgetId.value!!, amount)
+                    Log.d("TransactionAddViewModel", "Updated budget amount successfully")
+                } catch (e: Exception) {
+                    Log.e("TransactionAddViewModel", "Error updating amount: ${e.message}")
+                }
+            }
+        } else {
+            Log.e("TransactionAddViewModel", "Budget ID is null")
+        }
     }
 
 }

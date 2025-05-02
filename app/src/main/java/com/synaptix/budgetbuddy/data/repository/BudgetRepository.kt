@@ -17,4 +17,7 @@ class BudgetRepository @Inject constructor(
         return budgets.map { it.toDomain() }
     }
 
+    suspend fun updateBudgetAmount(budgetId: Long, amount: Double) {
+        budgetDao.updateAmount(budgetId, amount)
+    }
 }
