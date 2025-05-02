@@ -6,6 +6,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.synaptix.budgetbuddy.R
 import com.synaptix.budgetbuddy.core.model.BudgetReportListItems
@@ -36,6 +37,7 @@ class BudgetReportFragment : Fragment() {
 
     private fun setupRecyclers() {
         transactionRecycler()
+        categoryRecycler()
     }
 
     private fun transactionRecycler() {
@@ -54,6 +56,47 @@ class BudgetReportFragment : Fragment() {
         binding.recyclerViewTransactions.apply {
             layoutManager = LinearLayoutManager(requireContext())
             adapter = budgetReportAdapter
+        }
+    }
+
+    private fun categoryRecycler(){
+        val categoryItems = listOf(
+            BudgetReportListItems.CategoryItems(
+                categoryName = "Food",
+                categoryIcon = R.drawable.baseline_fastfood_24,
+                categoryColour = R.color.cat_light_blue,
+                transactionCount = 5,
+                amount = "R 1,000",
+                relativeDate = "This Week"
+            ),
+            BudgetReportListItems.CategoryItems(
+                categoryName = "Transport",
+                categoryIcon = R.drawable.ic_car_24,
+                categoryColour = R.color.cat_orange,
+                transactionCount = 2,
+                amount = "R 500",
+                relativeDate = "Yesterday"
+            ),
+            BudgetReportListItems.CategoryItems(
+                categoryName = "Entertainment",
+                categoryIcon = R.drawable.baseline_music_note_24,
+                categoryColour = R.color.cat_dark_green,
+                transactionCount = 3,
+                amount = "R 750",
+                relativeDate = "Last Month"
+            )
+        )
+
+        // New adapter instance for category items
+        val categoryAdapter = BudgetReportAdapter(categoryItems)
+
+        binding.recyclerViewCategories.apply {
+            layoutManager = LinearLayoutManager(requireContext())
+            adapter = categoryAdapter
+        }
+
+        binding.btnGoBack.setOnClickListener {
+            findNavController().popBackStack()
         }
     }
 
