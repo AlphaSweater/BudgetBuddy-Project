@@ -30,7 +30,7 @@ fun TransactionIn.toEntity(): TransactionEntity {
         date = this.date,
         note = this.note ?: "",
         currency = this.currencyType,
-        label = this.selectedLabels.joinToString(",") { it.labelName },
+//        label = this.selectedLabels.joinToString(",") { it.labelName },
         image = this.photo?.let { Base64.encodeToString(it, Base64.DEFAULT) } ?: "",
         recurrence = this.recurrenceRate ?: ""
     )
@@ -113,8 +113,7 @@ fun BudgetIn.toEntity(): BudgetEntity{
         user_id = this.userId,
         wallet_id = this.walletId,
         name = this.budgetName,
-        minAmount = this.goalMinAmount,
-        maxAmount = this.goalMaxAmount
+        amount = this.amount
     )
 }
 
@@ -124,8 +123,7 @@ fun BudgetEntity.toDomain(user: User?): Budget {
         user = user,
         walletId = wallet_id,
         budgetName = name,
-        goalMinAmount = minAmount,
-        goalMaxAmount = maxAmount
+        amount = amount
     )
 }
 

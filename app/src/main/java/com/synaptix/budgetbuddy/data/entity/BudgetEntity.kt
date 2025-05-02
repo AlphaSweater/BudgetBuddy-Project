@@ -26,6 +26,5 @@ data class BudgetEntity (
     val user_id: Int,
     val wallet_id: Int,
     val name: String,
-    val minAmount: Double,
-    val maxAmount: Double
+    val amount: Double
 )
