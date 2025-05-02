@@ -1,6 +1,5 @@
 package com.synaptix.budgetbuddy.presentation.ui.main.budget.budgetReport
 
-import android.content.res.ColorStateList
 import android.graphics.drawable.GradientDrawable
 import android.view.LayoutInflater
 import android.view.View

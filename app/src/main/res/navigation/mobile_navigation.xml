@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/navigation_home"
-        android:name="com.synaptix.budgetbuddy.presentation.ui.main.home.HomeFragment"
+        android:name="com.synaptix.budgetbuddy.presentation.ui.main.home.HomeMainFragment"
         android:label="@string/title_home"
         tools:layout="@layout/fragment_home" />
 
@@ -26,9 +26,9 @@
     <!-- AddTransactionFragment -->
     <fragment
         android:id="@+id/navigation_add_transaction"
-        android:name="com.synaptix.budgetbuddy.presentation.ui.main.addTransaction.AddTransactionFragment"
+        android:name="com.synaptix.budgetbuddy.presentation.ui.main.transaction.TransactionAddFragment"
         android:label="@string/title_transaction"
-        tools:layout="@layout/fragment_add_transaction">
+        tools:layout="@layout/fragment_transaction_add">
 
         <action
             android:id="@+id/action_addTransactionFragment_to_labelSelectorFragment"
@@ -50,21 +50,21 @@
 
     <fragment
         android:id="@+id/navigation_label_selector"
-        android:name="com.synaptix.budgetbuddy.presentation.ui.main.addTransaction.labelSelectorPopUp.LabelSelectorFragment"
+        android:name="com.synaptix.budgetbuddy.presentation.ui.main.transaction.transactionSelectLabelPopUp.TransactionSelectLabelFragment"
         android:label="Select Labels"
-        tools:layout="@layout/fragment_select_label" />
+        tools:layout="@layout/fragment_transaction_select_label" />
 
     <fragment
         android:id="@+id/navigation_category_selector"
-        android:name="com.synaptix.budgetbuddy.presentation.ui.main.addTransaction.categorySelectorPopUp.CategorySelectorFragment"
+        android:name="com.synaptix.budgetbuddy.presentation.ui.main.transaction.transactionSelectCategoryPopUp.TransactionSelectCategoryFragment"
         android:label="Select Category"
-        tools:layout="@layout/fragment_select_category"/>
+        tools:layout="@layout/fragment_transaction_select_category"/>
 
     <fragment
         android:id="@+id/navigation_add_new_category"
-        android:name="com.synaptix.budgetbuddy.presentation.ui.main.addTransaction.addTransactionCat.addNewCat.AddNewCategoryFragment"
+        android:name="com.synaptix.budgetbuddy.presentation.ui.main.transaction.categoryAddNew.CategoryAddNewFragment"
         android:label="Add Category"
-        tools:layout="@layout/fragment_add_new_category" />
+        tools:layout="@layout/fragment_category_add_new" />
 
     <fragment
         android:id="@+id/navigation_wallet_main"
@@ -91,9 +91,9 @@
 
     <fragment
         android:id="@+id/navigation_wallet_add"
-        android:name="com.synaptix.budgetbuddy.presentation.ui.main.wallet.addWallet.AddWalletFragment"
+        android:name="com.synaptix.budgetbuddy.presentation.ui.main.wallet.walletAdd.WalletAddFragment"
         android:label="Add Wallet"
-        tools:layout="@layout/fragment_add_wallet">
+        tools:layout="@layout/fragment_wallet_add">
 
         <action
             android:id="@+id/action_addWalletFragment_to_newWalletCategoryFragment"
@@ -114,9 +114,9 @@
 
     <fragment
         android:id="@+id/navigation_new_wallet_category"
-        android:name="com.synaptix.budgetbuddy.presentation.ui.main.wallet.addWallet.ChangeWalletIcon.NewWalletCategoryFragment"
+        android:name="com.synaptix.budgetbuddy.presentation.ui.main.wallet.walletAdd.walletSelectIconPopUp.WalletSelectIconFragment"
         android:label="New Wallet Category"
-        tools:layout="@layout/fragment_new_wallet_category">
+        tools:layout="@layout/fragment_wallet_select_icon">
 
         <action
             android:id="@+id/action_newWalletCategoryFragment_to_addWalletFragment"
@@ -130,7 +130,7 @@
 
     <fragment
         android:id="@+id/navigation_wallet_report"
-        android:name="com.synaptix.budgetbuddy.presentation.ui.main.wallet.reportWallet.WalletReportFragment"
+        android:name="com.synaptix.budgetbuddy.presentation.ui.main.wallet.walletReport.WalletReportFragment"
         android:label="Wallet Report"
         tools:layout="@layout/fragment_wallet_report"/>
 
@@ -138,21 +138,21 @@
 
     <fragment
         android:id="@+id/navigation_general_transactions"
-        android:name="com.synaptix.budgetbuddy.presentation.ui.main.transactions.generalTransactions.GeneralTransactionsFragment"
+        android:name="com.synaptix.budgetbuddy.presentation.ui.main.general.generalTransactions.GeneralTransactionsFragment"
         android:label="General Reports"
         tools:layout="@layout/fragment_general_transactions"/>
 
     <fragment
         android:id="@+id/navigation_general_reports"
-        android:name="com.synaptix.budgetbuddy.presentation.ui.main.transactions.generalReports.GeneralReportsFragment"
+        android:name="com.synaptix.budgetbuddy.presentation.ui.main.general.generalReports.GeneralReportsFragment"
         android:label="General Reports"
         tools:layout="@layout/fragment_general_reports" />
 
     <fragment
         android:id="@+id/navigation_budget_main"
-        android:name="com.synaptix.budgetbuddy.presentation.ui.main.budget.budgetHomePage.BudgetHomeFragment"
+        android:name="com.synaptix.budgetbuddy.presentation.ui.main.budget.BudgetMainFragment"
         android:label="Budgets"
-        tools:layout="@layout/fragment_budget_home">
+        tools:layout="@layout/fragment_budget_main">
 
         <action
             android:id="@+id/action_budgetMainFragment_to_budgetReportFragment"

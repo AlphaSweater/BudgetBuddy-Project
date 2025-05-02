@@ -31,10 +31,10 @@ class WalletMainAdapter(
         val wallet = walletList[position]
 
         // Bind data
-        holder.walletIcon.setImageResource(wallet.iconRes)
-        holder.walletName.text = wallet.name
-        holder.walletCurrency.text = wallet.currency
-        holder.walletAmount.text = wallet.amount
+//        holder.walletIcon.setImageResource(wallet.iconRes)
+//        holder.walletName.text = wallet.name
+//        holder.walletCurrency.text = wallet.currency
+//        holder.walletAmount.text = wallet.amount
 
         // Optional: handle click
         holder.itemView.setOnClickListener {
