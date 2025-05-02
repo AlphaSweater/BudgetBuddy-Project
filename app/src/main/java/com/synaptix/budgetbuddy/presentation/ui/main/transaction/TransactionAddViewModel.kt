@@ -66,20 +66,4 @@ class TransactionAddViewModel @Inject constructor(
         recurrenceRate.value = null
     }
 
-    fun updateBudgetAmount(amount: Double) {
-        // Ensure that the budgetId is not null or invalid
-        if (budgetId.value != null) {
-            viewModelScope.launch {
-                try {
-                    budgetRepository.updateBudgetAmount(budgetId.value!!, amount)
-                    Log.d("TransactionAddViewModel", "Updated budget amount successfully")
-                } catch (e: Exception) {
-                    Log.e("TransactionAddViewModel", "Error updating amount: ${e.message}")
-                }
-            }
-        } else {
-            Log.e("TransactionAddViewModel", "Budget ID is null")
-        }
-    }
-
 }

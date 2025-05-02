@@ -12,12 +12,10 @@ class BudgetRepository @Inject constructor(
     suspend fun insertBudget(budget: BudgetEntity) {
         budgetDao.insertBudget(budget)
     }
+
     suspend fun getBudgetsByUser(userId: Int): List<Budget> {
         val budgets = budgetDao.getBudgetsByUser(userId)
         return budgets.map { it.toDomain() }
     }
 
-    suspend fun updateBudgetAmount(budgetId: Long, amount: Double) {
-        budgetDao.updateAmount(budgetId, amount)
-    }
 }
