@@ -12,7 +12,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.synaptix.budgetbuddy.R
 import com.synaptix.budgetbuddy.core.model.BudgetReportListItems
 import com.synaptix.budgetbuddy.databinding.FragmentGeneralReportsBinding
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class GeneralReportsFragment : Fragment() {
 
     private var _binding: FragmentGeneralReportsBinding? = null
@@ -33,48 +35,51 @@ class GeneralReportsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setupRecyclers()
         setupOnClickListeners()
+        viewModel.reportCategoryItems.observe(viewLifecycleOwner) { items ->
+            binding.recyclerViewExpenseCategory.adapter = GeneralReportAdapter(items)
+        }
     }
 
     private fun setupRecyclers() {
-        labelRecycler()
-        categoryRecycler()
+//        labelRecycler()
+//        categoryRecycler()
     }
 
-    private fun labelRecycler() {
-        val labelItems = listOf(
-            BudgetReportListItems.LabelItems(
-                labelName = "Food",
-                labelIcon = R.drawable.baseline_fastfood_24,
-                labelColour = R.color.cat_light_blue,
-                transactionCount = 5,
-                amount = "R 1,000",
-                relativeDate = "This Week"
-            )
-        )
+//    private fun labelRecycler() {
+////        val labelItems = listOf(
+////            BudgetReportListItems.LabelItems(
+////                labelName = "Food",
+////                labelIcon = R.drawable.baseline_fastfood_24,
+////                labelColour = R.color.cat_light_blue,
+////                transactionCount = 5,
+////                amount = "R 1,000",
+////                relativeDate = "This Week"
+////            )
+////        )
+//
+//        binding.recyclerViewExpenseLabel.apply {
+//            layoutManager = LinearLayoutManager(requireContext())
+//            adapter = GeneralReportAdapter(labelItems)
+//        }
+//    }
 
-        binding.recyclerViewExpenseLabel.apply {
-            layoutManager = LinearLayoutManager(requireContext())
-            adapter = GeneralReportAdapter(labelItems)
-        }
-    }
-
-    private fun categoryRecycler() {
-        val categoryItems = listOf(
-            BudgetReportListItems.CategoryItems(
-                categoryName = "Food",
-                categoryIcon = R.drawable.baseline_fastfood_24,
-                categoryColour = R.color.cat_light_blue,
-                transactionCount = 5,
-                amount = "R 1,000",
-                relativeDate = "This Week"
-            )
-        )
-
-        binding.recyclerViewExpenseCategory.apply {
-            layoutManager = LinearLayoutManager(requireContext())
-            adapter = GeneralReportAdapter(categoryItems)
-        }
-    }
+//    private fun categoryRecycler() {
+////        val categoryItems = listOf(
+////            BudgetReportListItems.CategoryItems(
+////                categoryName = "Food",
+////                categoryIcon = R.drawable.baseline_fastfood_24,
+////                categoryColour = R.color.cat_light_blue,
+////                transactionCount = 5,
+////                amount = "R 1,000",
+////                relativeDate = "This Week"
+////            )
+////        )
+//
+//        binding.recyclerViewExpenseCategory.apply {
+//            layoutManager = LinearLayoutManager(requireContext())
+//            adapter = GeneralReportAdapter(categoryItems)
+//        }
+//    }
 
     private fun setupOnClickListeners() {
         binding.btnGoBack.setOnClickListener {
@@ -131,4 +136,5 @@ class GeneralReportsFragment : Fragment() {
         super.onDestroyView()
         _binding = null
     }
+
 }
