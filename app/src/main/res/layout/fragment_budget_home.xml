@@ -132,7 +132,7 @@
         app:layout_constraintTop_toBottomOf="@+id/budget_container" />
 
     <com.google.android.material.card.MaterialCardView
-        android:id="@+id/budgetCard"
+        android:id="@+id/budget_card"
         android:layout_width="384dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="18dp"
