@@ -1,7 +1,7 @@
 package com.synaptix.budgetbuddy.core.usecase.main.transaction
 
 import com.synaptix.budgetbuddy.core.model.TransactionIn
-import com.synaptix.budgetbuddy.data.local.mapper.toEntity
+import com.synaptix.budgetbuddy.data.entity.mapper.toEntity
 import com.synaptix.budgetbuddy.data.repository.TransactionRepository
 import javax.inject.Inject
 
