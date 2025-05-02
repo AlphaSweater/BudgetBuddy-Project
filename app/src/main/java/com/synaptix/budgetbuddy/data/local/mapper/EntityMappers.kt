@@ -6,59 +6,10 @@ import com.synaptix.budgetbuddy.data.entity.TransactionEntity
 import com.synaptix.budgetbuddy.data.entity.WalletEntity
 
 
-// -----------------------------
-// Mappers from Entities
-// AI assisted with creating the mappers
-// -----------------------------
-
-//fun BudgetEntity.toDomain() = Budget(
-//    id = budget_id,
-//    name = name,
-//    minAmount = minAmount,
-//    maxAmount = maxAmount
-//)
-//
-//fun CategoryEntity.toDomain() = Category(
-//    id = category_id,
-//    name = name,
-//    colour = colour,
-//    icon = icon,
-//    type = type
-//)
-//
-//fun LabelEntity.toDomain() = Label(
-//    id = label_id,
-//    name = name
-//)
-//
-//fun TransactionEntity.toDomain() = Transaction(
-//    id = transaction_id,
-//    amount = amount,
-//    date = date,
-//    note = note,
-//    currency = currency,
-//    label = label,
-//    image = image,
-//    recurrence = recurrence
-//)
-//
-//fun WalletEntity.toDomain() = Wallet(
-//    id = wallet_id,
-//    name = name,
-//    currency = currency,
-//    balance = balance
-//)
-//
-//fun UserEntity.toDomain() = User(
-//    id = user_id,
-//    firstName = firstName,
-//    lastName = lastName,
-//    email = email
-//)
 //AI assisted with the logic behind mapper
-fun Transaction.toEntity(): TransactionEntity {
+fun TransactionIn.toEntity(): TransactionEntity {
     return TransactionEntity(
-        transaction_id = this.transactionId ?: 0, // 0 for autoGenerate
+        transaction_id = this.transactionId ?: 0,
         user_id = this.userId,
         wallet_id = this.walletId,
         category_id = this.categoryId,
@@ -71,7 +22,26 @@ fun Transaction.toEntity(): TransactionEntity {
         recurrence = this.recurrenceRate ?: ""
     )
 }
-
+fun CategoryIn.toEntity(): CategoryEntity {
+    return CategoryEntity(
+        category_id = this.categoryId,
+        user_id = this.userId,
+        name = this.categoryName,
+        colour = this.categoryColor,
+        icon = this.categoryIcon,
+        type = this.categoryType
+    )
+}
+fun CategoryEntity.toDomain(): CategoryIn {
+    return CategoryIn(
+        categoryId = this.category_id,
+        userId = this.user_id,
+        categoryName = this.name,
+        categoryType = this.type,
+        categoryIcon = this.icon,
+        categoryColor = this.colour
+    )
+}
 
 fun Wallet.toEntity(): WalletEntity {
     return WalletEntity(

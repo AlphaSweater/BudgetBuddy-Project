@@ -7,6 +7,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.synaptix.budgetbuddy.core.model.Label
 import com.synaptix.budgetbuddy.core.model.Transaction
+import com.synaptix.budgetbuddy.core.model.TransactionIn
 import com.synaptix.budgetbuddy.core.usecase.auth.GetUserIdUseCase
 import com.synaptix.budgetbuddy.core.usecase.main.transaction.AddTransactionUseCase
 
@@ -29,7 +30,7 @@ class TransactionAddViewModel @Inject constructor(
 
 
     suspend fun addTransaction() {
-        val transaction = Transaction(
+        val transaction = TransactionIn(
             userId = getUserIdUseCase.execute(),
             categoryId = categoryId.value ?: 0,
             walletId = walletId.value ?: 0,

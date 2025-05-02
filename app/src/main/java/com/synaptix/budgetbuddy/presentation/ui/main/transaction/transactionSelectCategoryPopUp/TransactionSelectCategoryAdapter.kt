@@ -9,10 +9,11 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.synaptix.budgetbuddy.R
 import com.synaptix.budgetbuddy.core.model.Category
+import com.synaptix.budgetbuddy.core.model.CategoryIn
 
 class TransactionSelectCategoryAdapter(
-    private val categories: List<Category>,
-    private val onCategoryClick: (Category) -> Unit
+    private val categories: List<CategoryIn>,
+    private val onCategoryClick: (CategoryIn) -> Unit
 ) : RecyclerView.Adapter<TransactionSelectCategoryAdapter.CategoryViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CategoryViewHolder {
@@ -31,7 +32,7 @@ class TransactionSelectCategoryAdapter(
         private val categoryIcon: ImageView = itemView.findViewById(R.id.imgCategoryIcon)
         private val categoryName: TextView = itemView.findViewById(R.id.txtCategoryName)
 
-        fun bind(category: Category) {
+        fun bind(category: CategoryIn) {
             val context = itemView.context
 
             categoryName.text = category.categoryName

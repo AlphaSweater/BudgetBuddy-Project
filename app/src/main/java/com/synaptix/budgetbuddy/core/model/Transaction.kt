@@ -8,7 +8,7 @@ import com.synaptix.budgetbuddy.data.entity.UserEntity
 import com.synaptix.budgetbuddy.data.entity.WalletEntity
 import java.io.Serializable
 
-data class Transaction(
+data class TransactionIn(
     val transactionId: Int? = null,
     val userId: Int,
     val walletId: Int,
@@ -23,7 +23,7 @@ data class Transaction(
 ) : Serializable
 
 //AI assisted with the creation of this data class
-data class TransactionFull(
+data class Transaction(
     val id: Int,
     val amount: Double,
     val date: String,
@@ -60,8 +60,8 @@ data class TransactionWithDetails(
 )
 
 // AI assisted with the creation of this function
-fun TransactionWithDetails.toTransactionFull(): TransactionFull {
-    return TransactionFull(
+fun TransactionWithDetails.toTransaction(): Transaction {
+    return Transaction(
         id = transaction.transaction_id,
         amount = transaction.amount,
         date = transaction.date,
