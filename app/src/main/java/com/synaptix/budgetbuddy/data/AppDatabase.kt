@@ -48,7 +48,7 @@ import com.synaptix.budgetbuddy.data.local.dao.MinMaxGoalsDao
 // application evolves and requires migrations.
 @Database(
     entities = [UserEntity::class, TransactionEntity::class, WalletEntity::class, CategoryEntity::class, BudgetEntity::class, LabelEntity::class, TransactionLabelEntity::class, MinMaxGoalEntity::class],
-    version = 11
+    version = 12
 )
 
 
