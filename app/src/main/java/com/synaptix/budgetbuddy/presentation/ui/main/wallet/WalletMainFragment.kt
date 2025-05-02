@@ -39,14 +39,14 @@ class WalletMainFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.btnAdd.setOnClickListener{
+        binding.btnCreateWallet.setOnClickListener{
             (activity as? AuthActivity)?.showLogin()
         }
         setupOnClickListeners()
     }
 
     private fun setupOnClickListeners() {
-        binding.btnAdd.setOnClickListener {
+        binding.btnCreateWallet.setOnClickListener {
             findNavController().navigate(R.id.action_walletMainFragment_to_addWalletFragment)
         }
 
