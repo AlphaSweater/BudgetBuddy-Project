@@ -13,6 +13,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.synaptix.budgetbuddy.R
 import com.synaptix.budgetbuddy.core.model.Category
+import com.synaptix.budgetbuddy.core.model.CategoryIn
 import com.synaptix.budgetbuddy.core.usecase.auth.GetUserIdUseCase
 import com.synaptix.budgetbuddy.databinding.FragmentTransactionSelectCategoryBinding
 import com.synaptix.budgetbuddy.presentation.ui.main.transaction.TransactionAddViewModel
@@ -114,7 +115,7 @@ class TransactionSelectCategoryFragment : Fragment() {
 
         categoryViewmodel.categories.observe(viewLifecycleOwner) { categoryEntities ->
             val categories = categoryEntities.map {
-                Category(
+                CategoryIn(
                     it.category_id,
                     it.user_id ?: 0,
                     it.name,

@@ -6,7 +6,7 @@ import com.synaptix.budgetbuddy.data.entity.CategoryEntity
 import com.synaptix.budgetbuddy.data.entity.UserEntity
 import java.io.Serializable
 
-data class Category (
+data class CategoryIn (
     val categoryId: Int = 0,
     val userId: Int?,
     val categoryName: String,
@@ -15,7 +15,7 @@ data class Category (
     val categoryColor: Int
 ) : Serializable
 
-data class CategoryFull(
+data class Category(
     val category: CategoryEntity,
     val user: UserEntity?
 )
@@ -31,9 +31,9 @@ data class CategoryWithUser(
     val user: UserEntity?
 )
 
-//convert CategoryWithUser to CategoryFull
-fun CategoryWithUser.toCategoryFull(): CategoryFull {
-    return CategoryFull(
+//convert CategoryWithUser to Category
+fun CategoryWithUser.toCategory(): Category {
+    return Category(
         category = category,
         user = user
     )
