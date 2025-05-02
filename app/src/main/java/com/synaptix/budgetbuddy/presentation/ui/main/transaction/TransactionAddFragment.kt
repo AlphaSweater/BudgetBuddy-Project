@@ -1,6 +1,5 @@
-package com.synaptix.budgetbuddy.presentation.ui.main.addTransaction
+package com.synaptix.budgetbuddy.presentation.ui.main.transaction
 
-import android.app.DatePickerDialog
 import android.content.ContentValues
 import android.content.res.ColorStateList
 import android.graphics.Color
@@ -37,6 +36,7 @@ import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AlertDialog
 import java.io.ByteArrayOutputStream
 
 
@@ -171,7 +171,7 @@ class TransactionAddFragment : Fragment() {
 
     private fun showImageSourceDialog() {
         val options = arrayOf("Take Photo", "Choose from Gallery")
-        androidx.appcompat.app.AlertDialog.Builder(requireContext())
+        AlertDialog.Builder(requireContext())
             .setTitle("Add Image")
             .setItems(options) { _, which ->
                 when (which) {
