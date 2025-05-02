@@ -1,11 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
+
+<!--    ======================================================================================-->
+<!--    Group 2 - Group Members:-->
+<!--    ======================================================================================-->
+<!--    * Chad Fairlie ST10269509-->
+<!--    * Dhiren Ruthenavelu ST10256859-->
+<!--    * Kayla Ferreira ST10259527-->
+<!--    * Nathan Teixeira ST10249266-->
+<!--    ======================================================================================-->
+<!--    Declaration:-->
+<!--    ======================================================================================-->
+<!--    We declare that this work is our own original work and that no part of it has been-->
+<!--    copied from any other source, except where explicitly acknowledged.-->
+<!--    ======================================================================================-->
+<!--    References:-->
+<!--    ======================================================================================-->
+<!--    * ChatGPT was used to help with the design and planning. As well as assisted with-->
+<!--    finding and fixing errors in the code.-->
+<!--    * ChatGPT also helped with the forming of comments for the code.-->
+<!--    * https://www.youtube.com/watch?v=A_tPafV23DM&list=PLPgs125_L-X9H6J7x4beRU-AxJ4mXe5vX-->
+<!--    ======================================================================================-->
+
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <!--======================================================================================-->
+    <!-- Declare device hardware features used (e.g., camera) -->
+    <!--======================================================================================-->
     <uses-feature
         android:name="android.hardware.camera"
         android:required="false" />
 
+    <!--======================================================================================-->
+    <!-- Application configuration -->
+    <!--======================================================================================-->
     <application
         android:name=".BudgetBuddyApp"
         android:allowBackup="true"
@@ -17,6 +45,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.BudgetBuddy"
         tools:targetApi="31">
+
+        <!--======================================================================================-->
+        <!-- AuthActivity: This is the launcher activity (login/register screen) -->
+        <!--======================================================================================-->
         <activity
             android:name=".presentation.ui.auth.AuthActivity"
             android:exported="true">
@@ -26,11 +58,18 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!--======================================================================================-->
+        <!-- MainActivity: This is the main/home screen after login -->
+        <!--======================================================================================-->
         <activity
             android:name=".presentation.ui.main.MainActivity"
             android:exported="true"
-            android:label="@string/app_name" />
+            android:label="@string/app_name"/>
 
+        <!--======================================================================================-->
+        <!-- Preload custom fonts -->
+        <!--======================================================================================-->
         <meta-data
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />
