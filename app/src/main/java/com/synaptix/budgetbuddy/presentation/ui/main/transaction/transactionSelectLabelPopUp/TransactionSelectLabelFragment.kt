@@ -15,7 +15,8 @@ import com.synaptix.budgetbuddy.data.entity.LabelEntity
 import com.synaptix.budgetbuddy.databinding.FragmentTransactionSelectLabelBinding
 import com.synaptix.budgetbuddy.presentation.ui.main.transaction.TransactionAddViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import kotlin.getValue
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class TransactionSelectLabelFragment : Fragment() {
@@ -26,9 +27,11 @@ class TransactionSelectLabelFragment : Fragment() {
     private val viewModel: TransactionAddViewModel by activityViewModels()
     private val labelViewModel: TransactionSelectLabelViewModel by viewModels()
 
-    private lateinit var transactionSelectLabelAdapter: TransactionSelectLabelAdapter
-
-    private val baseLabelNames = listOf("Salary", "Gift", "Bonus", "Investment", "Cashback")
+    private val labelAdapter by lazy {
+        TransactionSelectLabelAdapter { selectedLabels ->
+            viewModel.selectedLabels.value = ArrayList(selectedLabels)
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -42,66 +45,47 @@ class TransactionSelectLabelFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupRecyclerView()
-        setupOnClickListeners()
-
-        labelViewModel.loadLabelsForUser(userId = 1)
-
-        lifecycleScope.launchWhenStarted {
-            labelViewModel.labels.collect { labels ->
-                updateLabels(labels)
-            }
-        }
+        setupClickListeners()
+        observeLabels()
     }
 
     private fun setupRecyclerView() {
-        val selectedLabels = viewModel.selectedLabels.value ?: listOf<Label>() // Default to an empty list if null
-
-        val labels = baseLabelNames.map { labelName ->
-            val isSelected = selectedLabels.any { it.labelName == labelName && it.isSelected }
-            Label(
-                labelName = labelName,
-                transactionInfo = "0 transactions in 0 wallets",
-                isSelected = isSelected
-            )
-        }.toMutableList()
-
-        transactionSelectLabelAdapter = TransactionSelectLabelAdapter(labels) {}
-
         binding.recyclerViewLabels.apply {
             layoutManager = LinearLayoutManager(requireContext())
-            adapter = transactionSelectLabelAdapter
+            adapter = labelAdapter
         }
+
+        // Initialize with selected labels from ViewModel
+        val selectedLabels = viewModel.selectedLabels.value ?: emptyList()
+        val initialLabels = selectedLabels.map { it.copy() }
+        labelAdapter.submitList(initialLabels)
     }
 
-    private fun setupOnClickListeners() {
+    private fun setupClickListeners() {
         binding.btnGoBack.setOnClickListener {
             findNavController().popBackStack()
         }
     }
 
+    private fun observeLabels() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            labelViewModel.loadLabelsForUser(userId = 1) // TODO: Get actual user ID
+            labelViewModel.labels.collectLatest { labelEntities ->
+                val selectedLabels = viewModel.selectedLabels.value ?: emptyList()
+                val labels = labelEntities.map { entity ->
+                    Label(
+                        labelName = entity.name,
+                        transactionInfo = "0 transactions in 0 wallets", // TODO: Get actual transaction info
+                        isSelected = selectedLabels.any { it.labelName == entity.name }
+                    )
+                }
+                labelAdapter.submitList(labels)
+            }
+        }
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
-        val selected = ArrayList(transactionSelectLabelAdapter.getSelectedLabels())
-        viewModel.selectedLabels.value = selected
         _binding = null
     }
-
-    // This function is called when the labels are loaded from the database
-    // AI assisted with this function to update the labels in the adapter
-    private fun updateLabels(entities: List<LabelEntity>) {
-        val selectedLabels = viewModel.selectedLabels.value ?: emptyList()
-
-        val labelList = entities.map { entity ->
-            val isSelected = selectedLabels.any { it.labelName == entity.name && it.isSelected }
-            Label(
-                labelName = entity.name,
-                transactionInfo = "0 transactions in 0 wallets",
-                isSelected = isSelected
-            )
-        }
-
-        transactionSelectLabelAdapter.updateLabels(labelList)
-    }
-    
-    
 }

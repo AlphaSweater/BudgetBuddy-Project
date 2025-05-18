@@ -1,41 +1,33 @@
 package com.synaptix.budgetbuddy.presentation.ui.main.transaction.transactionSelectWalletPopUp
 
-import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import androidx.recyclerview.widget.RecyclerView
 import com.synaptix.budgetbuddy.R
 import com.synaptix.budgetbuddy.core.model.Wallet
+import com.synaptix.budgetbuddy.presentation.ui.common.BaseAdapter
 
 class TransactionSelectWalletAdapter(
-    private val wallets: List<Wallet>,
-    private val onWalletClick: (Wallet) -> Unit // Callback with selected wallet
-) : RecyclerView.Adapter<TransactionSelectWalletAdapter.WalletViewHolder>() {
+    private val onWalletClick: (Wallet) -> Unit
+) : BaseAdapter<Wallet, TransactionSelectWalletAdapter.WalletViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): WalletViewHolder {
-        val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_wallet, parent, false)
-        return WalletViewHolder(view)
+        return createViewHolder(
+            parent = parent,
+            layoutResId = R.layout.item_wallet
+        ) { WalletViewHolder(it) }
     }
 
-    override fun onBindViewHolder(holder: WalletViewHolder, position: Int) {
-        holder.bind(wallets[position])
-    }
-
-    override fun getItemCount(): Int = wallets.size
-
-    inner class WalletViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    inner class WalletViewHolder(itemView: View) : BaseViewHolder<Wallet>(itemView) {
         private val name: TextView = itemView.findViewById(R.id.walletName)
         private val balance: TextView = itemView.findViewById(R.id.walletBalance)
 
-        fun bind(wallet: Wallet) {
-            name.text = wallet.walletName
-            balance.text = "R %.2f".format(wallet.walletBalance)
+        override fun bind(item: Wallet) {
+            name.text = item.walletName
+            balance.text = "R %.2f".format(item.walletBalance)
 
             itemView.setOnClickListener {
-                onWalletClick(wallet)
-
+                onWalletClick(item)
             }
         }
     }

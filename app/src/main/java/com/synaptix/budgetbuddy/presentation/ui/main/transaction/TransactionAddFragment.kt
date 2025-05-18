@@ -45,6 +45,7 @@ import com.synaptix.budgetbuddy.core.model.Category
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import android.widget.ImageView
+import com.synaptix.budgetbuddy.core.model.Wallet
 
 @AndroidEntryPoint
 class TransactionAddFragment : Fragment() {
@@ -263,20 +264,25 @@ class TransactionAddFragment : Fragment() {
 
     // --- Update Methods ---
 
-    private fun updateSelectedCategory(categoryName: String?) {
-        if (categoryName == null) {
+    private fun updateSelectedCategory(category: Category?) {
+        if (category == null) {
             binding.textSelectedCategoryName.text = "No category selected"
+            binding.imgSelectedCategoryIcon.setImageResource(R.drawable.ic_circle_24)
+            binding.imgSelectedCategoryIcon.setColorFilter(requireContext().getColor(R.color.button))
             return
         }
-        binding.textSelectedCategoryName.text = categoryName
+
+        binding.textSelectedCategoryName.text = category.categoryName
+        binding.imgSelectedCategoryIcon.setImageResource(category.categoryIcon)
+        binding.imgSelectedCategoryIcon.setColorFilter(requireContext().getColor(category.categoryColor))
     }
 
-    private fun updateSelectedWallet(walletName: String?) {
-        if (walletName == null) {
+    private fun updateSelectedWallet(wallet: Wallet?) {
+        if (wallet == null) {
             binding.textSelectedWalletName.text = "No wallet selected"
             return
         }
-        binding.textSelectedWalletName.text = walletName
+        binding.textSelectedWalletName.text = wallet.walletName
     }
 
     private fun updateSelectedDate(date: String?) {
@@ -291,7 +297,7 @@ class TransactionAddFragment : Fragment() {
 
     private fun updateSelectedRecurrenceRate(recurrenceRate: String?) {
         if (recurrenceRate == null){
-            binding.textSelectedRecurrenceRate.text = "No recurrence rate selected"
+            binding.textSelectedRecurrenceRate.text = "One time"
             return
         }
         binding.textSelectedRecurrenceRate.text = recurrenceRate
@@ -361,11 +367,11 @@ class TransactionAddFragment : Fragment() {
         }
 
         viewModel.category.observe(viewLifecycleOwner) { category ->
-            updateSelectedCategory(category?.categoryName)
+            updateSelectedCategory(category)
         }
 
         viewModel.wallet.observe(viewLifecycleOwner) { wallet ->
-            updateSelectedWallet(wallet?.walletName)
+            updateSelectedWallet(wallet)
         }
 
         viewModel.date.observe(viewLifecycleOwner) { date ->

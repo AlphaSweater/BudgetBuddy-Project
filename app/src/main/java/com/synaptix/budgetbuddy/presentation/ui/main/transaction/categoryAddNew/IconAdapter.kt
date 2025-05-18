@@ -1,51 +1,56 @@
 package com.synaptix.budgetbuddy.presentation.ui.main.transaction.categoryAddNew
 
-import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import androidx.recyclerview.widget.RecyclerView
 import com.synaptix.budgetbuddy.R
+import com.synaptix.budgetbuddy.presentation.ui.common.BaseAdapter
 
+/**
+ * Adapter for displaying and selecting category icons
+ * @param onIconSelected Callback when an icon is selected
+ */
 class IconAdapter(
     private val onIconSelected: (IconItem) -> Unit
-) : RecyclerView.Adapter<IconAdapter.IconViewHolder>() {
+) : BaseAdapter<IconItem, IconAdapter.IconViewHolder>() {
 
-    private var icons: List<IconItem> = emptyList()
     private var selectedPosition = -1
 
-    fun submitList(newIcons: List<IconItem>) {
-        icons = newIcons
-        notifyDataSetChanged()
-    }
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): IconViewHolder {
-        val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_category_icon, parent, false)
-        return IconViewHolder(view)
+        return createViewHolder(
+            parent = parent,
+            layoutResId = R.layout.item_category_icon
+        ) { IconViewHolder(it) }
     }
 
     override fun onBindViewHolder(holder: IconViewHolder, position: Int) {
-        holder.bind(icons[position], position == selectedPosition)
+        holder.bind(items[position])
+        holder.setSelected(position == selectedPosition)
+        holder.setOnClickListener {
+            val oldPosition = selectedPosition
+            selectedPosition = position
+            notifyItemChanged(oldPosition)
+            notifyItemChanged(selectedPosition)
+            onIconSelected(items[position])
+        }
     }
 
-    override fun getItemCount(): Int = icons.size
-
-    inner class IconViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    class IconViewHolder(
+        itemView: View
+    ) : BaseViewHolder<IconItem>(itemView) {
         private val iconView: ImageView = itemView.findViewById(R.id.iconView)
         private val selectedIndicator: ImageView = itemView.findViewById(R.id.selectedIndicator)
 
-        fun bind(icon: IconItem, isSelected: Boolean) {
-            iconView.setImageResource(icon.iconResourceId)
-            selectedIndicator.visibility = if (isSelected) View.VISIBLE else View.GONE
+        override fun bind(item: IconItem) {
+            iconView.setImageResource(item.iconResourceId)
+        }
 
-            itemView.setOnClickListener {
-                val oldPosition = selectedPosition
-                selectedPosition = adapterPosition
-                notifyItemChanged(oldPosition)
-                notifyItemChanged(selectedPosition)
-                onIconSelected(icon)
-            }
+        fun setSelected(isSelected: Boolean) {
+            selectedIndicator.visibility = if (isSelected) View.VISIBLE else View.GONE
+        }
+
+        fun setOnClickListener(onClick: () -> Unit) {
+            itemView.setOnClickListener { onClick() }
         }
     }
 } 

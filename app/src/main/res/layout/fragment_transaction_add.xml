@@ -184,6 +184,7 @@
                         android:background="?attr/selectableItemBackground">
 
                         <ImageView
+                            android:id="@+id/imgSelectedCategoryIcon"
                             style="@style/RowIconStyle"
                             android:src="@drawable/ic_circle_24"
                             app:tint="?attr/bb_button" />
@@ -243,6 +244,7 @@
                         android:background="?attr/selectableItemBackground">
 
                         <ImageView
+                            android:id="@+id/imgSelectedWalletIcon"
                             style="@style/RowIconStyle"
                             android:src="@drawable/ic_account_balance_wallet_24"
                             app:tint="?attr/bb_button" />

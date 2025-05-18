@@ -1,62 +1,67 @@
 package com.synaptix.budgetbuddy.presentation.ui.main.transaction.transactionSelectCategoryPopUp
 
-import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
-import androidx.recyclerview.widget.RecyclerView
 import com.synaptix.budgetbuddy.R
 import com.synaptix.budgetbuddy.core.model.Category
-import com.synaptix.budgetbuddy.core.model.CategoryIn
+import com.synaptix.budgetbuddy.presentation.ui.common.BaseAdapter
 
 class TransactionSelectCategoryAdapter(
-    private val categories: List<Category>,
     private val onCategoryClick: (Category) -> Unit
-) : RecyclerView.Adapter<TransactionSelectCategoryAdapter.CategoryViewHolder>() {
+) : BaseAdapter<Category, TransactionSelectCategoryAdapter.CategoryViewHolder>() {
 
-    private var filteredCategories = categories.toList()
-    val currentList: List<Category> get() = filteredCategories
+    private var originalItems = emptyList<Category>()
+    private var filteredItems = emptyList<Category>()
+    private var currentQuery = ""
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CategoryViewHolder {
-        val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_category, parent, false)
-        return CategoryViewHolder(view)
+        return createViewHolder(
+            parent = parent,
+            layoutResId = R.layout.item_category
+        ) { CategoryViewHolder(it) }
     }
 
-    override fun onBindViewHolder(holder: CategoryViewHolder, position: Int) {
-        holder.bind(filteredCategories[position])
+    fun submitList(list: List<Category>) {
+        originalItems = list
+        filter(currentQuery) // Reapply current filter
     }
-
-    override fun getItemCount(): Int = filteredCategories.size
 
     fun filter(query: String) {
-        filteredCategories = if (query.isEmpty()) {
-            categories
+        currentQuery = query
+        filteredItems = if (query.isEmpty()) {
+            originalItems
         } else {
-            categories.filter {
+            originalItems.filter {
                 it.categoryName.contains(query, ignoreCase = true)
             }
         }
         notifyDataSetChanged()
     }
 
-    inner class CategoryViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    inner class CategoryViewHolder(itemView: View) : BaseViewHolder<Category>(itemView) {
         private val categoryIcon: ImageView = itemView.findViewById(R.id.imgCategoryIcon)
         private val categoryName: TextView = itemView.findViewById(R.id.txtCategoryName)
 
-        fun bind(category: Category) {
+        override fun bind(item: Category) {
             val context = itemView.context
 
-            categoryName.text = category.categoryName
-            categoryIcon.setImageResource(category.categoryIcon)
-            val colorInt = ContextCompat.getColor(context, category.categoryColor)
+            categoryName.text = item.categoryName
+            categoryIcon.setImageResource(item.categoryIcon)
+            val colorInt = ContextCompat.getColor(context, item.categoryColor)
             categoryIcon.setColorFilter(colorInt)
 
             itemView.setOnClickListener {
-                onCategoryClick(category)
+                onCategoryClick(item)
             }
         }
+    }
+
+    override fun getItemCount(): Int = filteredItems.size
+
+    override fun onBindViewHolder(holder: CategoryViewHolder, position: Int) {
+        holder.bind(filteredItems[position])
     }
 }

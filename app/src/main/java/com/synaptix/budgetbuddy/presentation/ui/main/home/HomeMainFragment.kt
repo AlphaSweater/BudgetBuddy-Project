@@ -35,9 +35,48 @@ class HomeMainFragment : Fragment() {
 
     private val viewModel: HomeMainViewModel by activityViewModels()
 
-    private lateinit var homeAdapter: HomeAdapter
+    // Initialize adapters once and reuse them
+    private val walletAdapter by lazy {
+        HomeAdapter(
+            onWalletClick = { wallet ->
+                // TODO: Implement wallet click handling:
+                // 1. Navigate to wallet details screen
+                // 2. Pass wallet data using Safe Args:
+                //    - wallet name
+                //    - wallet balance
+                // 3. Show wallet transactions for this specific wallet
+            }
+        )
+    }
 
-    private val TAG = "HomeMainFragment"
+    private val transactionAdapter by lazy {
+        HomeAdapter(
+            onTransactionClick = { transaction ->
+                // TODO: Implement transaction click handling:
+                // 1. Navigate to transaction details screen
+                // 2. Pass transaction data using Safe Args:
+                //    - transaction amount
+                //    - category details
+                //    - wallet details
+                //    - date and notes
+                // 3. Allow editing and viewing of transaction
+            }
+        )
+    }
+
+    private val categoryAdapter by lazy {
+        HomeAdapter(
+            onCategoryClick = { category ->
+                // TODO: Implement category click handling:
+                // 1. Navigate to category details screen
+                // 2. Pass category data using Safe Args:
+                //    - category name
+                //    - category icon
+                //    - category color
+                // 3. Show transactions for this specific category
+            }
+        )
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -58,10 +97,21 @@ class HomeMainFragment : Fragment() {
         binding.apply {
             //editTextDate2.setOnClickListener { openDateRangePicker() }
 
-            // Setup RecyclerViews
-            recyclerViewHomeWalletOverview.layoutManager = LinearLayoutManager(requireContext())
-            recyclerViewHomeTransactionOverview.layoutManager = LinearLayoutManager(requireContext())
-            recyclerViewHomeCategoryOverview.layoutManager = LinearLayoutManager(requireContext())
+            // Setup RecyclerViews with their adapters
+            recyclerViewHomeWalletOverview.apply {
+                layoutManager = LinearLayoutManager(requireContext())
+                adapter = walletAdapter
+            }
+            
+            recyclerViewHomeTransactionOverview.apply {
+                layoutManager = LinearLayoutManager(requireContext())
+                adapter = transactionAdapter
+            }
+            
+            recyclerViewHomeCategoryOverview.apply {
+                layoutManager = LinearLayoutManager(requireContext())
+                adapter = categoryAdapter
+            }
 
             // Setup click listeners
             txtViewAllWallets.setOnClickListener {
@@ -127,7 +177,7 @@ class HomeMainFragment : Fragment() {
                             relativeDate = "Recent"
                         )
                     }
-                    setupWalletAdapter(walletItems)
+                    walletAdapter.submitList(walletItems)
                 }
                 is HomeMainViewModel.UiState.Error -> {
                     recyclerViewHomeWalletOverview.isVisible = false
@@ -171,7 +221,7 @@ class HomeMainFragment : Fragment() {
                             )
                         }
                     }
-                    setupTransactionAdapter(transactionItems)
+                    transactionAdapter.submitList(transactionItems)
                 }
                 is HomeMainViewModel.UiState.Error -> {
                     recyclerViewHomeTransactionOverview.isVisible = false
@@ -214,7 +264,7 @@ class HomeMainFragment : Fragment() {
                             )
                         }
                     }
-                    setupCategoryAdapter(categoryItems)
+                    categoryAdapter.submitList(categoryItems)
                 }
                 is HomeMainViewModel.UiState.Error -> {
                     recyclerViewHomeCategoryOverview.isVisible = false
@@ -226,63 +276,9 @@ class HomeMainFragment : Fragment() {
         }
     }
 
-    private fun setupWalletAdapter(items: List<HomeWalletItem>) {
-        binding.recyclerViewHomeWalletOverview.adapter = HomeAdapter(
-            items = items,
-            onWalletClick = { wallet ->
-                // TODO: Navigate to wallet details
-            }
-        )
-    }
-
-    private fun setupTransactionAdapter(items: List<TransactionItem>) {
-        binding.recyclerViewHomeTransactionOverview.adapter = HomeAdapter(
-            items = items,
-            onTransactionClick = { transaction ->
-                // TODO: Navigate to transaction details
-            }
-        )
-    }
-
-    private fun setupCategoryAdapter(items: List<CategoryItems>) {
-        binding.recyclerViewHomeCategoryOverview.adapter = HomeAdapter(
-            items = items,
-            onCategoryClick = { category ->
-                // TODO: Navigate to category details
-            }
-        )
-    }
-
     private fun showError(message: String) {
         Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
     }
-
-//    private fun openDateRangePicker() {
-//        val picker = MaterialDatePicker.Builder.dateRangePicker()
-//            .setTitleText("Select Date Range")
-//            .build()
-//
-//        picker.addOnPositiveButtonClickListener { selection ->
-//            val startDate = selection.first
-//            val endDate = selection.second
-//
-//            val calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
-//            val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-//
-//            calendar.timeInMillis = startDate
-//            val formattedStartDate = dateFormat.format(calendar.time)
-//
-//            calendar.timeInMillis = endDate
-//            val formattedEndDate = dateFormat.format(calendar.time)
-//
-//            binding.editTextDate2.setText("$formattedStartDate - $formattedEndDate")
-//
-//            viewModel.selectedStartDate = formattedStartDate
-//            viewModel.selectedEndDate = formattedEndDate
-//        }
-//
-//        picker.show(parentFragmentManager, "MATERIAL_DATE_RANGE_PICKER")
-//    }
 
     override fun onDestroyView() {
         super.onDestroyView()

@@ -1,53 +1,58 @@
 package com.synaptix.budgetbuddy.presentation.ui.main.transaction.categoryAddNew
 
-import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.core.content.ContextCompat
-import androidx.recyclerview.widget.RecyclerView
 import com.synaptix.budgetbuddy.R
+import com.synaptix.budgetbuddy.presentation.ui.common.BaseAdapter
 
+/**
+ * Adapter for displaying and selecting category colors
+ * @param onColorSelected Callback when a color is selected
+ */
 class ColorAdapter(
     private val onColorSelected: (ColorItem) -> Unit
-) : RecyclerView.Adapter<ColorAdapter.ColorViewHolder>() {
+) : BaseAdapter<ColorItem, ColorAdapter.ColorViewHolder>() {
 
-    private var colors: List<ColorItem> = emptyList()
     private var selectedPosition = -1
 
-    fun submitList(newColors: List<ColorItem>) {
-        colors = newColors
-        notifyDataSetChanged()
-    }
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ColorViewHolder {
-        val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_category_color, parent, false)
-        return ColorViewHolder(view)
+        return createViewHolder(
+            parent = parent,
+            layoutResId = R.layout.item_category_color
+        ) { ColorViewHolder(it) }
     }
 
     override fun onBindViewHolder(holder: ColorViewHolder, position: Int) {
-        holder.bind(colors[position], position == selectedPosition)
+        holder.bind(items[position])
+        holder.setSelected(position == selectedPosition)
+        holder.setOnClickListener {
+            val oldPosition = selectedPosition
+            selectedPosition = position
+            notifyItemChanged(oldPosition)
+            notifyItemChanged(selectedPosition)
+            onColorSelected(items[position])
+        }
     }
 
-    override fun getItemCount(): Int = colors.size
-
-    inner class ColorViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    class ColorViewHolder(
+        itemView: View
+    ) : BaseViewHolder<ColorItem>(itemView) {
         private val colorView: ImageView = itemView.findViewById(R.id.colorView)
         private val selectedIndicator: ImageView = itemView.findViewById(R.id.selectedIndicator)
 
-        fun bind(color: ColorItem, isSelected: Boolean) {
+        override fun bind(item: ColorItem) {
             val context = itemView.context
-            colorView.setColorFilter(ContextCompat.getColor(context, color.colorResourceId))
-            selectedIndicator.visibility = if (isSelected) View.VISIBLE else View.GONE
+            colorView.setColorFilter(ContextCompat.getColor(context, item.colorResourceId))
+        }
 
-            itemView.setOnClickListener {
-                val oldPosition = selectedPosition
-                selectedPosition = adapterPosition
-                notifyItemChanged(oldPosition)
-                notifyItemChanged(selectedPosition)
-                onColorSelected(color)
-            }
+        fun setSelected(isSelected: Boolean) {
+            selectedIndicator.visibility = if (isSelected) View.VISIBLE else View.GONE
+        }
+
+        fun setOnClickListener(onClick: () -> Unit) {
+            itemView.setOnClickListener { onClick() }
         }
     }
 } 
