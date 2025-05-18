@@ -31,6 +31,7 @@
     android:background="?attr/selectableItemBackground">
 
     <ImageView
+        android:id="@+id/imgWalletIcon"
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:layout_gravity="center_vertical"
@@ -45,7 +46,7 @@
         android:paddingStart="16dp">
 
         <TextView
-            android:id="@+id/walletName"
+            android:id="@+id/txtWalletName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Cash Wallet"
@@ -54,7 +55,7 @@
             android:textStyle="bold" />
 
         <TextView
-            android:id="@+id/walletBalance"
+            android:id="@+id/txtWalletBalance"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="ZAR 23,297"

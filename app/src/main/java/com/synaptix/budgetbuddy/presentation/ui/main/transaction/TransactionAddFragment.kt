@@ -329,6 +329,7 @@ class TransactionAddFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             try {
                 viewModel.addTransaction()
+                findNavController().popBackStack()
             } catch (e: Exception) {
                 showError("Failed to save transaction: ${e.message}")
             }

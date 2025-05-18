@@ -3,7 +3,6 @@ package com.synaptix.budgetbuddy.presentation.ui.common
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import android.widget.TextView
 import com.synaptix.budgetbuddy.R
 
 /**
@@ -21,7 +20,7 @@ class TemplateAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TemplateViewHolder {
         return createViewHolder(
             parent = parent,
-            layoutResId = R.layout.item_transaction
+            layoutResId = R.layout.item_home_transaction
         ) { view -> TemplateViewHolder(view, onItemClick, onItemLongClick) }
     }
 

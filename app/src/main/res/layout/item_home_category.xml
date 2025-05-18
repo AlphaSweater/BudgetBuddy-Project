@@ -94,9 +94,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="end"
-            android:text="Amount"
+            android:text="@string/amount"
             android:textColor="?attr/bb_expense"
-            android:textSize="16sp"
+            android:textSize="14sp"
             android:textStyle="bold" />
 
         <TextView
@@ -108,5 +108,4 @@
             android:textColor="?attr/bb_primaryText"
             android:textSize="10sp" />
     </LinearLayout>
-
 </androidx.constraintlayout.widget.ConstraintLayout>

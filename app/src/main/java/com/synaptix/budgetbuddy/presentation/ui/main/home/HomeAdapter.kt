@@ -42,11 +42,11 @@ class HomeAdapter(
             ) { WalletViewHolder(it, onWalletClick) }
             VIEW_TYPE_TRANSACTION -> createViewHolder(
                 parent = parent,
-                layoutResId = R.layout.item_transaction
+                layoutResId = R.layout.item_home_transaction
             ) { TransactionViewHolder(it, onTransactionClick) }
             VIEW_TYPE_CATEGORY -> createViewHolder(
                 parent = parent,
-                layoutResId = R.layout.item_budget_report
+                layoutResId = R.layout.item_home_category
             ) { CategoryViewHolder(it, onCategoryClick) }
             else -> throw IllegalArgumentException("Unknown view type: $viewType")
         }
@@ -56,9 +56,9 @@ class HomeAdapter(
         itemView: View,
         private val onClick: ((HomeWalletItem) -> Unit)?
     ) : BaseViewHolder<BudgetReportListItems>(itemView) {
-        private val iconView: ImageView = itemView.findViewById(R.id.iconCategory)
+        private val iconView: ImageView = itemView.findViewById(R.id.imgWalletIcon)
         private val nameText: TextView = itemView.findViewById(R.id.txtWalletName)
-        private val balanceText: TextView = itemView.findViewById(R.id.txtAmount)
+        private val balanceText: TextView = itemView.findViewById(R.id.txtWalletBalance)
         private val dateText: TextView = itemView.findViewById(R.id.txtRelativeDay)
 
         override fun bind(item: BudgetReportListItems) {

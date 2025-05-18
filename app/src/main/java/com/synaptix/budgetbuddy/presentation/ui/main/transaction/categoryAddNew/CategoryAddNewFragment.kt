@@ -77,7 +77,9 @@ class CategoryAddNewFragment : Fragment() {
         }
 
         binding.btnCreate.setOnClickListener {
+            //TODO: Validate input properly with methods
             viewModel.createCategory()
+            findNavController().popBackStack()
         }
     }
 

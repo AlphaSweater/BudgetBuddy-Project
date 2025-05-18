@@ -58,11 +58,11 @@ class BudgetReportAdapter(private val items: List<BudgetReportListItems>) : Recy
                 DateHeaderViewHolder(view)
             }
             VIEW_TYPE_TRANSACTION -> {
-                val view = LayoutInflater.from(parent.context).inflate(R.layout.item_transaction, parent, false)
+                val view = LayoutInflater.from(parent.context).inflate(R.layout.item_home_transaction, parent, false)
                 TransactionViewHolder(view)
             }
             VIEW_TYPE_CATEGORY -> {
-                val view = LayoutInflater.from(parent.context).inflate(R.layout.item_budget_report, parent, false)
+                val view = LayoutInflater.from(parent.context).inflate(R.layout.item_home_category, parent, false)
                 CategoryViewHolder(view)
             }
             else -> throw IllegalArgumentException("Unknown view type")

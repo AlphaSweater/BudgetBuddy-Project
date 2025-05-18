@@ -30,11 +30,11 @@ class GeneralReportAdapter(private val items: List<BudgetReportListItems>) : Rec
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
             VIEW_TYPE_LABEL -> {
-                val view = LayoutInflater.from(parent.context).inflate(R.layout.item_budget_report, parent, false)
+                val view = LayoutInflater.from(parent.context).inflate(R.layout.item_home_category, parent, false)
                 LabelViewHolder(view)
             }
             VIEW_TYPE_CATEGORY -> {
-                val view = LayoutInflater.from(parent.context).inflate(R.layout.item_budget_report, parent, false)
+                val view = LayoutInflater.from(parent.context).inflate(R.layout.item_home_category, parent, false)
                 CategoryViewHolder(view)
             }
             else -> throw IllegalArgumentException("Unknown view type")

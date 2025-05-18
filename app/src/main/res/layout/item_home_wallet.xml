@@ -29,7 +29,6 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?attr/bb_surface"
         android:orientation="vertical"
         android:padding="16dp">
 
@@ -42,7 +41,7 @@
             android:paddingVertical="8dp">
 
             <ImageView
-                android:id="@+id/iconCategory"
+                android:id="@+id/imgWalletIcon"
                 android:layout_width="36dp"
                 android:layout_height="36dp"
                 android:layout_marginEnd="12dp"
@@ -73,7 +72,7 @@
             </LinearLayout>
 
             <TextView
-                android:id="@+id/txtAmount"
+                android:id="@+id/txtWalletBalance"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="ZAR X"
@@ -82,10 +81,5 @@
         </LinearLayout>
 
         <!-- Divider -->
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginVertical="4dp"
-            android:background="?attr/bb_secondaryText" />
     </LinearLayout>
 </LinearLayout>

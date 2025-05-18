@@ -19,8 +19,8 @@ class TransactionSelectWalletAdapter(
     }
 
     inner class WalletViewHolder(itemView: View) : BaseViewHolder<Wallet>(itemView) {
-        private val name: TextView = itemView.findViewById(R.id.walletName)
-        private val balance: TextView = itemView.findViewById(R.id.walletBalance)
+        private val name: TextView = itemView.findViewById(R.id.txtWalletName)
+        private val balance: TextView = itemView.findViewById(R.id.txtWalletBalance)
 
         override fun bind(item: Wallet) {
             name.text = item.walletName

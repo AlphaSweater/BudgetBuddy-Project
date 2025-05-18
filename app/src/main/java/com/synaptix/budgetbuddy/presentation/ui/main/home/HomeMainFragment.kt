@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.synaptix.budgetbuddy.R
 import com.synaptix.budgetbuddy.core.model.BudgetReportListItems.*
+import com.synaptix.budgetbuddy.core.model.Wallet
 import com.synaptix.budgetbuddy.databinding.FragmentHomeBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -171,9 +172,9 @@ class HomeMainFragment : Fragment() {
                     
                     val walletItems = wallets.take(MAX_ITEMS).map { wallet ->
                         HomeWalletItem(
-                            walletName = (wallet as? com.synaptix.budgetbuddy.core.model.Wallet)?.walletName ?: "",
+                            walletName = (wallet as? Wallet)?.walletName ?: "",
                             walletIcon = R.drawable.baseline_shopping_bag_24,
-                            walletBalance = (wallet as? com.synaptix.budgetbuddy.core.model.Wallet)?.walletBalance ?: 0.0,
+                            walletBalance = (wallet as? Wallet)?.walletBalance ?: 0.0,
                             relativeDate = "Recent"
                         )
                     }
@@ -283,5 +284,10 @@ class HomeMainFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.refreshData()
     }
 }

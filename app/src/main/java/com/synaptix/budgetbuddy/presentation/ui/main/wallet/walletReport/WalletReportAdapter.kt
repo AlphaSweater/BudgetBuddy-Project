@@ -11,8 +11,6 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.synaptix.budgetbuddy.R
 import com.synaptix.budgetbuddy.core.model.BudgetReportListItems
-import com.synaptix.budgetbuddy.core.model.Wallet
-import com.synaptix.budgetbuddy.presentation.ui.main.general.generalTransactions.GeneralTransactionsAdapter
 
 class WalletReportAdapter(private val items: List<BudgetReportListItems>) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
@@ -36,7 +34,7 @@ class WalletReportAdapter(private val items: List<BudgetReportListItems>) : Recy
                 DateHeaderViewHolder(view)
             }
             WalletReportAdapter.VIEW_TYPE_TRANSACTION -> {
-                val view = LayoutInflater.from(parent.context).inflate(R.layout.item_transaction, parent, false)
+                val view = LayoutInflater.from(parent.context).inflate(R.layout.item_home_transaction, parent, false)
                 TransactionViewHolder(view)
             }
             else -> throw IllegalArgumentException("Unknown view type")

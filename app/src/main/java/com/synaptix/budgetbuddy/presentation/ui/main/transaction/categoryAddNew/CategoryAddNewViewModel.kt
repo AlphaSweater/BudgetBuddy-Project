@@ -45,63 +45,12 @@ class CategoryAddNewViewModel @Inject constructor(
         ColorItem(R.color.cat_light_green, "Green"),
         ColorItem(R.color.cat_light_purple, "Light Purple"),
         ColorItem(R.color.cat_dark_blue, "Dark Blue"),
-        ColorItem(R.color.cat_light_blue, "Light Blue"),
-        ColorItem(R.color.cat_dark_pink, "Pink"),
-        ColorItem(R.color.cat_yellow, "Yellow"),
-        ColorItem(R.color.cat_gold, "Gold"),
-        ColorItem(R.color.cat_dark_purple, "Purple"),
-        ColorItem(R.color.cat_light_green, "Green"),
-        ColorItem(R.color.cat_light_purple, "Light Purple"),
-        ColorItem(R.color.cat_dark_blue, "Dark Blue"),
-        ColorItem(R.color.cat_light_blue, "Light Blue"),
-        ColorItem(R.color.cat_dark_pink, "Pink"),
-        ColorItem(R.color.cat_yellow, "Yellow"),
-        ColorItem(R.color.cat_gold, "Gold"),
-        ColorItem(R.color.cat_dark_purple, "Purple"),
-        ColorItem(R.color.cat_light_green, "Green"),
-        ColorItem(R.color.cat_light_purple, "Light Purple"),
-        ColorItem(R.color.cat_dark_blue, "Dark Blue"),
-        ColorItem(R.color.cat_light_blue, "Light Blue"),
-        ColorItem(R.color.cat_dark_pink, "Pink"),
-        ColorItem(R.color.cat_yellow, "Yellow"),
-        ColorItem(R.color.cat_gold, "Gold"),
-        ColorItem(R.color.cat_dark_purple, "Purple"),
-        ColorItem(R.color.cat_light_green, "Green"),
-        ColorItem(R.color.cat_light_purple, "Light Purple"),
-        ColorItem(R.color.cat_dark_blue, "Dark Blue"),
         ColorItem(R.color.cat_light_blue, "Light Blue")
     ))
     val colors: StateFlow<List<ColorItem>> = _colors
 
     // Available icons
     private val _icons = MutableStateFlow<List<IconItem>>(listOf(
-        IconItem(R.drawable.baseline_fastfood_24, "Food"),
-        IconItem(R.drawable.baseline_local_gas_station_24, "Transport"),
-        IconItem(R.drawable.ic_add_alert_24, "Alert"),
-        IconItem(R.drawable.baseline_palette_24, "Beauty"),
-        IconItem(R.drawable.baseline_savings_24, "Savings"),
-        IconItem(R.drawable.baseline_school_24, "Education"),
-        IconItem(R.drawable.baseline_theater_comedy_24, "Entertainment"),
-        IconItem(R.drawable.baseline_escalator_warning_24, "Family"),
-        IconItem(R.drawable.baseline_shopping_bag_24, "Shopping"),
-        IconItem(R.drawable.baseline_fastfood_24, "Food"),
-        IconItem(R.drawable.baseline_local_gas_station_24, "Transport"),
-        IconItem(R.drawable.ic_add_alert_24, "Alert"),
-        IconItem(R.drawable.baseline_palette_24, "Beauty"),
-        IconItem(R.drawable.baseline_savings_24, "Savings"),
-        IconItem(R.drawable.baseline_school_24, "Education"),
-        IconItem(R.drawable.baseline_theater_comedy_24, "Entertainment"),
-        IconItem(R.drawable.baseline_escalator_warning_24, "Family"),
-        IconItem(R.drawable.baseline_shopping_bag_24, "Shopping"),
-        IconItem(R.drawable.baseline_fastfood_24, "Food"),
-        IconItem(R.drawable.baseline_local_gas_station_24, "Transport"),
-        IconItem(R.drawable.ic_add_alert_24, "Alert"),
-        IconItem(R.drawable.baseline_palette_24, "Beauty"),
-        IconItem(R.drawable.baseline_savings_24, "Savings"),
-        IconItem(R.drawable.baseline_school_24, "Education"),
-        IconItem(R.drawable.baseline_theater_comedy_24, "Entertainment"),
-        IconItem(R.drawable.baseline_escalator_warning_24, "Family"),
-        IconItem(R.drawable.baseline_shopping_bag_24, "Shopping"),
         IconItem(R.drawable.baseline_fastfood_24, "Food"),
         IconItem(R.drawable.baseline_local_gas_station_24, "Transport"),
         IconItem(R.drawable.ic_add_alert_24, "Alert"),
@@ -148,6 +97,7 @@ class CategoryAddNewViewModel @Inject constructor(
             
             addCategoryUseCase.execute(categoryIn)
             _eventCategoryCreated.value = true
+
         }
     }
 }

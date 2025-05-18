@@ -34,7 +34,7 @@ class GeneralTransactionsAdapter(private val items: List<BudgetReportListItems>)
                 DateHeaderViewHolder(view)
             }
             GeneralTransactionsAdapter.VIEW_TYPE_TRANSACTION -> {
-                val view = LayoutInflater.from(parent.context).inflate(R.layout.item_transaction, parent, false)
+                val view = LayoutInflater.from(parent.context).inflate(R.layout.item_home_transaction, parent, false)
                 TransactionViewHolder(view)
             }
             else -> throw IllegalArgumentException("Unknown view type")
