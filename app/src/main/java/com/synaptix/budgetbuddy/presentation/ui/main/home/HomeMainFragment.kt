@@ -18,6 +18,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.synaptix.budgetbuddy.R
 import com.synaptix.budgetbuddy.core.model.BudgetReportListItems.*
+import com.synaptix.budgetbuddy.core.model.Category
+import com.synaptix.budgetbuddy.core.model.Transaction
 import com.synaptix.budgetbuddy.core.model.Wallet
 import com.synaptix.budgetbuddy.databinding.FragmentHomeBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -151,16 +153,16 @@ class HomeMainFragment : Fragment() {
         }
     }
 
-    private fun handleWalletsState(state: HomeMainViewModel.UiState) {
+    private fun handleWalletsState(state: HomeMainViewModel.WalletState) {
         binding.apply {
             when (state) {
-                is HomeMainViewModel.UiState.Loading -> {
+                is HomeMainViewModel.WalletState.Loading -> {
                     recyclerViewHomeWalletOverview.isVisible = false
                     txtEmptyWallets.isVisible = false
                     // TODO: Show loading indicator
                 }
-                is HomeMainViewModel.UiState.Success<*> -> {
-                    val wallets = state.data as List<*>
+                is HomeMainViewModel.WalletState.Success -> {
+                    val wallets = state.wallets
                     if (wallets.isEmpty()) {
                         recyclerViewHomeWalletOverview.isVisible = false
                         txtEmptyWallets.isVisible = true
@@ -172,15 +174,15 @@ class HomeMainFragment : Fragment() {
                     
                     val walletItems = wallets.take(MAX_ITEMS).map { wallet ->
                         HomeWalletItem(
-                            walletName = (wallet as? Wallet)?.walletName ?: "",
+                            walletName = (wallet).walletName,
                             walletIcon = R.drawable.baseline_shopping_bag_24,
-                            walletBalance = (wallet as? Wallet)?.walletBalance ?: 0.0,
+                            walletBalance = wallet.walletBalance,
                             relativeDate = "Recent"
                         )
                     }
                     walletAdapter.submitList(walletItems)
                 }
-                is HomeMainViewModel.UiState.Error -> {
+                is HomeMainViewModel.WalletState.Error -> {
                     recyclerViewHomeWalletOverview.isVisible = false
                     txtEmptyWallets.isVisible = true
                     txtEmptyWallets.text = state.message
@@ -190,16 +192,16 @@ class HomeMainFragment : Fragment() {
         }
     }
 
-    private fun handleTransactionsState(state: HomeMainViewModel.UiState) {
+    private fun handleTransactionsState(state: HomeMainViewModel.TransactionState) {
         binding.apply {
             when (state) {
-                is HomeMainViewModel.UiState.Loading -> {
+                is HomeMainViewModel.TransactionState.Loading -> {
                     recyclerViewHomeTransactionOverview.isVisible = false
                     txtEmptyTransactions.isVisible = false
                     // TODO: Show loading indicator
                 }
-                is HomeMainViewModel.UiState.Success<*> -> {
-                    val transactions = state.data as List<*>
+                is HomeMainViewModel.TransactionState.Success -> {
+                    val transactions = state.transactions
                     if (transactions.isEmpty()) {
                         recyclerViewHomeTransactionOverview.isVisible = false
                         txtEmptyTransactions.isVisible = true
@@ -209,8 +211,8 @@ class HomeMainFragment : Fragment() {
                     recyclerViewHomeTransactionOverview.isVisible = true
                     txtEmptyTransactions.isVisible = false
                     
-                    val transactionItems = transactions.take(MAX_ITEMS).mapNotNull { transaction ->
-                        (transaction as? com.synaptix.budgetbuddy.core.model.Transaction)?.let { tx ->
+                    val transactionItems = transactions.take(MAX_ITEMS).map { transaction ->
+                        transaction.let { tx ->
                             TransactionItem(
                                 categoryName = tx.category?.categoryName ?: "",
                                 categoryIcon = tx.category?.categoryIcon ?: R.drawable.baseline_shopping_bag_24,
@@ -224,7 +226,7 @@ class HomeMainFragment : Fragment() {
                     }
                     transactionAdapter.submitList(transactionItems)
                 }
-                is HomeMainViewModel.UiState.Error -> {
+                is HomeMainViewModel.TransactionState.Error -> {
                     recyclerViewHomeTransactionOverview.isVisible = false
                     txtEmptyTransactions.isVisible = true
                     txtEmptyTransactions.text = state.message
@@ -234,16 +236,16 @@ class HomeMainFragment : Fragment() {
         }
     }
 
-    private fun handleCategoriesState(state: HomeMainViewModel.UiState) {
+    private fun handleCategoriesState(state: HomeMainViewModel.CategoryState) {
         binding.apply {
             when (state) {
-                is HomeMainViewModel.UiState.Loading -> {
+                is HomeMainViewModel.CategoryState.Loading -> {
                     recyclerViewHomeCategoryOverview.isVisible = false
                     txtEmptyCategories.isVisible = false
                     // TODO: Show loading indicator
                 }
-                is HomeMainViewModel.UiState.Success<*> -> {
-                    val categories = state.data as List<*>
+                is HomeMainViewModel.CategoryState.Success -> {
+                    val categories = state.categories
                     if (categories.isEmpty()) {
                         recyclerViewHomeCategoryOverview.isVisible = false
                         txtEmptyCategories.isVisible = true
@@ -253,8 +255,8 @@ class HomeMainFragment : Fragment() {
                     recyclerViewHomeCategoryOverview.isVisible = true
                     txtEmptyCategories.isVisible = false
                     
-                    val categoryItems = categories.take(MAX_ITEMS).mapNotNull { category ->
-                        (category as? com.synaptix.budgetbuddy.core.model.Category)?.let { cat ->
+                    val categoryItems = categories.take(MAX_ITEMS).map { category ->
+                        category.let { cat ->
                             CategoryItems(
                                 categoryName = cat.categoryName,
                                 categoryIcon = cat.categoryIcon,
@@ -267,7 +269,7 @@ class HomeMainFragment : Fragment() {
                     }
                     categoryAdapter.submitList(categoryItems)
                 }
-                is HomeMainViewModel.UiState.Error -> {
+                is HomeMainViewModel.CategoryState.Error -> {
                     recyclerViewHomeCategoryOverview.isVisible = false
                     txtEmptyCategories.isVisible = true
                     txtEmptyCategories.text = state.message

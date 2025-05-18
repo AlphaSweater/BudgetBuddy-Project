@@ -56,7 +56,7 @@ import com.synaptix.budgetbuddy.data.local.dao.MinMaxGoalsDao
         LabelEntity::class,
         TransactionLabelEntity::class,
         MinMaxGoalEntity::class],
-    version = 15
+    version = 16
 )
 
 

@@ -34,26 +34,17 @@ import com.synaptix.budgetbuddy.data.AppDatabase
 import com.synaptix.budgetbuddy.data.entity.CategoryEntity
 import com.synaptix.budgetbuddy.data.local.CategoryDatabaseCallback
 import com.synaptix.budgetbuddy.data.local.LabelDatabaseCallback
-import com.synaptix.budgetbuddy.data.local.dao.BudgetDao
-import com.synaptix.budgetbuddy.data.local.dao.CategoryDao
-import com.synaptix.budgetbuddy.data.local.dao.LabelDao
-import com.synaptix.budgetbuddy.data.local.dao.MinMaxGoalsDao
-import com.synaptix.budgetbuddy.data.local.dao.TransactionDao
-import com.synaptix.budgetbuddy.data.local.dao.UserDao
-import com.synaptix.budgetbuddy.data.local.dao.WalletDao
+import com.synaptix.budgetbuddy.data.local.dao.*
 import com.synaptix.budgetbuddy.data.local.datastore.DataStoreManager
-import com.synaptix.budgetbuddy.data.repository.BudgetRepository
-import com.synaptix.budgetbuddy.data.repository.CategoryRepository
-import com.synaptix.budgetbuddy.data.repository.LabelRepository
-import com.synaptix.budgetbuddy.data.repository.TransactionRepository
+import com.synaptix.budgetbuddy.data.repository.*
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import javax.inject.Qualifier
 import javax.inject.Singleton
 
 // Dagger module to provide application-level dependencies
@@ -62,10 +53,22 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object AppModule {
 
+    @IoDispatcher
+    @Provides
+    fun providesIoDispatcher(): CoroutineDispatcher = Dispatchers.IO
+
+    @MainDispatcher
+    @Provides
+    fun providesMainDispatcher(): CoroutineDispatcher = Dispatchers.Main
+
+    @DefaultDispatcher
+    @Provides
+    fun providesDefaultDispatcher(): CoroutineDispatcher = Dispatchers.Default
+
     // Provide AddTransactionUseCase for transaction-related operations
     @Provides
     @Singleton
-    fun provideAddTransactionUseCase(repository: TransactionRepository): AddTransactionUseCase {
+    fun provideAddTransactionUseCase(repository: ITransactionRepository): AddTransactionUseCase {
         return AddTransactionUseCase(repository)
     }
 
@@ -162,8 +165,11 @@ object AppModule {
     // Provide TransactionRepository for managing transaction-related data
     @Provides
     @Singleton
-    fun provideTransactionRepository(transactionDao: TransactionDao): TransactionRepository {
-        return TransactionRepository(transactionDao)
+    fun provideTransactionRepository(
+        transactionDao: TransactionDao,
+        @IoDispatcher ioDispatcher: CoroutineDispatcher
+    ): ITransactionRepository {
+        return TransactionRepository(transactionDao, ioDispatcher)
     }
 
     // Provide BudgetDao for accessing budget data in the database
@@ -197,5 +203,16 @@ object AppModule {
         return appDatabase.minMaxGoalsDao()
     }
 
-
 }
+
+@Retention(AnnotationRetention.BINARY)
+@Qualifier
+annotation class IoDispatcher
+
+@Retention(AnnotationRetention.BINARY)
+@Qualifier
+annotation class MainDispatcher
+
+@Retention(AnnotationRetention.BINARY)
+@Qualifier
+annotation class DefaultDispatcher

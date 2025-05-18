@@ -21,10 +21,7 @@
 
 package com.synaptix.budgetbuddy.data.local.dao
 
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
+import androidx.room.*
 import com.synaptix.budgetbuddy.data.entity.TransactionEntity
 import com.synaptix.budgetbuddy.data.entity.relations.TransactionWithDetail
 
@@ -35,10 +32,45 @@ interface TransactionDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insert(transaction: TransactionEntity): Long
 
-    //query to get all transactions for a specific user
-    @Query("SELECT * FROM transaction_table WHERE user_Id = :userId")
+    @Update
+    suspend fun update(transaction: TransactionEntity)
+
+    @Delete
+    suspend fun delete(transaction: TransactionEntity)
+
+    @Query("DELETE FROM transaction_table WHERE transaction_id = :transactionId")
+    suspend fun deleteById(transactionId: Int)
+
+    @Query("SELECT * FROM transaction_table WHERE transaction_id = :id")
+    suspend fun getTransactionById(id: Int): TransactionWithDetail?
+
+    @Query("SELECT * FROM transaction_table WHERE user_id = :userId")
     suspend fun getTransactionsForUser(userId: Int): List<TransactionEntity>
 
     @Query("SELECT * FROM transaction_table WHERE user_id = :userId")
     suspend fun getTransactionsWithDetail(userId: Int): List<TransactionWithDetail>
+
+    @Query("""
+        SELECT * FROM transaction_table 
+        WHERE user_id = :userId 
+        AND date BETWEEN :startDate AND :endDate
+        ORDER BY date DESC
+    """)
+    suspend fun getTransactionsForUserInDateRange(
+        userId: Int,
+        startDate: String,
+        endDate: String
+    ): List<TransactionWithDetail>
+
+    @Query("""
+        SELECT SUM(amount) FROM transaction_table 
+        WHERE user_id = :userId AND category_id = :categoryId
+    """)
+    suspend fun getTotalAmountByCategory(userId: Int, categoryId: Int): Double?
+
+    @Query("""
+        SELECT SUM(amount) FROM transaction_table 
+        WHERE user_id = :userId AND wallet_id = :walletId
+    """)
+    suspend fun getTotalAmountByWallet(userId: Int, walletId: Int): Double?
 }

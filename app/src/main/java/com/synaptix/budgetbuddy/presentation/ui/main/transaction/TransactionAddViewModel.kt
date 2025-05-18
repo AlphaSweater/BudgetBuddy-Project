@@ -12,6 +12,7 @@ import com.synaptix.budgetbuddy.core.model.TransactionIn
 import com.synaptix.budgetbuddy.core.model.Wallet
 import com.synaptix.budgetbuddy.core.usecase.auth.GetUserIdUseCase
 import com.synaptix.budgetbuddy.core.usecase.main.transaction.AddTransactionUseCase
+import com.synaptix.budgetbuddy.core.usecase.main.transaction.AddTransactionUseCase.AddTransactionResult
 import com.synaptix.budgetbuddy.data.repository.BudgetRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -168,9 +169,19 @@ class TransactionAddViewModel @Inject constructor(
                     photo = _imageBytes.value,
                     recurrenceRate = _recurrenceRate.value
                 )
-                addTransactionUseCase.execute(transaction)
-                _uiState.value = UiState.Success
-                reset()
+                val result = addTransactionUseCase.execute(transaction)
+                when (result) {
+                    is AddTransactionResult.Success -> {
+                        // Handle success
+                        _uiState.value = UiState.Success
+                        reset()
+                    }
+                    is AddTransactionResult.Error -> {
+                        // Handle error
+                        val errorMessage = result.message
+                        _uiState.value = UiState.Error(errorMessage)
+                    }
+                }
             } catch (e: Exception) {
                 _uiState.value = UiState.Error(e.message ?: "Failed to add transaction")
             }

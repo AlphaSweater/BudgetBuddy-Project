@@ -28,28 +28,28 @@ class GeneralReportsViewModel @Inject constructor(
         viewModelScope.launch {
             val userId = getUserIdUseCase.execute()
             val result = getTransactionUseCase.execute(userId)
-            _transactions.postValue(result)
+//            _transactions.postValue(result)
+//
+//
+//            val categoryGroups = result.groupBy { it.category?.categoryName ?: "Uncategorized" }
+//
+//            val items = categoryGroups.map { (name, transactions) ->
+//                val icon = transactions.firstOrNull()?.category?.categoryIcon ?: R.drawable.ic_car_24
+//                val colour = transactions.firstOrNull()?.category?.categoryColor ?: R.color.cat_orange
+//                val amount = "R ${transactions.sumOf { it.amount }.toInt()}"
+//                val relativeDate = "This Month" // You can implement actual logic here
+//
+//                BudgetReportListItems.CategoryItems(
+//                    categoryName = name,
+//                    categoryIcon = icon,
+//                    categoryColour = colour,
+//                    transactionCount = transactions.size,
+//                    amount = amount,
+//                    relativeDate = relativeDate
+//                )
+//            }
 
-
-            val categoryGroups = result.groupBy { it.category?.categoryName ?: "Uncategorized" }
-
-            val items = categoryGroups.map { (name, transactions) ->
-                val icon = transactions.firstOrNull()?.category?.categoryIcon ?: R.drawable.ic_car_24
-                val colour = transactions.firstOrNull()?.category?.categoryColor ?: R.color.cat_orange
-                val amount = "R ${transactions.sumOf { it.amount }.toInt()}"
-                val relativeDate = "This Month" // You can implement actual logic here
-
-                BudgetReportListItems.CategoryItems(
-                    categoryName = name,
-                    categoryIcon = icon,
-                    categoryColour = colour,
-                    transactionCount = transactions.size,
-                    amount = amount,
-                    relativeDate = relativeDate
-                )
-            }
-
-            reportCategoryItems.postValue(items)
+//            reportCategoryItems.postValue(items)
         }
     }
 }
