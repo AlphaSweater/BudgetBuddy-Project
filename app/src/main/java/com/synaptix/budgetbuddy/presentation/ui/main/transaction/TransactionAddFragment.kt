@@ -44,6 +44,7 @@ import androidx.core.widget.doAfterTextChanged
 import com.synaptix.budgetbuddy.core.model.Category
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import android.widget.ImageView
 
 @AndroidEntryPoint
 class TransactionAddFragment : Fragment() {
@@ -154,6 +155,15 @@ class TransactionAddFragment : Fragment() {
         pickImageLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
             uri?.let { handleImageResult(it) }
         }
+
+        // Setup click listeners for image preview and remove button
+        binding.imagePreview.setOnClickListener {
+            showFullScreenImage()
+        }
+
+        binding.btnRemovePhoto.setOnClickListener {
+            removePhoto()
+        }
     }
 
     private fun handleImageResult(uri: Uri) {
@@ -161,6 +171,7 @@ class TransactionAddFragment : Fragment() {
             requireContext().contentResolver.openInputStream(uri)?.use { inputStream ->
                 val bytes = inputStream.readBytes()
                 viewModel.setImageBytes(bytes)
+                showImagePreview(bytes)
             }
         } catch (e: Exception) {
             showError("Failed to process image")
@@ -182,13 +193,50 @@ class TransactionAddFragment : Fragment() {
         picker.show(parentFragmentManager, "DATE_PICKER")
     }
 
+    private fun showImagePreview(bytes: ByteArray) {
+        val bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
+        binding.imagePreviewContainer.visibility = View.VISIBLE
+        binding.imagePreview.setImageBitmap(bitmap)
+    }
+
+    private fun removePhoto() {
+        viewModel.setImageBytes(null)
+        binding.imagePreviewContainer.visibility = View.GONE
+        binding.imagePreview.setImageBitmap(null)
+    }
+
+    private fun showFullScreenImage() {
+        viewModel.imageBytes.value?.let { bytes ->
+            val dialog = AlertDialog.Builder(requireContext(), R.style.FullScreenDialog)
+                .setView(
+                    ImageView(requireContext()).apply {
+                        layoutParams = ViewGroup.LayoutParams(
+                            ViewGroup.LayoutParams.MATCH_PARENT,
+                            ViewGroup.LayoutParams.MATCH_PARENT
+                        )
+                        scaleType = ImageView.ScaleType.FIT_CENTER
+                        setImageBitmap(BitmapFactory.decodeByteArray(bytes, 0, bytes.size))
+                    }
+                )
+                .create()
+
+            dialog.window?.setLayout(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT
+            )
+            dialog.show()
+        }
+    }
+
     private fun showImageSourceDialog() {
+        val options = arrayOf("Take Photo", "Choose from Gallery", "Cancel")
         AlertDialog.Builder(requireContext())
-            .setTitle("Add Image")
-            .setItems(arrayOf("Take Photo", "Choose from Gallery")) { _, which ->
+            .setTitle("Add Photo")
+            .setItems(options) { dialog, which ->
                 when (which) {
                     0 -> launchCamera()
                     1 -> pickImageLauncher.launch("image/*")
+                    2 -> dialog.dismiss()
                 }
             }
             .show()

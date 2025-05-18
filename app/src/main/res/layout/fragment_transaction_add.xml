@@ -466,17 +466,37 @@
                             app:tint="?attr/bb_secondaryText" />
                     </LinearLayout>
 
-                    <!-- Image Preview -->
-                    <ImageView
-                        android:id="@+id/imagePreview"
+                    <!-- Image Preview Container -->
+                    <FrameLayout
+                        android:id="@+id/imagePreviewContainer"
                         android:layout_width="match_parent"
-                        android:layout_height="180dp"
+                        android:layout_height="wrap_content"
                         android:layout_margin="16dp"
-                        android:adjustViewBounds="true"
-                        android:background="@drawable/rounded_bg"
-                        android:scaleType="centerCrop"
                         android:visibility="gone"
-                        tools:visibility="visible" />
+                        tools:visibility="visible">
+
+                        <!-- Image Preview -->
+                        <com.google.android.material.imageview.ShapeableImageView
+                            android:id="@+id/imagePreview"
+                            android:layout_width="match_parent"
+                            android:layout_height="200dp"
+                            android:adjustViewBounds="true"
+                            android:scaleType="centerCrop"
+                            app:shapeAppearanceOverlay="@style/RoundedImageView"
+                            android:foreground="?attr/selectableItemBackground"/>
+
+                        <!-- Remove Photo Button -->
+                        <com.google.android.material.floatingactionbutton.FloatingActionButton
+                            android:id="@+id/btnRemovePhoto"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="top|end"
+                            android:layout_margin="8dp"
+                            android:src="@drawable/ic_add_circle_40"
+                            app:fabSize="mini"
+                            app:tint="@android:color/white"
+                            app:backgroundTint="@android:color/holo_red_light"/>
+                    </FrameLayout>
                 </LinearLayout>
 
             </com.google.android.material.card.MaterialCardView>
