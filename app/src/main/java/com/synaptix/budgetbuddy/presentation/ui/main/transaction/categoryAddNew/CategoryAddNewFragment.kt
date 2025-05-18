@@ -39,7 +39,6 @@ class CategoryAddNewFragment : Fragment() {
         setupAdapters()
         setupListeners()
         setupObservers()
-        setupInitialState()
     }
 
     private fun setupAdapters() {
@@ -67,12 +66,10 @@ class CategoryAddNewFragment : Fragment() {
 
         binding.btnExpenseToggle.setOnClickListener {
             viewModel.setCategoryType("Expense")
-            updateToggleState(true)
         }
 
         binding.btnIncomeToggle.setOnClickListener {
             viewModel.setCategoryType("Income")
-            updateToggleState(false)
         }
 
         binding.btnGoBack.setOnClickListener {
@@ -109,10 +106,6 @@ class CategoryAddNewFragment : Fragment() {
             }
         }
 
-        viewModel.categoryType.observe(viewLifecycleOwner) { type ->
-            updateToggleState(type == "Expense")
-        }
-
         viewModel.eventCategoryCreated.observe(viewLifecycleOwner) { success ->
             if (success) {
                 binding.statusMessage.text = getString(R.string.category_created_success)
@@ -125,28 +118,10 @@ class CategoryAddNewFragment : Fragment() {
         }
     }
 
-    private fun setupInitialState() {
-        updateToggleState(true)
-    }
-
-    private fun updateToggleState(isExpense: Boolean) {
-        binding.btnExpenseToggle.isSelected = isExpense
-        binding.btnIncomeToggle.isSelected = !isExpense
-
-        // Update background tint
-        binding.btnExpenseToggle.setBackgroundResource(
-            if (isExpense) R.drawable.toggle_selected else android.R.color.transparent
-        )
-        binding.btnIncomeToggle.setBackgroundResource(
-            if (!isExpense) R.drawable.toggle_selected else android.R.color.transparent
-        )
-    }
-
     private fun clearForm() {
         binding.categoryNameInput.text?.clear()
         binding.previewIcon.setImageResource(R.drawable.ic_circle_24)
         binding.previewIcon.clearColorFilter()
-        setupInitialState()
     }
 
     override fun onDestroyView() {
