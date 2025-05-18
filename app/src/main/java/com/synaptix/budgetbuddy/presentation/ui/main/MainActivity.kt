@@ -18,10 +18,10 @@ class MainActivity : AppCompatActivity() {
     private lateinit var navController: NavController
     private lateinit var navView: BottomNavigationView
 
-    private val hiddenBottomNavFragments = setOf(
-        R.id.navigation_transaction_select_label,
-        R.id.navigation_transaction_add,
-        R.id.navigation_wallet_add
+    private val showBottomNavFragments = setOf(
+        R.id.navigation_home,
+        R.id.navigation_wallet_main,
+        R.id.navigation_budget_main,
         // add others here
     )
 
@@ -64,10 +64,10 @@ class MainActivity : AppCompatActivity() {
         // ✅ Hide bottom nav on certain fragments
         navController.addOnDestinationChangedListener { _, destination, _ ->
             // Hide/show bottom nav bar
-            if (destination.id in hiddenBottomNavFragments) {
-                navView.visibility = View.GONE
-            } else {
+            if (destination.id in showBottomNavFragments) {
                 navView.visibility = View.VISIBLE
+            } else {
+                navView.visibility = View.GONE
             }
 
             // Hide/show FAB

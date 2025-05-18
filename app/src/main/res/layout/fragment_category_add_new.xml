@@ -24,30 +24,29 @@
 <androidx.coordinatorlayout.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?attr/bb_background"
-    android:fitsSystemWindows="true">
+    android:background="?attr/bb_background">
 
-    <!-- Top App Bar -->
-    <com.google.android.material.appbar.AppBarLayout
-        android:id="@+id/appBarLayout"
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@android:color/transparent"
-        app:elevation="0dp">
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:fillViewport="true"
+        android:paddingBottom="80dp">
 
-        <androidx.appcompat.widget.Toolbar
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="@android:color/transparent">
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
+            <!-- Simple Top Bar -->
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="?attr/actionBarSize"
                 android:gravity="center_vertical"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:paddingHorizontal="12dp">
 
                 <ImageButton
                     android:id="@+id/btnGoBack"
@@ -67,199 +66,185 @@
                     android:textSize="20sp"
                     android:textStyle="bold" />
             </LinearLayout>
-        </androidx.appcompat.widget.Toolbar>
-    </com.google.android.material.appbar.AppBarLayout>
 
-    <!-- Main Content -->
-    <androidx.core.widget.NestedScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:clipToPadding="false"
-        android:fillViewport="true"
-        android:paddingBottom="130dp"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="16dp"
-            android:spacing="16dp">
-
-            <!-- Preview Card -->
-            <com.google.android.material.card.MaterialCardView
+            <!-- Main Content -->
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="24dp"
-                app:cardBackgroundColor="?attr/bb_surface"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="2dp">
+                android:orientation="vertical"
+                android:padding="16dp"
+                android:spacing="16dp">
 
-                <LinearLayout
+                <!-- Preview Card -->
+                <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:orientation="vertical"
-                    android:padding="24dp">
+                    android:layout_marginBottom="24dp"
+                    app:cardBackgroundColor="?attr/bb_surface"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="2dp">
 
-                    <ImageView
-                        android:id="@+id/previewIcon"
-                        android:layout_width="72dp"
-                        android:layout_height="72dp"
-                        android:layout_marginBottom="20dp"
-                        android:src="@drawable/ic_circle_24"
-                        app:tint="?attr/bb_button"/>
-
-                    <com.google.android.material.textfield.TextInputLayout
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="Category Name"
-                        app:boxBackgroundColor="?attr/bb_surface"
-                        app:hintTextColor="?attr/bb_secondaryText">
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:padding="24dp">
 
-                        <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/categoryNameInput"
+                        <ImageView
+                            android:id="@+id/previewIcon"
+                            android:layout_width="72dp"
+                            android:layout_height="72dp"
+                            android:layout_marginBottom="20dp"
+                            android:src="@drawable/ic_circle_24"
+                            app:tint="?attr/bb_button"/>
+
+                        <com.google.android.material.textfield.TextInputLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:background="?attr/bb_surface"
-                            android:inputType="text"
-                            android:maxLines="1"
-                            android:textColor="?attr/bb_primaryText"/>
-                    </com.google.android.material.textfield.TextInputLayout>
+                            android:hint="Category Name"
+                            app:boxBackgroundColor="?attr/bb_surface"
+                            app:hintTextColor="?attr/bb_secondaryText">
 
-                    <TextView
-                        android:id="@+id/statusMessage"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:textColor="?attr/bb_secondaryText"/>
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/categoryNameInput"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:background="?attr/bb_surface"
+                                android:inputType="text"
+                                android:maxLines="1"
+                                android:textColor="?attr/bb_primaryText"/>
+                        </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- Category Type Selection -->
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="24dp"
-                app:cardBackgroundColor="?attr/bb_surface"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="2dp">
+                        <TextView
+                            android:id="@+id/statusMessage"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:textColor="?attr/bb_secondaryText"/>
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
 
-                <RadioGroup
-                    android:id="@+id/categoryTypeGroup"
+                <!-- Category Type Selection -->
+                <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:padding="16dp">
+                    android:layout_marginBottom="24dp"
+                    app:cardBackgroundColor="?attr/bb_surface"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="2dp">
 
-                    <com.google.android.material.radiobutton.MaterialRadioButton
-                        android:id="@+id/btnExpenseToggle"
-                        android:layout_width="0dp"
+                    <RadioGroup
+                        android:id="@+id/categoryTypeGroup"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:checked="true"
-                        android:text="Expense"
-                        android:textColor="?attr/bb_primaryText"
-                        android:textSize="16sp"/>
+                        android:orientation="horizontal"
+                        android:padding="16dp">
 
-                    <com.google.android.material.radiobutton.MaterialRadioButton
-                        android:id="@+id/btnIncomeToggle"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="Income"
-                        android:textColor="?attr/bb_primaryText"
-                        android:textSize="16sp"/>
-                </RadioGroup>
-            </com.google.android.material.card.MaterialCardView>
+                        <com.google.android.material.radiobutton.MaterialRadioButton
+                            android:id="@+id/btnExpenseToggle"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:checked="true"
+                            android:text="Expense"
+                            android:textColor="?attr/bb_primaryText"
+                            android:textSize="16sp"/>
 
-            <!-- Color Selection -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="12dp"
-                android:text="@string/category_colour"
-                android:textColor="?attr/bb_primaryText"
-                android:textSize="16sp"
-                android:textStyle="bold"/>
+                        <com.google.android.material.radiobutton.MaterialRadioButton
+                            android:id="@+id/btnIncomeToggle"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Income"
+                            android:textColor="?attr/bb_primaryText"
+                            android:textSize="16sp"/>
+                    </RadioGroup>
+                </com.google.android.material.card.MaterialCardView>
 
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="24dp"
-                app:cardBackgroundColor="?attr/bb_surface"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="2dp">
+                <!-- Color Selection -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="12dp"
+                    android:text="@string/category_colour"
+                    android:textColor="?attr/bb_primaryText"
+                    android:textSize="16sp"
+                    android:textStyle="bold"/>
 
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/recyclerViewColors"
+                <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:clipToPadding="false"
-                    android:minHeight="90dp"
-                    android:orientation="horizontal"
-                    android:paddingHorizontal="8dp"
-                    android:paddingVertical="16dp"
-                    app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
-                    app:spanCount="2"/>
-            </com.google.android.material.card.MaterialCardView>
+                    android:layout_marginBottom="24dp"
+                    app:cardBackgroundColor="?attr/bb_surface"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="2dp">
 
-            <!-- Icon Selection -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="12dp"
-                android:text="@string/category_icon"
-                android:textColor="?attr/bb_primaryText"
-                android:textSize="16sp"
-                android:textStyle="bold"/>
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/recyclerViewColors"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:clipToPadding="false"
+                        android:minHeight="90dp"
+                        android:orientation="horizontal"
+                        android:paddingHorizontal="8dp"
+                        android:paddingVertical="16dp"
+                        app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+                        app:spanCount="2"/>
+                </com.google.android.material.card.MaterialCardView>
 
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="24dp"
-                app:cardBackgroundColor="?attr/bb_surface"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="2dp">
+                <!-- Icon Selection -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="12dp"
+                    android:text="@string/category_icon"
+                    android:textColor="?attr/bb_primaryText"
+                    android:textSize="16sp"
+                    android:textStyle="bold"/>
 
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/recyclerViewIcons"
+                <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:clipToPadding="false"
-                    android:minHeight="160dp"
-                    android:paddingHorizontal="8dp"
-                    android:paddingVertical="16dp"
-                    app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
-                    app:spanCount="4"/>
-            </com.google.android.material.card.MaterialCardView>
+                    android:layout_marginBottom="24dp"
+                    app:cardBackgroundColor="?attr/bb_surface"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="2dp">
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/recyclerViewIcons"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:clipToPadding="false"
+                        android:minHeight="160dp"
+                        android:paddingHorizontal="8dp"
+                        android:paddingVertical="16dp"
+                        app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+                        app:spanCount="4"/>
+                </com.google.android.material.card.MaterialCardView>
+            </LinearLayout>
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
-    <!-- Create Button Container -->
-    <com.google.android.material.card.MaterialCardView
+    <!-- Bottom Save Button -->
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
-        app:cardBackgroundColor="?attr/bb_background"
-        app:cardElevation="8dp">
+        android:background="?attr/bb_background"
+        android:elevation="8dp"
+        android:padding="16dp">
 
-        <FrameLayout
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnCreate"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="64dp">
+            android:paddingVertical="16dp"
+            android:text="Create Category"
+            android:textColor="@android:color/white"
+            android:textSize="16sp"
+            app:backgroundTint="?attr/bb_button"
+            app:cornerRadius="16dp"/>
+    </FrameLayout>
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnCreate"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="16dp"
-                android:paddingVertical="16dp"
-                android:text="Create Category"
-                android:textColor="@android:color/white"
-                android:textSize="16sp"
-                app:backgroundTint="?attr/bb_button"
-                app:cornerRadius="16dp"/>
-        </FrameLayout>
-    </com.google.android.material.card.MaterialCardView>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
