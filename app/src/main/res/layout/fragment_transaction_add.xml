@@ -134,6 +134,28 @@
                             android:textColorHint="?attr/bb_secondaryText"
                             android:textSize="32sp" />
                     </LinearLayout>
+
+                    <!-- Error for amount selection -->
+                    <TextView
+                        android:id="@+id/textAmountError"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@android:color/holo_red_light"
+                        android:textSize="12sp"
+                        android:visibility="gone"
+                        android:layout_marginStart="82dp"
+                        android:layout_marginTop="0dp"/>
+
+                    <!-- Add after currency spinner -->
+                    <TextView
+                        android:id="@+id/textCurrencyError"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@android:color/holo_red_light"
+                        android:textSize="12sp"
+                        android:visibility="gone"
+                        android:layout_marginStart="6dp"
+                        android:layout_marginTop="0dp"/>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
@@ -193,6 +215,17 @@
                             app:tint="?attr/bb_secondaryText" />
                     </LinearLayout>
 
+                    <!-- Error for category selection -->
+                    <TextView
+                        android:id="@+id/textCategoryError"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@android:color/holo_red_light"
+                        android:textSize="12sp"
+                        android:visibility="gone"
+                        android:layout_marginStart="70dp"
+                        android:layout_marginTop="0dp"/>
+
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
@@ -241,6 +274,17 @@
                             app:tint="?attr/bb_secondaryText" />
                     </LinearLayout>
 
+                    <!-- Error for wallet selection -->
+                    <TextView
+                        android:id="@+id/textWalletError"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@android:color/holo_red_light"
+                        android:textSize="12sp"
+                        android:visibility="gone"
+                        android:layout_marginStart="70dp"
+                        android:layout_marginTop="0dp"/>
+
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
@@ -288,6 +332,17 @@
                             android:src="@drawable/ic_arrow_open_24"
                             app:tint="?attr/bb_secondaryText" />
                     </LinearLayout>
+
+                    <!-- Error for date selection -->
+                    <TextView
+                        android:id="@+id/textDateError"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@android:color/holo_red_light"
+                        android:textSize="12sp"
+                        android:visibility="gone"
+                        android:layout_marginStart="70dp"
+                        android:layout_marginTop="0dp"/>
 
                     <View
                         android:layout_width="match_parent"

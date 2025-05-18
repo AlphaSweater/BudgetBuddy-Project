@@ -36,11 +36,17 @@ class TransactionAddViewModel @Inject constructor(
     }
 
     data class ValidationState(
-        val isAmountValid: Boolean = true,
-        val isCategoryValid: Boolean = true,
-        val isWalletValid: Boolean = true,
-        val isDateValid: Boolean = true,
-        val message: String? = null
+        val isAmountValid: Boolean = false,
+        val isCurrencyValid: Boolean = false,
+        val isCategoryValid: Boolean = false,
+        val isWalletValid: Boolean = false,
+        val isDateValid: Boolean = false,
+        val amountError: String? = null,
+        val currencyError: String? = null,
+        val categoryError: String? = null,
+        val walletError: String? = null,
+        val dateError: String? = null,
+        val shouldShowErrors: Boolean = false
     )
 
     private val _uiState = MutableStateFlow<UiState>(UiState.Initial)
@@ -65,14 +71,14 @@ class TransactionAddViewModel @Inject constructor(
     private val _date = MutableLiveData(getCurrentDate())
     val date: LiveData<String> = _date
 
-    private val _note = MutableLiveData<String>()
-    val note: LiveData<String> = _note
+    private val _note = MutableLiveData<String?>()
+    val note: LiveData<String?> = _note
 
     private val _imageBytes = MutableLiveData<ByteArray?>()
     val imageBytes: LiveData<ByteArray?> = _imageBytes
 
-    private val _recurrenceRate = MutableLiveData<String>()
-    val recurrenceRate: LiveData<String> = _recurrenceRate
+    private val _recurrenceRate = MutableLiveData<String?>()
+    val recurrenceRate: LiveData<String?> = _recurrenceRate
 
     var selectedLabels = MutableLiveData<List<Label>>(emptyList())
 
@@ -83,6 +89,11 @@ class TransactionAddViewModel @Inject constructor(
 
     fun setWallet(wallet: Wallet?) {
         _wallet.value = wallet
+        validateForm()
+    }
+
+    fun setCurrency(currency: String) {
+        _currency.value = currency
         validateForm()
     }
 
@@ -108,23 +119,34 @@ class TransactionAddViewModel @Inject constructor(
         _imageBytes.value = bytes
     }
 
-    private fun validateForm(): Boolean {
-        val validationState = ValidationState(
-            isAmountValid = (_amount.value ?: 0.0) > 0.0,
-            isCategoryValid = _category.value != null,
-            isWalletValid = _wallet.value != null,
-            isDateValid = !_date.value.isNullOrBlank(),
-            message = when {
-                (_amount.value ?: 0.0) <= 0.0 -> "Please enter a valid amount"
-                _category.value == null -> "Please select a category"
-                _wallet.value == null -> "Please select a wallet"
-                _date.value.isNullOrBlank() -> "Please select a date"
-                else -> null
-            }
+    fun validateForm(): Boolean {
+        val isAmountValid = (_amount.value ?: 0.0) > 0.0
+        val isCurrencyValid = !_currency.value.isNullOrBlank()
+        val isCategoryValid = _category.value != null
+        val isWalletValid = _wallet.value != null
+        val isDateValid = !_date.value.isNullOrBlank()
+
+        val currentState = _validationState.value ?: ValidationState()
+        _validationState.value = currentState.copy(
+            isAmountValid = isAmountValid,
+            isCurrencyValid = isCurrencyValid,
+            isCategoryValid = isCategoryValid,
+            isWalletValid = isWalletValid,
+            isDateValid = isDateValid,
+            amountError = if (currentState.shouldShowErrors && !isAmountValid) "Please enter a valid amount" else null,
+            currencyError = if (currentState.shouldShowErrors && !isCurrencyValid) "Please select a currency" else null,
+            categoryError = if (currentState.shouldShowErrors && !isCategoryValid) "Please select a category" else null,
+            walletError = if (currentState.shouldShowErrors && !isWalletValid) "Please select a wallet" else null,
+            dateError = if (currentState.shouldShowErrors && !isDateValid) "Please select a date" else null
         )
 
-        _validationState.value = validationState
-        return validationState.message == null
+        return isAmountValid && isCurrencyValid && isCategoryValid && isWalletValid && isDateValid
+    }
+
+    fun showValidationErrors() {
+        val currentState = _validationState.value ?: ValidationState()
+        _validationState.value = currentState.copy(shouldShowErrors = true)
+        validateForm()
     }
 
     fun addTransaction() {
@@ -163,7 +185,7 @@ class TransactionAddViewModel @Inject constructor(
         _wallet.value = null
         _imageBytes.value = null
         _recurrenceRate.value = null
-        _validationState.value = ValidationState()
+        _validationState.value = ValidationState(shouldShowErrors = false)
         _uiState.value = UiState.Initial
     }
 

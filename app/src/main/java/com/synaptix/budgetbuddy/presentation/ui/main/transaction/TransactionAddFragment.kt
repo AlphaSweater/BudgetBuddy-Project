@@ -233,7 +233,6 @@ class TransactionAddFragment : Fragment() {
 
     private fun updateSelectedDate(date: String?) {
         if (date == null) {
-        // SET CURRENT DATE as today
             val currentDate = LocalDate.now()
             val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
             binding.edtTextDate.text = currentDate.format(formatter)
@@ -241,8 +240,6 @@ class TransactionAddFragment : Fragment() {
         }
         binding.edtTextDate.text = date
     }
-
-
 
     private fun updateSelectedRecurrenceRate(recurrenceRate: String?) {
         if (recurrenceRate == null){
@@ -263,21 +260,14 @@ class TransactionAddFragment : Fragment() {
         val note = binding.edtTextNote.text.toString()
         viewModel.setNote(note)
 
-        val currency = binding.spinnerCurrency.selectedItem
-        viewModel.setCategory(currency as Category?)
+        val currency = binding.spinnerCurrency.selectedItem.toString()
+        viewModel.setCurrency(currency)
 
-        // Validate input
-        if (viewModel.category.value == null  ||
-            viewModel.wallet.value == null ||
-            viewModel.currency.value.isNullOrBlank() ||
-            viewModel.amount.value!! <= 0.0 ||
-            viewModel.date.value?.isBlank() == true
-        ) {
-            Toast.makeText(
-                requireContext(),
-                "Please fill in all required fields correctly.",
-                Toast.LENGTH_SHORT
-            ).show()
+        // Show validation errors if any
+        viewModel.showValidationErrors()
+
+        // Check if form is valid before proceeding
+        if (!viewModel.validateForm()) {
             return
         }
 
@@ -285,19 +275,8 @@ class TransactionAddFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             try {
                 viewModel.addTransaction()
-                Toast.makeText(
-                    requireContext(),
-                    "Transaction saved successfully!",
-                    Toast.LENGTH_SHORT
-                ).show()
-                viewModel.reset()
-                findNavController().popBackStack()
             } catch (e: Exception) {
-                Toast.makeText(
-                    requireContext(),
-                    "Failed to save transaction: ${e.message}",
-                    Toast.LENGTH_SHORT
-                ).show()
+                showError("Failed to save transaction: ${e.message}")
             }
         }
     }
@@ -346,7 +325,7 @@ class TransactionAddFragment : Fragment() {
         }
 
         viewModel.recurrenceRate.observe(viewLifecycleOwner) { rate ->
-            binding.textSelectedRecurrenceRate.text = rate ?: "One time"
+            updateSelectedRecurrenceRate(rate)
         }
 
         viewModel.imageBytes.observe(viewLifecycleOwner) { bytes ->
@@ -372,7 +351,7 @@ class TransactionAddFragment : Fragment() {
                 findNavController().popBackStack()
             }
             is TransactionAddViewModel.UiState.Error -> {
-                binding.btnSave.isEnabled = true
+                binding.btnSave.isEnabled = false
                 showError(state.message)
             }
             else -> {
@@ -382,8 +361,33 @@ class TransactionAddFragment : Fragment() {
     }
 
     private fun handleValidationState(state: TransactionAddViewModel.ValidationState) {
-        binding.btnSave.isEnabled = state.message == null
-        state.message?.let { showError(it) }
+        with(binding) {
+            // Show/hide error messages for each field
+            textAmountError.apply {
+                text = state.amountError
+                visibility = if (state.shouldShowErrors && state.amountError != null) View.VISIBLE else View.GONE
+            }
+
+            textCurrencyError.apply {
+                text = state.currencyError
+                visibility = if (state.shouldShowErrors && state.currencyError != null) View.VISIBLE else View.GONE
+            }
+
+            textCategoryError.apply {
+                text = state.categoryError
+                visibility = if (state.shouldShowErrors && state.categoryError != null) View.VISIBLE else View.GONE
+            }
+
+            textWalletError.apply {
+                text = state.walletError
+                visibility = if (state.shouldShowErrors && state.walletError != null) View.VISIBLE else View.GONE
+            }
+
+            textDateError.apply {
+                text = state.dateError
+                visibility = if (state.shouldShowErrors && state.dateError != null) View.VISIBLE else View.GONE
+            }
+        }
     }
 
     private fun showError(message: String) {
