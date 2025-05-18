@@ -152,7 +152,8 @@ fun WalletIn.toEntity(): WalletEntity {
         user_id = this.userId,
         name = this.walletName,
         currency = this.walletCurrency,
-        balance = this.walletBalance
+        balance = this.walletBalance,
+        excludeFromTotal = this.excludeFromTotal
     )
 }
 
@@ -163,7 +164,8 @@ fun WalletEntity.toDomain(user: User?): Wallet {
         user = user,
         walletName = name,
         walletCurrency = currency,
-        walletBalance = balance
+        walletBalance = balance,
+        excludeFromTotal = excludeFromTotal
     )
 }
 

@@ -17,6 +17,9 @@ import com.synaptix.budgetbuddy.databinding.FragmentTransactionAddBinding
 import com.synaptix.budgetbuddy.databinding.FragmentWalletAddBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import android.text.Editable
+import android.text.TextWatcher
+import androidx.core.view.isVisible
 
 @AndroidEntryPoint
 class WalletAddFragment : Fragment() {
@@ -40,6 +43,7 @@ class WalletAddFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupUI()
+        setupListeners()
         observeViewModel()
     }
 
@@ -51,7 +55,6 @@ class WalletAddFragment : Fragment() {
     // --- Setup Methods ---
     private fun setupUI() {
         setupCurrencySpinner()
-        setupOnClickListeners()
     }
 
     //Handles the setup of the currency spinner.
@@ -59,60 +62,77 @@ class WalletAddFragment : Fragment() {
         val adapter = ArrayAdapter(
             requireContext(),
             R.layout.spinner_item,
-            listOf("ZAR")
+            listOf("ZAR", "USD", "EUR", "GBP") // Add more currencies as needed
         )
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         binding.spinnerCurrency.adapter = adapter
     }
 
-    private fun setupOnClickListeners() {
+    private fun setupListeners() {
+        // Back button
         binding.btnGoBack.setOnClickListener {
             findNavController().popBackStack()
         }
 
-        binding.btnWalletEdit.setOnClickListener {
-//            findNavController().navigate(R.id.action_walletAddFragment_to_walletSelectIconFragment)
+        // Wallet name
+        binding.edtWalletName.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun afterTextChanged(s: Editable?) {
+                viewModel.updateWalletName(s?.toString() ?: "")
+            }
+        })
+
+        // Initial amount
+        binding.edtInitialAmount.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun afterTextChanged(s: Editable?) {
+                viewModel.updateWalletAmount(s?.toString() ?: "0")
+            }
+        })
+
+        // Notifications switch
+        binding.switchNotifications.setOnCheckedChangeListener { _, isChecked ->
+            viewModel.updateNotifications(isChecked)
         }
 
+        // Exclude from total switch
+        binding.switchExcludeTotal.setOnCheckedChangeListener { _, isChecked ->
+            viewModel.updateExcludeFromTotal(isChecked)
+        }
+
+        // Save button
         binding.btnSave.setOnClickListener {
             saveWallet()
-            findNavController().popBackStack()
         }
-
     }
 
     // --- Save Logic ---
     private fun saveWallet() {
-        viewModel.walletName.value = binding.edtWalletName.text.toString()
-        viewModel.walletCurrency.value = binding.spinnerCurrency.selectedItem.toString()
-        viewModel.walletAmount.value = binding.edtInitialAmount.text.toString().toDoubleOrNull() ?: 0.0
-
-        // Validate input
-        if (viewModel.walletName.value.isNullOrBlank()   ||
-            viewModel.walletCurrency.value.isNullOrBlank() ||
-            viewModel.walletAmount.value == null
-        ) {
-            Toast.makeText(
-                requireContext(),
-                "Please fill in all required fields correctly.",
-                Toast.LENGTH_SHORT
-            ).show()
-            return
-        }
-
-        // Launch coroutine to call suspend function
         viewLifecycleOwner.lifecycleScope.launch {
             try {
+                viewModel.updateWalletCurrency(binding.spinnerCurrency.selectedItem.toString())
                 viewModel.addWallet()
-                Toast.makeText(
-                    requireContext(),
-                    "Wallet saved successfully!",
-                    Toast.LENGTH_SHORT
-                ).show()
+                    .onSuccess {
+                        Toast.makeText(
+                            requireContext(),
+                            "Wallet saved successfully!",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        findNavController().popBackStack()
+                    }
+                    .onFailure { exception ->
+                        Toast.makeText(
+                            requireContext(),
+                            exception.message ?: "Failed to save wallet",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
             } catch (e: Exception) {
                 Toast.makeText(
                     requireContext(),
-                    "Wallet to save transaction: ${e.message}",
+                    "Error: ${e.message}",
                     Toast.LENGTH_SHORT
                 ).show()
             }
@@ -121,19 +141,36 @@ class WalletAddFragment : Fragment() {
 
     // --- Observers ---
     private fun observeViewModel() {
-        viewModel.walletName.observe(viewLifecycleOwner) { walletName ->
-            Log.d("Wallet", "Selected Wallet Name: $walletName")
-            // Update UI based on the selected wallet
+        // Observe validation errors
+        viewModel.nameError.observe(viewLifecycleOwner) { error ->
+            showError(error, binding.edtWalletName)
         }
 
-        viewModel.walletCurrency.observe(viewLifecycleOwner) { walletCurrency ->
-            Log.d("Wallet", "Selected Wallet Currency: $walletCurrency")
-            // Update UI based on the selected wallet
+        viewModel.currencyError.observe(viewLifecycleOwner) { error ->
+            // Handle currency error if needed
         }
 
-        viewModel.walletAmount.observe(viewLifecycleOwner) { walletAmount ->
-            Log.d("Wallet", "Selected Wallet Amount: $walletAmount")
-            // Update UI based on the selected wallet
+        viewModel.amountError.observe(viewLifecycleOwner) { error ->
+            showError(error, binding.edtInitialAmount)
+        }
+
+        // Observe loading state
+        lifecycleScope.launch {
+            viewModel.isLoading.collect { isLoading ->
+                binding.btnSave.isEnabled = !isLoading
+                // You can also show a loading indicator if needed
+            }
+        }
+    }
+
+    private fun showError(error: String?, view: View) {
+        when (view) {
+            binding.edtWalletName -> {
+                binding.edtWalletName.error = error
+            }
+            binding.edtInitialAmount -> {
+                binding.edtInitialAmount.error = error
+            }
         }
     }
 }

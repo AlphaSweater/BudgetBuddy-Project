@@ -47,5 +47,6 @@ data class WalletEntity (
     val user_id: Int,           // ID of the user who owns this wallet
     val name: String,           // Name of the wallet (e.g., "Savings", "Cash")
     val currency: String,       // Currency type (e.g., "USD", "ZAR")
-    val balance: Double         // Current balance of the wallet
+    val balance: Double,        // Current balance of the wallet
+    val excludeFromTotal: Boolean = false // Flag to exclude this wallet from total calculations
 )

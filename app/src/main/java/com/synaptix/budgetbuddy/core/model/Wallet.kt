@@ -38,7 +38,10 @@ data class WalletIn (
     val walletCurrency: String,
 
     // Current balance in the wallet
-    var walletBalance: Double
+    var walletBalance: Double,
+
+    // Flag indicating if the wallet should be excluded from total calculations
+    val excludeFromTotal: Boolean = false
 ) : Serializable
 
 // Data class representing a Wallet (with associated User)
@@ -56,5 +59,8 @@ data class Wallet (
     val walletCurrency: String,
 
     // Current balance in the wallet
-    var walletBalance: Double
+    var walletBalance: Double,
+
+    // Flag indicating if the wallet should be excluded from total calculations
+    val excludeFromTotal: Boolean = false
 )
