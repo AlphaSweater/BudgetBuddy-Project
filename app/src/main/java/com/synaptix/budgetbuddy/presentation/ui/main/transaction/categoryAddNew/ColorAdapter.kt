@@ -22,7 +22,7 @@ class ColorAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ColorViewHolder {
         val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_color, parent, false)
+            .inflate(R.layout.item_category_color, parent, false)
         return ColorViewHolder(view)
     }
 

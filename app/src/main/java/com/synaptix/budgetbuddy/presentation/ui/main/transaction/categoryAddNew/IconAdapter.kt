@@ -21,7 +21,7 @@ class IconAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): IconViewHolder {
         val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_icon, parent, false)
+            .inflate(R.layout.item_category_icon, parent, false)
         return IconViewHolder(view)
     }
 

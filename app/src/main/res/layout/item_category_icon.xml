@@ -2,22 +2,33 @@
 <com.google.android.material.card.MaterialCardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/iconCardView"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
+    android:layout_width="64dp"
+    android:layout_height="64dp"
     android:layout_margin="4dp"
-    app:cardCornerRadius="8dp"
+    app:cardCornerRadius="16dp"
     app:cardElevation="2dp"
-    app:checkedIcon="@drawable/ic_add_circle_40"
-    app:checkedIconTint="?attr/bb_button"
-    android:checkable="true">
+    app:cardBackgroundColor="?attr/bb_surface">
 
-    <ImageView
-        android:id="@+id/imgIcon"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:layout_margin="8dp"
-        android:padding="8dp"
-        app:tint="?attr/bb_primaryText" />
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:id="@+id/iconView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="12dp"
+            app:tint="?attr/bb_primaryText"/>
+
+        <ImageView
+            android:id="@+id/selectedIndicator"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_gravity="center"
+            android:src="@drawable/ic_add_circle_40"
+            android:visibility="gone"
+            app:tint="?attr/bb_button"/>
+
+    </FrameLayout>
 
 </com.google.android.material.card.MaterialCardView> 
