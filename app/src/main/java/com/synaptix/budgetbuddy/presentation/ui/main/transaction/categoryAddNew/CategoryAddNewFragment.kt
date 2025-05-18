@@ -73,7 +73,7 @@ class CategoryAddNewFragment : Fragment() {
 
         viewModel.selectedColor.observe(viewLifecycleOwner) { color ->
             color?.let {
-                binding.previewIcon.setBackgroundColor(requireContext().getColor(it.colorValue))
+                binding.previewIcon.setColorFilter(requireContext().getColor(it.colorValue))
             }
         }
 

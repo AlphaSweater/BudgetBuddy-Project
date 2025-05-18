@@ -4,6 +4,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.ImageView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -40,10 +41,10 @@ class ColorAdapter(
 
     class ColorViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val cardView: MaterialCardView = itemView.findViewById(R.id.colorCardView)
-        private val colorButton: Button = itemView.findViewById(R.id.btnColor)
+        private val colorView: ImageView = itemView.findViewById(R.id.imgColor)
 
         fun bind(color: CategoryColor, isSelected: Boolean) {
-            colorButton.setBackgroundColor(itemView.context.getColor(color.colorValue))
+            colorView.setColorFilter(itemView.context.getColor(color.colorValue))
             cardView.isChecked = isSelected
         }
     }

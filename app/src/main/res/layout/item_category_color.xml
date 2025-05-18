@@ -12,12 +12,11 @@
     app:checkedIconTint="?attr/bb_button"
     android:checkable="true">
 
-    <Button
-        android:id="@+id/btnColor"
+    <ImageView
+        android:id="@+id/imgColor"
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:layout_margin="8dp"
-        android:background="@drawable/circle_button_background"
-        android:clickable="false" />
+        android:src="@drawable/ic_circle_24"/>
 
 </com.google.android.material.card.MaterialCardView> 

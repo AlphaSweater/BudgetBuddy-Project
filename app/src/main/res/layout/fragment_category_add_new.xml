@@ -103,7 +103,7 @@
                         android:layout_width="64dp"
                         android:layout_height="64dp"
                         android:layout_marginBottom="16dp"
-                        app:srcCompat="@drawable/ic_circle_24"
+                        android:src="@drawable/ic_circle_24"
                         app:tint="?attr/bb_button"/>
 
                     <com.google.android.material.textfield.TextInputLayout
