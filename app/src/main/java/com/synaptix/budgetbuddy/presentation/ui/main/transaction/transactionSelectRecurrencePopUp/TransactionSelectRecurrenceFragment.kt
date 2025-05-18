@@ -33,6 +33,10 @@ class TransactionSelectRecurrenceFragment : Fragment() {
     }
 
     private fun setupOnClickListeners() {
+        binding.btnGoBack.setOnClickListener {
+            findNavController().popBackStack()
+        }
+
         binding.btnDaily.setOnClickListener {
             viewModel.setRecurrenceRate("Daily")
             findNavController().popBackStack()
