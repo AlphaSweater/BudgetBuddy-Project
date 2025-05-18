@@ -184,8 +184,8 @@
                             android:background="?attr/selectableItemBackgroundBorderless">
 
                             <ImageView
-                                android:layout_width="32dp"
-                                android:layout_height="32dp"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
                                 android:layout_gravity="center"
                                 android:src="@drawable/ic_attach_money_24"
                                 app:tint="?attr/bb_button" />
@@ -233,8 +233,8 @@
                             android:background="?attr/selectableItemBackgroundBorderless">
 
                             <ImageView
-                                android:layout_width="32dp"
-                                android:layout_height="32dp"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
                                 android:layout_gravity="center"
                                 android:src="@drawable/ic_edit_note_24"
                                 app:tint="?attr/bb_button" />
