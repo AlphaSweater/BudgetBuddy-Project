@@ -16,17 +16,31 @@ class TransactionSelectCategoryAdapter(
     private val onCategoryClick: (Category) -> Unit
 ) : RecyclerView.Adapter<TransactionSelectCategoryAdapter.CategoryViewHolder>() {
 
+    private var filteredCategories = categories.toList()
+    val currentList: List<Category> get() = filteredCategories
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CategoryViewHolder {
         val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_expense, parent, false)
+            .inflate(R.layout.item_category, parent, false)
         return CategoryViewHolder(view)
     }
 
     override fun onBindViewHolder(holder: CategoryViewHolder, position: Int) {
-        holder.bind(categories[position])
+        holder.bind(filteredCategories[position])
     }
 
-    override fun getItemCount(): Int = categories.size
+    override fun getItemCount(): Int = filteredCategories.size
+
+    fun filter(query: String) {
+        filteredCategories = if (query.isEmpty()) {
+            categories
+        } else {
+            categories.filter {
+                it.categoryName.contains(query, ignoreCase = true)
+            }
+        }
+        notifyDataSetChanged()
+    }
 
     inner class CategoryViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val categoryIcon: ImageView = itemView.findViewById(R.id.imgCategoryIcon)
@@ -44,6 +58,5 @@ class TransactionSelectCategoryAdapter(
                 onCategoryClick(category)
             }
         }
-
     }
 }
