@@ -40,7 +40,7 @@ class BudgetSelectCategoryAdapter(
     // Inflates the item layout and creates the ViewHolder
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CategoryViewHolder {
         val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_expense, parent, false)
+            .inflate(R.layout.item_category, parent, false)
         return CategoryViewHolder(view)
     }
 

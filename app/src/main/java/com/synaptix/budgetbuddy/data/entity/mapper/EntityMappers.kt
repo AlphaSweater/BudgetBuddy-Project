@@ -24,6 +24,8 @@ package com.synaptix.budgetbuddy.data.entity.mapper
 import com.synaptix.budgetbuddy.core.model.Budget
 import com.synaptix.budgetbuddy.core.model.BudgetIn
 import com.synaptix.budgetbuddy.core.model.Category
+import com.synaptix.budgetbuddy.core.model.CategoryColor
+import com.synaptix.budgetbuddy.core.model.CategoryIcon
 import com.synaptix.budgetbuddy.core.model.CategoryIn
 import com.synaptix.budgetbuddy.core.model.Transaction
 import com.synaptix.budgetbuddy.core.model.TransactionIn
@@ -31,7 +33,9 @@ import com.synaptix.budgetbuddy.core.model.User
 import com.synaptix.budgetbuddy.core.model.Wallet
 import com.synaptix.budgetbuddy.core.model.WalletIn
 import com.synaptix.budgetbuddy.data.entity.BudgetEntity
+import com.synaptix.budgetbuddy.data.entity.CategoryColorEntity
 import com.synaptix.budgetbuddy.data.entity.CategoryEntity
+import com.synaptix.budgetbuddy.data.entity.CategoryIconEntity
 import com.synaptix.budgetbuddy.data.entity.TransactionEntity
 import com.synaptix.budgetbuddy.data.entity.UserEntity
 import com.synaptix.budgetbuddy.data.entity.WalletEntity
@@ -113,6 +117,44 @@ fun CategoryEntity.toDomain(user: User?): Category {
 // Maps from CategoryWithUser relation to domain model
 fun CategoryWithUser.toDomain(): Category {
     return category.toDomain(user?.toDomain())
+}
+
+// Maps from CategoryColour entity to domain model
+fun CategoryColorEntity.toDomain(): CategoryColor {
+    return CategoryColor(
+        id = id,
+        name = name,
+        colorValue = colorValue,
+        hexCode = hexCode
+    )
+}
+
+// Maps from CategoryColour model to entity
+fun CategoryColor.toEntity(): CategoryColorEntity {
+    return CategoryColorEntity(
+        id = id,
+        name = name,
+        colorValue = colorValue,
+        hexCode = hexCode
+    )
+}
+
+// Maps from CategoryIcon entity model to domain model
+fun CategoryIconEntity.toDomain(): CategoryIcon {
+    return CategoryIcon(
+        id = id,
+        name = name,
+        iconResourceId = iconResourceId
+    )
+}
+
+// Maps from CategoryIcon model to entity
+fun CategoryIcon.toEntity(): CategoryIconEntity {
+    return CategoryIconEntity(
+        id = id,
+        name = name,
+        iconResourceId = iconResourceId
+    )
 }
 
 //

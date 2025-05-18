@@ -25,7 +25,11 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import com.synaptix.budgetbuddy.core.model.CategoryColor
+import com.synaptix.budgetbuddy.core.model.CategoryIcon
+import com.synaptix.budgetbuddy.data.entity.CategoryColorEntity
 import com.synaptix.budgetbuddy.data.entity.CategoryEntity
+import com.synaptix.budgetbuddy.data.entity.CategoryIconEntity
 import com.synaptix.budgetbuddy.data.entity.relations.CategoryWithUser
 
 @Dao
@@ -39,4 +43,28 @@ interface CategoryDao {
     @Query("SELECT * FROM category_table WHERE user_id = :userId OR user_id IS null")
     suspend fun getCategoriesByUserId(userId: Int): List<CategoryWithUser>
 
+}
+
+@Dao
+interface CategoryIconDao {
+    @Query("SELECT * FROM category_icons_table")
+    suspend fun getAllIcons(): List<CategoryIconEntity>
+
+    @Insert
+    suspend fun insertAll(icons: List<CategoryIconEntity>)
+
+    @Query("DELETE FROM category_icons_table")
+    suspend fun deleteAll()
+}
+
+@Dao
+interface CategoryColorDao {
+    @Query("SELECT * FROM category_colors_table")
+    suspend fun getAllColors(): List<CategoryColorEntity>
+
+    @Insert
+    suspend fun insertAll(colors: List<CategoryColorEntity>)
+
+    @Query("DELETE FROM category_colors_table")
+    suspend fun deleteAll()
 }

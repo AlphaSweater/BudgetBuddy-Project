@@ -24,11 +24,13 @@ package com.synaptix.budgetbuddy.data
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import com.synaptix.budgetbuddy.data.entity.BudgetEntity
+import com.synaptix.budgetbuddy.data.entity.CategoryColorEntity
 import com.synaptix.budgetbuddy.data.local.dao.CategoryDao
 import com.synaptix.budgetbuddy.data.local.dao.TransactionDao
 import com.synaptix.budgetbuddy.data.local.dao.UserDao
 import com.synaptix.budgetbuddy.data.local.dao.WalletDao
 import com.synaptix.budgetbuddy.data.entity.CategoryEntity
+import com.synaptix.budgetbuddy.data.entity.CategoryIconEntity
 import com.synaptix.budgetbuddy.data.entity.LabelEntity
 import com.synaptix.budgetbuddy.data.entity.MinMaxGoalEntity
 import com.synaptix.budgetbuddy.data.entity.TransactionEntity
@@ -36,6 +38,8 @@ import com.synaptix.budgetbuddy.data.entity.TransactionLabelEntity
 import com.synaptix.budgetbuddy.data.entity.UserEntity
 import com.synaptix.budgetbuddy.data.entity.WalletEntity
 import com.synaptix.budgetbuddy.data.local.dao.BudgetDao
+import com.synaptix.budgetbuddy.data.local.dao.CategoryColorDao
+import com.synaptix.budgetbuddy.data.local.dao.CategoryIconDao
 import com.synaptix.budgetbuddy.data.local.dao.LabelDao
 import com.synaptix.budgetbuddy.data.local.dao.MinMaxGoalsDao
 
@@ -47,8 +51,18 @@ import com.synaptix.budgetbuddy.data.local.dao.MinMaxGoalsDao
 // Wallet, Category, Budget, etc. The database version is 9, which may change as the
 // application evolves and requires migrations.
 @Database(
-    entities = [UserEntity::class, TransactionEntity::class, WalletEntity::class, CategoryEntity::class, BudgetEntity::class, LabelEntity::class, TransactionLabelEntity::class, MinMaxGoalEntity::class],
-    version = 12
+    entities = [
+        UserEntity::class,
+        TransactionEntity::class,
+        WalletEntity::class,
+        CategoryEntity::class,
+        CategoryColorEntity::class,
+        CategoryIconEntity::class,
+        BudgetEntity::class,
+        LabelEntity::class,
+        TransactionLabelEntity::class,
+        MinMaxGoalEntity::class],
+    version = 13
 )
 
 
@@ -63,6 +77,8 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun transactionDao(): TransactionDao
     abstract fun walletDao(): WalletDao
     abstract fun categoryDao(): CategoryDao
+    abstract fun categoryColorDao(): CategoryColorDao
+    abstract fun categoryIconDao(): CategoryIconDao
     abstract fun budgetDao(): BudgetDao
     abstract fun labelDao(): LabelDao
     abstract fun minMaxGoalsDao(): MinMaxGoalsDao

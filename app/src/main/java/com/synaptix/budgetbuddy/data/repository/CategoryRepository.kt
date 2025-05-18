@@ -22,12 +22,17 @@
 package com.synaptix.budgetbuddy.data.repository
 
 import com.synaptix.budgetbuddy.core.model.Category
+import com.synaptix.budgetbuddy.core.model.CategoryColor
+import com.synaptix.budgetbuddy.core.model.CategoryIcon
 import com.synaptix.budgetbuddy.core.model.CategoryIn
 import com.synaptix.budgetbuddy.data.entity.CategoryEntity
 import com.synaptix.budgetbuddy.data.entity.TransactionEntity
 import com.synaptix.budgetbuddy.data.local.dao.CategoryDao
 import com.synaptix.budgetbuddy.data.local.dao.UserDao
 import com.synaptix.budgetbuddy.data.entity.mapper.toDomain
+import com.synaptix.budgetbuddy.data.entity.mapper.toEntity
+import com.synaptix.budgetbuddy.data.local.dao.CategoryColorDao
+import com.synaptix.budgetbuddy.data.local.dao.CategoryIconDao
 import javax.inject.Inject
 
 // ===================================
@@ -49,5 +54,32 @@ class CategoryRepository @Inject constructor(
 
     suspend fun addCategory(entity: CategoryEntity): Long {
         return categoryDao.insertCategory(entity)
+    }
+}
+
+class CategoryAssetsRepository @Inject constructor(
+    private val categoryColorDao: CategoryColorDao,
+    private val categoryIconDao: CategoryIconDao
+) {
+    suspend fun getAllColors(): List<CategoryColor> {
+        val categoryColors = categoryColorDao.getAllColors()
+        return categoryColors.map { it.toDomain() }
+    }
+
+    suspend fun getAllIcons(): List<CategoryIcon> {
+        val categoryIcons = categoryIconDao.getAllIcons()
+        return categoryIcons.map { it.toDomain() }
+    }
+
+    suspend fun initializeDefaultColors(colors: List<CategoryColor>) {
+        categoryColorDao.deleteAll()
+        val colorsEntities = colors.map { it.toEntity() }
+        categoryColorDao.insertAll(colorsEntities)
+    }
+
+    suspend fun initializeDefaultIcons(icons: List<CategoryIcon>) {
+        categoryIconDao.deleteAll()
+        val iconsEntities = icons.map { it.toEntity() }
+        categoryIconDao.insertAll(iconsEntities)
     }
 }
