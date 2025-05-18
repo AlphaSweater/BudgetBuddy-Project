@@ -29,17 +29,13 @@ import com.synaptix.budgetbuddy.core.usecase.auth.GetUserIdUseCase
 import com.synaptix.budgetbuddy.data.repository.UserRepository
 import com.synaptix.budgetbuddy.core.usecase.main.transaction.AddTransactionUseCase
 import com.synaptix.budgetbuddy.core.usecase.auth.LoginUserUseCase
-import com.synaptix.budgetbuddy.core.usecase.main.category.GetCategoryColorsUseCase
-import com.synaptix.budgetbuddy.core.usecase.main.category.GetCategoryIconsUseCase
 import com.synaptix.budgetbuddy.core.usecase.main.transaction.GetCategoriesUseCase
 import com.synaptix.budgetbuddy.data.AppDatabase
 import com.synaptix.budgetbuddy.data.entity.CategoryEntity
 import com.synaptix.budgetbuddy.data.local.CategoryDatabaseCallback
 import com.synaptix.budgetbuddy.data.local.LabelDatabaseCallback
 import com.synaptix.budgetbuddy.data.local.dao.BudgetDao
-import com.synaptix.budgetbuddy.data.local.dao.CategoryColorDao
 import com.synaptix.budgetbuddy.data.local.dao.CategoryDao
-import com.synaptix.budgetbuddy.data.local.dao.CategoryIconDao
 import com.synaptix.budgetbuddy.data.local.dao.LabelDao
 import com.synaptix.budgetbuddy.data.local.dao.MinMaxGoalsDao
 import com.synaptix.budgetbuddy.data.local.dao.TransactionDao
@@ -47,7 +43,6 @@ import com.synaptix.budgetbuddy.data.local.dao.UserDao
 import com.synaptix.budgetbuddy.data.local.dao.WalletDao
 import com.synaptix.budgetbuddy.data.local.datastore.DataStoreManager
 import com.synaptix.budgetbuddy.data.repository.BudgetRepository
-import com.synaptix.budgetbuddy.data.repository.CategoryAssetsRepository
 import com.synaptix.budgetbuddy.data.repository.CategoryRepository
 import com.synaptix.budgetbuddy.data.repository.LabelRepository
 import com.synaptix.budgetbuddy.data.repository.TransactionRepository
@@ -143,20 +138,6 @@ object AppModule {
         return appDatabase.categoryDao()
     }
 
-    // Provide CategoryColorDao for accessing category color data in the database
-    @Provides
-    @Singleton
-    fun provideCategoryColorDao(appDatabase: AppDatabase): CategoryColorDao {
-        return appDatabase.categoryColorDao()
-    }
-
-    // Provide CategoryIconDao for accessing category icon data in the database
-    @Provides
-    @Singleton
-    fun provideCategoryIconDao(appDatabase: AppDatabase): CategoryIconDao {
-        return appDatabase.categoryIconDao()
-    }
-
     // Provide LabelDao for accessing label data in the database
     @Provides
     @Singleton
@@ -208,25 +189,6 @@ object AppModule {
     @Singleton
     fun provideGetCategoriesUseCase(categoryRepository: CategoryRepository) : GetCategoriesUseCase {
         return GetCategoriesUseCase(categoryRepository)
-    }
-
-    // Provide CategoryAssetsRepository for managing category assets (colors and icons)
-    @Provides
-    @Singleton
-    fun provideCategoryAssetsRepository(categoryColorDao: CategoryColorDao, categoryIconDao: CategoryIconDao): CategoryAssetsRepository {
-        return CategoryAssetsRepository(categoryColorDao, categoryIconDao)
-    }
-
-    @Provides
-    @Singleton
-    fun provideCategoryColorUseCase(categoryAssetsRepository: CategoryAssetsRepository): GetCategoryColorsUseCase {
-        return GetCategoryColorsUseCase(categoryAssetsRepository)
-    }
-
-    @Provides
-    @Singleton
-    fun provideCategoryIconUseCase(categoryAssetsRepository: CategoryAssetsRepository): GetCategoryIconsUseCase{
-        return GetCategoryIconsUseCase(categoryAssetsRepository)
     }
 
     @Provides

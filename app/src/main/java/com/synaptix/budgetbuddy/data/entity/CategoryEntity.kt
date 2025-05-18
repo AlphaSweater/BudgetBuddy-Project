@@ -50,21 +50,3 @@ data class CategoryEntity (
     val colour: Int,
     val icon: Int,
 )
-
-// ================================ //
-@Entity(tableName = "category_colors_table")
-data class CategoryColorEntity(
-    @PrimaryKey(autoGenerate = true)
-    val id: Int = 0,
-    val name: String,
-    val colorValue: Int, // Color resource ID
-    val hexCode: String
-)
-
-@Entity(tableName = "category_icons_table")
-data class CategoryIconEntity(
-    @PrimaryKey(autoGenerate = true)
-    val id: Int = 0,
-    val name: String,
-    val iconResourceId: Int, // Drawable resource ID
-)

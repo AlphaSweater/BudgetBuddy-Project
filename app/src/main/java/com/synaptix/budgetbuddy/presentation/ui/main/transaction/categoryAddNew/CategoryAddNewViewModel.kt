@@ -1,12 +1,12 @@
 package com.synaptix.budgetbuddy.presentation.ui.main.transaction.categoryAddNew
 
-import androidx.lifecycle.*
-import com.synaptix.budgetbuddy.core.model.CategoryColor
-import com.synaptix.budgetbuddy.core.model.CategoryIcon
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.synaptix.budgetbuddy.R
 import com.synaptix.budgetbuddy.core.model.CategoryIn
 import com.synaptix.budgetbuddy.core.usecase.auth.GetUserIdUseCase
-import com.synaptix.budgetbuddy.core.usecase.main.category.GetCategoryColorsUseCase
-import com.synaptix.budgetbuddy.core.usecase.main.category.GetCategoryIconsUseCase
 import com.synaptix.budgetbuddy.core.usecase.main.transaction.AddCategoryUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,72 +17,96 @@ import javax.inject.Inject
 @HiltViewModel
 class CategoryAddNewViewModel @Inject constructor(
     private val addCategoryUseCase: AddCategoryUseCase,
-    private val getUserIdUseCase: GetUserIdUseCase,
-    private val getCategoryColorsUseCase: GetCategoryColorsUseCase,
-    private val getCategoryIconsUseCase: GetCategoryIconsUseCase,
-    savedStateHandle: SavedStateHandle
+    private val getUserIdUseCase: GetUserIdUseCase
 ) : ViewModel() {
 
-    private val currentUserId: Int = savedStateHandle["currentUserId"] ?: 0
-
+    // Form state
     val categoryName = MutableLiveData<String>()
-    private val _selectedColor = MutableLiveData<CategoryColor>()
-    val selectedColor: LiveData<CategoryColor> = _selectedColor
-    private val _selectedIcon = MutableLiveData<CategoryIcon>()
-    val selectedIcon: LiveData<CategoryIcon> = _selectedIcon
-    val categoryType = MutableLiveData("Expense")
+    private val _categoryType = MutableLiveData("Expense")
+    val categoryType: LiveData<String> = _categoryType
 
-    private val _colors = MutableStateFlow<List<CategoryColor>>(emptyList())
-    val colors: StateFlow<List<CategoryColor>> = _colors
+    // Selection state
+    private val _selectedColor = MutableLiveData<ColorItem>()
+    val selectedColor: LiveData<ColorItem> = _selectedColor
 
-    private val _icons = MutableStateFlow<List<CategoryIcon>>(emptyList())
-    val icons: StateFlow<List<CategoryIcon>> = _icons
+    private val _selectedIcon = MutableLiveData<IconItem>()
+    val selectedIcon: LiveData<IconItem> = _selectedIcon
 
+    // Event state
     private val _eventCategoryCreated = MutableLiveData<Boolean>()
     val eventCategoryCreated: LiveData<Boolean> = _eventCategoryCreated
 
-    init {
-        loadColorsAndIcons()
-    }
+    // Available colors
+    private val _colors = MutableStateFlow<List<ColorItem>>(listOf(
+        ColorItem(R.color.cat_dark_pink, "Pink"),
+        ColorItem(R.color.cat_yellow, "Yellow"),
+        ColorItem(R.color.cat_gold, "Gold"),
+        ColorItem(R.color.cat_dark_purple, "Purple"),
+        ColorItem(R.color.cat_light_green, "Green"),
+        ColorItem(R.color.cat_light_purple, "Light Purple"),
+        ColorItem(R.color.cat_dark_blue, "Dark Blue"),
+        ColorItem(R.color.cat_light_blue, "Light Blue")
+    ))
+    val colors: StateFlow<List<ColorItem>> = _colors
 
-    private fun loadColorsAndIcons() {
-        viewModelScope.launch {
-            _colors.value = getCategoryColorsUseCase.execute()
-            _icons.value = getCategoryIconsUseCase.execute()
-        }
-    }
+    // Available icons
+    private val _icons = MutableStateFlow<List<IconItem>>(listOf(
+        IconItem(R.drawable.baseline_fastfood_24, "Food"),
+        IconItem(R.drawable.baseline_local_gas_station_24, "Transport"),
+        IconItem(R.drawable.ic_add_alert_24, "Alert"),
+        IconItem(R.drawable.baseline_palette_24, "Beauty"),
+        IconItem(R.drawable.baseline_savings_24, "Savings"),
+        IconItem(R.drawable.baseline_school_24, "Education"),
+        IconItem(R.drawable.baseline_theater_comedy_24, "Entertainment"),
+        IconItem(R.drawable.baseline_escalator_warning_24, "Family"),
+        IconItem(R.drawable.baseline_shopping_bag_24, "Shopping")
+    ))
+    val icons: StateFlow<List<IconItem>> = _icons
 
-    fun setSelectedColor(color: CategoryColor) {
+    fun setSelectedColor(color: ColorItem) {
         _selectedColor.value = color
     }
 
-    fun setSelectedIcon(icon: CategoryIcon) {
+    fun setSelectedIcon(icon: IconItem) {
         _selectedIcon.value = icon
+    }
+
+    fun setCategoryType(type: String) {
+        _categoryType.value = type
     }
 
     fun createCategory() {
         val name = categoryName.value
-        val icon = _selectedIcon.value
-        val color = _selectedColor.value
-        val type = categoryType.value ?: "Expense"
+        val color = selectedColor.value
+        val icon = selectedIcon.value
 
-        if (!name.isNullOrBlank() && icon != null && color != null) {
-            viewModelScope.launch {
-                val userId = getUserIdUseCase.execute()
-
-                val newCategory = CategoryIn(
-                    categoryName = name,
-                    categoryIcon = icon.iconResourceId,
-                    categoryColor = color.colorValue,
-                    categoryType = type,
-                    userId = userId
-                )
-
-                addCategoryUseCase.execute(newCategory)
-                _eventCategoryCreated.value = true
-            }
-        } else {
+        if (name.isNullOrBlank() || color == null || icon == null) {
             _eventCategoryCreated.value = false
+            return
+        }
+
+        viewModelScope.launch {
+            val userId = getUserIdUseCase.execute()
+            val categoryIn = CategoryIn(
+                userId = userId,
+                categoryName = name,
+                categoryType = _categoryType.value?.lowercase() ?: "expense",
+                categoryIcon = icon.iconResourceId,
+                categoryColor = color.colorResourceId
+            )
+            
+            addCategoryUseCase.execute(categoryIn)
+            _eventCategoryCreated.value = true
         }
     }
 }
+
+data class ColorItem(
+    val colorResourceId: Int,
+    val name: String
+)
+
+data class IconItem(
+    val iconResourceId: Int,
+    val name: String
+)

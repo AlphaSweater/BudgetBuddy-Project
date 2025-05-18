@@ -1,7 +1,6 @@
 package com.synaptix.budgetbuddy
 
 import android.app.Application
-import com.synaptix.budgetbuddy.core.usecase.main.category.InitializeCategoryAssetsUseCase
 import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -13,20 +12,17 @@ class BudgetBuddyApp : Application() {
     // This class is the entry point for Hilt dependency injection.
     // You can add any application-wide initialization logic here if needed.
 
-    @Inject
-    lateinit var initializeCategoryAssetsUseCase: InitializeCategoryAssetsUseCase
-
     private val applicationScope = CoroutineScope(Dispatchers.IO)
 
     override fun onCreate() {
         super.onCreate()
-        initializeCategoryAssets()
+        initializeAssets()
     }
 
-    private fun initializeCategoryAssets() {
+    private fun initializeAssets() {
         applicationScope.launch {
             try {
-                initializeCategoryAssetsUseCase.execute()
+//                initializeCategoryAssetsUseCase.execute()
             } catch (e: Exception) {
                 // Handle any initialization errors
                 e.printStackTrace()
