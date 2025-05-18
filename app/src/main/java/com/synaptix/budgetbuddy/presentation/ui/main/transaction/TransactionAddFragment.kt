@@ -15,17 +15,21 @@ import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.chip.Chip
 import com.google.android.material.color.MaterialColors
 import com.google.android.material.datepicker.MaterialDatePicker
+import com.google.android.material.snackbar.Snackbar
 import com.synaptix.budgetbuddy.R
 import com.synaptix.budgetbuddy.core.model.Label
 import com.synaptix.budgetbuddy.databinding.FragmentTransactionAddBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
+import java.util.Date
 import java.util.Locale
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -36,7 +40,10 @@ import android.provider.MediaStore
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import java.io.ByteArrayOutputStream
-
+import androidx.core.widget.doAfterTextChanged
+import com.synaptix.budgetbuddy.core.model.Category
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 @AndroidEntryPoint
 class TransactionAddFragment : Fragment() {
@@ -62,14 +69,13 @@ class TransactionAddFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setupUI()
-        setupCameraStuff()
+        setupViews()
+        setupImagePickers()
         observeViewModel()
     }
 
     override fun onResume() {
         super.onResume()
-        observeViewModel()
     }
 
     override fun onDestroyView() {
@@ -78,9 +84,10 @@ class TransactionAddFragment : Fragment() {
     }
 
     // --- Setup Methods ---
-    private fun setupUI() {
+    private fun setupViews() {
         setupCurrencySpinner()
         setupClickListeners()
+        setupTextWatchers()
     }
 
     //Handles the setup of the currency spinner.
@@ -89,132 +96,156 @@ class TransactionAddFragment : Fragment() {
             requireContext(),
             R.layout.spinner_item,
             listOf("ZAR")
-        )
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        ).apply {
+            setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        }
         binding.spinnerCurrency.adapter = adapter
     }
 
     private fun setupClickListeners() {
-        binding.rowSelectRecurrenceRate.setOnClickListener {
-            showRecurrenceSelector()
-        }
-
-        binding.rowSelectWallet.setOnClickListener {
-            showWalletSelector()
-        }
-
-//        binding.rowSelectLabel.setOnClickListener {
-//            showLabelSelector()
-//        }
-
-        binding.rowSelectCategory.setOnClickListener {
-            showCategorySelector()
-        }
-
-        val openDatePicker = {
-            val picker = MaterialDatePicker.Builder.datePicker()
-                .setTitleText("Select Date")
-                .setSelection(MaterialDatePicker.todayInUtcMilliseconds())
-                .build()
-
-            picker.addOnPositiveButtonClickListener { selection ->
-                // Convert selection (epoch millis) to readable date
-                val calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
-                calendar.timeInMillis = selection
-                val formattedDate = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(calendar.time)
-                binding.edtTextDate.setText(formattedDate)
+        with(binding) {
+            btnGoBack.setOnClickListener {
+                findNavController().popBackStack()
             }
 
-            picker.show(parentFragmentManager, "MATERIAL_DATE_PICKER")
+            rowSelectCategory.setOnClickListener {
+                showCategorySelector()
+            }
+
+            rowSelectWallet.setOnClickListener {
+                showWalletSelector()
+            }
+
+            rowSelectDate.setOnClickListener {
+                showDatePicker()
+            }
+
+            rowSelectRecurrenceRate.setOnClickListener {
+                showRecurrenceSelector()
+            }
+
+            rowSelectPhoto.setOnClickListener {
+                showImageSourceDialog()
+            }
+
+            btnSave.setOnClickListener {
+                saveTransaction()
+            }
         }
-
-        binding.rowSelectDate.setOnClickListener { openDatePicker() }
-        binding.edtTextDate.setOnClickListener { openDatePicker() }
-
-        binding.rowSelectPhoto.setOnClickListener { showImageSourceDialog() }
-
-        binding.btnSave.setOnClickListener { saveTransaction() }
-
-        binding.btnGoBack.setOnClickListener { findNavController().popBackStack() }
     }
 
-    private fun setupCameraStuff() {
+    private fun setupTextWatchers() {
+        binding.edtTextAmount.doAfterTextChanged { text ->
+            viewModel.setAmount(text.toString())
+        }
+
+        binding.edtTextNote.doAfterTextChanged { text ->
+            viewModel.setNote(text.toString())
+        }
+    }
+
+    private fun setupImagePickers() {
         takePictureLauncher = registerForActivityResult(ActivityResultContracts.TakePicture()) { success ->
             if (success && tempImageUri != null) {
-                val bytes = uriToByteArray(tempImageUri!!)
-                viewModel.setImageBytes(bytes)
+                handleImageResult(tempImageUri!!)
             }
         }
 
         pickImageLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
-            uri?.let {
-                val bytes = uriToByteArray(it)
-                viewModel.setImageBytes(bytes)
-            }
+            uri?.let { handleImageResult(it) }
         }
-
     }
 
-    private fun uriToByteArray(uri: Uri): ByteArray? {
-        val bitmap = if (Build.VERSION.SDK_INT < 28) {
-            MediaStore.Images.Media.getBitmap(requireContext().contentResolver, uri)
-        } else {
-            val source = ImageDecoder.createSource(requireContext().contentResolver, uri)
-            ImageDecoder.decodeBitmap(source)
+    private fun handleImageResult(uri: Uri) {
+        try {
+            requireContext().contentResolver.openInputStream(uri)?.use { inputStream ->
+                val bytes = inputStream.readBytes()
+                viewModel.setImageBytes(bytes)
+            }
+        } catch (e: Exception) {
+            showError("Failed to process image")
         }
-        val outputStream = ByteArrayOutputStream()
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 80, outputStream)
-        return outputStream.toByteArray()
+    }
+
+    private fun showDatePicker() {
+        val picker = MaterialDatePicker.Builder.datePicker()
+            .setTitleText("Select Date")
+            .setSelection(MaterialDatePicker.todayInUtcMilliseconds())
+            .build()
+
+        picker.addOnPositiveButtonClickListener { selection ->
+            val date = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+                .format(Date(selection))
+            viewModel.setDate(date)
+        }
+
+        picker.show(parentFragmentManager, "DATE_PICKER")
     }
 
     private fun showImageSourceDialog() {
-        val options = arrayOf("Take Photo", "Choose from Gallery")
         AlertDialog.Builder(requireContext())
             .setTitle("Add Image")
-            .setItems(options) { _, which ->
+            .setItems(arrayOf("Take Photo", "Choose from Gallery")) { _, which ->
                 when (which) {
-                    0 -> {
-                        val contentValues = ContentValues().apply {
-                            put(MediaStore.Images.Media.DISPLAY_NAME, "transaction_${System.currentTimeMillis()}.jpg")
-                            put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
-                        }
-                        tempImageUri = requireContext().contentResolver.insert(
-                            MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                            contentValues
-                        )
-                        if (tempImageUri != null) {
-                            takePictureLauncher.launch(tempImageUri!!)
-                        } else {
-                            Toast.makeText(requireContext(), "Failed to prepare image location.", Toast.LENGTH_SHORT).show()
-                        }
-
-                    }
+                    0 -> launchCamera()
                     1 -> pickImageLauncher.launch("image/*")
                 }
-            }.show()
+            }
+            .show()
+    }
+
+    private fun launchCamera() {
+        val contentValues = ContentValues().apply {
+            put(MediaStore.Images.Media.DISPLAY_NAME, "transaction_${System.currentTimeMillis()}.jpg")
+            put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
+        }
+        
+        try {
+            tempImageUri = requireContext().contentResolver.insert(
+                MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                contentValues
+            )
+            tempImageUri?.let { uri ->
+                takePictureLauncher.launch(uri)
+            } ?: showError("Failed to prepare camera")
+        } catch (e: Exception) {
+            showError("Failed to launch camera")
+        }
     }
 
     // --- Update Methods ---
 
-    private fun updateSelectedCategory(categoryName: String) {
-        if (categoryName.isBlank()) {
+    private fun updateSelectedCategory(categoryName: String?) {
+        if (categoryName == null) {
             binding.textSelectedCategoryName.text = "No category selected"
             return
         }
         binding.textSelectedCategoryName.text = categoryName
     }
 
-    private fun updateSelectedWallet(walletName: String) {
-        if (walletName.isBlank()) {
+    private fun updateSelectedWallet(walletName: String?) {
+        if (walletName == null) {
             binding.textSelectedWalletName.text = "No wallet selected"
             return
         }
         binding.textSelectedWalletName.text = walletName
     }
 
+    private fun updateSelectedDate(date: String?) {
+        if (date == null) {
+        // SET CURRENT DATE as today
+            val currentDate = LocalDate.now()
+            val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
+            binding.edtTextDate.text = currentDate.format(formatter)
+            return
+        }
+        binding.edtTextDate.text = date
+    }
+
+
 
     private fun updateSelectedRecurrenceRate(recurrenceRate: String?) {
-        if (recurrenceRate.isNullOrBlank()){
+        if (recurrenceRate == null){
             binding.textSelectedRecurrenceRate.text = "No recurrence rate selected"
             return
         }
@@ -223,16 +254,17 @@ class TransactionAddFragment : Fragment() {
 
     // --- Save Logic ---
     private fun saveTransaction() {
-        // TODO: Replace with actual data from UI
-        val amount = binding.edtTextAmount.text.toString().toDoubleOrNull() ?: 0.0
-        viewModel.amount.value = amount
+        val amount = binding.edtTextAmount.text.toString()
+        viewModel.setAmount(amount)
 
         val date = binding.edtTextDate.text.toString()
-        viewModel.date.value = date
+        viewModel.setDate(date)
 
-        viewModel.note.value = binding.edtTextNote.text.toString()
+        val note = binding.edtTextNote.text.toString()
+        viewModel.setNote(note)
 
-        viewModel.currency.value = binding.spinnerCurrency.selectedItem.toString()
+        val currency = binding.spinnerCurrency.selectedItem
+        viewModel.setCategory(currency as Category?)
 
         // Validate input
         if (viewModel.category.value == null  ||
@@ -289,61 +321,80 @@ class TransactionAddFragment : Fragment() {
 
     // --- Observers ---
     private fun observeViewModel() {
-//        viewModel.selectedLabels.observe(viewLifecycleOwner) { selectedLabels ->
-//            Log.d("ViewModelsLabels", selectedLabels.toString())
-//            updateSelectedLabelChips(selectedLabels)
-//
-//        }
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.uiState.collect { state ->
+                    handleUiState(state)
+                }
+            }
+        }
+
+        viewModel.validationState.observe(viewLifecycleOwner) { state ->
+            handleValidationState(state)
+        }
 
         viewModel.category.observe(viewLifecycleOwner) { category ->
-            // Update UI based on the selected category
-            updateSelectedCategory(category?.categoryName ?: "")
-            Log.d("Category", "Selected Category: $category")
+            updateSelectedCategory(category?.categoryName)
         }
 
         viewModel.wallet.observe(viewLifecycleOwner) { wallet ->
-            // Update UI based on the selected wallet
-            updateSelectedWallet(wallet?.walletName ?: "")
-            Log.d("Wallet", "Selected Wallet ID: $wallet")
-        }
-
-        viewModel.currency.observe(viewLifecycleOwner) { currency ->
-            Log.d("Currency", "Selected Currency: $currency")
-            // Update UI based on the selected currency
-        }
-
-        viewModel.amount.observe(viewLifecycleOwner) { amount ->
-            Log.d("Amount", "Entered Amount: $amount")
-            // Update UI based on the entered amount
+            updateSelectedWallet(wallet?.walletName)
         }
 
         viewModel.date.observe(viewLifecycleOwner) { date ->
-            Log.d("Date", "Selected Date: $date")
-            // Update UI based on the selected date
+            updateSelectedDate(date.toString())
         }
 
-        viewModel.note.observe(viewLifecycleOwner) { note ->
-            Log.d("Note", "Entered Note: $note")
-            // Update UI based on the entered note
-        }
-
-        viewModel.recurrenceRate.observe(viewLifecycleOwner) { recurrenceRate ->
-            updateSelectedRecurrenceRate(recurrenceRate)
-            Log.d("RecurrenceRate", "Selected Recurrence Rate: $recurrenceRate")
-            // Update UI based on the selected recurrence rate
+        viewModel.recurrenceRate.observe(viewLifecycleOwner) { rate ->
+            binding.textSelectedRecurrenceRate.text = rate ?: "One time"
         }
 
         viewModel.imageBytes.observe(viewLifecycleOwner) { bytes ->
             if (bytes != null) {
                 val bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
-                binding.imagePreview.setImageBitmap(bitmap)
-                binding.imagePreview.visibility = View.VISIBLE
-                Log.d("Image", "Image Preview: ${bitmap.width}x${bitmap.height}")
+                binding.imagePreview.apply {
+                    setImageBitmap(bitmap)
+                    visibility = View.VISIBLE
+                }
             } else {
-                binding.imagePreview.setImageDrawable(null)
                 binding.imagePreview.visibility = View.GONE
             }
         }
+    }
 
+    private fun handleUiState(state: TransactionAddViewModel.UiState) {
+        when (state) {
+            is TransactionAddViewModel.UiState.Loading -> {
+                binding.btnSave.isEnabled = false
+            }
+            is TransactionAddViewModel.UiState.Success -> {
+                showSuccess("Transaction added successfully")
+                findNavController().popBackStack()
+            }
+            is TransactionAddViewModel.UiState.Error -> {
+                binding.btnSave.isEnabled = true
+                showError(state.message)
+            }
+            else -> {
+                binding.btnSave.isEnabled = true
+            }
+        }
+    }
+
+    private fun handleValidationState(state: TransactionAddViewModel.ValidationState) {
+        binding.btnSave.isEnabled = state.message == null
+        state.message?.let { showError(it) }
+    }
+
+    private fun showError(message: String) {
+        Snackbar.make(binding.root, message, Snackbar.LENGTH_SHORT)
+            .setBackgroundTint(resources.getColor(R.color.error, null))
+            .show()
+    }
+
+    private fun showSuccess(message: String) {
+        Snackbar.make(binding.root, message, Snackbar.LENGTH_SHORT)
+            .setBackgroundTint(resources.getColor(R.color.success, null))
+            .show()
     }
 }

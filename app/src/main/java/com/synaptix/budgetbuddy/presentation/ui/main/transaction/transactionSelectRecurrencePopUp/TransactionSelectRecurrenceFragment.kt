@@ -34,22 +34,22 @@ class TransactionSelectRecurrenceFragment : Fragment() {
 
     private fun setupOnClickListeners() {
         binding.btnDaily.setOnClickListener {
-            viewModel.recurrenceRate.value = "Daily"
+            viewModel.setRecurrenceRate("Daily")
             findNavController().popBackStack()
         }
 
         binding.btnWeekly.setOnClickListener {
-            viewModel.recurrenceRate.value = "Weekly"
+            viewModel.setRecurrenceRate("Weekly")
             findNavController().popBackStack()
         }
 
         binding.btnMonthly.setOnClickListener {
-            viewModel.recurrenceRate.value = "Monthly"
+            viewModel.setRecurrenceRate("Monthly")
             findNavController().popBackStack()
         }
 
         binding.btnYearly.setOnClickListener {
-            viewModel.recurrenceRate.value = "Yearly"
+            viewModel.setRecurrenceRate("Yearly")
             findNavController().popBackStack()
         }
     }

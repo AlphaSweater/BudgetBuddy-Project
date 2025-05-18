@@ -109,12 +109,12 @@ class TransactionSelectCategoryFragment : Fragment() {
             val (expenseCategories, incomeCategories) = categories.partition { it.categoryType == "expense" }
 
             binding.recyclerViewExpenseCategory.adapter = TransactionSelectCategoryAdapter(expenseCategories) { category ->
-                viewModel.category.value = category
+                viewModel.setCategory(category)
                 findNavController().popBackStack()
             }
 
             binding.recyclerViewIncomeCategory.adapter = TransactionSelectCategoryAdapter(incomeCategories) { category ->
-                viewModel.category.value = category
+                viewModel.setCategory(category)
                 findNavController().popBackStack()
             }
         }
