@@ -24,146 +24,139 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/linearLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:background="?attr/bb_background"
     tools:context=".presentation.ui.auth.signup.SignupFragment">
 
+    <!-- Back Button -->
     <ImageButton
         android:id="@+id/btn_back_signup"
         android:layout_width="48dp"
         android:layout_height="48dp"
-        android:background="@null"
+        android:background="?attr/selectableItemBackgroundBorderless"
         android:src="?attr/actionModeCloseDrawable"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-
-    <!-- ==================================== Sign Up label ====================================== -->
+    <!-- Title -->
     <TextView
         android:id="@+id/lblSignup"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="50dp"
+        android:layout_marginTop="@dimen/margin_large"
         android:fontFamily="@font/tilt_warp"
         android:text="@string/signupText"
         android:textAlignment="center"
         android:textColor="?attr/bb_primaryText"
-        android:textSize="48sp"
+        android:textSize="@dimen/header_text_size"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- ================================ Email input and Label ================================= -->
+    <!-- Email Input -->
     <TextView
         android:id="@+id/lblEmail"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="@dimen/margin_large"
         android:text="@string/email"
-        android:textSize="20sp"
+        android:textSize="@dimen/body_text_size"
         app:layout_constraintStart_toStartOf="@+id/edtEmailAddress"
         app:layout_constraintTop_toBottomOf="@+id/lblSignup" />
 
     <EditText
         android:id="@+id/edtEmailAddress"
-        android:layout_width="362dp"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="7dp"
+        android:layout_marginHorizontal="@dimen/margin_xlarge"
+        android:layout_marginTop="@dimen/margin_small"
         android:background="@drawable/bg_rounded_edit_grey"
-        android:ems="10"
         android:inputType="textEmailAddress"
-        android:padding="12dp"
+        android:padding="@dimen/input_field_padding"
         android:textColor="?attr/bb_primaryText"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/lblEmail" />
 
-
-    <!-- =============================== Password input and Label =============================== -->
+    <!-- Password Input -->
     <TextView
         android:id="@+id/lblPassword"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="@dimen/margin_medium"
         android:text="@string/password"
-        android:textSize="20sp"
+        android:textSize="@dimen/body_text_size"
         app:layout_constraintStart_toStartOf="@+id/edtPassword"
         app:layout_constraintTop_toBottomOf="@+id/edtEmailAddress" />
 
     <EditText
         android:id="@+id/edtPassword"
-        android:layout_width="362dp"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="3dp"
+        android:layout_marginHorizontal="@dimen/margin_xlarge"
+        android:layout_marginTop="@dimen/margin_small"
         android:background="@drawable/bg_rounded_edit_grey"
-        android:ems="10"
         android:inputType="textPassword"
-        android:padding="12dp"
+        android:padding="@dimen/input_field_padding"
         android:textColor="?attr/bb_primaryText"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/lblPassword" />
 
-
-    <!-- =========================== Confirm Password input and Label =========================== -->
+    <!-- Confirm Password Input -->
     <TextView
         android:id="@+id/edtPasswordConfirm"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="@dimen/margin_medium"
         android:text="@string/confirm_password"
-        android:textSize="20sp"
+        android:textSize="@dimen/body_text_size"
         app:layout_constraintStart_toStartOf="@+id/edtTxtPasswordConfirm"
         app:layout_constraintTop_toBottomOf="@+id/edtPassword" />
 
     <EditText
         android:id="@+id/edtTxtPasswordConfirm"
-        android:layout_width="362dp"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="3dp"
+        android:layout_marginHorizontal="@dimen/margin_xlarge"
+        android:layout_marginTop="@dimen/margin_small"
         android:background="@drawable/bg_rounded_edit_grey"
-        android:ems="10"
         android:inputType="textPassword"
-        android:padding="12dp"
+        android:padding="@dimen/input_field_padding"
         android:textColor="?attr/bb_primaryText"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/edtPasswordConfirm" />
 
-
-    <!-- ===================================== SignUp Button ==================================== -->
+    <!-- Sign Up Button -->
     <Button
         android:id="@+id/btnSignup"
-        android:layout_width="268dp"
-        android:layout_height="60dp"
-        android:layout_marginTop="50dp"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/margin_xlarge"
+        android:backgroundTint="?attr/bb_button"
+        android:minHeight="@dimen/button_height"
         android:text="@string/signupText"
         android:textColor="@android:color/white"
-        android:textSize="20sp"
-        app:backgroundTint="?attr/bb_button"
-        app:cornerRadius="24dp"
+        android:textSize="@dimen/button_text_size"
+        app:cornerRadius="@dimen/button_corner_radius"
+        app:layout_constraintBottom_toTopOf="@+id/lblVersionSignup"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/edtTxtPasswordConfirm" />
+        app:layout_constraintTop_toBottomOf="@+id/edtTxtPasswordConfirm"
+        app:layout_constraintVertical_bias="0.3" />
 
-
-    <!-- ===================================== Version Label ==================================== -->
+    <!-- Version Label -->
     <TextView
         android:id="@+id/lblVersionSignup"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="50dp"
-        android:layout_marginEnd="50dp"
-        android:layout_marginBottom="20dp"
+        android:layout_marginHorizontal="@dimen/margin_xlarge"
+        android:layout_marginBottom="@dimen/margin_medium"
         android:text="@string/version"
         android:textAlignment="center"
-        android:textSize="20sp"
+        android:textSize="@dimen/body_text_size"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
