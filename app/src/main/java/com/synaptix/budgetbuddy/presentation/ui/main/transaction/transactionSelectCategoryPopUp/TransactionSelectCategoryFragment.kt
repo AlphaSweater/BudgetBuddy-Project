@@ -91,19 +91,13 @@ class TransactionSelectCategoryFragment : Fragment() {
 
     private fun setupSearch() {
         binding.searchEditText.doAfterTextChanged { text ->
-            filterCategories(text?.toString() ?: "")
+            categoryViewModel.filterCategories(text?.toString() ?: "")
         }
-    }
-
-    private fun filterCategories(query: String) {
-        expenseAdapter.filter(query)
-        incomeAdapter.filter(query)
-        updateEmptyState()
     }
 
     private fun observeCategories() {
         categoryViewModel.loadCategories()
-        categoryViewModel.categories.observe(viewLifecycleOwner) { categories ->
+        categoryViewModel.filteredCategories.observe(viewLifecycleOwner) { categories ->
             val (expenseCategories, incomeCategories) = categories.partition { it.categoryType == "expense" }
             expenseAdapter.submitList(expenseCategories)
             incomeAdapter.submitList(incomeCategories)

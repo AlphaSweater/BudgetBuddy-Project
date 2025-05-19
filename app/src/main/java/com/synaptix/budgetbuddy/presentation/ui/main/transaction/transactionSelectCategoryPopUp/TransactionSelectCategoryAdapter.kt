@@ -9,14 +9,24 @@ import com.synaptix.budgetbuddy.R
 import com.synaptix.budgetbuddy.core.model.Category
 import com.synaptix.budgetbuddy.presentation.ui.common.BaseAdapter
 
+/**
+ * Adapter for displaying a list of categories in a RecyclerView.
+ * This adapter follows the standard pattern for RecyclerView adapters in the app:
+ * 1. Extends BaseAdapter for common functionality
+ * 2. Uses a dedicated ViewHolder class
+ * 3. Handles item click events through a callback
+ * 4. Handles category icon and color display
+ *
+ * @param onCategoryClick Callback function that is triggered when a category item is clicked
+ */
 class TransactionSelectCategoryAdapter(
     private val onCategoryClick: (Category) -> Unit
 ) : BaseAdapter<Category, TransactionSelectCategoryAdapter.CategoryViewHolder>() {
 
-    private var originalItems = emptyList<Category>()
-    private var filteredItems = emptyList<Category>()
-    private var currentQuery = ""
-
+    /**
+     * Creates a new ViewHolder instance for category items.
+     * Uses the standard item_category layout resource.
+     */
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CategoryViewHolder {
         return createViewHolder(
             parent = parent,
@@ -24,27 +34,18 @@ class TransactionSelectCategoryAdapter(
         ) { CategoryViewHolder(it) }
     }
 
-    fun submitList(list: List<Category>) {
-        originalItems = list
-        filter(currentQuery) // Reapply current filter
-    }
-
-    fun filter(query: String) {
-        currentQuery = query
-        filteredItems = if (query.isEmpty()) {
-            originalItems
-        } else {
-            originalItems.filter {
-                it.categoryName.contains(query, ignoreCase = true)
-            }
-        }
-        notifyDataSetChanged()
-    }
-
+    /**
+     * ViewHolder class for category items.
+     * Responsible for binding category data to the view and handling click events.
+     */
     inner class CategoryViewHolder(itemView: View) : BaseViewHolder<Category>(itemView) {
         private val categoryIcon: ImageView = itemView.findViewById(R.id.imgCategoryIcon)
         private val categoryName: TextView = itemView.findViewById(R.id.txtCategoryName)
 
+        /**
+         * Binds category data to the view.
+         * Sets the category icon, name, and applies the category's color to the icon.
+         */
         override fun bind(item: Category) {
             val context = itemView.context
 
@@ -57,11 +58,5 @@ class TransactionSelectCategoryAdapter(
                 onCategoryClick(item)
             }
         }
-    }
-
-    override fun getItemCount(): Int = filteredItems.size
-
-    override fun onBindViewHolder(holder: CategoryViewHolder, position: Int) {
-        holder.bind(filteredItems[position])
     }
 }

@@ -7,10 +7,24 @@ import com.synaptix.budgetbuddy.R
 import com.synaptix.budgetbuddy.core.model.Wallet
 import com.synaptix.budgetbuddy.presentation.ui.common.BaseAdapter
 
+/**
+ * Adapter for displaying a list of wallets in a RecyclerView.
+ * This adapter follows the standard pattern for RecyclerView adapters in the app:
+ * 1. Extends BaseAdapter for common functionality
+ * 2. Uses a dedicated ViewHolder class
+ * 3. Handles item click events through a callback
+ * 4. Formats currency values consistently
+ *
+ * @param onWalletClick Callback function that is triggered when a wallet item is clicked
+ */
 class TransactionSelectWalletAdapter(
     private val onWalletClick: (Wallet) -> Unit
 ) : BaseAdapter<Wallet, TransactionSelectWalletAdapter.WalletViewHolder>() {
 
+    /**
+     * Creates a new ViewHolder instance for wallet items.
+     * Uses the standard item_wallet layout resource.
+     */
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): WalletViewHolder {
         return createViewHolder(
             parent = parent,
@@ -18,10 +32,18 @@ class TransactionSelectWalletAdapter(
         ) { WalletViewHolder(it) }
     }
 
+    /**
+     * ViewHolder class for wallet items.
+     * Responsible for binding wallet data to the view and handling click events.
+     */
     inner class WalletViewHolder(itemView: View) : BaseViewHolder<Wallet>(itemView) {
         private val name: TextView = itemView.findViewById(R.id.txtWalletName)
         private val balance: TextView = itemView.findViewById(R.id.txtWalletBalance)
 
+        /**
+         * Binds wallet data to the view.
+         * Formats the balance with the R currency symbol and 2 decimal places.
+         */
         override fun bind(item: Wallet) {
             name.text = item.walletName
             balance.text = "R %.2f".format(item.walletBalance)
