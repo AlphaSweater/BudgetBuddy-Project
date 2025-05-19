@@ -4,7 +4,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.LayoutRes
-import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 
 /**
@@ -26,25 +25,10 @@ abstract class BaseAdapter<T, VH : BaseAdapter.BaseViewHolder<T>> : RecyclerView
     /**
      * Updates the adapter's data with a new list
      * @param newItems The new list of items
-     * @param enableDiffUtil Whether to use DiffUtil for calculating changes (default: false)
      */
-    fun submitList(newItems: List<T>, enableDiffUtil: Boolean = false) {
-        if (enableDiffUtil) {
-            val diffCallback = object : DiffUtil.Callback() {
-                override fun getOldListSize(): Int = items.size
-                override fun getNewListSize(): Int = newItems.size
-                override fun areItemsTheSame(oldPos: Int, newPos: Int): Boolean = 
-                    areItemsSame(items[oldPos], newItems[newPos])
-                override fun areContentsTheSame(oldPos: Int, newPos: Int): Boolean = 
-                    areContentsSame(items[oldPos], newItems[newPos])
-            }
-            val diffResult = DiffUtil.calculateDiff(diffCallback)
-            items = newItems
-            diffResult.dispatchUpdatesTo(this)
-        } else {
-            items = newItems
-            notifyDataSetChanged()
-        }
+    fun submitList(newItems: List<T>) {
+        items = newItems
+        notifyDataSetChanged()
     }
 
     /**
@@ -62,18 +46,6 @@ abstract class BaseAdapter<T, VH : BaseAdapter.BaseViewHolder<T>> : RecyclerView
             .inflate(layoutResId, parent, false)
         return bindView(view)
     }
-
-    /**
-     * Compare if two items represent the same object (e.g., same ID)
-     * Override this if using DiffUtil
-     */
-    protected open fun areItemsSame(oldItem: T, newItem: T): Boolean = oldItem == newItem
-
-    /**
-     * Compare if two items have the same content
-     * Override this if using DiffUtil and need custom content comparison
-     */
-    protected open fun areContentsSame(oldItem: T, newItem: T): Boolean = oldItem == newItem
 
     /**
      * Base ViewHolder class that enforces a bind method
