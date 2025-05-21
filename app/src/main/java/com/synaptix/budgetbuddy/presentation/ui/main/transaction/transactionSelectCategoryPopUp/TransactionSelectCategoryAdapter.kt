@@ -49,9 +49,9 @@ class TransactionSelectCategoryAdapter(
         override fun bind(item: Category) {
             val context = itemView.context
 
-            categoryName.text = item.categoryName
-            categoryIcon.setImageResource(item.categoryIcon)
-            val colorInt = ContextCompat.getColor(context, item.categoryColor)
+            categoryName.text = item.name
+            categoryIcon.setImageResource(item.icon)
+            val colorInt = ContextCompat.getColor(context, item.color)
             categoryIcon.setColorFilter(colorInt)
 
             itemView.setOnClickListener {

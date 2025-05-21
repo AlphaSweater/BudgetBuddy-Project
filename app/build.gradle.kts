@@ -4,6 +4,7 @@ plugins {
     id("kotlin-kapt")
     id("dagger.hilt.android.plugin")
     id("com.google.devtools.ksp") version "2.0.21-1.0.27"
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -65,6 +66,8 @@ dependencies {
 
     // Hilt dependencies
     implementation(libs.hilt.android)
+    implementation(libs.google.firebase.firestore.ktx)
+    implementation(libs.google.firebase.auth.ktx)
     kapt(libs.dagger.hilt.compiler)
 
     //roomDB dependencies
@@ -82,4 +85,10 @@ dependencies {
 
     //hashing dependencies
     implementation(libs.jbcrypt)
+
+    // Firebase dependencies
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.auth.ktx)
+    implementation(libs.firebase.storage.ktx)
+    implementation(libs.firebase.firestore.ktx)
 }

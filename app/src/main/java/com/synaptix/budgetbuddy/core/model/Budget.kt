@@ -21,32 +21,19 @@
 
 package com.synaptix.budgetbuddy.core.model
 
-import java.io.Serializable
-
-//======================================================================================
-// Data Model: BudgetIn
-// Represents the input data for creating or updating a budget.
-// Implements Serializable for easy passing between Android components.
-//======================================================================================
-data class BudgetIn (
-    val budgetId: Int = 0,
-    val userId: Int,
-    val budgetName: String,
-    val walletId: Int,
-    val categoryId: Int,
-    val amount: Double,
-    val spent: Double
-) : Serializable
-
 //======================================================================================
 // Data Model: Budget
 // Represents the full budget entity including related user object.
 //======================================================================================
-data class Budget (
-    val budgetId: Int = 0,
-    val user: User?,
-    val categories: List<Category>?,
-    val budgetName: String,
+data class Budget(
+    val id: String,
+    val user: User,
+    val name: String,
     val amount: Double,
-    val spent: Double,
+    val spent: Double = 0.0,
+    val categories: List<Category>,
+    val startDate: Long = System.currentTimeMillis(),
+    val endDate: Long? = null,
+    val isRecurring: Boolean = false,
+    val recurrencePeriod: String? = null
 )

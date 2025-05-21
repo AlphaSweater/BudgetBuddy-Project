@@ -272,9 +272,9 @@ class TransactionAddFragment : Fragment() {
             return
         }
 
-        binding.textSelectedCategoryName.text = category.categoryName
-        binding.imgSelectedCategoryIcon.setImageResource(category.categoryIcon)
-        binding.imgSelectedCategoryIcon.setColorFilter(requireContext().getColor(category.categoryColor))
+        binding.textSelectedCategoryName.text = category.name
+        binding.imgSelectedCategoryIcon.setImageResource(category.icon)
+        binding.imgSelectedCategoryIcon.setColorFilter(requireContext().getColor(category.color))
     }
 
     private fun updateSelectedWallet(wallet: Wallet?) {
@@ -282,7 +282,7 @@ class TransactionAddFragment : Fragment() {
             binding.textSelectedWalletName.text = "No wallet selected"
             return
         }
-        binding.textSelectedWalletName.text = wallet.walletName
+        binding.textSelectedWalletName.text = wallet.name
     }
 
     private fun updateSelectedDate(date: String?) {
@@ -321,9 +321,7 @@ class TransactionAddFragment : Fragment() {
         viewModel.showValidationErrors()
 
         // Check if form is valid before proceeding
-        if (!viewModel.validateForm()) {
-            return
-        }
+        if (!viewModel.validateForm()) return
 
         // Launch coroutine to call suspend function
         viewLifecycleOwner.lifecycleScope.launch {

@@ -10,8 +10,6 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.synaptix.budgetbuddy.core.model.Label
-import com.synaptix.budgetbuddy.data.entity.LabelEntity
 import com.synaptix.budgetbuddy.databinding.FragmentTransactionSelectLabelBinding
 import com.synaptix.budgetbuddy.presentation.ui.main.transaction.TransactionAddViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -29,7 +27,7 @@ class TransactionSelectLabelFragment : Fragment() {
 
     private val labelAdapter by lazy {
         TransactionSelectLabelAdapter { selectedLabels ->
-            viewModel.selectedLabels.value = ArrayList(selectedLabels)
+            viewModel.selectedLabels.value = selectedLabels
         }
     }
 
@@ -56,9 +54,8 @@ class TransactionSelectLabelFragment : Fragment() {
         }
 
         // Initialize with selected labels from ViewModel
-        val selectedLabels = viewModel.selectedLabels.value ?: emptyList()
-        val initialLabels = selectedLabels.map { it.copy() }
-        labelAdapter.submitList(initialLabels)
+        val initialSelected = viewModel.selectedLabels.value ?: emptyList()
+        labelAdapter.submitList(emptyList(), initialSelected)
     }
 
     private fun setupClickListeners() {
@@ -69,17 +66,10 @@ class TransactionSelectLabelFragment : Fragment() {
 
     private fun observeLabels() {
         viewLifecycleOwner.lifecycleScope.launch {
-            labelViewModel.loadLabelsForUser(userId = 1) // TODO: Get actual user ID
-            labelViewModel.labels.collectLatest { labelEntities ->
+            labelViewModel.loadLabelsForUser()
+            labelViewModel.labels.collectLatest { labels ->
                 val selectedLabels = viewModel.selectedLabels.value ?: emptyList()
-                val labels = labelEntities.map { entity ->
-                    Label(
-                        labelName = entity.name,
-                        transactionInfo = "0 transactions in 0 wallets", // TODO: Get actual transaction info
-                        isSelected = selectedLabels.any { it.labelName == entity.name }
-                    )
-                }
-                labelAdapter.submitList(labels)
+                labelAdapter.submitList(labels, selectedLabels)
             }
         }
     }

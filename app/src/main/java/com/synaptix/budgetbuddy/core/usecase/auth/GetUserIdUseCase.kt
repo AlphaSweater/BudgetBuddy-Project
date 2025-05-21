@@ -21,18 +21,18 @@
 
 package com.synaptix.budgetbuddy.core.usecase.auth
 
-import com.synaptix.budgetbuddy.data.repository.UserRepository
+import com.synaptix.budgetbuddy.data.firebase.repository.FirestoreUserRepository
 import javax.inject.Inject
 
 // UseCase class responsible for fetching the current user's ID from the repository
 class GetUserIdUseCase @Inject constructor(
     // Injecting the UserRepository dependency to interact with user data
-    private val userRepository: UserRepository
+    private val userRepository: FirestoreUserRepository
 ) {
     // Executes the operation to fetch the current user's ID
     // This is a suspend function, indicating it runs asynchronously
-    suspend fun execute(): Int {
+    fun execute(): String {
         // Fetches the current user ID from the UserRepository
-        return userRepository.getCurrentUserId()
+        return userRepository.getCurrentUserId() ?: throw Exception("No user logged in")
     }
 }

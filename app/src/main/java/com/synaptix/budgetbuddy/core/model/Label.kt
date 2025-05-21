@@ -21,19 +21,29 @@
 
 package com.synaptix.budgetbuddy.core.model
 
-import java.io.Serializable
-
-// Data class representing a Label with relevant properties
+//======================================================================================
+// Data Model: Label
+// Represents the full Label entity including related user object.
+//======================================================================================
 data class Label(
-    // Optional label ID, can be null
-    val labelId: Int? = null,
-
-    // Name of the label, cannot be null
-    val labelName: String,
-
-    // Optional transaction information, can be null
-    val transactionInfo: String? = null,
-
-    // Boolean indicating whether the label is selected
-    var isSelected: Boolean = false
-) : Serializable
+    override val id: String,
+    val user: User?, // Nullable to allow for default labels
+    val name: String,
+    val createdAt: Long = System.currentTimeMillis(),
+    val updatedAt: Long = System.currentTimeMillis()
+) : Entity {
+    companion object {
+        fun new(
+            user: User?,
+            name: String,
+            createdAt: Long = System.currentTimeMillis(),
+            updatedAt: Long = System.currentTimeMillis()
+        ): Label = Label(
+            id = "",
+            user = user,
+            name = name,
+            createdAt = createdAt,
+            updatedAt = updatedAt
+        )
+    }
+}

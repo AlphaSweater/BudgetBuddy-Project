@@ -92,8 +92,8 @@ class HomeAdapter(
             if (item !is HomeListItems.HomeWalletItem) return
             
             iconView.setImageResource(R.drawable.ic_wallet_24)
-            nameText.text = item.wallet.walletName
-            val balanceFormatted = String.format("R %.2f", item.wallet.walletBalance)
+            nameText.text = item.wallet.name
+            val balanceFormatted = String.format("R %.2f", item.wallet.balance)
             balanceText.text = balanceFormatted
             dateText.text = item.relativeDate
             
@@ -120,15 +120,15 @@ class HomeAdapter(
         override fun bind(item: HomeListItems) {
             if (item !is HomeListItems.HomeTransactionItem) return
             
-            val resolvedColor = ContextCompat.getColor(itemView.context, item.transaction.category?.categoryColor ?: R.color.button)
+            val resolvedColor = ContextCompat.getColor(itemView.context, item.transaction.category.color)
             (iconContainer.background.mutate() as GradientDrawable).setColor(resolvedColor)
 
-            iconView.setImageResource(item.transaction.category?.categoryIcon ?: R.drawable.ic_circle_24)
-            nameText.text = item.transaction.category?.categoryName ?: "No Category"
+            iconView.setImageResource(item.transaction.category.icon)
+            nameText.text = item.transaction.category.name
             val amountFormatted = String.format("R %.2f", item.transaction.amount)
             amountText.text = amountFormatted
             dateText.text = item.relativeDate
-            walletText.text = item.transaction.wallet?.walletName
+            walletText.text = item.transaction.wallet.name
             
             itemView.setOnClickListener { onClick?.invoke(item.transaction) }
         }
@@ -153,11 +153,11 @@ class HomeAdapter(
         override fun bind(item: HomeListItems) {
             if (item !is HomeListItems.HomeCategoryItem) return
             
-            val resolvedColor = ContextCompat.getColor(itemView.context, item.category.categoryColor)
+            val resolvedColor = ContextCompat.getColor(itemView.context, item.category.color)
             (iconContainer.background.mutate() as GradientDrawable).setColor(resolvedColor)
 
-            iconView.setImageResource(item.category.categoryIcon)
-            nameText.text = item.category.categoryName
+            iconView.setImageResource(item.category.icon)
+            nameText.text = item.category.name
             transactionsText.text = "${item.transactionCount} transactions"
             amountText.text = item.amount
             dateText.text = item.relativeDate

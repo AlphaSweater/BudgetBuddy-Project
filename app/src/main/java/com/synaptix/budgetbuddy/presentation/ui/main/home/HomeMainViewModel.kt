@@ -8,9 +8,8 @@ import com.synaptix.budgetbuddy.core.model.Category
 import com.synaptix.budgetbuddy.core.model.Transaction
 import com.synaptix.budgetbuddy.core.model.Wallet
 import com.synaptix.budgetbuddy.core.usecase.auth.GetUserIdUseCase
-import com.synaptix.budgetbuddy.core.usecase.main.transaction.GetCategoriesUseCase
-import com.synaptix.budgetbuddy.core.usecase.main.transaction.GetTransactionUseCase
-import com.synaptix.budgetbuddy.core.usecase.main.transaction.GetTransactionUseCase.GetTransactionsResult
+import com.synaptix.budgetbuddy.core.usecase.main.category.GetCategoriesUseCase
+import com.synaptix.budgetbuddy.core.usecase.main.transaction.GetTransactionsUseCase
 import com.synaptix.budgetbuddy.core.usecase.main.wallet.GetWalletUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -25,7 +24,7 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeMainViewModel @Inject constructor(
     private val getWalletUseCase: GetWalletUseCase,
-    private val getTransactionUseCase: GetTransactionUseCase,
+    private val getTransactionsUseCase: GetTransactionsUseCase,
     private val getCategoriesUseCase: GetCategoriesUseCase,
     private val getUserIdUseCase: GetUserIdUseCase
 ) : ViewModel() {
@@ -99,8 +98,14 @@ class HomeMainViewModel @Inject constructor(
             _walletsState.value = WalletState.Loading
             try {
                 val userId = getUserIdUseCase.execute()
-                val walletList = getWalletUseCase.execute(userId)
-                _walletsState.value = WalletState.Success(walletList)
+                when (val result = getWalletUseCase.execute(userId)) {
+                    is GetWalletUseCase.GetWalletResult.Success -> {
+                        _walletsState.value = WalletState.Success(result.wallets)
+                    }
+                    is GetWalletUseCase.GetWalletResult.Error -> {
+                        _walletsState.value = WalletState.Error(result.message)
+                    }
+                }
             } catch (e: Exception) {
                 _walletsState.value = WalletState.Error(e.message ?: "Failed to load wallets")
             }
@@ -112,12 +117,12 @@ class HomeMainViewModel @Inject constructor(
             _transactionsState.value = TransactionState.Loading
             try {
                 val userId = getUserIdUseCase.execute()
-                when (val result = getTransactionUseCase.execute(userId)) {
-                    is GetTransactionsResult.Success -> {
+                when (val result = getTransactionsUseCase.execute(userId)) {
+                    is GetTransactionsUseCase.GetTransactionsResult.Success -> {
                         val filteredTransactions = filterTransactions(result.transactions)
                         _transactionsState.value = TransactionState.Success(filteredTransactions)
                     }
-                    is GetTransactionsResult.Error -> {
+                    is GetTransactionsUseCase.GetTransactionsResult.Error -> {
                         _transactionsState.value = TransactionState.Error(result.message)
                     }
                 }
@@ -148,24 +153,23 @@ class HomeMainViewModel @Inject constructor(
         return filtered.sortedByDescending { it.date }
     }
 
-    private fun isTransactionInDateRange(transactionDate: String, startDate: String, endDate: String): Boolean {
+    private fun isTransactionInDateRange(transactionDate: Long, startDate: String, endDate: String): Boolean {
         return try {
-            val transaction = dateFormat.parse(transactionDate)?.time ?: return false
             val start = dateFormat.parse(startDate)?.time ?: return false
             val end = dateFormat.parse(endDate)?.time ?: return false
 
-            transaction in start..end
+            transactionDate in start..end
         } catch (e: Exception) {
             println("Date parsing error: ${e.message}")
             false
         }
     }
 
-    private fun isToday(dateStr: String): Boolean {
+    private fun isToday(date: Long): Boolean {
         return try {
-            val date = dateFormat.parse(dateStr)
+            val dateDate = dateFormat.format(Date(date))
             val today = Calendar.getInstance()
-            val transactionCal = Calendar.getInstance().apply { time = date ?: Date() }
+            val transactionCal = Calendar.getInstance().apply { time = dateFormat.parse(dateDate) ?: Date() }
 
             today.get(Calendar.YEAR) == transactionCal.get(Calendar.YEAR) &&
                     today.get(Calendar.DAY_OF_YEAR) == transactionCal.get(Calendar.DAY_OF_YEAR)
@@ -174,11 +178,11 @@ class HomeMainViewModel @Inject constructor(
         }
     }
 
-    private fun isThisWeek(dateStr: String): Boolean {
+    private fun isThisWeek(date: Long): Boolean {
         return try {
-            val date = dateFormat.parse(dateStr)
+            val dateDate = dateFormat.format(Date(date))
             val today = Calendar.getInstance()
-            val transactionCal = Calendar.getInstance().apply { time = date ?: Date() }
+            val transactionCal = Calendar.getInstance().apply { time = dateFormat.parse(dateDate) ?: Date() }
 
             today.get(Calendar.YEAR) == transactionCal.get(Calendar.YEAR) &&
                     today.get(Calendar.WEEK_OF_YEAR) == transactionCal.get(Calendar.WEEK_OF_YEAR)
@@ -187,11 +191,11 @@ class HomeMainViewModel @Inject constructor(
         }
     }
 
-    private fun isThisMonth(dateStr: String): Boolean {
+    private fun isThisMonth(date: Long): Boolean {
         return try {
-            val date = dateFormat.parse(dateStr)
+            val dateDate = dateFormat.format(Date(date))
             val today = Calendar.getInstance()
-            val transactionCal = Calendar.getInstance().apply { time = date ?: Date() }
+            val transactionCal = Calendar.getInstance().apply { time = dateFormat.parse(dateDate) ?: Date() }
 
             today.get(Calendar.YEAR) == transactionCal.get(Calendar.YEAR) &&
                     today.get(Calendar.MONTH) == transactionCal.get(Calendar.MONTH)
@@ -205,8 +209,14 @@ class HomeMainViewModel @Inject constructor(
             _categoriesState.value = CategoryState.Loading
             try {
                 val userId = getUserIdUseCase.execute()
-                val categoryList = getCategoriesUseCase.invoke(userId)
-                _categoriesState.value = CategoryState.Success(categoryList)
+                when (val result = getCategoriesUseCase.execute(userId)) {
+                    is GetCategoriesUseCase.GetCategoriesResult.Success -> {
+                        _categoriesState.value = CategoryState.Success(result.categories)
+                    }
+                    is GetCategoriesUseCase.GetCategoriesResult.Error -> {
+                        _categoriesState.value = CategoryState.Error(result.message)
+                    }
+                }
             } catch (e: Exception) {
                 _categoriesState.value = CategoryState.Error(e.message ?: "Failed to load categories")
             }
@@ -225,20 +235,6 @@ class HomeMainViewModel @Inject constructor(
         _selectedStartDate = ""
         _selectedEndDate = ""
         loadTransactions()
-    }
-
-    fun getFilteredTransactionsByCategory(categoryId: Int): List<Transaction> {
-        return when (val state = transactionsState.value) {
-            is TransactionState.Success -> state.transactions.filter { it.category?.categoryId == categoryId }
-            else -> emptyList()
-        }
-    }
-
-    fun getFilteredTransactionsByWallet(walletId: Int): List<Transaction> {
-        return when (val state = transactionsState.value) {
-            is TransactionState.Success -> state.transactions.filter { it.wallet?.walletId == walletId }
-            else -> emptyList()
-        }
     }
 }
 

@@ -21,8 +21,8 @@
 
 package com.synaptix.budgetbuddy.core.usecase.auth
 
-import com.synaptix.budgetbuddy.data.repository.UserRepository
-import org.mindrot.jbcrypt.BCrypt
+import com.synaptix.budgetbuddy.core.model.Result
+import com.synaptix.budgetbuddy.data.firebase.repository.FirestoreUserRepository
 import javax.inject.Inject
 
 // Sealed class to represent possible login outcomes
@@ -43,23 +43,21 @@ sealed class LoginResult {
 // UseCase class for handling user login logic
 class LoginUserUseCase @Inject constructor(
     // Injecting the UserRepository dependency to interact with user data
-    private val userRepository: UserRepository
+    private val userRepository: FirestoreUserRepository
 ) {
     // Invokes the login process with email and password parameters
     // Returns a LoginResult indicating the outcome
     suspend operator fun invoke(email: String, password: String): LoginResult {
         return try {
-            // Fetch the user by email, return UserNotFound if not found
-            val user = userRepository.getUserByEmail(email)
-                ?: return LoginResult.UserNotFound
-
-            // Check the password using bcrypt, if valid, set the user session
-            return if (BCrypt.checkpw(password, user.password )) {
-                userRepository.setUserSession(user)
-                LoginResult.Success
-            } else {
-                // Return IncorrectPassword if the bcrypt password check fails
-                LoginResult.IncorrectPassword
+            when (val result = userRepository.loginUser(email, password)) {
+                is Result.Success -> LoginResult.Success
+                is Result.Error -> {
+                    when {
+                        result.exception.message?.contains("no user record") == true -> LoginResult.UserNotFound
+                        result.exception.message?.contains("password is invalid") == true -> LoginResult.IncorrectPassword
+                        else -> LoginResult.Error(result.exception.message ?: "Unknown error")
+                    }
+                }
             }
         } catch (e: Exception) {
             // Handle exceptions and return an error result with the message

@@ -53,8 +53,8 @@ class BudgetSelectWalletAdapter(
         private val balance: TextView = itemView.findViewById(R.id.walletBalance)
 
         fun bind(wallet: Wallet) {
-            name.text = wallet.walletName
-            balance.text = "R %.2f".format(wallet.walletBalance)
+            name.text = wallet.name
+            balance.text = "R %.2f".format(wallet.balance)
 
             itemView.setOnClickListener {
                 onWalletClick(wallet)

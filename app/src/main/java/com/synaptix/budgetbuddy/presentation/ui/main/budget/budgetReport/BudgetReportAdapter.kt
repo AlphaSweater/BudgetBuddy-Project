@@ -133,10 +133,10 @@ class BudgetReportAdapter(
 
             // Set text fields
             categoryName.text = item.categoryName
-            walletName.text = item.transaction.wallet?.walletName
+            walletName.text = item.transaction.wallet.name
 
             // Handle note visibility
-            if (item.transaction.note == null) {
+            if (item.transaction.note.isEmpty()) {
                 noteContainer.visibility = View.GONE
             } else {
                 noteContainer.visibility = View.VISIBLE
@@ -160,12 +160,12 @@ class BudgetReportAdapter(
             if (item !is BudgetListItems.BudgetCategoryItem) return
 
             // Set category icon and color
-            val resolvedColor = ContextCompat.getColor(itemView.context, item.category.categoryColor)
+            val resolvedColor = ContextCompat.getColor(itemView.context, item.category.color)
             (iconContainer.background.mutate() as GradientDrawable).setColor(resolvedColor)
-            iconView.setImageResource(item.category.categoryIcon)
+            iconView.setImageResource(item.category.icon)
 
             // Set text fields
-            categoryName.text = item.category.categoryName
+            categoryName.text = item.category.name
             transactionCount.text = "${item.transactionCount} transactions"
             amount.text = item.amount
             date.text = item.relativeDate

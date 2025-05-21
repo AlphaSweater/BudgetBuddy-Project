@@ -21,14 +21,16 @@
 
 package com.synaptix.budgetbuddy.presentation.ui.main.budget.budgetAdd.budgetSelectCategoryPopUp
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.synaptix.budgetbuddy.core.model.Category
 import com.synaptix.budgetbuddy.core.usecase.auth.GetUserIdUseCase
-import com.synaptix.budgetbuddy.core.usecase.main.transaction.GetCategoriesUseCase
+import com.synaptix.budgetbuddy.core.usecase.main.category.GetCategoriesUseCase
+import com.synaptix.budgetbuddy.core.usecase.main.category.GetCategoriesUseCase.GetCategoriesResult
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -39,18 +41,26 @@ class BudgetSelectCategoryViewModel @Inject constructor(
     private val getUserIdUseCase: GetUserIdUseCase           // Use case to get user ID
 ) : ViewModel() {
 
-    // Backing field for category list, MutableLiveData allows us to update data internally
-    private val _categories = MutableLiveData<List<Category>>()
+    // Backing field for category list, MutableStateFlow allows us to update data internally
+    private val _categories = MutableStateFlow<List<Category>>(emptyList())
 
-    // Publicly exposed immutable LiveData to observe category list
-    val categories: LiveData<List<Category>> get() = _categories
+    // Publicly exposed immutable StateFlow to observe category list
+    val categories: StateFlow<List<Category>> get() = _categories
 
     // Function to load categories for the currently logged-in user
     fun loadCategories() {
         viewModelScope.launch {
-            val userId = getUserIdUseCase.execute() // Get the user ID
-            val result = getCategoriesUseCase.invoke(userId) // Fetch categories for that user
-            _categories.value = result // Update LiveData with the fetched categories
+            val userId = getUserIdUseCase.execute()
+            when (val result = getCategoriesUseCase.execute(userId)) {
+                is GetCategoriesResult.Success -> {
+                    _categories.value = result.categories
+                }
+                is GetCategoriesResult.Error -> {
+                    // Handle the error — maybe show a message
+                    Log.e("Categories", "Failed: ${result.message}")
+                }
+            }
+
         }
     }
 }

@@ -21,47 +21,44 @@
 
 package com.synaptix.budgetbuddy.core.usecase.main.transaction
 
-import com.synaptix.budgetbuddy.core.model.TransactionIn
-import com.synaptix.budgetbuddy.data.entity.mapper.toEntity
-import com.synaptix.budgetbuddy.data.repository.ITransactionRepository
-import com.synaptix.budgetbuddy.data.repository.Result
+import android.util.Log
+import com.synaptix.budgetbuddy.core.model.Transaction
+import com.synaptix.budgetbuddy.core.model.Result
+import com.synaptix.budgetbuddy.data.firebase.mapper.FirebaseMapper.toDTO
+import com.synaptix.budgetbuddy.data.firebase.repository.FirestoreTransactionRepository
 import javax.inject.Inject
 
 // UseCase class for adding a new transaction
 class AddTransactionUseCase @Inject constructor(
-    // Injecting the TransactionRepository to handle transaction-related operations
-    private val repository: ITransactionRepository
+    // Injecting the FirestoreTransactionRepository to handle transaction-related operations
+    private val repository: FirestoreTransactionRepository
 ) {
     sealed class AddTransactionResult {
-        data class Success(val transactionId: Long) : AddTransactionResult()
+        data class Success(val transactionId: String) : AddTransactionResult()
         data class Error(val message: String) : AddTransactionResult()
     }
 
-    // Executes the operation to add a new transaction by converting to entity and inserting into the repository
-    suspend fun execute(transaction: TransactionIn): AddTransactionResult {
-        // Input validation
-        if (transaction.amount <= 0) {
-            return AddTransactionResult.Error("Amount must be greater than 0")
-        }
+    // Executes the operation to add a new transaction
+    suspend fun execute(newTransaction: Transaction): AddTransactionResult {
 
-        if (transaction.date.isBlank()) {
-            return AddTransactionResult.Error("Date cannot be empty")
-        }
+        // Convert domain model to DTO using mapper
+        val newTransactionDTO = newTransaction.toDTO()
 
-        if (transaction.currencyType.isBlank()) {
-            return AddTransactionResult.Error("Currency type cannot be empty")
-        }
-
-        // Convert to entity and attempt to insert
-        return when (val result = repository.insertTransaction(transaction.toEntity())) {
-            is Result.Success -> {
-                println("Transaction added successfully: $transaction")
-                AddTransactionResult.Success(result.data)
+        // Attempt to create the transaction
+        return try {
+            when (val result = repository.createTransaction(newTransactionDTO)) {
+                is Result.Success -> {
+                    Log.d("AddTransactionUseCase", "Transaction added successfully: ${result.data}")
+                    AddTransactionResult.Success(result.data)
+                }
+                is Result.Error -> {
+                    Log.e("AddTransactionUseCase", "Error adding transaction: ${result.exception.message}")
+                    AddTransactionResult.Error("Failed to add transaction: ${result.exception.message}")
+                }
             }
-            is Result.Error -> {
-                println("Failed to add transaction: ${result.exception.message}")
-                AddTransactionResult.Error("Failed to add transaction: ${result.exception.message}")
-            }
+        } catch (e: Exception) {
+            Log.e("AddTransactionUseCase", "Exception while adding transaction: ${e.message}")
+            AddTransactionResult.Error("Failed to add transaction: ${e.message}")
         }
     }
 }

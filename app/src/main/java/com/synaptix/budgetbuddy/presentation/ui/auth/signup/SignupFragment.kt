@@ -90,7 +90,7 @@ class SignupFragment : Fragment(R.layout.fragment_auth_signup) {
                     return@launch
                 }
                 // Call ViewModel to handle the sign-up process
-                viewModel.signUp(email, password)
+                val result = viewModel.signUp(email, password)
                 // Navigate to login screen after successful sign-up
                 (activity as? AuthActivity)?.showLogin()
             }

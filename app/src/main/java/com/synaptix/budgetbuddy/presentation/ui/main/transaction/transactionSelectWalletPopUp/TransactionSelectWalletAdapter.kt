@@ -45,8 +45,8 @@ class TransactionSelectWalletAdapter(
          * Formats the balance with the R currency symbol and 2 decimal places.
          */
         override fun bind(item: Wallet) {
-            name.text = item.walletName
-            balance.text = "R %.2f".format(item.walletBalance)
+            name.text = item.name
+            balance.text = "R %.2f".format(item.balance)
 
             itemView.setOnClickListener {
                 onWalletClick(item)

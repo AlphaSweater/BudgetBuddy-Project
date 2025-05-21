@@ -23,8 +23,9 @@ package com.synaptix.budgetbuddy.presentation.ui.auth.signup
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.synaptix.budgetbuddy.core.usecase.auth.SignupResult
 import com.synaptix.budgetbuddy.core.usecase.auth.SignupUserUseCase
-import com.synaptix.budgetbuddy.data.entity.UserEntity
+import com.synaptix.budgetbuddy.data.firebase.model.UserDTO
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import org.mindrot.jbcrypt.BCrypt
@@ -39,22 +40,10 @@ class SignupViewModel @Inject constructor(
     // Takes email and password, hashes the password securely
     // and creates a new UserEntity object to register the user
     fun signUp(email: String, password: String) {
-        // Hash the password using BCrypt before saving it to the database
-        val hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt())
-
-        // Instantiate the UserEntity object with hashed password and provided email
-        val userEntity = UserEntity(
-            user_id = 0,       // User ID will be auto-generated in the database
-            firstName = null,  // First name is currently set to null (can be updated later)
-            lastName = null,   // Last name is currently set to null (can be updated later)
-            email = email,
-            password = hashedPassword
-        )
-
         // Use coroutine scope to perform database operation asynchronously
         viewModelScope.launch {
-            val result = signupUserUseCase.execute(userEntity)
-            // Currently, result is not handled but can be used for future error/success handling
+            val result = signupUserUseCase.invoke(email, password, null, null)
+            //TODO: Handle the result of the sign-up operation
         }
     }
 

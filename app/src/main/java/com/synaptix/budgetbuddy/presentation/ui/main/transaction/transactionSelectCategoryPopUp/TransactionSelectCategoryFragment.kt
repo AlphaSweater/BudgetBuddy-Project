@@ -98,7 +98,7 @@ class TransactionSelectCategoryFragment : Fragment() {
     private fun observeCategories() {
         categoryViewModel.loadCategories()
         categoryViewModel.filteredCategories.observe(viewLifecycleOwner) { categories ->
-            val (expenseCategories, incomeCategories) = categories.partition { it.categoryType == "expense" }
+            val (expenseCategories, incomeCategories) = categories.partition { it.type == "expense" }
             expenseAdapter.submitList(expenseCategories)
             incomeAdapter.submitList(incomeCategories)
             updateEmptyState()

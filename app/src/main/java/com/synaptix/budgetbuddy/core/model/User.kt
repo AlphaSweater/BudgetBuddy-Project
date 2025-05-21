@@ -21,22 +21,29 @@
 
 package com.synaptix.budgetbuddy.core.model
 
-import java.io.Serializable
-
-// Data class representing a User in the system
-data class User (
-    // Unique identifier for the user
-    val userId: Int,
-
-    // Optional first name of the user
-    val firstName: String?,
-
-    // Optional last name of the user
-    val lastName: String?,
-
-    // Email address of the user, cannot be null
+//======================================================================================
+// Data Model: User
+// Represents the full user entity.
+//======================================================================================
+data class User(
+    override val id: String,
     val email: String,
-
-    // Password of the user, cannot be null
-    val password: String
-) : Serializable
+    val firstName: String?,
+    val lastName: String?,
+    val lastLoginAt: Long = System.currentTimeMillis()
+) : Entity {
+    companion object {
+        fun new(
+            email: String,
+            firstName: String? = null,
+            lastName: String? = null,
+            lastLoginAt: Long = System.currentTimeMillis()
+        ): User = User(
+            id = "",
+            email = email,
+            firstName = firstName,
+            lastName = lastName,
+            lastLoginAt = lastLoginAt
+        )
+    }
+}

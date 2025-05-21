@@ -1,10 +1,12 @@
 package com.synaptix.budgetbuddy.presentation.ui.main.wallet.walletAdd
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.synaptix.budgetbuddy.core.model.WalletIn
+import com.synaptix.budgetbuddy.core.model.User
+import com.synaptix.budgetbuddy.core.model.Wallet
 import com.synaptix.budgetbuddy.core.usecase.auth.GetUserIdUseCase
 import com.synaptix.budgetbuddy.core.usecase.main.wallet.AddWalletUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -20,6 +22,30 @@ class WalletAddViewModel @Inject constructor(
 ) : ViewModel() {
 
     // UI State
+    sealed class UiState {
+        object Initial : UiState()
+        object Loading : UiState()
+        object Success : UiState()
+        data class Error(val message: String) : UiState()
+    }
+
+    data class ValidationState(
+        val isWalletNameValid: Boolean = false,
+        val isWalletCurrencyValid: Boolean = false,
+        val isWalletAmountValid: Boolean = false,
+        val walletNameError: String? = null,
+        val walletCurrencyError: String? = null,
+        val walletAmountError: String? = null,
+        val shouldShowErrors: Boolean = false
+    )
+
+    private val _uiState = MutableStateFlow<UiState>(UiState.Initial)
+    val uiState: StateFlow<UiState> = _uiState
+
+    private val _validationState = MutableLiveData(ValidationState())
+    val validationState: LiveData<ValidationState> = _validationState
+
+    // Form fields
     private val _walletName = MutableLiveData<String>()
     val walletName: LiveData<String> = _walletName
 
@@ -35,42 +61,22 @@ class WalletAddViewModel @Inject constructor(
     private val _excludeFromTotal = MutableLiveData(false)
     val excludeFromTotal: LiveData<Boolean> = _excludeFromTotal
 
-    // Validation State
-    private val _nameError = MutableLiveData<String?>()
-    val nameError: LiveData<String?> = _nameError
-
-    private val _currencyError = MutableLiveData<String?>()
-    val currencyError: LiveData<String?> = _currencyError
-
-    private val _amountError = MutableLiveData<String?>()
-    val amountError: LiveData<String?> = _amountError
-
-    // Loading State
-    private val _isLoading = MutableStateFlow(false)
-    val isLoading: StateFlow<Boolean> = _isLoading
-
-    // Update Functions
-    fun updateWalletName(name: String) {
+    fun setWalletName(name: String) {
         _walletName.value = name
-        validateWalletName(name)
+        validateForm()
     }
 
-    fun updateWalletCurrency(currency: String) {
+    fun setWalletCurrency(currency: String) {
         _walletCurrency.value = currency
-        validateWalletCurrency(currency)
+        validateForm()
     }
 
-    fun updateWalletAmount(amount: String) {
-        try {
-            val parsedAmount = amount.toDoubleOrNull()
-            _walletAmount.value = parsedAmount
-            validateWalletAmount(parsedAmount)
-        } catch (e: NumberFormatException) {
-            _amountError.value = "Invalid amount format"
-        }
+    fun setWalletAmount(amount: String) {
+        _walletAmount.value = amount.toDoubleOrNull()
+        validateForm()
     }
 
-    fun updateNotifications(enabled: Boolean) {
+    fun updateEnableNotifications(enabled: Boolean) {
         _enableNotifications.value = enabled
     }
 
@@ -79,62 +85,98 @@ class WalletAddViewModel @Inject constructor(
     }
 
     // Validation Functions
-    private fun validateWalletName(name: String?) {
-        _nameError.value = when {
-            name.isNullOrBlank() -> "Wallet name is required"
-            name.length < 3 -> "Wallet name must be at least 3 characters"
-            else -> null
-        }
+    fun validateForm() : Boolean {
+        val name = _walletName.value
+        val currency = _walletCurrency.value
+        val amount = _walletAmount.value
+
+        val (isWalletNameValid, walletNameError) = validateWalletName(name)
+        val (isWalletCurrencyValid, walletCurrencyError) = validateWalletCurrency(currency)
+        val (isWalletAmountValid, walletAmountError) = validateWalletAmount(amount)
+
+        val currentState = _validationState.value ?: ValidationState()
+        _validationState.value = currentState.copy(
+            isWalletNameValid = isWalletNameValid,
+            isWalletCurrencyValid = isWalletCurrencyValid,
+            isWalletAmountValid = isWalletAmountValid,
+            walletNameError = walletNameError,
+            walletCurrencyError = walletCurrencyError,
+            walletAmountError = walletAmountError
+        )
+
+        return isWalletNameValid && isWalletCurrencyValid && isWalletAmountValid
     }
 
-    private fun validateWalletCurrency(currency: String?) {
-        _currencyError.value = when {
-            currency.isNullOrBlank() -> "Currency is required"
-            else -> null
-        }
+    private fun validateWalletName(name: String?) : Pair<Boolean, String?> {
+        val isValid = !name.isNullOrEmpty()
+        val error = if (isValid) null else "Wallet name cannot be empty"
+
+        return Pair(isValid, error)
     }
 
-    private fun validateWalletAmount(amount: Double?) {
-        _amountError.value = when {
-            amount == null -> "Amount is required"
-            amount < 0 -> "Amount cannot be negative"
-            else -> null
-        }
+    private fun validateWalletCurrency(currency: String?) : Pair<Boolean, String?> {
+        val isValid = !currency.isNullOrEmpty()
+        val error = if (isValid) null else "Wallet currency cannot be empty"
+
+        return Pair(isValid, error)
     }
 
-    private fun validateAll(): Boolean {
-        validateWalletName(_walletName.value)
-        validateWalletCurrency(_walletCurrency.value)
-        validateWalletAmount(_walletAmount.value)
+    private fun validateWalletAmount(amount: Double?) : Pair<Boolean, String?> {
+        val isValid = amount != null && amount > 0
+        val error = if (isValid) null else "Wallet amount must be greater than 0"
 
-        return _nameError.value == null &&
-                _currencyError.value == null &&
-                _amountError.value == null
+        return Pair(isValid, error)
+    }
+
+    fun showValidationErrors() {
+        val currentState = _validationState.value ?: ValidationState()
+        _validationState.value = currentState.copy(shouldShowErrors = true)
+        validateForm()
     }
 
     // Save Function
-    suspend fun addWallet(): Result<Unit> {
-        return try {
-            if (!validateAll()) {
-                return Result.failure(IllegalStateException("Please fix validation errors"))
-            }
-
-            _isLoading.value = true
-
-            val wallet = WalletIn(
-                userId = getUserIdUseCase.execute(),
-                walletName = _walletName.value ?: "",
-                walletCurrency = _walletCurrency.value ?: "",
-                walletBalance = _walletAmount.value ?: 0.0,
-                excludeFromTotal = _excludeFromTotal.value ?: false
-            )
-
-            addWalletUseCase.execute(wallet)
-            Result.success(Unit)
-        } catch (e: Exception) {
-            Result.failure(e)
-        } finally {
-            _isLoading.value = false
+    fun addWallet() {
+        if (!validateForm()) {
+            return
         }
+
+        viewModelScope.launch {
+            _uiState.value = UiState.Loading
+            try {
+                val userId = getUserIdUseCase.execute()
+                val tempUser = User(userId, "", "", "")
+                val newWallet = Wallet.new(
+                    user = tempUser,
+                    name = _walletName.value ?: "",
+                    currency = _walletCurrency.value ?: "",
+                    balance = _walletAmount.value ?: 0.0,
+                    excludeFromTotal = _excludeFromTotal.value == true
+                )
+
+                when (val result = addWalletUseCase.execute(newWallet)) {
+                    is AddWalletUseCase.AddWalletResult.Success -> {
+                        Log.d("WalletAddViewModel", "Wallet added successfully: ${result.walletId}")
+                        _uiState.value = UiState.Success
+                    }
+                    is AddWalletUseCase.AddWalletResult.Error -> {
+                        Log.e("WalletAddViewModel", "Error adding wallet: ${result.message}")
+                        _uiState.value = UiState.Error(result.message)
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e("WalletAddViewModel", "Exception adding wallet: ${e.message}")
+                _uiState.value = UiState.Error(e.message ?: "Failed to add wallet")
+            }
+        }
+    }
+
+    fun reset() {
+        _walletName.value = ""
+        _walletCurrency.value = "ZAR"
+        _walletAmount.value = 0.0
+        _enableNotifications.value = true
+        _excludeFromTotal.value = false
+        _validationState.value = ValidationState(shouldShowErrors = false)
+        _uiState.value = UiState.Initial
     }
 }

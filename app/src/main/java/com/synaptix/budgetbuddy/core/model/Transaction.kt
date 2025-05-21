@@ -21,46 +21,47 @@
 
 package com.synaptix.budgetbuddy.core.model
 
-import androidx.room.Embedded
-import androidx.room.Relation
-import com.synaptix.budgetbuddy.data.entity.CategoryEntity
-import com.synaptix.budgetbuddy.data.entity.TransactionEntity
-import com.synaptix.budgetbuddy.data.entity.UserEntity
-import com.synaptix.budgetbuddy.data.entity.WalletEntity
-import java.io.Serializable
-
-//======================================================================================
-// Data Model: TransactionIn
-// Represents the input data when creating or updating a transaction.
-// Implements Serializable for easy passing between Android components.
-//======================================================================================
-data class TransactionIn(
-    val transactionId: Int? = null,
-    val userId: Int,
-    val walletId: Int,
-    val categoryId: Int,
-    val currencyType: String,
-    val amount: Double,
-    val date: String,
-    val note: String?,
-    // val selectedLabels: List<Label> = mutableListOf(), // WIP: Work in progress feature
-    val photo: ByteArray?,
-    val recurrenceRate: String?
-) : Serializable
-
 //======================================================================================
 // Data Model: Transaction
-// Represents the full transaction entity including related user, wallet, and category.
+// Represents the full transaction entity including related user, wallet, and category + label objects.
 //======================================================================================
 data class Transaction(
-    val transactionId: Int,
-    val user: User?,         // Associated user (nullable)
-    val wallet: Wallet?,     // Associated wallet (nullable)
-    val category: Category?, // Associated category (nullable)
-    val currencyType: String,
+    override val id: String,
+    val user: User,
+    val wallet: Wallet,
+    val category: Category,
+    val labels: List<Label> = emptyList(),
     val amount: Double,
-    val date: String,
-    val note: String?,
-    val photo: ByteArray?,
-    val recurrenceRate: String?
-)
+    val currency: String = "ZAR",
+    val date: Long = System.currentTimeMillis(),
+    val note: String = "",
+    val photoUrl: String? = null,
+    val recurrenceRate: String? = null,
+) : Entity {
+    companion object {
+        fun new(
+            user: User,
+            wallet: Wallet,
+            category: Category,
+            labels: List<Label> = emptyList(),
+            amount: Double,
+            currency: String = "ZAR",
+            date: Long = System.currentTimeMillis(),
+            note: String = "",
+            photoUrl: String? = null,
+            recurrenceRate: String? = null,
+        ): Transaction = Transaction(
+            id = "",
+            user = user,
+            wallet = wallet,
+            category = category,
+            labels = labels,
+            amount = amount,
+            currency = currency,
+            date = date,
+            note = note,
+            photoUrl = photoUrl,
+            recurrenceRate = recurrenceRate
+        )
+    }
+}

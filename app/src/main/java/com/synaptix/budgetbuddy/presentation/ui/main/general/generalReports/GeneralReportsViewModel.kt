@@ -7,14 +7,14 @@ import androidx.lifecycle.viewModelScope
 import com.synaptix.budgetbuddy.core.model.BudgetListItems
 import com.synaptix.budgetbuddy.core.model.Transaction
 import com.synaptix.budgetbuddy.core.usecase.auth.GetUserIdUseCase
-import com.synaptix.budgetbuddy.core.usecase.main.transaction.GetTransactionUseCase
+import com.synaptix.budgetbuddy.core.usecase.main.transaction.GetTransactionsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class GeneralReportsViewModel @Inject constructor(
-    private val getTransactionUseCase: GetTransactionUseCase,
+    private val getTransactionsUseCase: GetTransactionsUseCase,
     private val getUserIdUseCase: GetUserIdUseCase
 ) : ViewModel() {
 
@@ -26,7 +26,7 @@ class GeneralReportsViewModel @Inject constructor(
     fun loadTransactions(userId: Int) {
         viewModelScope.launch {
             val userId = getUserIdUseCase.execute()
-            val result = getTransactionUseCase.execute(userId)
+            val result = getTransactionsUseCase.execute(userId)
 //            _transactions.postValue(result)
 //
 //

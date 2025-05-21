@@ -21,22 +21,21 @@
 
 package com.synaptix.budgetbuddy.core.usecase.main.budget
 
-import com.synaptix.budgetbuddy.core.model.BudgetIn
-import com.synaptix.budgetbuddy.data.entity.mapper.toEntity
-import com.synaptix.budgetbuddy.data.repository.BudgetRepository
+import com.synaptix.budgetbuddy.core.model.Budget
+import com.synaptix.budgetbuddy.data.firebase.mapper.FirebaseMapper.toDTO
 import javax.inject.Inject
 
-// UseCase class responsible for adding a new budget
-class AddBudgetUseCase @Inject constructor(
-    // Injecting the BudgetRepository to handle budget-related operations
-    private val budgetRepository: BudgetRepository
-) {
-    // Executes the operation to add a new budget by converting to entity and inserting into the database
-    suspend fun execute(budget: BudgetIn) {
-        // Convert the BudgetIn data model to the entity representation for database insertion
-        val entity = budget.toEntity()
-
-        // Insert the converted budget entity into the repository (database)
-        budgetRepository.insertBudget(entity)
-    }
-}
+//// UseCase class responsible for adding a new budget
+//class AddBudgetUseCase @Inject constructor(
+//    // Injecting the BudgetRepository to handle budget-related operations
+//    private val budgetRepository: BudgetRepository
+//) {
+//    // Executes the operation to add a new budget by converting to entity and inserting into the database
+//    suspend fun execute(budget: Budget) {
+//        // Convert the BudgetIn data model to the entity representation for database insertion
+//        val entity = budget.toDTO()
+//
+//        // Insert the converted budget entity into the repository (database)
+//        budgetRepository.insertBudget(entity)
+//    }
+//}

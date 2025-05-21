@@ -7,13 +7,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.synaptix.budgetbuddy.core.model.Category
 import com.synaptix.budgetbuddy.core.model.Label
-import com.synaptix.budgetbuddy.core.model.Transaction
-import com.synaptix.budgetbuddy.core.model.TransactionIn
 import com.synaptix.budgetbuddy.core.model.Wallet
 import com.synaptix.budgetbuddy.core.usecase.auth.GetUserIdUseCase
-import com.synaptix.budgetbuddy.core.usecase.main.transaction.AddTransactionUseCase
-import com.synaptix.budgetbuddy.core.usecase.main.transaction.AddTransactionUseCase.AddTransactionResult
-import com.synaptix.budgetbuddy.data.repository.BudgetRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -22,11 +17,16 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import javax.inject.Inject
+import com.synaptix.budgetbuddy.core.model.Transaction
+import com.synaptix.budgetbuddy.core.model.User
+import com.synaptix.budgetbuddy.core.usecase.main.transaction.AddTransactionUseCase
+import com.synaptix.budgetbuddy.core.usecase.main.transaction.AddTransactionUseCase.AddTransactionResult
+import com.synaptix.budgetbuddy.presentation.ui.main.transaction.TransactionAddViewModel.UiState.*
 
 @HiltViewModel
 class TransactionAddViewModel @Inject constructor(
+    private val getUserIdUseCase: GetUserIdUseCase,
     private val addTransactionUseCase: AddTransactionUseCase,
-    private val getUserIdUseCase: GetUserIdUseCase
 ) : ViewModel() {
 
     sealed class UiState {
@@ -158,32 +158,34 @@ class TransactionAddViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.value = UiState.Loading
             try {
-                val transaction = TransactionIn(
-                    userId = getUserIdUseCase.execute(),
-                    categoryId = _category.value?.categoryId ?: 0,
-                    walletId = _wallet.value?.walletId ?: 0,
-                    currencyType = _currency.value ?: "ZAR",
+                val userId = getUserIdUseCase.execute()
+                val tempUser = User(userId, "", "", "")
+                val newTransaction = Transaction.new(
+                    user = tempUser,
+                    wallet = _wallet.value!!,
+                    category = _category.value!!,
+                    labels = selectedLabels.value!!,
                     amount = _amount.value ?: 0.0,
-                    date = _date.value ?: getCurrentDate(),
-                    note = _note.value,
-                    photo = _imageBytes.value,
+                    currency = _currency.value ?: "ZAR",
+                    date = parseDate((_date.value ?: System.currentTimeMillis()).toString()),
+                    note = _note.value ?: "",
+                    photoUrl = null, // TODO: Upload image to Firebase Storage
                     recurrenceRate = _recurrenceRate.value
                 )
-                val result = addTransactionUseCase.execute(transaction)
-                when (result) {
+
+                when (val result = addTransactionUseCase.execute(newTransaction)) {
                     is AddTransactionResult.Success -> {
-                        // Handle success
-                        _uiState.value = UiState.Success
-                        reset()
+                        Log.d("TransactionAddViewModel", "Transaction added successfully: ${result.transactionId}")
+                        _uiState.value = Success
                     }
                     is AddTransactionResult.Error -> {
-                        // Handle error
-                        val errorMessage = result.message
-                        _uiState.value = UiState.Error(errorMessage)
+                        Log.e("TransactionAddViewModel", "Error adding transaction: ${result.message}")
+                        _uiState.value = Error(result.message)
                     }
                 }
             } catch (e: Exception) {
-                _uiState.value = UiState.Error(e.message ?: "Failed to add transaction")
+                Log.e("TransactionAddViewModel", "Exception adding transaction: ${e.message}")
+                _uiState.value = Error(e.message ?: "Failed to add transaction")
             }
         }
     }
@@ -202,5 +204,14 @@ class TransactionAddViewModel @Inject constructor(
 
     private fun getCurrentDate(): String {
         return SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date())
+    }
+
+    private fun parseDate(dateStr: String): Long {
+        return try {
+            val format = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+            format.parse(dateStr)?.time ?: System.currentTimeMillis()
+        } catch (e: Exception) {
+            System.currentTimeMillis()
+        }
     }
 }

@@ -77,8 +77,8 @@ class BudgetMainAdapter(
          * Attaches click listener to the entire item view.
          */
         override fun bind(item: BudgetListItems.BudgetBudgetItem) {
-            budgetIcon.setImageResource(item.budget.category?.categoryIcon ?: R.drawable.ic_money_24)
-            budgetTitle.text = item.budget.budgetName
+            budgetIcon.setImageResource(R.drawable.ic_money_24)
+            budgetTitle.text = item.budget.name
             budgetStatus.text = item.status
             
             itemView.setOnClickListener { onBudgetClick(item.budget) }

@@ -92,9 +92,11 @@ class WalletMainFragment : Fragment() {
     private fun updateWalletsList(wallets: List<Wallet>) {
         val budgetWalletItems = wallets.map { wallet ->
             BudgetListItems.BudgetWalletItem(
-                walletName = wallet.walletName,
-                walletBalance = wallet.walletBalance,
-                walletIcon = R.drawable.baseline_shopping_bag_24
+                wallet = wallet,
+                walletName = wallet.name,
+                walletIcon = R.drawable.baseline_shopping_bag_24,
+                walletBalance = wallet.balance,
+                relativeDate = wallet.formatDate(wallet.lastTransactionAt)
             )
         }
 

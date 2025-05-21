@@ -2,6 +2,7 @@
 buildscript {
     dependencies {
         classpath(libs.dagger.hilt.android.gradle.plugin)
+        classpath("com.google.gms:google-services:4.4.1")
     }
 }
 

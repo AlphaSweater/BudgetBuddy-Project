@@ -161,6 +161,17 @@
                                 android:minHeight="40dp"
                                 android:gravity="center_vertical"
                                 android:paddingVertical="4dp" />
+
+                            <!-- Error for wallet name -->
+                            <TextView
+                                android:id="@+id/textNameError"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textColor="@android:color/holo_red_light"
+                                android:textSize="12sp"
+                                android:visibility="gone"
+                                android:layout_marginStart="0dp"
+                                android:layout_marginTop="0dp"/>
                         </LinearLayout>
                     </LinearLayout>
 
@@ -210,6 +221,17 @@
                                 android:layout_height="40dp"
                                 android:background="@null"
                                 android:spinnerMode="dropdown" />
+
+                            <!-- Error for currency -->
+                            <TextView
+                                android:id="@+id/textCurrencyError"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textColor="@android:color/holo_red_light"
+                                android:textSize="12sp"
+                                android:visibility="gone"
+                                android:layout_marginStart="0dp"
+                                android:layout_marginTop="0dp"/>
                         </LinearLayout>
                     </LinearLayout>
 
@@ -266,6 +288,17 @@
                                 android:minHeight="40dp"
                                 android:gravity="center_vertical"
                                 android:paddingVertical="4dp" />
+
+                            <!-- Error for initial amount -->
+                            <TextView
+                                android:id="@+id/textAmountError"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textColor="@android:color/holo_red_light"
+                                android:textSize="12sp"
+                                android:visibility="gone"
+                                android:layout_marginStart="0dp"
+                                android:layout_marginTop="0dp"/>
                         </LinearLayout>
                     </LinearLayout>
                 </LinearLayout>

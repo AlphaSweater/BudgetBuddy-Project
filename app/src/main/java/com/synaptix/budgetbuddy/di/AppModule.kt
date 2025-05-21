@@ -21,22 +21,24 @@
 
 package com.synaptix.budgetbuddy.di
 
-import android.content.Context
-import androidx.room.Room
-import androidx.room.RoomDatabase
-import androidx.sqlite.db.SupportSQLiteDatabase
+import android.app.Application
+import com.google.firebase.Firebase
+import com.google.firebase.FirebaseApp
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.firestore
 import com.synaptix.budgetbuddy.core.usecase.auth.GetUserIdUseCase
-import com.synaptix.budgetbuddy.data.repository.UserRepository
-import com.synaptix.budgetbuddy.core.usecase.main.transaction.AddTransactionUseCase
 import com.synaptix.budgetbuddy.core.usecase.auth.LoginUserUseCase
-import com.synaptix.budgetbuddy.core.usecase.main.transaction.GetCategoriesUseCase
-import com.synaptix.budgetbuddy.data.AppDatabase
-import com.synaptix.budgetbuddy.data.entity.CategoryEntity
-import com.synaptix.budgetbuddy.data.local.CategoryDatabaseCallback
-import com.synaptix.budgetbuddy.data.local.LabelDatabaseCallback
-import com.synaptix.budgetbuddy.data.local.dao.*
-import com.synaptix.budgetbuddy.data.local.datastore.DataStoreManager
-import com.synaptix.budgetbuddy.data.repository.*
+import com.synaptix.budgetbuddy.core.usecase.main.budget.GetBudgetsUseCase
+import com.synaptix.budgetbuddy.core.usecase.main.transaction.AddTransactionUseCase
+import com.synaptix.budgetbuddy.core.usecase.main.category.GetCategoriesUseCase
+import com.synaptix.budgetbuddy.core.usecase.main.transaction.GetTransactionsUseCase
+import com.synaptix.budgetbuddy.data.firebase.repository.FirestoreBudgetRepository
+import com.synaptix.budgetbuddy.data.firebase.repository.FirestoreCategoryRepository
+import com.synaptix.budgetbuddy.data.firebase.repository.FirestoreLabelRepository
+import com.synaptix.budgetbuddy.data.firebase.repository.FirestoreTransactionRepository
+import com.synaptix.budgetbuddy.data.firebase.repository.FirestoreUserRepository
+import com.synaptix.budgetbuddy.data.firebase.repository.FirestoreWalletRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -47,12 +49,9 @@ import kotlinx.coroutines.Dispatchers
 import javax.inject.Qualifier
 import javax.inject.Singleton
 
-// Dagger module to provide application-level dependencies
-
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
-
     @IoDispatcher
     @Provides
     fun providesIoDispatcher(): CoroutineDispatcher = Dispatchers.IO
@@ -65,144 +64,119 @@ object AppModule {
     @Provides
     fun providesDefaultDispatcher(): CoroutineDispatcher = Dispatchers.Default
 
-    // Provide AddTransactionUseCase for transaction-related operations
+    // Firebase
     @Provides
     @Singleton
-    fun provideAddTransactionUseCase(repository: ITransactionRepository): AddTransactionUseCase {
-        return AddTransactionUseCase(repository)
+    fun provideFirebaseFirestore(): FirebaseFirestore {
+        return FirebaseFirestore.getInstance()
     }
 
-    // Provide GetUserIdUseCase for fetching the user ID
     @Provides
     @Singleton
-    fun provideGetUserIdUseCase(repository: UserRepository): GetUserIdUseCase {
+    fun provideFirebaseAuth(): FirebaseAuth {
+        return FirebaseAuth.getInstance()
+    }
+
+
+    // Provide Firebase Repositories
+    @Provides
+    @Singleton
+    fun provideFirestoreUserRepository(
+        firebaseAuth: FirebaseAuth,
+        firestore: FirebaseFirestore
+    ): FirestoreUserRepository {
+        return FirestoreUserRepository(firebaseAuth, firestore)
+    }
+
+    @Provides
+    @Singleton
+    fun provideFirestoreBudgetRepository(
+        firestore: FirebaseFirestore,
+        categoryRepository: FirestoreCategoryRepository
+    ): FirestoreBudgetRepository {
+        return FirestoreBudgetRepository(firestore, categoryRepository)
+    }
+
+    @Provides
+    @Singleton
+    fun provideFirestoreCategoryRepository(
+        firestore: FirebaseFirestore
+    ): FirestoreCategoryRepository {
+        return FirestoreCategoryRepository(firestore)
+    }
+
+    @Provides
+    @Singleton
+    fun provideFirestoreTransactionRepository(
+        firestore: FirebaseFirestore
+    ): FirestoreTransactionRepository {
+        return FirestoreTransactionRepository(firestore)
+    }
+
+    @Provides
+    @Singleton
+    fun provideFirestoreWalletRepository(
+        firestore: FirebaseFirestore
+    ): FirestoreWalletRepository {
+        return FirestoreWalletRepository(firestore)
+    }
+
+    @Provides
+    @Singleton
+    fun provideFirestoreLabelRepository(
+        firestore: FirebaseFirestore
+    ): FirestoreLabelRepository {
+        return FirestoreLabelRepository(firestore)
+    }
+
+    // Provide Use Cases
+    @Provides
+    @Singleton
+    fun provideGetUserIdUseCase(repository: FirestoreUserRepository): GetUserIdUseCase {
         return GetUserIdUseCase(repository)
     }
 
-    // Provide the UserDao for accessing user-related data in the database
     @Provides
     @Singleton
-    fun provideUserDao(appDatabase: AppDatabase): UserDao {
-        return appDatabase.userDao()
-    }
-
-    // Provide the AppDatabase instance for Room database setup
-    @Provides
-    @Singleton
-    fun provideAppDatabase(@ApplicationContext context: Context): AppDatabase {
-        lateinit var db: AppDatabase
-        db = Room.databaseBuilder(
-            context,
-            AppDatabase::class.java,
-            "budgetbuddy_db"
-        )
-            // this destroys database if version changes to allow for easier migration when testing and developing app
-            .fallbackToDestructiveMigration()
-
-            // AI assisted with callback to allow for default categories to be added to the database on creation
-            .addCallback(CategoryDatabaseCallback { db })
-            .addCallback(LabelDatabaseCallback { db })
-            .build()
-        return db
-    }
-
-    // Provide UserRepository for managing user data in the database and DataStore
-    @Provides
-    @Singleton
-    fun provideUserRepository(userDao: UserDao, dataStoreManager: DataStoreManager): UserRepository {
-        return UserRepository(userDao, dataStoreManager)
-    }
-
-    // Provide DataStoreManager for managing application preferences and data
-    @Provides
-    @Singleton
-    fun providesDataStoreManager(@ApplicationContext context: Context): DataStoreManager {
-        return DataStoreManager(context)
-    }
-
-    // Provide LoginUserUseCase for handling user login functionality
-    @Provides
-    @Singleton
-    fun provideLoginUseCase(repository: UserRepository): LoginUserUseCase {
+    fun provideLoginUseCase(repository: FirestoreUserRepository): LoginUserUseCase {
         return LoginUserUseCase(repository)
     }
 
-    // Provide WalletDao for accessing wallet data in the database
     @Provides
     @Singleton
-    fun provideWalletDao(appDatabase: AppDatabase): WalletDao {
-        return appDatabase.walletDao()
-    }
-
-    // Provide CategoryDao for accessing category data in the database
-    @Provides
-    @Singleton
-    fun provideCategoryDao(appDatabase: AppDatabase): CategoryDao {
-        return appDatabase.categoryDao()
-    }
-
-    // Provide LabelDao for accessing label data in the database
-    @Provides
-    @Singleton
-    fun provideLabelDao(appDatabase: AppDatabase): LabelDao {
-        return appDatabase.labelDao()
-    }
-
-    // Provide LabelRepository for managing label-related data
-    @Provides
-    @Singleton
-    fun providelabelrepository(labelDao: LabelDao): LabelRepository {
-        return LabelRepository(labelDao)
-    }
-
-    // Provide TransactionDao for accessing transaction data in the database
-    @Provides
-    @Singleton
-    fun provideTransactionDao(appDatabase: AppDatabase): TransactionDao {
-        return appDatabase.transactionDao()
-    }
-
-    // Provide TransactionRepository for managing transaction-related data
-    @Provides
-    @Singleton
-    fun provideTransactionRepository(
-        transactionDao: TransactionDao,
-        @IoDispatcher ioDispatcher: CoroutineDispatcher
-    ): ITransactionRepository {
-        return TransactionRepository(transactionDao, ioDispatcher)
-    }
-
-    // Provide BudgetDao for accessing budget data in the database
-    @Provides
-    @Singleton
-    fun provideBudgetDao(appDatabase: AppDatabase): BudgetDao {
-        return appDatabase.budgetDao()
+    fun provideAddTransactionUseCase(repository: FirestoreTransactionRepository): AddTransactionUseCase {
+        return AddTransactionUseCase(repository)
     }
 
     @Provides
     @Singleton
-    fun provideBudgetRepository(budgetDao: BudgetDao): BudgetRepository {
-        return BudgetRepository(budgetDao)
+    fun provideGetTransactionsUseCase(
+        transactionRepository: FirestoreTransactionRepository,
+        userRepository: FirestoreUserRepository,
+        walletRepository: FirestoreWalletRepository,
+        categoryRepository: FirestoreCategoryRepository,
+        labelRepository: FirestoreLabelRepository
+    ): GetTransactionsUseCase {
+        return GetTransactionsUseCase(
+            transactionRepository,
+            userRepository,
+            walletRepository,
+            categoryRepository,
+            labelRepository
+        )
     }
 
     @Provides
     @Singleton
-    fun provideCategoryRepository(categoryDao: CategoryDao, userDao: UserDao): CategoryRepository {
-        return CategoryRepository(categoryDao, userDao)
+    fun provideGetCategoriesUseCase(categoryRepository: FirestoreCategoryRepository, userRepository: FirestoreUserRepository): GetCategoriesUseCase {
+        return GetCategoriesUseCase(categoryRepository, userRepository)
     }
 
     @Provides
     @Singleton
-    fun provideGetCategoriesUseCase(categoryRepository: CategoryRepository) : GetCategoriesUseCase {
-        return GetCategoriesUseCase(categoryRepository)
+    fun provideGetBudgetsUseCase(budgetRepository: FirestoreBudgetRepository, userRepository: FirestoreUserRepository, categoryRepository: FirestoreCategoryRepository): com.synaptix.budgetbuddy.core.usecase.main.budget.GetBudgetsUseCase {
+        return GetBudgetsUseCase(budgetRepository, userRepository, categoryRepository)
     }
-
-    @Provides
-    @Singleton
-    fun provideMinMaxGoalsDao(appDatabase: AppDatabase): MinMaxGoalsDao {
-        return appDatabase.minMaxGoalsDao()
-    }
-
 }
 
 @Retention(AnnotationRetention.BINARY)

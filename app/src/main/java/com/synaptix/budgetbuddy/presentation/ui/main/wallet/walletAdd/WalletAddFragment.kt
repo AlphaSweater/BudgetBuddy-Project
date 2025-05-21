@@ -1,25 +1,24 @@
 package com.synaptix.budgetbuddy.presentation.ui.main.wallet.walletAdd
 
-import android.graphics.BitmapFactory
 import androidx.fragment.app.viewModels
 import android.os.Bundle
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
-import android.widget.Toast
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.synaptix.budgetbuddy.R
-import com.synaptix.budgetbuddy.databinding.FragmentTransactionAddBinding
 import com.synaptix.budgetbuddy.databinding.FragmentWalletAddBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import android.text.Editable
 import android.text.TextWatcher
-import androidx.core.view.isVisible
+import androidx.core.widget.doAfterTextChanged
+import com.google.android.material.snackbar.Snackbar
 
 @AndroidEntryPoint
 class WalletAddFragment : Fragment() {
@@ -28,7 +27,6 @@ class WalletAddFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val viewModel: WalletAddViewModel by viewModels()
-
 
     // --- Lifecycle ---
     override fun onCreateView(
@@ -43,7 +41,6 @@ class WalletAddFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupUI()
-        setupListeners()
         observeViewModel()
     }
 
@@ -55,122 +52,141 @@ class WalletAddFragment : Fragment() {
     // --- Setup Methods ---
     private fun setupUI() {
         setupCurrencySpinner()
+        setupClickListeners()
+        setupTextWatchers()
     }
 
-    //Handles the setup of the currency spinner.
     private fun setupCurrencySpinner() {
         val adapter = ArrayAdapter(
             requireContext(),
             R.layout.spinner_item,
-            listOf("ZAR", "USD", "EUR", "GBP") // Add more currencies as needed
+            listOf("ZAR")
         )
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         binding.spinnerCurrency.adapter = adapter
     }
 
-    private fun setupListeners() {
-        // Back button
-        binding.btnGoBack.setOnClickListener {
-            findNavController().popBackStack()
-        }
-
-        // Wallet name
-        binding.edtWalletName.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-            override fun afterTextChanged(s: Editable?) {
-                viewModel.updateWalletName(s?.toString() ?: "")
+    private fun setupClickListeners() {
+        with(binding) {
+            btnGoBack.setOnClickListener {
+                findNavController().popBackStack()
             }
-        })
 
-        // Initial amount
-        binding.edtInitialAmount.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-            override fun afterTextChanged(s: Editable?) {
-                viewModel.updateWalletAmount(s?.toString() ?: "0")
+            switchNotifications.setOnCheckedChangeListener { _, isChecked ->
+                viewModel.updateEnableNotifications(isChecked)
             }
-        })
 
-        // Notifications switch
-        binding.switchNotifications.setOnCheckedChangeListener { _, isChecked ->
-            viewModel.updateNotifications(isChecked)
+            switchExcludeTotal.setOnCheckedChangeListener { _, isChecked ->
+                viewModel.updateExcludeFromTotal(isChecked)
+            }
+
+            btnSave.setOnClickListener {
+                saveWallet()
+            }
         }
+    }
 
-        // Exclude from total switch
-        binding.switchExcludeTotal.setOnCheckedChangeListener { _, isChecked ->
-            viewModel.updateExcludeFromTotal(isChecked)
-        }
+    private fun setupTextWatchers() {
+        with(binding){
+            binding.edtWalletName.doAfterTextChanged { text ->
+                viewModel.setWalletName(text.toString())
+            }
 
-        // Save button
-        binding.btnSave.setOnClickListener {
-            saveWallet()
+            binding.edtInitialAmount.doAfterTextChanged { text ->
+                viewModel.setWalletAmount(text.toString())
+            }
         }
     }
 
     // --- Save Logic ---
     private fun saveWallet() {
+        val walletName = binding.edtWalletName.text.toString()
+        viewModel.setWalletName(walletName)
+
+        val walletAmount = binding.edtInitialAmount.text.toString()
+        viewModel.setWalletAmount(walletAmount)
+
+        val walletCurrency = binding.spinnerCurrency.selectedItem.toString()
+        viewModel.setWalletCurrency(walletCurrency)
+
+        // Show validation errors if any
+        viewModel.showValidationErrors()
+
+        // Check if form is valid before proceeding
+        if (!viewModel.validateForm()) return
+
         viewLifecycleOwner.lifecycleScope.launch {
             try {
-                viewModel.updateWalletCurrency(binding.spinnerCurrency.selectedItem.toString())
                 viewModel.addWallet()
-                    .onSuccess {
-                        Toast.makeText(
-                            requireContext(),
-                            "Wallet saved successfully!",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                        findNavController().popBackStack()
-                    }
-                    .onFailure { exception ->
-                        Toast.makeText(
-                            requireContext(),
-                            exception.message ?: "Failed to save wallet",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
             } catch (e: Exception) {
-                Toast.makeText(
-                    requireContext(),
-                    "Error: ${e.message}",
-                    Toast.LENGTH_SHORT
-                ).show()
+                showError("Failed to save wallet: ${e.message}")
             }
         }
     }
 
     // --- Observers ---
     private fun observeViewModel() {
-        // Observe validation errors
-        viewModel.nameError.observe(viewLifecycleOwner) { error ->
-            showError(error, binding.edtWalletName)
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.uiState.collect { state ->
+                    handleUiState(state)
+                }
+            }
         }
 
-        viewModel.currencyError.observe(viewLifecycleOwner) { error ->
-            // Handle currency error if needed
+        viewModel.validationState.observe(viewLifecycleOwner) { state ->
+            handleValidationState(state)
         }
+    }
 
-        viewModel.amountError.observe(viewLifecycleOwner) { error ->
-            showError(error, binding.edtInitialAmount)
-        }
-
-        // Observe loading state
-        lifecycleScope.launch {
-            viewModel.isLoading.collect { isLoading ->
-                binding.btnSave.isEnabled = !isLoading
-                // You can also show a loading indicator if needed
+    private fun handleUiState(state: WalletAddViewModel.UiState) {
+        when (state) {
+            is WalletAddViewModel.UiState.Loading -> {
+                binding.btnSave.isEnabled = false
+            }
+            is WalletAddViewModel.UiState.Success -> {
+                showSuccess("Wallet added successfully")
+                findNavController().popBackStack()
+            }
+            is WalletAddViewModel.UiState.Error -> {
+                binding.btnSave.isEnabled = false
+                showError(state.message)
+            }
+            else -> {
+                binding.btnSave.isEnabled = true
             }
         }
     }
 
-    private fun showError(error: String?, view: View) {
-        when (view) {
-            binding.edtWalletName -> {
-                binding.edtWalletName.error = error
+    private fun handleValidationState(state: WalletAddViewModel.ValidationState) {
+        with(binding) {
+            // Show/hide error messages for each field
+            textNameError.apply {
+                text = state.walletNameError
+                visibility = if (state.shouldShowErrors && state.walletNameError != null) View.VISIBLE else View.GONE
             }
-            binding.edtInitialAmount -> {
-                binding.edtInitialAmount.error = error
+
+            textAmountError.apply {
+                text = state.walletAmountError
+                visibility = if (state.shouldShowErrors && state.walletAmountError != null) View.VISIBLE else View.GONE
+            }
+
+            textCurrencyError.apply {
+                text = state.walletCurrencyError
+                visibility = if (state.shouldShowErrors && state.walletCurrencyError != null) View.VISIBLE else View.GONE
             }
         }
+    }
+
+    private fun showError(message: String) {
+        Snackbar.make(binding.root, message, Snackbar.LENGTH_SHORT)
+            .setBackgroundTint(resources.getColor(R.color.error, null))
+            .show()
+    }
+
+    private fun showSuccess(message: String) {
+        Snackbar.make(binding.root, message, Snackbar.LENGTH_SHORT)
+            .setBackgroundTint(resources.getColor(R.color.success, null))
+            .show()
     }
 }

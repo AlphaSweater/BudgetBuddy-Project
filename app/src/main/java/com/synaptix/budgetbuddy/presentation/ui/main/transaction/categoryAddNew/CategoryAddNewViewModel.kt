@@ -5,9 +5,10 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.synaptix.budgetbuddy.R
-import com.synaptix.budgetbuddy.core.model.CategoryIn
+import com.synaptix.budgetbuddy.core.model.Category
+import com.synaptix.budgetbuddy.core.model.User
 import com.synaptix.budgetbuddy.core.usecase.auth.GetUserIdUseCase
-import com.synaptix.budgetbuddy.core.usecase.main.transaction.AddCategoryUseCase
+import com.synaptix.budgetbuddy.core.usecase.main.category.AddCategoryUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -87,15 +88,22 @@ class CategoryAddNewViewModel @Inject constructor(
 
         viewModelScope.launch {
             val userId = getUserIdUseCase.execute()
-            val categoryIn = CategoryIn(
-                userId = userId,
-                categoryName = name,
-                categoryType = _categoryType.value?.lowercase() ?: "expense",
-                categoryIcon = icon.iconResourceId,
-                categoryColor = color.colorResourceId
+            val tempUser = User(
+                id = userId,
+                email = "",
+                firstName = "",
+                lastName = ""
+            )
+
+            val newCategory = Category.new(
+                user = tempUser,
+                name = name,
+                type = _categoryType.value?.lowercase() ?: "expense",
+                icon = icon.iconResourceId,
+                color = color.colorResourceId
             )
             
-            addCategoryUseCase.execute(categoryIn)
+            addCategoryUseCase.execute(newCategory)
             _eventCategoryCreated.value = true
 
         }

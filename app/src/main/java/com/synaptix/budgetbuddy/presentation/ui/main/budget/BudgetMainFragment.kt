@@ -76,20 +76,21 @@ class BudgetMainFragment : Fragment() {
                 ).show()
                 return@setOnClickListener
             }
-            viewModel.saveMinMaxGoals(minGoal, maxGoal)
+            // TODO: Save the min and max goals to the ViewModel or database
+//            viewModel.saveMinMaxGoals(minGoal, maxGoal)
         }
     }
 
     private fun observeViewModel() {
-        viewModel.minMaxGoal.observe(viewLifecycleOwner) { minMaxGoal ->
-            if (minMaxGoal != null) {
-                binding.minValueSpent.text = "R%.2f".format(minMaxGoal.minGoal)
-                binding.minValueTotal.text = "R%.2f".format(minMaxGoal.maxGoal)
-            } else {
-                binding.minValueSpent.text = "N/A"
-                binding.minValueTotal.text = "N/A"
-            }
-        }
+//        viewModel.minMaxGoal.observe(viewLifecycleOwner) { minMaxGoal ->
+//            if (minMaxGoal != null) {
+//                binding.minValueSpent.text = "R%.2f".format(minMaxGoal.minGoal)
+//                binding.minValueTotal.text = "R%.2f".format(minMaxGoal.maxGoal)
+//            } else {
+//                binding.minValueSpent.text = "N/A"
+//                binding.minValueTotal.text = "N/A"
+//            }
+//        }
 
         viewModel.budgets.observe(viewLifecycleOwner) { budgetList ->
             val budgetItems = budgetList.map { budget ->

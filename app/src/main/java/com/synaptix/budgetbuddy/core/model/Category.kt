@@ -21,31 +21,32 @@
 
 package com.synaptix.budgetbuddy.core.model
 
-import java.io.Serializable
-
-//======================================================================================
-// Data Model: CategoryIn
-// Represents the input data when creating or updating a category.
-// Implements Serializable for safe passing between Android components.
-//======================================================================================
-data class CategoryIn (
-    val categoryId: Int = 0,
-    val userId: Int?,          // Associated user ID (nullable)
-    val categoryName: String,  // Name of the category
-    val categoryType: String,  // Type (e.g., Income or Expense)
-    val categoryIcon: Int,     // Resource ID for the category icon
-    val categoryColor: Int     // Resource ID or color integer for display
-) : Serializable
-
 //======================================================================================
 // Data Model: Category
 // Represents the full category entity including related user.
 //======================================================================================
 data class Category(
-    val categoryId: Int = 0,
-    val user: User?,           // Associated user object (nullable)
-    val categoryName: String,  // Name of the category
-    val categoryType: String,  // Type (e.g., Income or Expense)
-    val categoryIcon: Int,     // Icon for display
-    val categoryColor: Int     // Color associated with the category
-)
+    override val id: String,
+    val user: User?,    // Nullable user object for default categories
+    val name: String,
+    val type: String,  // Income or Expense
+    val icon: Int,     // Resource ID for the category icon
+    val color: Int,     // Resource ID or color integer for display
+) : Entity {
+    companion object {
+        fun new(
+            user: User?,
+            name: String,
+            type: String,
+            icon: Int,
+            color: Int
+        ): Category = Category(
+            id = "",
+            user = user,
+            name = name,
+            type = type,
+            icon = icon,
+            color = color
+        )
+    }
+}
