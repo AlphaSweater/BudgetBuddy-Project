@@ -1,7 +1,5 @@
 package com.synaptix.budgetbuddy.presentation.ui.main.home
 
-import android.icu.util.Calendar
-import android.icu.util.TimeZone
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -13,19 +11,12 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.google.android.material.datepicker.MaterialDatePicker
 import com.synaptix.budgetbuddy.R
-import com.synaptix.budgetbuddy.core.model.BudgetReportListItems.*
-import com.synaptix.budgetbuddy.core.model.Category
-import com.synaptix.budgetbuddy.core.model.Transaction
-import com.synaptix.budgetbuddy.core.model.Wallet
+import com.synaptix.budgetbuddy.core.model.HomeListItems
 import com.synaptix.budgetbuddy.databinding.FragmentHomeBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
-import java.util.Locale
 
 @AndroidEntryPoint
 class HomeMainFragment : Fragment() {
@@ -173,11 +164,10 @@ class HomeMainFragment : Fragment() {
                     txtEmptyWallets.isVisible = false
                     
                     val walletItems = wallets.take(MAX_ITEMS).map { wallet ->
-                        HomeWalletItem(
-                            walletName = (wallet).walletName,
-                            walletIcon = R.drawable.baseline_shopping_bag_24,
-                            walletBalance = wallet.walletBalance,
-                            relativeDate = "Recent"
+                        HomeListItems.HomeWalletItem(
+                            wallet = wallet,
+                            walletIcon = R.drawable.ic_wallet_24,
+                            relativeDate = "Recent" // TODO: Calculate actual relative date
                         )
                     }
                     walletAdapter.submitList(walletItems)
@@ -212,17 +202,10 @@ class HomeMainFragment : Fragment() {
                     txtEmptyTransactions.isVisible = false
                     
                     val transactionItems = transactions.take(MAX_ITEMS).map { transaction ->
-                        transaction.let { tx ->
-                            TransactionItem(
-                                categoryName = tx.category?.categoryName ?: "",
-                                categoryIcon = tx.category?.categoryIcon ?: R.drawable.baseline_shopping_bag_24,
-                                categoryColour = tx.category?.categoryColor ?: R.color.dark_background,
-                                amount = tx.amount,
-                                walletName = tx.wallet?.walletName ?: "",
-                                note = tx.note,
-                                relativeDate = tx.date
-                            )
-                        }
+                        HomeListItems.HomeTransactionItem(
+                            transaction = transaction,
+                            relativeDate = "Recent" // TODO: Calculate actual relative date
+                        )
                     }
                     transactionAdapter.submitList(transactionItems)
                 }
@@ -256,16 +239,12 @@ class HomeMainFragment : Fragment() {
                     txtEmptyCategories.isVisible = false
                     
                     val categoryItems = categories.take(MAX_ITEMS).map { category ->
-                        category.let { cat ->
-                            CategoryItems(
-                                categoryName = cat.categoryName,
-                                categoryIcon = cat.categoryIcon,
-                                categoryColour = cat.categoryColor,
-                                transactionCount = 0, // TODO: Calculate actual count
-                                amount = "0.00", // TODO: Calculate actual amount
-                                relativeDate = "Recent"
-                            )
-                        }
+                        HomeListItems.HomeCategoryItem(
+                            category = category,
+                            transactionCount = 0, // TODO: Calculate actual count
+                            amount = "0.00", // TODO: Calculate actual amount
+                            relativeDate = "Recent" // TODO: Calculate actual relative date
+                        )
                     }
                     categoryAdapter.submitList(categoryItems)
                 }

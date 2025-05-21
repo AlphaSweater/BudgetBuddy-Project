@@ -29,7 +29,7 @@
         android:title="@string/title_home" />
     <item
         android:id="@+id/navigation_wallet_main"
-        android:icon="@drawable/ic_account_balance_wallet_24"
+        android:icon="@drawable/ic_wallet_24"
         android:title="@string/title_wallets" />
 
     <item

@@ -8,8 +8,10 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import com.synaptix.budgetbuddy.R
-import com.synaptix.budgetbuddy.core.model.BudgetReportListItems
-import com.synaptix.budgetbuddy.core.model.BudgetReportListItems.*
+import com.synaptix.budgetbuddy.core.model.Category
+import com.synaptix.budgetbuddy.core.model.HomeListItems
+import com.synaptix.budgetbuddy.core.model.Transaction
+import com.synaptix.budgetbuddy.core.model.Wallet
 import com.synaptix.budgetbuddy.presentation.ui.common.BaseAdapter
 
 /**
@@ -27,10 +29,10 @@ import com.synaptix.budgetbuddy.presentation.ui.common.BaseAdapter
  * @param onCategoryClick Optional callback for category item clicks
  */
 class HomeAdapter(
-    private val onWalletClick: ((HomeWalletItem) -> Unit)? = null,
-    private val onTransactionClick: ((TransactionItem) -> Unit)? = null,
-    private val onCategoryClick: ((CategoryItems) -> Unit)? = null
-) : BaseAdapter<BudgetReportListItems, BaseAdapter.BaseViewHolder<BudgetReportListItems>>() {
+    private val onWalletClick: ((Wallet) -> Unit)? = null,
+    private val onTransactionClick: ((Transaction) -> Unit)? = null,
+    private val onCategoryClick: ((Category) -> Unit)? = null
+) : BaseAdapter<HomeListItems, BaseAdapter.BaseViewHolder<HomeListItems>>() {
 
     companion object {
         private const val VIEW_TYPE_WALLET = 0
@@ -43,11 +45,10 @@ class HomeAdapter(
      * @return An integer representing the view type
      */
     override fun getItemViewType(position: Int): Int = when (items[position]) {
-        is HomeWalletItem -> VIEW_TYPE_WALLET
-        is TransactionItem -> VIEW_TYPE_TRANSACTION
-        is CategoryItems -> VIEW_TYPE_CATEGORY
-        else -> {}
-    } as Int
+        is HomeListItems.HomeWalletItem -> VIEW_TYPE_WALLET
+        is HomeListItems.HomeTransactionItem -> VIEW_TYPE_TRANSACTION
+        is HomeListItems.HomeCategoryItem -> VIEW_TYPE_CATEGORY
+    }
 
     /**
      * Creates the appropriate ViewHolder based on the view type.
@@ -56,7 +57,7 @@ class HomeAdapter(
     override fun onCreateViewHolder(
         parent: ViewGroup, 
         viewType: Int
-    ): BaseViewHolder<BudgetReportListItems> {
+    ): BaseViewHolder<HomeListItems> {
         return when (viewType) {
             VIEW_TYPE_WALLET -> createViewHolder(
                 parent = parent,
@@ -80,22 +81,23 @@ class HomeAdapter(
      */
     class WalletViewHolder(
         itemView: View,
-        private val onClick: ((HomeWalletItem) -> Unit)?
-    ) : BaseViewHolder<BudgetReportListItems>(itemView) {
+        private val onClick: ((Wallet) -> Unit)?
+    ) : BaseViewHolder<HomeListItems>(itemView) {
         private val iconView: ImageView = itemView.findViewById(R.id.imgWalletIcon)
         private val nameText: TextView = itemView.findViewById(R.id.txtWalletName)
         private val balanceText: TextView = itemView.findViewById(R.id.txtWalletBalance)
         private val dateText: TextView = itemView.findViewById(R.id.txtRelativeDay)
 
-        override fun bind(item: BudgetReportListItems) {
-            if (item !is HomeWalletItem) return
+        override fun bind(item: HomeListItems) {
+            if (item !is HomeListItems.HomeWalletItem) return
             
-            iconView.setImageResource(R.drawable.ic_account_balance_wallet_24)
-            nameText.text = item.walletName
-            balanceText.text = "R${item.walletBalance}"
+            iconView.setImageResource(R.drawable.ic_wallet_24)
+            nameText.text = item.wallet.walletName
+            val balanceFormatted = String.format("R %.2f", item.wallet.walletBalance)
+            balanceText.text = balanceFormatted
             dateText.text = item.relativeDate
             
-            itemView.setOnClickListener { onClick?.invoke(item) }
+            itemView.setOnClickListener { onClick?.invoke(item.wallet) }
         }
     }
 
@@ -106,8 +108,8 @@ class HomeAdapter(
      */
     class TransactionViewHolder(
         itemView: View,
-        private val onClick: ((TransactionItem) -> Unit)?
-    ) : BaseViewHolder<BudgetReportListItems>(itemView) {
+        private val onClick: ((Transaction) -> Unit)?
+    ) : BaseViewHolder<HomeListItems>(itemView) {
         private val iconView: ImageView = itemView.findViewById(R.id.iconCategory)
         private val iconContainer: LinearLayout = itemView.findViewById(R.id.iconCategoryContainer)
         private val nameText: TextView = itemView.findViewById(R.id.textCategoryName)
@@ -115,19 +117,20 @@ class HomeAdapter(
         private val dateText: TextView = itemView.findViewById(R.id.text_date)
         private val walletText: TextView = itemView.findViewById(R.id.textWalletName)
 
-        override fun bind(item: BudgetReportListItems) {
-            if (item !is TransactionItem) return
+        override fun bind(item: HomeListItems) {
+            if (item !is HomeListItems.HomeTransactionItem) return
             
-            val resolvedColor = ContextCompat.getColor(itemView.context, item.categoryColour)
+            val resolvedColor = ContextCompat.getColor(itemView.context, item.transaction.category?.categoryColor ?: R.color.button)
             (iconContainer.background.mutate() as GradientDrawable).setColor(resolvedColor)
 
-            iconView.setImageResource(item.categoryIcon)
-            nameText.text = item.categoryName
-            amountText.text = "R${item.amount}"
+            iconView.setImageResource(item.transaction.category?.categoryIcon ?: R.drawable.ic_circle_24)
+            nameText.text = item.transaction.category?.categoryName ?: "No Category"
+            val amountFormatted = String.format("R %.2f", item.transaction.amount)
+            amountText.text = amountFormatted
             dateText.text = item.relativeDate
-            walletText.text = item.walletName
+            walletText.text = item.transaction.wallet?.walletName
             
-            itemView.setOnClickListener { onClick?.invoke(item) }
+            itemView.setOnClickListener { onClick?.invoke(item.transaction) }
         }
     }
 
@@ -138,8 +141,8 @@ class HomeAdapter(
      */
     class CategoryViewHolder(
         itemView: View,
-        private val onClick: ((CategoryItems) -> Unit)?
-    ) : BaseViewHolder<BudgetReportListItems>(itemView) {
+        private val onClick: ((Category) -> Unit)?
+    ) : BaseViewHolder<HomeListItems>(itemView) {
         private val iconView: ImageView = itemView.findViewById(R.id.iconCategory)
         private val iconContainer: LinearLayout = itemView.findViewById(R.id.iconCategoryContainer)
         private val nameText: TextView = itemView.findViewById(R.id.txtCategoryName)
@@ -147,19 +150,19 @@ class HomeAdapter(
         private val amountText: TextView = itemView.findViewById(R.id.txtAmount)
         private val dateText: TextView = itemView.findViewById(R.id.txtDate)
 
-        override fun bind(item: BudgetReportListItems) {
-            if (item !is CategoryItems) return
+        override fun bind(item: HomeListItems) {
+            if (item !is HomeListItems.HomeCategoryItem) return
             
-            val resolvedColor = ContextCompat.getColor(itemView.context, item.categoryColour)
+            val resolvedColor = ContextCompat.getColor(itemView.context, item.category.categoryColor)
             (iconContainer.background.mutate() as GradientDrawable).setColor(resolvedColor)
 
-            iconView.setImageResource(item.categoryIcon)
-            nameText.text = item.categoryName
+            iconView.setImageResource(item.category.categoryIcon)
+            nameText.text = item.category.categoryName
             transactionsText.text = "${item.transactionCount} transactions"
             amountText.text = item.amount
             dateText.text = item.relativeDate
             
-            itemView.setOnClickListener { onClick?.invoke(item) }
+            itemView.setOnClickListener { onClick?.invoke(item.category) }
         }
     }
 }

@@ -22,11 +22,13 @@
 package com.synaptix.budgetbuddy.data.repository
 
 import com.synaptix.budgetbuddy.core.model.Budget
-import com.synaptix.budgetbuddy.core.model.Wallet
-import com.synaptix.budgetbuddy.data.entity.BudgetEntity
+import com.synaptix.budgetbuddy.core.model.BudgetIn
 import com.synaptix.budgetbuddy.data.entity.mapper.toDomain
+import com.synaptix.budgetbuddy.data.entity.mapper.toEntity
 import com.synaptix.budgetbuddy.data.local.dao.BudgetDao
-import com.synaptix.budgetbuddy.data.local.dao.WalletDao
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 // ===================================
@@ -34,20 +36,34 @@ import javax.inject.Inject
 // ===================================
 // This repository handles operations related to budgets,
 // including retrieving and inserting budgets using the BudgetDao.
-class BudgetRepository @Inject constructor(private val budgetDao: BudgetDao) {
+class BudgetRepository @Inject constructor(
+    private val budgetDao: BudgetDao
+) {
 
     // ===================================
     // getBudgetsByUserId - Fetch Budgets for User
     // ===================================
-    suspend fun getBudgetsByUserId(userId: Int): List<Budget> {
-        val budgets = budgetDao.getBudgetsByUserId(userId)
-        return budgets.map { it.toDomain() }
+    fun getBudgetsByUserId(userId: Int): List<Budget> {
+        return budgetDao.getBudgetsByUser(userId)
+            .map { it.toDomain() }
+    }
+
+    fun getBudgetById(budgetId: Int): Budget? {
+        val budget = budgetDao.getBudgetById(budgetId)
+        return budget?.toDomain()
     }
 
     // ===================================
     // insertBudget - Insert New Budget
     // ===================================
-    suspend fun insertBudget(budget: BudgetEntity) {
-        budgetDao.insertBudget(budget)
+    suspend fun insertBudget(budget: BudgetIn, categoryIds: List<Int>): Long {
+        return budgetDao.insertBudgetWithCategories(
+            budget = budget.toEntity(),
+            categoryIds = categoryIds
+        )
+    }
+
+    suspend fun deleteBudget(budgetId: Int) {
+        budgetDao.deleteBudgetWithCategories(budgetId)
     }
 }

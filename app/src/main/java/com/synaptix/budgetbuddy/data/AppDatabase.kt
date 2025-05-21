@@ -23,6 +23,7 @@ package com.synaptix.budgetbuddy.data
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
+import com.synaptix.budgetbuddy.data.entity.BudgetCategoryCrossRef
 import com.synaptix.budgetbuddy.data.entity.BudgetEntity
 import com.synaptix.budgetbuddy.data.local.dao.CategoryDao
 import com.synaptix.budgetbuddy.data.local.dao.TransactionDao
@@ -52,11 +53,12 @@ import com.synaptix.budgetbuddy.data.local.dao.MinMaxGoalsDao
         TransactionEntity::class,
         WalletEntity::class,
         CategoryEntity::class,
+        BudgetCategoryCrossRef::class,
         BudgetEntity::class,
         LabelEntity::class,
         TransactionLabelEntity::class,
         MinMaxGoalEntity::class],
-    version = 16
+    version = 18
 )
 
 

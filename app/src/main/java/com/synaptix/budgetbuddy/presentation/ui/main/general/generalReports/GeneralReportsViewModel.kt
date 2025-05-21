@@ -4,8 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.synaptix.budgetbuddy.R
-import com.synaptix.budgetbuddy.core.model.BudgetReportListItems
+import com.synaptix.budgetbuddy.core.model.BudgetListItems
 import com.synaptix.budgetbuddy.core.model.Transaction
 import com.synaptix.budgetbuddy.core.usecase.auth.GetUserIdUseCase
 import com.synaptix.budgetbuddy.core.usecase.main.transaction.GetTransactionUseCase
@@ -20,7 +19,7 @@ class GeneralReportsViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _transactions = MutableLiveData<List<Transaction>>()
-    val reportCategoryItems = MutableLiveData<List<BudgetReportListItems.CategoryItems>>()
+    val reportBudgetCategoryItem = MutableLiveData<List<BudgetListItems.BudgetCategoryItem>>()
 
     val transactions: LiveData<List<Transaction>> = _transactions
 

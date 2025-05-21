@@ -85,7 +85,7 @@
                 android:layout_width="17dp"
                 android:layout_height="17dp"
                 android:contentDescription="Wallet Icon"
-                android:src="@drawable/ic_account_balance_wallet_24"
+                android:src="@drawable/ic_wallet_24"
                 app:tint="?attr/bb_primaryText" />
 
             <TextView

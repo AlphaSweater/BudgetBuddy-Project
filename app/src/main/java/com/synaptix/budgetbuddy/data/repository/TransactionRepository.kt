@@ -30,17 +30,17 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Singleton
+import com.synaptix.budgetbuddy.core.model.Result
 
 @Singleton
 class TransactionRepository @Inject constructor(
     private val transactionDao: TransactionDao,
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
-) : ITransactionRepository {
-
+) {
     // Simple in-memory cache
     private val cache = mutableMapOf<Int, List<Transaction>>()
 
-    override suspend fun insertTransaction(entity: TransactionEntity): Result<Long> = withContext(ioDispatcher) {
+    suspend fun insertTransaction(entity: TransactionEntity): Result<Long> = withContext(ioDispatcher) {
         try {
             val id = transactionDao.insert(entity)
             // Invalidate cache for this user
@@ -51,7 +51,7 @@ class TransactionRepository @Inject constructor(
         }
     }
 
-    override suspend fun updateTransaction(transaction: TransactionEntity): Result<Unit> = withContext(ioDispatcher) {
+    suspend fun updateTransaction(transaction: TransactionEntity): Result<Unit> = withContext(ioDispatcher) {
         try {
             transactionDao.update(transaction)
             // Invalidate cache for this user
@@ -62,7 +62,7 @@ class TransactionRepository @Inject constructor(
         }
     }
 
-    override suspend fun deleteTransaction(transactionId: Int): Result<Unit> = withContext(ioDispatcher) {
+    suspend fun deleteTransaction(transactionId: Int): Result<Unit> = withContext(ioDispatcher) {
         try {
             transactionDao.deleteById(transactionId)
             // Invalidate all cache since we don't know the user ID
@@ -73,7 +73,7 @@ class TransactionRepository @Inject constructor(
         }
     }
 
-    override suspend fun getTransactionById(transactionId: Int): Result<Transaction?> = withContext(ioDispatcher) {
+    suspend fun getTransactionById(transactionId: Int): Result<Transaction?> = withContext(ioDispatcher) {
         try {
             val transaction = transactionDao.getTransactionById(transactionId)
             Result.Success(transaction?.toDomain())
@@ -82,7 +82,7 @@ class TransactionRepository @Inject constructor(
         }
     }
 
-    override suspend fun getTransactionsForUser(userId: Int): Result<List<Transaction>> = withContext(ioDispatcher) {
+    suspend fun getTransactionsForUser(userId: Int): Result<List<Transaction>> = withContext(ioDispatcher) {
         try {
             // Check cache first
             cache[userId]?.let {
@@ -102,11 +102,17 @@ class TransactionRepository @Inject constructor(
         }
     }
 
-    override suspend fun getTransactionsForUserInDateRange(
-        userId: Int,
-        startDate: String,
-        endDate: String
-    ): Result<List<Transaction>> = withContext(ioDispatcher) {
+    suspend fun getTransactionsForUserBudget(userId: Int, budgetId: Int): Result<List<Transaction>> = withContext(ioDispatcher) {
+        try {
+            val transactions = transactionDao.getTransactionsForUserByBudget(userId, budgetId)
+                .map { it.toDomain() }
+            Result.Success(transactions)
+        } catch (e: Exception) {
+            Result.Error(e)
+        }
+    }
+
+    suspend fun getTransactionsForUserInDateRange(userId: Int, startDate: String, endDate: String): Result<List<Transaction>> = withContext(ioDispatcher) {
         try {
             val transactions = transactionDao.getTransactionsForUserInDateRange(userId, startDate, endDate)
                 .map { it.toDomain() }

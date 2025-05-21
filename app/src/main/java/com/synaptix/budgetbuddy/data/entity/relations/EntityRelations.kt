@@ -24,6 +24,7 @@ package com.synaptix.budgetbuddy.data.entity.relations
 import androidx.room.Embedded
 import androidx.room.Junction
 import androidx.room.Relation
+import com.synaptix.budgetbuddy.data.entity.BudgetCategoryCrossRef
 import com.synaptix.budgetbuddy.data.entity.BudgetEntity
 import com.synaptix.budgetbuddy.data.entity.CategoryEntity
 import com.synaptix.budgetbuddy.data.entity.LabelEntity
@@ -72,16 +73,15 @@ data class BudgetWithDetail(
     val user: UserEntity?,
 
     @Relation(
-        parentColumn = "wallet_id",
-        entityColumn = "wallet_id"
+        parentColumn = "budget_id",
+        entityColumn = "category_id",
+        associateBy = Junction(
+            value = BudgetCategoryCrossRef::class,
+            parentColumn = "budget_id",
+            entityColumn = "category_id"
+        )
     )
-    val wallet: WalletEntity?,
-
-    @Relation(
-        parentColumn = "category_id",
-        entityColumn = "category_id"
-    )
-    val category: CategoryEntity?
+    val categories: List<CategoryEntity>
 )
 
 //

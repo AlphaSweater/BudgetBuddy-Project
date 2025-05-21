@@ -10,9 +10,9 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.synaptix.budgetbuddy.R
-import com.synaptix.budgetbuddy.core.model.BudgetReportListItems
+import com.synaptix.budgetbuddy.core.model.BudgetListItems
 
-class WalletReportAdapter(private val items: List<BudgetReportListItems>) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class WalletReportAdapter(private val items: List<BudgetListItems>) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     companion object {
         private const val VIEW_TYPE_HEADER = 0
@@ -21,8 +21,8 @@ class WalletReportAdapter(private val items: List<BudgetReportListItems>) : Recy
 
     override fun getItemViewType(position: Int): Int {
         return when (items[position]) {
-            is BudgetReportListItems.DateHeader -> VIEW_TYPE_HEADER
-            is BudgetReportListItems.TransactionItem -> VIEW_TYPE_TRANSACTION
+            is BudgetListItems.BudgetDateHeader -> VIEW_TYPE_HEADER
+            is BudgetListItems.BudgetTransactionItem -> VIEW_TYPE_TRANSACTION
             else -> throw IllegalArgumentException("Unsupported item type at position $position")
         }
     }
@@ -44,14 +44,14 @@ class WalletReportAdapter(private val items: List<BudgetReportListItems>) : Recy
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (val item = items[position]) {
-            is BudgetReportListItems.DateHeader -> (holder as DateHeaderViewHolder).bind(item)
-            is BudgetReportListItems.TransactionItem -> (holder as TransactionViewHolder).bind(item)
+            is BudgetListItems.BudgetDateHeader -> (holder as DateHeaderViewHolder).bind(item)
+            is BudgetListItems.BudgetTransactionItem -> (holder as TransactionViewHolder).bind(item)
             else -> throw IllegalArgumentException("Unsupported item type at position $position")
         }
     }
 
     class DateHeaderViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        fun bind(item: BudgetReportListItems.DateHeader) {
+        fun bind(item: BudgetListItems.BudgetDateHeader) {
             itemView.findViewById<TextView>(R.id.textDayNumber).text = item.dateNumber
             itemView.findViewById<TextView>(R.id.textRelativeDate).text = item.relativeDate
             itemView.findViewById<TextView>(R.id.textMonthYearDate).text = item.monthYearDate
@@ -60,7 +60,7 @@ class WalletReportAdapter(private val items: List<BudgetReportListItems>) : Recy
     }
 
     class TransactionViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        fun bind(item: BudgetReportListItems.TransactionItem) {
+        fun bind(item: BudgetListItems.BudgetTransactionItem) {
             val iconContainer = itemView.findViewById<LinearLayout>(R.id.iconCategoryContainer)
             val iconView = itemView.findViewById<ImageView>(R.id.iconCategory)
 

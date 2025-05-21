@@ -44,11 +44,14 @@ interface TransactionDao {
     @Query("SELECT * FROM transaction_table WHERE transaction_id = :id")
     suspend fun getTransactionById(id: Int): TransactionWithDetail?
 
-    @Query("SELECT * FROM transaction_table WHERE user_id = :userId")
-    suspend fun getTransactionsForUser(userId: Int): List<TransactionEntity>
+//    @Query("SELECT * FROM transaction_table WHERE user_id = :userId")
+//    suspend fun getTransactionsForUser(userId: Int): List<TransactionEntity>
 
     @Query("SELECT * FROM transaction_table WHERE user_id = :userId")
     suspend fun getTransactionsWithDetail(userId: Int): List<TransactionWithDetail>
+
+    @Query("SELECT * FROM transaction_table WHERE user_id = :userId AND category_id = :categoryId")
+    suspend fun getTransactionsForUserByCategory(userId: Int, categoryId: Int): List<TransactionWithDetail>
 
     @Query("""
         SELECT * FROM transaction_table 
@@ -73,4 +76,13 @@ interface TransactionDao {
         WHERE user_id = :userId AND wallet_id = :walletId
     """)
     suspend fun getTotalAmountByWallet(userId: Int, walletId: Int): Double?
+
+    @Query("""
+        SELECT t.* FROM transaction_table t
+        INNER JOIN category_table c ON t.category_id = c.category_id
+        INNER JOIN budget_category_cross_ref bcr ON c.category_id = bcr.category_id
+        WHERE t.user_id = :userId AND bcr.budget_id = :budgetId
+        ORDER BY t.date DESC
+    """)
+    suspend fun getTransactionsForUserByBudget(userId: Int, budgetId: Int): List<TransactionWithDetail>
 }

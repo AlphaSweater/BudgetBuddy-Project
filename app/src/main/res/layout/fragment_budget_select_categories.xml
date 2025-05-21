@@ -98,7 +98,7 @@
 
         <ImageView
             style="@style/RowIconStyle"
-            android:src="@drawable/ic_attach_money_24"
+            android:src="@drawable/ic_money_24"
             app:tint="@color/cat_dark_green" />
 
         <TextView

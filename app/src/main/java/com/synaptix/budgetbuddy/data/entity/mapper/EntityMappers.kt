@@ -183,26 +183,26 @@ fun BudgetIn.toEntity(): BudgetEntity {
     return BudgetEntity(
         budget_id = this.budgetId,
         user_id = this.userId,
-        wallet_id = this.walletId,
-        category_id = this.categoryId,
         name = this.budgetName,
         amount = this.amount,
         spent = this.spent
     )
 }
 
-fun BudgetEntity.toDomain(user: User?, wallet: Wallet?, category: Category?): Budget {
+fun BudgetEntity.toDomain(user: User?, categories: List<Category>): Budget {
     return Budget(
         budgetId = budget_id,
         user = user,
-        wallet = wallet,
-        category = category,
         budgetName = name,
+        categories = categories,
         amount = amount,
         spent = spent
     )
 }
 
 fun BudgetWithDetail.toDomain(): Budget {
-    return budget.toDomain(user?.toDomain(), wallet?.toDomain(user?.toDomain()), category?.toDomain(user?.toDomain()))
+    return budget.toDomain(
+        user = user?.toDomain(),
+        categories = categories.map { it.toDomain(user?.toDomain()) }
+    )
 }

@@ -246,7 +246,7 @@
                         <ImageView
                             android:id="@+id/imgSelectedWalletIcon"
                             style="@style/RowIconStyle"
-                            android:src="@drawable/ic_account_balance_wallet_24"
+                            android:src="@drawable/ic_wallet_24"
                             app:tint="?attr/bb_button" />
 
                         <LinearLayout

@@ -10,9 +10,9 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.synaptix.budgetbuddy.R
-import com.synaptix.budgetbuddy.core.model.BudgetReportListItems
+import com.synaptix.budgetbuddy.core.model.BudgetListItems
 
-class GeneralReportAdapter(private val items: List<BudgetReportListItems>) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class GeneralReportAdapter(private val items: List<BudgetListItems>) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     companion object {
         private const val VIEW_TYPE_LABEL = 0
@@ -21,8 +21,8 @@ class GeneralReportAdapter(private val items: List<BudgetReportListItems>) : Rec
 
     override fun getItemViewType(position: Int): Int {
         return when (items[position]) {
-            is BudgetReportListItems.LabelItems -> VIEW_TYPE_LABEL
-            is BudgetReportListItems.CategoryItems -> VIEW_TYPE_CATEGORY
+            is BudgetListItems.BudgetLabelItem -> VIEW_TYPE_LABEL
+            is BudgetListItems.BudgetCategoryItem -> VIEW_TYPE_CATEGORY
             else -> throw IllegalArgumentException("Invalid item type at position $position")
         }
     }
@@ -43,8 +43,8 @@ class GeneralReportAdapter(private val items: List<BudgetReportListItems>) : Rec
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (val item = items[position]) {
-            is BudgetReportListItems.LabelItems -> (holder as LabelViewHolder).bind(item)
-            is BudgetReportListItems.CategoryItems -> (holder as CategoryViewHolder).bind(item)
+            is BudgetListItems.BudgetLabelItem -> (holder as LabelViewHolder).bind(item)
+            is BudgetListItems.BudgetCategoryItem -> (holder as CategoryViewHolder).bind(item)
             else -> throw IllegalArgumentException("Unexpected item type at position $position: ${item::class.simpleName}")
         }
     }
@@ -52,7 +52,7 @@ class GeneralReportAdapter(private val items: List<BudgetReportListItems>) : Rec
     override fun getItemCount(): Int = items.size
 
     class LabelViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        fun bind(item: BudgetReportListItems.LabelItems) {
+        fun bind(item: BudgetListItems.BudgetLabelItem) {
             val iconView = itemView.findViewById<ImageView>(R.id.iconCategory)
             val iconContainer = itemView.findViewById<LinearLayout>(R.id.iconCategoryContainer)
 
@@ -69,7 +69,7 @@ class GeneralReportAdapter(private val items: List<BudgetReportListItems>) : Rec
     }
 
     class CategoryViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        fun bind(item: BudgetReportListItems.CategoryItems) {
+        fun bind(item: BudgetListItems.BudgetCategoryItem) {
             val iconView = itemView.findViewById<ImageView>(R.id.iconCategory)
             val iconContainer = itemView.findViewById<LinearLayout>(R.id.iconCategoryContainer)
 

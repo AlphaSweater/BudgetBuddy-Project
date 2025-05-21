@@ -25,29 +25,52 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
+import com.synaptix.budgetbuddy.data.entity.BudgetCategoryCrossRef
 import com.synaptix.budgetbuddy.data.entity.BudgetEntity
 import com.synaptix.budgetbuddy.data.entity.relations.BudgetWithDetail
-
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface BudgetDao {
-
-    // Inserts a new budget into the database. If the budget already exists, it ignores it.
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertBudget(budget: BudgetEntity): Long
 
-    //sql query to grab a budget based on budget ID
-    @Query("SELECT * FROM budget_table WHERE budget_id = :budgetid")
-    suspend fun getBudgetById(budgetid: Int): BudgetEntity?
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertBudgetCategories(crossRefs: List<BudgetCategoryCrossRef>)
 
-    //sql query to grab all budgets for a user
+    @Transaction
+    suspend fun insertBudgetWithCategories(
+        budget: BudgetEntity,
+        categoryIds: List<Int>
+    ): Long {
+        val budgetId = insertBudget(budget)
+        val crossRefs = categoryIds.map { categoryId ->
+            BudgetCategoryCrossRef(
+                budget_id = budgetId.toInt(),
+                category_id = categoryId
+            )
+        }
+        insertBudgetCategories(crossRefs)
+        return budgetId
+    }
+
     @Query("SELECT * FROM budget_table WHERE user_id = :userId")
-    suspend fun getBudgetsByUserId(userId: Int): List<BudgetWithDetail>
+    fun getBudgetsByUser(userId: Int): List<BudgetWithDetail>
 
-    //sql query to grab all budgets for a wallet
-    @Query("SELECT * FROM budget_table WHERE wallet_id = :walletId")
-    suspend fun getBudgetsByWalletId(walletId: Int): List<BudgetEntity>
+    @Transaction
+    @Query("SELECT * FROM budget_table WHERE budget_id = :budgetId")
+    fun getBudgetById(budgetId: Int): BudgetWithDetail?
 
-    @Query("UPDATE budget_table SET amount = :amount WHERE wallet_id = :budgetId")
-    suspend fun updateAmount(budgetId: Long, amount: Double)
+    @Query("DELETE FROM budget_table WHERE budget_id = :budgetId")
+    suspend fun deleteBudget(budgetId: Int)
+
+    @Query("DELETE FROM budget_category_cross_ref WHERE budget_id = :budgetId")
+    suspend fun deleteBudgetCategories(budgetId: Int)
+
+    @Transaction
+    suspend fun deleteBudgetWithCategories(budgetId: Int) {
+        deleteBudgetCategories(budgetId)
+        deleteBudget(budgetId)
+    }
 }

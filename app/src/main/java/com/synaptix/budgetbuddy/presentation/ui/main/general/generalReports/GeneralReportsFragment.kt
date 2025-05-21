@@ -8,9 +8,7 @@ import android.widget.LinearLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.synaptix.budgetbuddy.R
-import com.synaptix.budgetbuddy.core.model.BudgetReportListItems
 import com.synaptix.budgetbuddy.databinding.FragmentGeneralReportsBinding
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -35,7 +33,7 @@ class GeneralReportsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setupRecyclers()
         setupOnClickListeners()
-        viewModel.reportCategoryItems.observe(viewLifecycleOwner) { items ->
+        viewModel.reportBudgetCategoryItem.observe(viewLifecycleOwner) { items ->
             binding.recyclerViewExpenseCategory.adapter = GeneralReportAdapter(items)
         }
     }

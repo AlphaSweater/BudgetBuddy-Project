@@ -45,9 +45,8 @@ data class BudgetIn (
 data class Budget (
     val budgetId: Int = 0,
     val user: User?,
+    val categories: List<Category>?,
     val budgetName: String,
-    val wallet: Wallet?,
-    val category: Category?,
     val amount: Double,
-    val spent: Double
+    val spent: Double,
 )

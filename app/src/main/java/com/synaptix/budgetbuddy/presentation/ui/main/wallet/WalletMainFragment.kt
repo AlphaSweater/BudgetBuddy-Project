@@ -11,7 +11,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.synaptix.budgetbuddy.databinding.FragmentWalletMainBinding
 import com.synaptix.budgetbuddy.R
-import com.synaptix.budgetbuddy.core.model.BudgetReportListItems
+import com.synaptix.budgetbuddy.core.model.BudgetListItems
 import com.synaptix.budgetbuddy.core.model.Wallet
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -90,21 +90,21 @@ class WalletMainFragment : Fragment() {
     }
 
     private fun updateWalletsList(wallets: List<Wallet>) {
-        val walletItems = wallets.map { wallet ->
-            BudgetReportListItems.WalletItem(
+        val budgetWalletItems = wallets.map { wallet ->
+            BudgetListItems.BudgetWalletItem(
                 walletName = wallet.walletName,
                 walletBalance = wallet.walletBalance,
                 walletIcon = R.drawable.baseline_shopping_bag_24
             )
         }
 
-        binding.txtEmptyWallets.isVisible = walletItems.isEmpty()
-        binding.recyclerViewWalletMain.isVisible = walletItems.isNotEmpty()
+        binding.txtEmptyWallets.isVisible = budgetWalletItems.isEmpty()
+        binding.recyclerViewWalletMain.isVisible = budgetWalletItems.isNotEmpty()
         
-        walletAdapter.submitList(walletItems, enableDiffUtil = true)
+        walletAdapter.submitList(budgetWalletItems)
     }
 
-    private fun onWalletClicked(wallet: BudgetReportListItems.WalletItem) {
+    private fun onWalletClicked(wallet: BudgetListItems.BudgetWalletItem) {
         // TODO: Navigate to wallet details
         // findNavController().navigate(R.id.action_walletMainFragment_to_walletDetailsFragment)
     }

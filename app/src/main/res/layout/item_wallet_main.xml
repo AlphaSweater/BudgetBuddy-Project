@@ -59,7 +59,7 @@
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:layout_gravity="center"
-                android:src="@drawable/ic_account_balance_wallet_24"
+                android:src="@drawable/ic_wallet_24"
                 app:tint="?attr/bb_button" />
 
         </com.google.android.material.card.MaterialCardView>
