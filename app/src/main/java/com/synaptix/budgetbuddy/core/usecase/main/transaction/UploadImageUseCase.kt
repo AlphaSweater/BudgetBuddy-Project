@@ -1,16 +1,18 @@
 package com.synaptix.budgetbuddy.core.usecase.main.transaction
 
 import android.util.Base64
+import android.util.Log
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.FormBody
 import org.json.JSONObject
+import javax.inject.Inject
 
 //imgur client id
 private const val IMGUR_CLIENT_ID = "c3363df746ecd23"
 
 
-class UploadImageUseCase {
+class UploadImageUseCase @Inject constructor() {
     sealed class UploadImageResult {
         data class Success(val imageUrl: String) : UploadImageResult()
         data class Error(val message: String) : UploadImageResult()
@@ -19,19 +21,20 @@ class UploadImageUseCase {
     private val client = OkHttpClient()
 
 
-    suspend fun execute(imageBytes: ByteArray): UploadImageResult {
+    fun execute(imageBytes: ByteArray): UploadImageResult {
         return try{
             val base64Image = Base64.encodeToString(imageBytes, Base64.NO_WRAP)
 
             //builds request body for imgur
             val requestBody = FormBody.Builder()
                 .add("image", base64Image)
+                .add("type", "base64")
                 .build()
 
             //builds Http request for imgur
             val request = Request.Builder()
                 .url("https://api.imgur.com/3/image")
-                .addHeader("Authorization", "Client-ID $IMGUR_CLIENT_ID")
+                .addHeader("Authorization", "Client-ID ${IMGUR_CLIENT_ID.trim()}")
                 .post(requestBody)
                 .build()
 
@@ -39,9 +42,13 @@ class UploadImageUseCase {
             val response = client.newCall(request).execute()
             val body = response.body?.string()
 
+            Log.d("UploadImageUseCase", "HTTP Code: ${response.code}")
+            Log.d("UploadImageUseCase", "HTTP Message: ${response.message}")
+            Log.d("UploadImageUseCase", "HTTP Response Body: $body")
+
             // check if the response is successful and body is not null
             if (!response.isSuccessful || body == null) {
-                return UploadImageResult.Error("Failed to upload image: ${response.message}")
+                return UploadImageResult.Error("HTTP ${response.code} - ${response.message}. Body null? ${body == null}")
             }
 
             // Parse the response converting string to a JSON object
@@ -59,7 +66,8 @@ class UploadImageUseCase {
             }
 
         } catch (e: Exception) {
-            UploadImageResult.Error("Exception: ${e.message}")
+            Log.e("UploadImage", "Exception during image upload", e) // FULL exception details
+            UploadImageResult.Error("Exception: ${e.localizedMessage ?: e.toString()}")
         }
     }
 }

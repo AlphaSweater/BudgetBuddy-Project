@@ -21,12 +21,15 @@ import com.synaptix.budgetbuddy.core.model.Transaction
 import com.synaptix.budgetbuddy.core.model.User
 import com.synaptix.budgetbuddy.core.usecase.main.transaction.AddTransactionUseCase
 import com.synaptix.budgetbuddy.core.usecase.main.transaction.AddTransactionUseCase.AddTransactionResult
+import com.synaptix.budgetbuddy.core.usecase.main.transaction.UploadImageUseCase
 import com.synaptix.budgetbuddy.presentation.ui.main.transaction.TransactionAddViewModel.UiState.*
+import kotlinx.coroutines.withContext
 
 @HiltViewModel
 class TransactionAddViewModel @Inject constructor(
     private val getUserIdUseCase: GetUserIdUseCase,
     private val addTransactionUseCase: AddTransactionUseCase,
+    private val uploadImageUseCase: UploadImageUseCase,
 ) : ViewModel() {
 
     sealed class UiState {
@@ -169,7 +172,7 @@ class TransactionAddViewModel @Inject constructor(
                     currency = _currency.value ?: "ZAR",
                     date = parseDate((_date.value ?: System.currentTimeMillis()).toString()),
                     note = _note.value ?: "",
-                    photoUrl = null, // TODO: Upload image to Firebase Storage
+                    photoUrl = uploadImageAndGetUrl(),
                     recurrenceRate = _recurrenceRate.value
                 )
 
@@ -214,4 +217,21 @@ class TransactionAddViewModel @Inject constructor(
             System.currentTimeMillis()
         }
     }
+
+    private suspend fun uploadImageAndGetUrl(): String? = withContext(kotlinx.coroutines.Dispatchers.IO) {
+        val bytes = imageBytes.value
+        if (bytes == null) {
+            Log.e("UploadImage", "No image bytes provided")
+            return@withContext null
+        }
+
+        return@withContext when (val result = uploadImageUseCase.execute(bytes)) {
+            is UploadImageUseCase.UploadImageResult.Success -> result.imageUrl
+            is UploadImageUseCase.UploadImageResult.Error -> {
+                Log.e("UploadImage", "Failed: ${result.message}")
+                null
+            }
+        }
+    }
+
 }
