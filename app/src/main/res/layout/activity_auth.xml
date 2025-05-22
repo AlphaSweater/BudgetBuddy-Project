@@ -42,7 +42,7 @@
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/margin_xlarge"
         android:layout_marginBottom="@dimen/margin_medium"
-        android:text="@string/version"
+        android:text="@string/version_format"
         android:textAlignment="center"
         android:textSize="20sp"
         android:textColor="?attr/bb_secondaryText"

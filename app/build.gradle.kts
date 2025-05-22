@@ -23,7 +23,7 @@ android {
         versionCode = 1
         versionName = gitVersion
 
-        buildConfigField("String", "GIT_VERSION", "\"Version $gitVersion\"")
+        buildConfigField("String", "GIT_VERSION", "\"$gitVersion\"")
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }

@@ -40,8 +40,6 @@ class AuthActivity : AppCompatActivity() {
     // ViewBinding instance for activity_auth.xml
     private lateinit var binding: ActivityAuthBinding
 
-    private val versionNumber = BuildConfig.GIT_VERSION
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -49,7 +47,10 @@ class AuthActivity : AppCompatActivity() {
         binding = ActivityAuthBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        binding.lblVersion.text = versionNumber
+        val version = BuildConfig.GIT_VERSION
+        val versionText = getString(R.string.version_format, version)
+        binding.lblVersion.text = versionText
+
 
         // Load the LandingFragment when activity starts (only if not restoring state)
         if (savedInstanceState == null) {
