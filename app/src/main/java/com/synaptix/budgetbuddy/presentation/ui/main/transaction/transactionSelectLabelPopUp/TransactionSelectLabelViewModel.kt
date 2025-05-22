@@ -19,7 +19,8 @@ class TransactionSelectLabelViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _labels = MutableStateFlow<List<Label>>(emptyList())
-    val labels: StateFlow<List<Label>> get() = _labels
+    val labels: StateFlow<List<Label>> get()
+        = _labels
 
     // Fetch labels for a specific user
     fun loadLabelsForUser() {

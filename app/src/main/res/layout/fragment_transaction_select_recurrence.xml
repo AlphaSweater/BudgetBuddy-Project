@@ -86,44 +86,562 @@
             android:orientation="vertical"
             android:padding="16dp">
 
-            <!-- Recurrence Options -->
-            <com.google.android.material.button.MaterialButtonToggleGroup
-                android:id="@+id/toggleRecurrenceGroup"
+            <!-- Recurrence Type Selection -->
+            <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                app:singleSelection="true"
-                app:selectionRequired="true">
+                android:layout_marginBottom="16dp"
+                app:cardBackgroundColor="?attr/bb_surface"
+                app:cardCornerRadius="24dp"
+                app:cardElevation="0dp">
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnDaily"
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Daily" />
+                    android:orientation="vertical"
+                    android:padding="16dp">
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnWeekly"
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
-                    android:layout_height="wrap_content"
-                    android:text="Weekly" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Recurrence Type"
+                        android:textColor="?attr/bb_primaryText"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:layout_marginBottom="8dp"/>
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnMonthly"
-                    android:layout_width="0dp"
-                    android:layout_weight="1.1"
-                    android:layout_height="wrap_content"
-                    android:text="Monthly" />
+                    <GridLayout
+                        android:id="@+id/toggleRecurrenceGroup"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:columnCount="3"
+                        android:rowCount="2"
+                        android:useDefaultMargins="true">
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnYearly"
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnOnceOff"
+                            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_columnWeight="1"
+                            android:layout_marginEnd="4dp"
+                            android:layout_marginBottom="4dp"
+                            android:text="Once Off"
+                            android:textColor="?attr/bb_primaryText"
+                            android:backgroundTint="?attr/bb_buttonSelected"
+                            android:checkable="true"
+                            android:checked="true" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnDaily"
+                            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_columnWeight="1"
+                            android:layout_marginEnd="4dp"
+                            android:layout_marginBottom="4dp"
+                            android:text="Daily"
+                            android:textColor="?attr/bb_primaryText"
+                            android:backgroundTint="?attr/bb_surface"
+                            android:checkable="true"/>
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnWeekly"
+                            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_columnWeight="1"
+                            android:layout_marginEnd="4dp"
+                            android:layout_marginBottom="4dp"
+                            android:text="Weekly"
+                            android:textColor="?attr/bb_primaryText"
+                            android:backgroundTint="?attr/bb_surface"
+                            android:checkable="true"/>
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnMonthly"
+                            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_columnWeight="1"
+                            android:layout_marginEnd="4dp"
+                            android:text="Monthly"
+                            android:textColor="?attr/bb_primaryText"
+                            android:backgroundTint="?attr/bb_surface"
+                            android:checkable="true"/>
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnYearly"
+                            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_columnWeight="1"
+                            android:text="Yearly"
+                            android:textColor="?attr/bb_primaryText"
+                            android:backgroundTint="?attr/bb_surface"
+                            android:checkable="true"/>
+                    </GridLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Recurrence Details -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/recurrenceDetailsCard"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardBackgroundColor="?attr/bb_surface"
+                app:cardCornerRadius="24dp"
+                app:cardElevation="0dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Yearly" />
-            </com.google.android.material.button.MaterialButtonToggleGroup>
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Recurrence Details"
+                        android:textColor="?attr/bb_primaryText"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:layout_marginBottom="8dp"/>
+
+                    <!-- Daily Options -->
+                    <LinearLayout
+                        android:id="@+id/dailyOptions"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:visibility="gone">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Repeat every"
+                            android:textColor="?attr/bb_primaryText"
+                            android:textSize="16sp"
+                            android:layout_marginBottom="8dp"/>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:layout_marginBottom="8dp">
+
+                            <TextView
+                                android:id="@+id/dailyIntervalValue"
+                                android:layout_width="48dp"
+                                android:layout_height="wrap_content"
+                                android:text="1"
+                                android:textColor="?attr/bb_primaryText"
+                                android:textSize="24sp"
+                                android:textStyle="bold"
+                                android:gravity="center"/>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="days"
+                                android:textColor="?attr/bb_primaryText"
+                                android:textSize="16sp"
+                                android:layout_marginStart="8dp"/>
+                        </LinearLayout>
+
+                        <com.google.android.material.slider.Slider
+                            android:id="@+id/dailyIntervalSlider"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:valueFrom="1"
+                            android:valueTo="31"
+                            android:stepSize="1"
+                            android:value="1"
+                            app:trackColorActive="?attr/bb_buttonSelected"
+                            app:trackColorInactive="?attr/bb_surfaceAlt"
+                            app:thumbColor="?attr/bb_button"/>
+                    </LinearLayout>
+
+                    <!-- Weekly Options -->
+                    <LinearLayout
+                        android:id="@+id/weeklyOptions"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:visibility="visible">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Repeat every"
+                            android:textColor="?attr/bb_primaryText"
+                            android:textSize="16sp"
+                            android:layout_marginBottom="8dp"/>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:layout_marginBottom="8dp">
+
+                            <TextView
+                                android:id="@+id/weeklyIntervalValue"
+                                android:layout_width="48dp"
+                                android:layout_height="wrap_content"
+                                android:text="1"
+                                android:textColor="?attr/bb_primaryText"
+                                android:textSize="24sp"
+                                android:textStyle="bold"
+                                android:gravity="center"/>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="weeks"
+                                android:textColor="?attr/bb_primaryText"
+                                android:textSize="16sp"
+                                android:layout_marginStart="8dp"/>
+                        </LinearLayout>
+
+                        <com.google.android.material.slider.Slider
+                            android:id="@+id/weeklyIntervalSlider"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:valueFrom="1"
+                            android:valueTo="52"
+                            android:stepSize="1"
+                            android:value="1"
+                            app:trackColorActive="?attr/bb_buttonSelected"
+                            app:trackColorInactive="?attr/bb_surfaceAlt"
+                            app:thumbColor="?attr/bb_button"/>
+
+                        <com.google.android.material.chip.ChipGroup
+                            android:id="@+id/weekDaysChipGroup"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            app:singleSelection="false"
+                            app:selectionRequired="false">
+
+                            <com.google.android.material.chip.Chip
+                                android:id="@+id/chipMon"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Mon"
+                                android:textColor="?attr/bb_primaryText"
+                                android:checkable="true"
+                                app:chipBackgroundColor="?attr/bb_surfaceAlt"
+                                app:chipStrokeWidth="0dp"
+                                app:rippleColor="@android:color/transparent" />
+
+                            <com.google.android.material.chip.Chip
+                                android:id="@+id/chipTue"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Tue"
+                                android:textColor="?attr/bb_primaryText"
+                                android:checkable="true"
+                                app:chipBackgroundColor="?attr/bb_surfaceAlt"
+                                app:chipStrokeWidth="0dp"
+                                app:rippleColor="@android:color/transparent"/>
+
+                            <com.google.android.material.chip.Chip
+                                android:id="@+id/chipWed"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Wed"
+                                android:textColor="?attr/bb_primaryText"
+                                android:checkable="true"
+                                app:chipBackgroundColor="?attr/bb_surfaceAlt"
+                                app:chipStrokeWidth="0dp"
+                                app:rippleColor="@android:color/transparent"/>
+
+                            <com.google.android.material.chip.Chip
+                                android:id="@+id/chipThu"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Thu"
+                                android:textColor="?attr/bb_primaryText"
+                                android:checkable="true"
+                                app:chipBackgroundColor="?attr/bb_surfaceAlt"
+                                app:chipStrokeWidth="0dp"
+                                app:rippleColor="@android:color/transparent"/>
+
+                            <com.google.android.material.chip.Chip
+                                android:id="@+id/chipFri"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Fri"
+                                android:textColor="?attr/bb_primaryText"
+                                android:checkable="true"
+                                app:chipBackgroundColor="?attr/bb_surfaceAlt"
+                                app:chipStrokeWidth="0dp"
+                                app:rippleColor="@android:color/transparent"/>
+
+                            <com.google.android.material.chip.Chip
+                                android:id="@+id/chipSat"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Sat"
+                                android:textColor="?attr/bb_primaryText"
+                                android:checkable="true"
+                                app:chipBackgroundColor="?attr/bb_surfaceAlt"
+                                app:chipStrokeWidth="0dp"
+                                app:rippleColor="@android:color/transparent"/>
+
+                            <com.google.android.material.chip.Chip
+                                android:id="@+id/chipSun"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Sun"
+                                android:textColor="?attr/bb_primaryText"
+                                android:checkable="true"
+                                app:chipBackgroundColor="?attr/bb_surfaceAlt"
+                                app:chipStrokeWidth="0dp"
+                                app:rippleColor="@android:color/transparent"/>
+                        </com.google.android.material.chip.ChipGroup>
+                    </LinearLayout>
+
+                    <!-- Monthly Options -->
+                    <LinearLayout
+                        android:id="@+id/monthlyOptions"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:visibility="gone">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Repeat every"
+                            android:textColor="?attr/bb_primaryText"
+                            android:textSize="16sp"
+                            android:layout_marginBottom="8dp"/>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:layout_marginBottom="8dp">
+
+                            <TextView
+                                android:id="@+id/monthlyIntervalValue"
+                                android:layout_width="48dp"
+                                android:layout_height="wrap_content"
+                                android:text="1"
+                                android:textColor="?attr/bb_primaryText"
+                                android:textSize="24sp"
+                                android:textStyle="bold"
+                                android:gravity="center"/>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="months"
+                                android:textColor="?attr/bb_primaryText"
+                                android:textSize="16sp"
+                                android:layout_marginStart="8dp"/>
+                        </LinearLayout>
+
+                        <com.google.android.material.slider.Slider
+                            android:id="@+id/monthlyIntervalSlider"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:valueFrom="1"
+                            android:valueTo="12"
+                            android:stepSize="1"
+                            android:value="1"
+                            app:trackColorActive="?attr/bb_buttonSelected"
+                            app:trackColorInactive="?attr/bb_surfaceAlt"
+                            app:thumbColor="?attr/bb_button"/>
+
+                        <RadioGroup
+                            android:id="@+id/monthlyTypeGroup"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp">
+
+                            <RadioButton
+                                android:id="@+id/radioDayOfMonth"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="On day of month"/>
+
+                            <RadioButton
+                                android:id="@+id/radioDayOfWeek"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="On day of week"/>
+                        </RadioGroup>
+                    </LinearLayout>
+
+                    <!-- Yearly Options -->
+                    <LinearLayout
+                        android:id="@+id/yearlyOptions"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:visibility="gone">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Repeat every"
+                            android:textColor="?attr/bb_primaryText"
+                            android:textSize="16sp"
+                            android:layout_marginBottom="8dp"/>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:layout_marginBottom="8dp">
+
+                            <TextView
+                                android:id="@+id/yearlyIntervalValue"
+                                android:layout_width="48dp"
+                                android:layout_height="wrap_content"
+                                android:text="1"
+                                android:textColor="?attr/bb_primaryText"
+                                android:textSize="24sp"
+                                android:textStyle="bold"
+                                android:gravity="center"/>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="years"
+                                android:textColor="?attr/bb_primaryText"
+                                android:textSize="16sp"
+                                android:layout_marginStart="8dp"/>
+                        </LinearLayout>
+
+                        <com.google.android.material.slider.Slider
+                            android:id="@+id/yearlyIntervalSlider"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:valueFrom="1"
+                            android:valueTo="10"
+                            android:stepSize="1"
+                            android:value="1"
+                            app:trackColorActive="?attr/bb_buttonSelected"
+                            app:trackColorInactive="?attr/bb_surfaceAlt"
+                            app:thumbColor="?attr/bb_button"/>
+                    </LinearLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- End Date Selection -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/endDateCard"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                app:cardBackgroundColor="?attr/bb_surface"
+                app:cardCornerRadius="24dp"
+                app:cardElevation="0dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="End Date"
+                        android:textColor="?attr/bb_primaryText"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:layout_marginBottom="8dp"/>
+
+                    <RadioGroup
+                        android:id="@+id/endDateGroup"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <RadioButton
+                            android:id="@+id/radioNoEnd"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="No end date"
+                            android:checked="true"/>
+
+                        <RadioButton
+                            android:id="@+id/radioEndAfter"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="End after X occurrences"/>
+
+                        <RadioButton
+                            android:id="@+id/radioEndOn"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="End on date"/>
+                    </RadioGroup>
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/occurrencesLayout"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:visibility="gone"
+                        android:hint="Number of occurrences">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/occurrencesInput"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="number"/>
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/endDateLayout"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:visibility="gone"
+                        android:hint="End date">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/endDateInput"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:focusable="false"
+                            android:clickable="true"/>
+                    </com.google.android.material.textfield.TextInputLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
+
+    <!-- Bottom Save Button -->
+    <FrameLayout
+        android:id="@+id/bottomButtonContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:background="?attr/bb_background"
+        android:elevation="8dp"
+        android:padding="16dp">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnSave"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingVertical="16dp"
+            android:text="@string/save"
+            android:textColor="@android:color/white"
+            android:textSize="16sp"
+            app:backgroundTint="?attr/bb_button"
+            app:cornerRadius="16dp" />
+    </FrameLayout>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
