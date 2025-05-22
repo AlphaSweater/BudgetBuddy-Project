@@ -23,7 +23,7 @@ android {
         versionCode = 1
         versionName = gitVersion
 
-        buildConfigField("String", "GIT_VERSION", "\"$gitVersion\"")
+        buildConfigField("String", "GIT_VERSION", "\"Version $gitVersion\"")
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -46,6 +46,7 @@ android {
     }
     buildFeatures {
         viewBinding = true
+        buildConfig = true
     }
 }
 

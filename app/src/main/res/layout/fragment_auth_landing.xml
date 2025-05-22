@@ -66,7 +66,7 @@
     <Button
         android:id="@+id/btnSignup"
         android:layout_width="0dp"
-        android:layout_height="56dp"
+        android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/margin_xlarge"
         android:layout_marginTop="60dp"
         android:layout_marginBottom="32dp"
@@ -98,19 +98,5 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/btnSignup" />
-
-    <!-- Version Label -->
-    <TextView
-        android:id="@+id/lblVersionOpenPage"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="@dimen/margin_xlarge"
-        android:layout_marginBottom="@dimen/margin_medium"
-        android:text="@string/version"
-        android:textAlignment="center"
-        android:textSize="@dimen/body_text_size"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

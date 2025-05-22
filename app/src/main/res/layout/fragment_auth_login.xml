@@ -128,31 +128,16 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/margin_xlarge"
+        android:layout_marginTop="32dp"
+        android:backgroundTint="?attr/bb_button"
         android:minHeight="@dimen/button_height"
         android:text="@string/login"
         android:textColor="@android:color/white"
         android:textSize="@dimen/button_text_size"
-        android:backgroundTint="?attr/bb_button"
         app:cornerRadius="@dimen/button_corner_radius"
-        app:layout_constraintBottom_toTopOf="@+id/lblVersionLogin"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tilPassword"
-        app:layout_constraintVertical_bias="0.3" />
-
-    <!-- Version Label -->
-    <TextView
-        android:id="@+id/lblVersionLogin"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="@dimen/margin_xlarge"
-        android:layout_marginBottom="@dimen/margin_medium"
-        android:text="@string/version"
-        android:textAlignment="center"
-        android:textSize="@dimen/body_text_size"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/tilPassword" />
 
     <!-- Loading Overlay -->
     <FrameLayout

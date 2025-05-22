@@ -55,7 +55,7 @@ jobs:
           BRANCH_COMMITS=$(git rev-list --count $BASE_BRANCH..HEAD || echo 0)
           
           # 🏷️ Compose full version string vMAJOR.MINOR.PATCH.BUILD
-          VERSION="v$MAJOR_VERSION.$MINOR_VERSION.$PATCH_VERSION.$BRANCH_COMMITS"
+          VERSION="$MAJOR_VERSION.$MINOR_VERSION.$PATCH_VERSION.$BRANCH_COMMITS"
 
           # 📝 Write version string to version.txt file
           echo "$VERSION" > app/src/main/assets/version.txt

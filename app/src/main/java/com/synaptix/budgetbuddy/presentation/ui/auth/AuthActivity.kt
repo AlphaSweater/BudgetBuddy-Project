@@ -24,6 +24,7 @@ package com.synaptix.budgetbuddy.presentation.ui.auth
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import com.synaptix.budgetbuddy.BuildConfig
 import com.synaptix.budgetbuddy.R
 import com.synaptix.budgetbuddy.databinding.ActivityAuthBinding
 import com.synaptix.budgetbuddy.presentation.ui.auth.landing.LandingFragment
@@ -39,12 +40,16 @@ class AuthActivity : AppCompatActivity() {
     // ViewBinding instance for activity_auth.xml
     private lateinit var binding: ActivityAuthBinding
 
+    private val versionNumber = BuildConfig.GIT_VERSION
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         // Inflate layout using ViewBinding
         binding = ActivityAuthBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        binding.lblVersion.text = versionNumber
 
         // Load the LandingFragment when activity starts (only if not restoring state)
         if (savedInstanceState == null) {
