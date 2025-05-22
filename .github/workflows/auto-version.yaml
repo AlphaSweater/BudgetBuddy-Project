@@ -1,9 +1,7 @@
 name: Auto Versioning
 
 on:
-  push:
-    branches:
-      - 'feature/*'   # Run on any feature branch
+  push:        # 🔁 Triggers on any branch
   workflow_dispatch:
 
 permissions:
@@ -24,18 +22,18 @@ jobs:
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
 
-      - name: Generate version from commit count
+      - name: Generate fun version number
         id: generate_version
         run: |
           MAJOR=1
           MINOR=0
 
-          # Total commits in the repo = build number
-          BUILD=$(git rev-list --count HEAD)
+          # Total commits in entire repo = BUILD
+          PATCH=$(git rev-list --count HEAD)
 
-          # Commits since branch point with development = patch number
+          # Commits made on this branch only = PATCH
           BASE_BRANCH="origin/development"
-          PATCH=$(git rev-list --count $BASE_BRANCH..HEAD)
+          BUILD=$(git rev-list --count $BASE_BRANCH..HEAD || echo 0)
 
           VERSION="v$MAJOR.$MINOR.$PATCH.$BUILD"
           echo "$VERSION" > version.txt
