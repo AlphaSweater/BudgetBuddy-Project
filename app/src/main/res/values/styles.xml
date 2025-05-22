@@ -25,10 +25,10 @@
         <!-- Customize the DatePickerDialog -->
         <style name="CustomDatePickerDialog" parent="Theme.AppCompat.Light.Dialog">
             <!-- Customize the title color (top text) -->
-            <item name="android:textColorPrimary">@android:color/black</item>
+            <item name="android:textColorPrimary">?attr/bb_primaryText</item>
             <!-- Customize other elements, e.g., button color -->
-            <item name="android:buttonBarNegativeButtonStyle">@android:color/black</item>
-            <item name="android:buttonBarPositiveButtonStyle">@android:color/black</item>
+            <item name="android:buttonBarNegativeButtonStyle">?attr/bb_primaryText</item>
+            <item name="android:buttonBarPositiveButtonStyle">?attr/bb_primaryText</item>
         </style>
 
         <!-- Row Style: Consistent look for all rows -->
@@ -63,8 +63,8 @@
         <!-- Row Icon Style -->
         <style name="RowIconStyle">
             <!-- Size of the icon -->
-            <item name="android:layout_width">24dp</item>
-            <item name="android:layout_height">24dp</item>
+            <item name="android:layout_width">36dp</item>
+            <item name="android:layout_height">36dp</item>
 
             <!-- Margin to text -->
             <item name="android:layout_marginEnd">16dp</item>
@@ -73,7 +73,7 @@
             <item name="android:tint">?attr/colorControlNormal</item>
 
             <!-- Scale inside ImageView -->
-            <item name="android:scaleType">centerInside</item>
+            <item name="android:scaleType">fitCenter</item>
         </style>
 
         <!-- Card  Style -->
@@ -117,5 +117,30 @@
         <item name="android:windowBackground">@android:color/black</item>
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowFullscreen">true</item>
+    </style>
+
+    <style name="ToolButtonIcon">
+        <item name="android:layout_width">48dp</item>
+        <item name="android:layout_height">48dp</item>
+        <item name="android:scaleType">fitCenter</item>
+        <item name="android:padding">7dp</item>
+    </style>
+
+    <style name="IconButton">
+        <item name="android:layout_width">36dp</item>
+        <item name="android:layout_height">36dp</item>
+        <item name="android:scaleType">fitCenter</item>
+    </style>
+
+    <style name="IconButtonSmall">
+        <item name="android:layout_width">24dp</item>
+        <item name="android:layout_height">24dp</item>
+        <item name="android:scaleType">fitCenter</item>
+    </style>
+
+    <style name="IconButtonLarge">
+        <item name="android:layout_width">48dp</item>
+        <item name="android:layout_height">48dp</item>
+        <item name="android:scaleType">fitCenter</item>
     </style>
 </resources>

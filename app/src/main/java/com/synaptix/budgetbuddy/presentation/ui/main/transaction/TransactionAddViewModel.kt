@@ -22,11 +22,13 @@ import com.synaptix.budgetbuddy.core.model.Transaction
 import com.synaptix.budgetbuddy.core.model.User
 import com.synaptix.budgetbuddy.core.usecase.main.transaction.AddTransactionUseCase
 import com.synaptix.budgetbuddy.core.usecase.main.transaction.AddTransactionUseCase.AddTransactionResult
+import com.synaptix.budgetbuddy.core.usecase.main.transaction.UploadImageUseCase
 
 @HiltViewModel
 class TransactionAddViewModel @Inject constructor(
     private val getUserIdUseCase: GetUserIdUseCase,
     private val addTransactionUseCase: AddTransactionUseCase,
+    private val uploadImageUseCase: UploadImageUseCase
 ) : ViewModel() {
 
     sealed class UiState {
@@ -91,6 +93,8 @@ class TransactionAddViewModel @Inject constructor(
 
     var selectedLabels = MutableLiveData<List<Label>>(emptyList())
 
+    var saveState = MutableLiveData<Boolean>(false)
+
     fun setCategory(category: Category?) {
         _category.value = category
         validateForm()
@@ -135,6 +139,7 @@ class TransactionAddViewModel @Inject constructor(
         val isWalletValid = _wallet.value != null
         val isDateValid = !_date.value.isNullOrBlank()
 
+        saveState.value = true
         val currentState = _validationState.value ?: ValidationState()
         _validationState.value = currentState.copy(
             isAmountValid = isAmountValid,
@@ -208,6 +213,7 @@ class TransactionAddViewModel @Inject constructor(
         _recurrenceData.value = RecurrenceData.DEFAULT
         _validationState.value = ValidationState(shouldShowErrors = false)
         _uiState.value = UiState.Initial
+        saveState.value = false
     }
 
     private fun getCurrentDate(): String {

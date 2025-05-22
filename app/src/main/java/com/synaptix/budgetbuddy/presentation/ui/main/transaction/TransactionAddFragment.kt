@@ -25,6 +25,7 @@ import java.util.Locale
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.provider.MediaStore
+import android.text.Editable
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.core.widget.doAfterTextChanged
@@ -55,7 +56,6 @@ class TransactionAddFragment : Fragment() {
     ): View {
         _binding = FragmentTransactionAddBinding.inflate(inflater, container, false)
         return binding.root
-        setupInitialState()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -67,6 +67,7 @@ class TransactionAddFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
+        restoreState()
     }
 
     override fun onDestroyView() {
@@ -81,14 +82,15 @@ class TransactionAddFragment : Fragment() {
         setupTextWatchers()
     }
 
-    //Handles the initial state of the fragment.
-    private fun setupInitialState() {
+    private fun restoreState() {
+        if (!viewModel.saveState.value!!) {
+            return
+        }
+
         binding.apply {
-            viewModel.reset()
-            textSelectedCategoryName.text = "No category selected"
-            textSelectedWalletName.text = "No wallet selected"
-            textSelectedRecurrenceRate.text = viewModel.recurrenceData.value!!.toDisplayString()
-            edtTextDate.text = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date())
+            edtTextAmount.setText(viewModel.amount.value?.toString() ?: "")
+            edtTextNote.setText(viewModel.note.value)
+            showImagePreview(viewModel.imageBytes.value)
         }
     }
 
@@ -194,7 +196,12 @@ class TransactionAddFragment : Fragment() {
         picker.show(parentFragmentManager, "DATE_PICKER")
     }
 
-    private fun showImagePreview(bytes: ByteArray) {
+    private fun showImagePreview(bytes: ByteArray?) {
+        if (bytes == null) {
+            binding.imagePreviewContainer.visibility = View.GONE
+            return
+        }
+
         val bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
         binding.imagePreviewContainer.visibility = View.VISIBLE
         binding.imagePreview.setImageBitmap(bitmap)
