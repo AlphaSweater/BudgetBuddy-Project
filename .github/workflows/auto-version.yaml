@@ -25,7 +25,8 @@ jobs:
       - name: Generate version number ✨
         id: generate_version
         run: |
-
+          #Generate Version number
+          
           # Fetch tags
           git fetch --tags
           # Get latest tag starting with 'v' (sorted by version semver)
