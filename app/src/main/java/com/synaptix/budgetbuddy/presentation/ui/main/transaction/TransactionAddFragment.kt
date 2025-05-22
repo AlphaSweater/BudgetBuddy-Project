@@ -286,7 +286,7 @@ class TransactionAddFragment : Fragment() {
 
     private fun updateSelectedCategory(category: Category?) {
         if (category == null) {
-            binding.textSelectedCategoryName.text = "No category selected"
+            binding.textSelectedCategoryName.text = "Select Category"
             binding.imgSelectedCategoryIcon.setImageResource(R.drawable.ic_ui_categories)
             binding.imgSelectedCategoryIcon.setColorFilter(requireContext().getThemeColor(R.attr.bb_accent))
             return
@@ -299,7 +299,7 @@ class TransactionAddFragment : Fragment() {
 
     private fun updateSelectedWallet(wallet: Wallet?) {
         if (wallet == null) {
-            binding.textSelectedWalletName.text = "No wallet selected"
+            binding.textSelectedWalletName.text = "Select Wallet"
             return
         }
         binding.textSelectedWalletName.text = wallet.name
