@@ -5,9 +5,10 @@ on:
     branches:
       - development
   workflow_dispatch:
-  
+
 permissions:
-  contents: write  # Allow pushing changes back to the repo
+  contents: write
+  pull-requests: write
 
 jobs:
   update-version:
@@ -17,7 +18,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Full history for accurate commit count
+          fetch-depth: 0
 
       - name: Set up Git config
         run: |
@@ -35,11 +36,38 @@ jobs:
           echo "$VERSION" > version.txt
           echo "VERSION=$VERSION" >> $GITHUB_ENV
 
-      - name: Commit and push version.txt
+      - name: Create a new branch and commit changes
         env:
           TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          git remote set-url origin https://x-access-token:${TOKEN}@github.com/${{ github.repository }}
+          BRANCH_NAME=auto/version-update-${{ github.run_number }}
+          git checkout -b $BRANCH_NAME
           git add version.txt
           git commit -m "chore: update version to $VERSION" || echo "No changes to commit"
-          git push
+          git push -u origin $BRANCH_NAME
+
+      - name: Create a pull request
+        id: create_pr
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          title: "chore: update version to ${{ env.VERSION }}"
+          body: "Auto-generated version update."
+          head: auto/version-update-${{ github.run_number }}
+          base: development
+          branch: auto/version-update-${{ github.run_number }}
+          delete-branch: true
+          draft: false
+
+      - name: Auto-approve and merge PR
+        uses: hmarr/auto-approve-action@v3
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Merge the pull request
+        if: steps.create_pr.outputs.pull-request-url != ''
+        uses: devops-infra/action-pull-request@v0.5.0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          pull_request_url: ${{ steps.create_pr.outputs.pull-request-url }}
+          merge_method: squash
