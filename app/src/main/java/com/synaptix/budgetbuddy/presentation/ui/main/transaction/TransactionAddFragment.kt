@@ -35,6 +35,7 @@ import java.time.format.DateTimeFormatter
 import android.widget.ImageView
 import com.synaptix.budgetbuddy.core.model.RecurrenceData
 import com.synaptix.budgetbuddy.core.model.Wallet
+import com.synaptix.budgetbuddy.extentions.getThemeColor
 import kotlin.toString
 
 @AndroidEntryPoint
@@ -286,8 +287,8 @@ class TransactionAddFragment : Fragment() {
     private fun updateSelectedCategory(category: Category?) {
         if (category == null) {
             binding.textSelectedCategoryName.text = "No category selected"
-            binding.imgSelectedCategoryIcon.setImageResource(R.drawable.ic_circle_24)
-            binding.imgSelectedCategoryIcon.setColorFilter(requireContext().getColor(R.color.button))
+            binding.imgSelectedCategoryIcon.setImageResource(R.drawable.ic_ui_categories)
+            binding.imgSelectedCategoryIcon.setColorFilter(requireContext().getThemeColor(R.attr.bb_accent))
             return
         }
 
