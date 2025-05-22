@@ -31,75 +31,198 @@ import com.synaptix.budgetbuddy.R
 import com.synaptix.budgetbuddy.databinding.FragmentAuthSignupBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import com.google.android.material.snackbar.Snackbar
+import android.text.TextWatcher
+import android.text.Editable
 
 @AndroidEntryPoint
 class SignupFragment : Fragment(R.layout.fragment_auth_signup) {
 
-    private lateinit var binding: FragmentAuthSignupBinding
+    private var _binding: FragmentAuthSignupBinding? = null
+    private val binding get() = _binding!!
     private val viewModel: SignupViewModel by viewModels()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        _binding = FragmentAuthSignupBinding.bind(view)
 
-        // Inflate ViewBinding
-        binding = FragmentAuthSignupBinding.bind(view)
+        setupViews()
+        observeViewModel()
+    }
 
-        // Handle back button
+    private fun setupViews() {
+        // Add text change listeners for real-time validation
+        binding.edtEmailAddress.addTextChangedListener(createTextWatcher { text ->
+            val error = viewModel.validateEmail(text.toString())
+            binding.tilEmail.error = error
+        })
+
+        binding.edtPassword.addTextChangedListener(createTextWatcher { text ->
+            val error = viewModel.validatePassword(text.toString())
+            binding.tilPassword.error = error
+        })
+
+        binding.edtTxtPasswordConfirm.addTextChangedListener(createTextWatcher { text ->
+            val error = viewModel.validatePasswordConfirmation(
+                binding.edtPassword.text.toString(),
+                text.toString()
+            )
+            binding.tilPasswordConfirm.error = error
+        })
+
+        // Handle back button with animation
         binding.btnBackSignup.setOnClickListener {
             requireActivity().onBackPressedDispatcher.onBackPressed()
         }
 
-        // Handle sign-up button click
+        // Handle sign-up button click with animation
         binding.btnSignup.setOnClickListener {
-            val email = binding.edtEmailAddress.text.toString()
-            val password = binding.edtPassword.text.toString()
-            val confirmPassword = binding.edtTxtPasswordConfirm.text.toString()
+            performSignup()
+        }
+    }
 
-            // Validate email format
-            if (!isValidEmail(email)) {
-                binding.edtEmailAddress.error = "Invalid email address"
-                return@setOnClickListener
+    private fun performSignup() {
+        val email = binding.edtEmailAddress.text.toString()
+        val password = binding.edtPassword.text.toString()
+
+        // Animate button press
+        binding.btnSignup.animate()
+            .scaleX(0.95f)
+            .scaleY(0.95f)
+            .setDuration(100)
+            .withEndAction {
+                binding.btnSignup.animate()
+                    .scaleX(1f)
+                    .scaleY(1f)
+                    .setDuration(100)
+                    .start()
             }
+            .start()
 
-            // Check if the email already exists (check database)
-            // Placeholder logic for email existence check (future implementation)
+        // Show loading state
+        showLoadingState()
 
-            // Validate password complexity
-            if (password.length < 8
-                || !password.matches(Regex(".*[0-9].*"))
-                || !password.matches(Regex(".*[A-Z].*"))
-                || !password.matches(Regex(".*[!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>\\/?].*"))
-            ) {
-                binding.edtPassword.error =
-                    "Password must be at least 8 characters and contain 1 number, capital letter, and special character"
-                return@setOnClickListener
-            }
-
-            // Ensure password and confirm password match
-            if (password != confirmPassword) {
-                binding.edtTxtPasswordConfirm.error = "Passwords do not match"
-                return@setOnClickListener
-            }
-
-            // If all checks pass, proceed with sign-up
-            lifecycleScope.launch {
-                // Check if the email already exists
+        // Check if email exists and proceed with signup
+        lifecycleScope.launch {
+            try {
                 val emailExists = viewModel.checkEmailExists(email)
                 if (emailExists) {
-                    binding.edtEmailAddress.error = "Email already in use"
+                    showErrorState("Email already in use")
                     return@launch
                 }
-                // Call ViewModel to handle the sign-up process
-                val result = viewModel.signUp(email, password)
-                // Navigate to login screen after successful sign-up
-                (activity as? AuthActivity)?.showLogin()
+
+                // Proceed with signup
+                viewModel.signUp(email, password)
+            } catch (e: Exception) {
+                showErrorState("An error occurred. Please try again.")
             }
         }
     }
 
-    // Utility function to validate email format using regex
-    // AI assisted with the regex logic for this function
-    private fun isValidEmail(email: String): Boolean {
-        return email.matches(Regex("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}$"))
+    private fun observeViewModel() {
+        viewModel.signupState.observe(viewLifecycleOwner) { state ->
+            when (state) {
+                is SignupUiState.Idle -> {
+                    showIdleState()
+                }
+                is SignupUiState.Loading -> {
+                    showLoadingState()
+                }
+                is SignupUiState.Success -> {
+                    showSuccessState()
+                }
+                is SignupUiState.Error -> {
+                    showErrorState(state.message)
+                }
+                is SignupUiState.ValidationError -> {
+                    binding.tilEmail.error = state.emailError
+                    binding.tilPassword.error = state.passwordError
+                    binding.tilPasswordConfirm.error = state.confirmPasswordError
+                }
+            }
+        }
+    }
+
+    private fun showIdleState() {
+        binding.loadingOverlay.animate()
+            .alpha(0f)
+            .setDuration(200)
+            .withEndAction {
+                binding.loadingOverlay.visibility = View.GONE
+            }
+            .start()
+        enableInputs(true)
+    }
+
+    private fun showLoadingState() {
+        binding.loadingOverlay.visibility = View.VISIBLE
+        binding.loadingOverlay.alpha = 0f
+        binding.loadingOverlay.animate()
+            .alpha(1f)
+            .setDuration(200)
+            .start()
+        enableInputs(false)
+    }
+
+    private fun showSuccessState() {
+        binding.loadingOverlay.animate()
+            .alpha(0f)
+            .setDuration(200)
+            .withEndAction {
+                binding.loadingOverlay.visibility = View.GONE
+                showSuccessMessage("Account created successfully!")
+                (activity as? AuthActivity)?.showLogin()
+            }
+            .start()
+    }
+
+    private fun showErrorState(message: String) {
+        binding.loadingOverlay.animate()
+            .alpha(0f)
+            .setDuration(200)
+            .withEndAction {
+                binding.loadingOverlay.visibility = View.GONE
+                enableInputs(true)
+                showErrorMessage(message)
+            }
+            .start()
+    }
+
+    private fun createTextWatcher(onTextChanged: (Editable?) -> Unit): TextWatcher {
+        return object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun afterTextChanged(s: Editable?) {
+                onTextChanged(s)
+            }
+        }
+    }
+
+    private fun showSuccessMessage(message: String) {
+        Snackbar.make(binding.root, message, Snackbar.LENGTH_SHORT)
+            .setBackgroundTint(resources.getColor(R.color.success, null))
+            .setTextColor(resources.getColor(android.R.color.white, null))
+            .show()
+    }
+
+    private fun showErrorMessage(message: String) {
+        Snackbar.make(binding.root, message, Snackbar.LENGTH_LONG)
+            .setBackgroundTint(resources.getColor(R.color.error, null))
+            .setTextColor(resources.getColor(android.R.color.white, null))
+            .setAction("Dismiss") { }
+            .show()
+    }
+
+    private fun enableInputs(enabled: Boolean) {
+        binding.edtEmailAddress.isEnabled = enabled
+        binding.edtPassword.isEnabled = enabled
+        binding.edtTxtPasswordConfirm.isEnabled = enabled
+        binding.btnSignup.isEnabled = enabled
+        binding.btnBackSignup.isEnabled = enabled
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }

@@ -13,9 +13,8 @@ class BudgetBuddyApp : Application() {
     private val applicationScope = CoroutineScope(Dispatchers.IO)
 
     override fun onCreate() {
-        FirebaseApp.initializeApp(this)
-        Log.d("FirebaseCheck", "App initialized: ${FirebaseApp.getInstance().name}")
         super.onCreate()
+        Log.d("FirebaseCheck", "App initialized: ${FirebaseApp.getInstance().name}")
         initializeAssets()
     }
 

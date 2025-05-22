@@ -37,6 +37,10 @@ sealed class LoginUiState {
     object Loading : LoginUiState() // The loading state, showing progress
     object Success : LoginUiState() // The success state, login successful
     data class Error(val message: String) : LoginUiState() // The error state with an error message
+    data class ValidationError(
+        val emailError: String? = null,
+        val passwordError: String? = null
+    ) : LoginUiState()
 }
 
 @HiltViewModel
@@ -48,18 +52,53 @@ class LoginViewModel @Inject constructor(
     private val _loginState = MutableLiveData<LoginUiState>(LoginUiState.Idle)
     val loginState: LiveData<LoginUiState> get() = _loginState
 
+    fun validateEmail(email: String): String? {
+        return when {
+            email.isBlank() -> "Email is required"
+            !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches() -> "Invalid email format"
+            else -> null
+        }
+    }
+
+    fun validatePassword(password: String): String? {
+        return when {
+            password.isBlank() -> "Password is required"
+            password.length < 6 -> "Password must be at least 6 characters"
+            else -> null
+        }
+    }
+
+    fun validateInputs(email: String, password: String): Boolean {
+        val emailError = validateEmail(email)
+        val passwordError = validatePassword(password)
+
+        if (emailError != null || passwordError != null) {
+            _loginState.value = LoginUiState.ValidationError(emailError, passwordError)
+            return false
+        }
+        return true
+    }
+
     // Function to handle the login process
     fun login(email: String, password: String) {
+        if (!validateInputs(email, password)) {
+            return
+        }
+
         _loginState.value = LoginUiState.Loading // Set state to Loading before login attempt
 
         viewModelScope.launch {
-            val result = loginUserUseCase(email, password) // Call the use case to perform login
-            // Update the state based on the result of the login attempt
-            _loginState.value = when (result) {
-                is LoginResult.Success -> LoginUiState.Success // If successful, show success
-                is LoginResult.UserNotFound -> LoginUiState.Error("User not found") // User not found error
-                is LoginResult.IncorrectPassword -> LoginUiState.Error("Incorrect password") // Incorrect password error
-                is LoginResult.Error -> LoginUiState.Error(result.message) // General error with message
+            try {
+                val result = loginUserUseCase(email, password) // Call the use case to perform login
+                // Update the state based on the result of the login attempt
+                _loginState.value = when (result) {
+                    is LoginResult.Success -> LoginUiState.Success // If successful, show success
+                    is LoginResult.UserNotFound -> LoginUiState.Error("User not found") // User not found error
+                    is LoginResult.IncorrectPassword -> LoginUiState.Error("Incorrect password") // Incorrect password error
+                    is LoginResult.Error -> LoginUiState.Error(result.message) // General error with message
+                }
+            } catch (e: Exception) {
+                _loginState.value = LoginUiState.Error(e.localizedMessage ?: "Unknown error")
             }
         }
     }

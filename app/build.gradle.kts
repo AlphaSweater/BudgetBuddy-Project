@@ -43,7 +43,6 @@ android {
 }
 
 dependencies {
-
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
@@ -70,21 +69,10 @@ dependencies {
     implementation(libs.google.firebase.auth.ktx)
     kapt(libs.dagger.hilt.compiler)
 
-    //roomDB dependencies
-    implementation(libs.androidx.room.runtime)
-    implementation(libs.androidx.room.ktx)
-    ksp(libs.androidx.room.compiler)
-
-    // DataStore dependencies
-    implementation(libs.androidx.datastore.preferences)
-    implementation(libs.androidx.datastore.core)
-
+    // KSP dependencies
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
-
-    //hashing dependencies
-    implementation(libs.jbcrypt)
 
     // Firebase dependencies
     implementation(platform(libs.firebase.bom))

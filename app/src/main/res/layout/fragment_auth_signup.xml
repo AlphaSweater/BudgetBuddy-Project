@@ -34,6 +34,7 @@
         android:id="@+id/btn_back_signup"
         android:layout_width="48dp"
         android:layout_height="48dp"
+        android:layout_margin="@dimen/margin_small"
         android:background="?attr/selectableItemBackgroundBorderless"
         android:src="?attr/actionModeCloseDrawable"
         app:layout_constraintStart_toStartOf="parent"
@@ -62,22 +63,30 @@
         android:layout_marginTop="@dimen/margin_large"
         android:text="@string/email"
         android:textSize="@dimen/body_text_size"
-        app:layout_constraintStart_toStartOf="@+id/edtEmailAddress"
+        app:layout_constraintStart_toStartOf="@+id/tilEmail"
         app:layout_constraintTop_toBottomOf="@+id/lblSignup" />
 
-    <EditText
-        android:id="@+id/edtEmailAddress"
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/tilEmail"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/margin_xlarge"
         android:layout_marginTop="@dimen/margin_small"
-        android:background="@drawable/bg_rounded_edit_grey"
-        android:inputType="textEmailAddress"
-        android:padding="@dimen/input_field_padding"
-        android:textColor="?attr/bb_primaryText"
+        app:errorEnabled="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/lblEmail" />
+        app:layout_constraintTop_toBottomOf="@+id/lblEmail">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/edtEmailAddress"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_rounded_edit_grey"
+            android:inputType="textEmailAddress"
+            android:minHeight="@dimen/input_field_height"
+            android:padding="@dimen/input_field_padding"
+            android:textColor="?attr/bb_primaryText" />
+    </com.google.android.material.textfield.TextInputLayout>
 
     <!-- Password Input -->
     <TextView
@@ -87,64 +96,82 @@
         android:layout_marginTop="@dimen/margin_medium"
         android:text="@string/password"
         android:textSize="@dimen/body_text_size"
-        app:layout_constraintStart_toStartOf="@+id/edtPassword"
-        app:layout_constraintTop_toBottomOf="@+id/edtEmailAddress" />
+        app:layout_constraintStart_toStartOf="@+id/tilPassword"
+        app:layout_constraintTop_toBottomOf="@+id/tilEmail" />
 
-    <EditText
-        android:id="@+id/edtPassword"
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/tilPassword"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/margin_xlarge"
         android:layout_marginTop="@dimen/margin_small"
-        android:background="@drawable/bg_rounded_edit_grey"
-        android:inputType="textPassword"
-        android:padding="@dimen/input_field_padding"
-        android:textColor="?attr/bb_primaryText"
+        app:errorEnabled="true"
+        app:endIconMode="password_toggle"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/lblPassword" />
+        app:layout_constraintTop_toBottomOf="@+id/lblPassword">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/edtPassword"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_rounded_edit_grey"
+            android:inputType="textPassword"
+            android:minHeight="@dimen/input_field_height"
+            android:padding="@dimen/input_field_padding"
+            android:textColor="?attr/bb_primaryText" />
+    </com.google.android.material.textfield.TextInputLayout>
 
     <!-- Confirm Password Input -->
     <TextView
-        android:id="@+id/edtPasswordConfirm"
+        android:id="@+id/lblPasswordConfirm"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/margin_medium"
         android:text="@string/confirm_password"
         android:textSize="@dimen/body_text_size"
-        app:layout_constraintStart_toStartOf="@+id/edtTxtPasswordConfirm"
-        app:layout_constraintTop_toBottomOf="@+id/edtPassword" />
+        app:layout_constraintStart_toStartOf="@+id/tilPasswordConfirm"
+        app:layout_constraintTop_toBottomOf="@+id/tilPassword" />
 
-    <EditText
-        android:id="@+id/edtTxtPasswordConfirm"
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/tilPasswordConfirm"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/margin_xlarge"
         android:layout_marginTop="@dimen/margin_small"
-        android:background="@drawable/bg_rounded_edit_grey"
-        android:inputType="textPassword"
-        android:padding="@dimen/input_field_padding"
-        android:textColor="?attr/bb_primaryText"
+        app:errorEnabled="true"
+        app:endIconMode="password_toggle"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/edtPasswordConfirm" />
+        app:layout_constraintTop_toBottomOf="@+id/lblPasswordConfirm">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/edtTxtPasswordConfirm"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_rounded_edit_grey"
+            android:inputType="textPassword"
+            android:minHeight="@dimen/input_field_height"
+            android:padding="@dimen/input_field_padding"
+            android:textColor="?attr/bb_primaryText" />
+    </com.google.android.material.textfield.TextInputLayout>
 
     <!-- Sign Up Button -->
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/btnSignup"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/margin_xlarge"
-        android:backgroundTint="?attr/bb_button"
         android:minHeight="@dimen/button_height"
         android:text="@string/signupText"
         android:textColor="@android:color/white"
         android:textSize="@dimen/button_text_size"
+        android:backgroundTint="?attr/bb_button"
         app:cornerRadius="@dimen/button_corner_radius"
         app:layout_constraintBottom_toTopOf="@+id/lblVersionSignup"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/edtTxtPasswordConfirm"
+        app:layout_constraintTop_toBottomOf="@+id/tilPasswordConfirm"
         app:layout_constraintVertical_bias="0.3" />
 
     <!-- Version Label -->
@@ -160,5 +187,25 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
+
+    <!-- Loading Overlay -->
+    <FrameLayout
+        android:id="@+id/loadingOverlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#80000000"
+        android:clickable="true"
+        android:focusable="true"
+        android:visibility="gone">
+
+        <com.google.android.material.progressindicator.CircularProgressIndicator
+            android:id="@+id/progressSpinner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:indeterminate="true"
+            app:indicatorColor="@android:color/white"
+            app:trackColor="#4DFFFFFF" />
+    </FrameLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
