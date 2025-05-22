@@ -1,0 +1,51 @@
+name: Auto Versioning
+
+on:
+  push:
+    branches:
+      - 'feature/*'   # Run on any feature branch
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update-version:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Git config
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+
+      - name: Generate version from commit count
+        id: generate_version
+        run: |
+          MAJOR=1
+          MINOR=0
+
+          # Total commits in the repo = build number
+          BUILD=$(git rev-list --count HEAD)
+
+          # Commits since branch point with development = patch number
+          BASE_BRANCH="origin/development"
+          PATCH=$(git rev-list --count $BASE_BRANCH..HEAD)
+
+          VERSION="v$MAJOR.$MINOR.$PATCH.$BUILD"
+          echo "$VERSION" > version.txt
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+
+      - name: Commit and push version.txt
+        env:
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git remote set-url origin https://x-access-token:${TOKEN}@github.com/${{ github.repository }}
+          git add version.txt
+          git commit -m "chore: update version to $VERSION" || echo "No changes to commit"
+          git push
