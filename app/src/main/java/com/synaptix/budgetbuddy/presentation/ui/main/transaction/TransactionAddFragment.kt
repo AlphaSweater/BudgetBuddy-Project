@@ -146,7 +146,7 @@ class TransactionAddFragment : Fragment() {
 
     private fun setupTextWatchers() {
         binding.edtTextAmount.doAfterTextChanged { text ->
-            viewModel.setAmount(text.toString())
+            viewModel.setAmount(text.toString().toDoubleOrNull())
         }
 
         binding.edtTextNote.doAfterTextChanged { text ->
@@ -286,7 +286,7 @@ class TransactionAddFragment : Fragment() {
 
     private fun updateSelectedCategory(category: Category?) {
         if (category == null) {
-            binding.textSelectedCategoryName.text = "Select Category"
+            binding.textSelectedCategoryName.text = "Select category"
             binding.imgSelectedCategoryIcon.setImageResource(R.drawable.ic_ui_categories)
             binding.imgSelectedCategoryIcon.setColorFilter(requireContext().getThemeColor(R.attr.bb_accent))
             return
@@ -299,7 +299,7 @@ class TransactionAddFragment : Fragment() {
 
     private fun updateSelectedWallet(wallet: Wallet?) {
         if (wallet == null) {
-            binding.textSelectedWalletName.text = "Select Wallet"
+            binding.textSelectedWalletName.text = "Select wallet"
             return
         }
         binding.textSelectedWalletName.text = wallet.name
@@ -321,7 +321,7 @@ class TransactionAddFragment : Fragment() {
 
     // --- Save Logic ---
     private fun saveTransaction() {
-        val amount = binding.edtTextAmount.text.toString()
+        val amount = binding.edtTextAmount.text.toString().toDoubleOrNull()
         viewModel.setAmount(amount)
 
         val date = binding.edtTextDate.text.toString()

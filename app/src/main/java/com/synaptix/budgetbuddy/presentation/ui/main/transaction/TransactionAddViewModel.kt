@@ -110,8 +110,8 @@ class TransactionAddViewModel @Inject constructor(
         validateForm()
     }
 
-    fun setAmount(amount: String) {
-        _amount.value = amount.toDoubleOrNull() ?: 0.0
+    fun setAmount(amount: Double?) {
+        _amount.value = amount
         validateForm()
     }
 
