@@ -3,12 +3,11 @@ name: Auto Versioning
 on:
   push:
     branches:
-      - development
+      - 'feature/*'   # Run on any feature branch
   workflow_dispatch:
 
 permissions:
   contents: write
-  pull-requests: write
 
 jobs:
   update-version:
@@ -30,44 +29,23 @@ jobs:
         run: |
           MAJOR=1
           MINOR=0
-          PATCH=0
+
+          # Total commits in the repo = build number
           BUILD=$(git rev-list --count HEAD)
+
+          # Commits since branch point with development = patch number
+          BASE_BRANCH="origin/development"
+          PATCH=$(git rev-list --count $BASE_BRANCH..HEAD)
+
           VERSION="v$MAJOR.$MINOR.$PATCH.$BUILD"
           echo "$VERSION" > version.txt
           echo "VERSION=$VERSION" >> $GITHUB_ENV
 
-      - name: Create a new branch and commit changes
+      - name: Commit and push version.txt
         env:
           TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          BRANCH_NAME=auto/version-update-${{ github.run_number }}
-          git checkout -b $BRANCH_NAME
+          git remote set-url origin https://x-access-token:${TOKEN}@github.com/${{ github.repository }}
           git add version.txt
           git commit -m "chore: update version to $VERSION" || echo "No changes to commit"
-          git push -u origin $BRANCH_NAME
-
-      - name: Create a pull request
-        id: create_pr
-        uses: peter-evans/create-pull-request@v5
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          title: "chore: update version to ${{ env.VERSION }}"
-          body: "Auto-generated version update."
-          head: auto/version-update-${{ github.run_number }}
-          base: development
-          branch: auto/version-update-${{ github.run_number }}
-          delete-branch: true
-          draft: false
-
-      - name: Auto-approve and merge PR
-        uses: hmarr/auto-approve-action@v3
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Merge the pull request
-        if: steps.create_pr.outputs.pull-request-url != ''
-        uses: devops-infra/action-pull-request@v0.5.0
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          pull_request_url: ${{ steps.create_pr.outputs.pull-request-url }}
-          merge_method: squash
+          git push
