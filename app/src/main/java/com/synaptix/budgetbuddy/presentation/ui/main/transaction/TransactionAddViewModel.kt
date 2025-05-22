@@ -58,28 +58,36 @@ class TransactionAddViewModel @Inject constructor(
 
     // Form fields
     private val _category = MutableLiveData<Category?>()
-    val category: LiveData<Category?> = _category
+    val category: LiveData<Category?>
+        get() = _category
 
     private val _wallet = MutableLiveData<Wallet?>()
-    val wallet: LiveData<Wallet?> = _wallet
+    val wallet: LiveData<Wallet?>
+        get() = _wallet
 
     private val _currency = MutableLiveData("ZAR")
-    val currency: LiveData<String> = _currency
+    val currency: LiveData<String>
+        get() = _currency
 
     private val _amount = MutableLiveData<Double?>()
-    val amount: LiveData<Double?> = _amount
+    val amount: LiveData<Double?>
+        get() = _amount
 
     private val _date = MutableLiveData(getCurrentDate())
-    val date: LiveData<String> = _date
+    val date: LiveData<String>
+        get() = _date
 
     private val _note = MutableLiveData<String?>()
-    val note: LiveData<String?> = _note
+    val note: LiveData<String?>
+        get() = _note
 
     private val _imageBytes = MutableLiveData<ByteArray?>()
-    val imageBytes: LiveData<ByteArray?> = _imageBytes
+    val imageBytes: LiveData<ByteArray?>
+        get() = _imageBytes
 
     private val _recurrenceData = MutableLiveData<RecurrenceData>()
-    val recurrenceData: LiveData<RecurrenceData> = _recurrenceData
+    val recurrenceData: LiveData<RecurrenceData>
+        get() = _recurrenceData
 
     var selectedLabels = MutableLiveData<List<Label>>(emptyList())
 

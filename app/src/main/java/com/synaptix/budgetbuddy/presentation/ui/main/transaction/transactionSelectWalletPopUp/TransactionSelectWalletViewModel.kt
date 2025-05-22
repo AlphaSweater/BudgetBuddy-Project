@@ -21,10 +21,12 @@ class TransactionSelectWalletViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _wallets = MutableLiveData<List<Wallet>>()
-    val wallets: LiveData<List<Wallet>> = _wallets
+    val wallets: LiveData<List<Wallet>>
+        get() = _wallets
 
     private val _error = MutableLiveData<String?>()
-    val error: LiveData<String?> = _error
+    val error: LiveData<String?>
+        get() = _error
 
     fun loadWallets() {
         viewModelScope.launch {
