@@ -1,10 +1,11 @@
-name: Auto Version from Commit Count
+name: Auto Versioning
 
 on:
   push:
     branches:
       - development
-
+  workflow_dispatch:
+  
 permissions:
   contents: write  # Allow pushing changes back to the repo
 
