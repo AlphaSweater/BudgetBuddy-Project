@@ -25,8 +25,8 @@ jobs:
       - name: Generate version number ✨
         id: generate_version
         run: |
-          # 🎯 Major version fixed at 1 for this project
-          MAJOR_VERSION=1
+          # 🎯 Major version is count total releases (tags starting with "v")
+          MAJOR_VERSION=$(git tag --list 'v*' | wc -l)
 
           # 🔢 Count total commits in repo (used for minor & patch version)
           TOTAL_COMMITS=$(git rev-list --count origin/development)
