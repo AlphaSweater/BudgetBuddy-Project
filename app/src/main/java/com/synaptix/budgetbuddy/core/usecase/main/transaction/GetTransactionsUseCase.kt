@@ -9,6 +9,7 @@ import com.synaptix.budgetbuddy.data.firebase.repository.FirestoreCategoryReposi
 import com.synaptix.budgetbuddy.data.firebase.repository.FirestoreLabelRepository
 import com.synaptix.budgetbuddy.data.firebase.repository.FirestoreUserRepository
 import com.synaptix.budgetbuddy.data.firebase.repository.FirestoreWalletRepository
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.first
@@ -29,6 +30,7 @@ class GetTransactionsUseCase @Inject constructor(
         data class Error(val message: String) : GetTransactionsResult()
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     fun execute(userId: String): Flow<GetTransactionsResult> {
         if (userId.isEmpty()) return flowOf(GetTransactionsResult.Error("Invalid user ID"))
 
@@ -56,6 +58,7 @@ class GetTransactionsUseCase @Inject constructor(
             }
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     fun executeWithDateRange(userId: String, startDate: Long, endDate: Long): Flow<GetTransactionsResult> {
         if (userId.isEmpty()) return flowOf(GetTransactionsResult.Error("Invalid user ID"))
         if (startDate > endDate) return flowOf(GetTransactionsResult.Error("Invalid date range"))

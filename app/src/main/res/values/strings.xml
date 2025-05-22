@@ -39,7 +39,7 @@
     <!-- ============ Open, Sign In and Sign Up Strings ============-->
     <string name="signupText">SIGN UP</string>
     <string name="loginText">LOGIN</string>
-    <string name="version">Version 0.0.0.0</string>
+    <string name="version_format">Version %1$s</string>
     <string name="googleSignUp">SIGN UP WITH GOOGLE</string>
     <string name="microsoftSignUp">SIGN UP WITH MIRCOSOFT</string>\
     <string name="confirm_password">Confirm Password</string>

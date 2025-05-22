@@ -55,10 +55,10 @@ jobs:
           BRANCH_COMMITS=$(git rev-list --count $BASE_BRANCH..HEAD || echo 0)
           
           # 🏷️ Compose full version string vMAJOR.MINOR.PATCH.BUILD
-          VERSION="v$MAJOR_VERSION.$MINOR_VERSION.$PATCH_VERSION.$BRANCH_COMMITS"
+          VERSION="$MAJOR_VERSION.$MINOR_VERSION.$PATCH_VERSION.$BRANCH_COMMITS"
 
           # 📝 Write version string to version.txt file
-          echo "$VERSION" > app/src/main/version.txt
+          echo "$VERSION" > app/src/main/assets/version.txt
           
           # ⚙️ Export version string to workflow environment variables
           echo "VERSION=$VERSION" >> $GITHUB_ENV
@@ -71,7 +71,7 @@ jobs:
           git remote set-url origin https://x-access-token:${TOKEN}@github.com/${{ github.repository }}
           
           # ➕ Stage the updated version.txt file
-          git add app/src/main/version.txt
+          git add app/src/main/assets/version.txt
           
           # 💬 Commit the change or skip if no changes
           git commit -m "chore: update version to $VERSION 🚀" || echo "No changes to commit"

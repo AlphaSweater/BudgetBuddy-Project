@@ -15,8 +15,15 @@ android {
         applicationId = "com.synaptix.budgetbuddy"
         minSdk = 26
         targetSdk = 35
+
+        // Read from version.txt (written by GitHub Actions)
+        val versionFile = file("src/main/assets/version.txt")
+        val gitVersion = if (versionFile.exists()) versionFile.readText().trim() else "dev"
+
         versionCode = 1
-        versionName = "1.0"
+        versionName = gitVersion
+
+        buildConfigField("String", "GIT_VERSION", "\"$gitVersion\"")
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -39,6 +46,7 @@ android {
     }
     buildFeatures {
         viewBinding = true
+        buildConfig = true
     }
 }
 
