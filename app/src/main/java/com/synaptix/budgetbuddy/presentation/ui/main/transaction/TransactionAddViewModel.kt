@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.synaptix.budgetbuddy.core.model.Category
 import com.synaptix.budgetbuddy.core.model.Label
+import com.synaptix.budgetbuddy.core.model.RecurrenceData
 import com.synaptix.budgetbuddy.core.model.Wallet
 import com.synaptix.budgetbuddy.core.usecase.auth.GetUserIdUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -22,13 +23,12 @@ import com.synaptix.budgetbuddy.core.model.User
 import com.synaptix.budgetbuddy.core.usecase.main.transaction.AddTransactionUseCase
 import com.synaptix.budgetbuddy.core.usecase.main.transaction.AddTransactionUseCase.AddTransactionResult
 import com.synaptix.budgetbuddy.core.usecase.main.transaction.UploadImageUseCase
-import com.synaptix.budgetbuddy.presentation.ui.main.transaction.TransactionAddViewModel.UiState.*
 
 @HiltViewModel
 class TransactionAddViewModel @Inject constructor(
     private val getUserIdUseCase: GetUserIdUseCase,
     private val addTransactionUseCase: AddTransactionUseCase,
-    private val uploadImageUseCase: UploadImageUseCase,
+    private val uploadImageUseCase: UploadImageUseCase
 ) : ViewModel() {
 
     sealed class UiState {
@@ -60,30 +60,40 @@ class TransactionAddViewModel @Inject constructor(
 
     // Form fields
     private val _category = MutableLiveData<Category?>()
-    val category: LiveData<Category?> = _category
+    val category: LiveData<Category?>
+        get() = _category
 
     private val _wallet = MutableLiveData<Wallet?>()
-    val wallet: LiveData<Wallet?> = _wallet
+    val wallet: LiveData<Wallet?>
+        get() = _wallet
 
     private val _currency = MutableLiveData("ZAR")
-    val currency: LiveData<String> = _currency
+    val currency: LiveData<String>
+        get() = _currency
 
     private val _amount = MutableLiveData<Double?>()
-    val amount: LiveData<Double?> = _amount
+    val amount: LiveData<Double?>
+        get() = _amount
 
     private val _date = MutableLiveData(getCurrentDate())
-    val date: LiveData<String> = _date
+    val date: LiveData<String>
+        get() = _date
 
     private val _note = MutableLiveData<String?>()
-    val note: LiveData<String?> = _note
+    val note: LiveData<String?>
+        get() = _note
 
     private val _imageBytes = MutableLiveData<ByteArray?>()
-    val imageBytes: LiveData<ByteArray?> = _imageBytes
+    val imageBytes: LiveData<ByteArray?>
+        get() = _imageBytes
 
-    private val _recurrenceRate = MutableLiveData<String?>()
-    val recurrenceRate: LiveData<String?> = _recurrenceRate
+    private val _recurrenceData = MutableLiveData<RecurrenceData>()
+    val recurrenceData: LiveData<RecurrenceData>
+        get() = _recurrenceData
 
     var selectedLabels = MutableLiveData<List<Label>>(emptyList())
+
+    var saveState = MutableLiveData<Boolean>(false)
 
     fun setCategory(category: Category?) {
         _category.value = category
@@ -114,8 +124,8 @@ class TransactionAddViewModel @Inject constructor(
         _note.value = note
     }
 
-    fun setRecurrenceRate(rate: String) {
-        _recurrenceRate.value = rate
+    fun setRecurrenceData(data: RecurrenceData) {
+        _recurrenceData.value = data
     }
 
     fun setImageBytes(bytes: ByteArray?) {
@@ -129,6 +139,7 @@ class TransactionAddViewModel @Inject constructor(
         val isWalletValid = _wallet.value != null
         val isDateValid = !_date.value.isNullOrBlank()
 
+        saveState.value = true
         val currentState = _validationState.value ?: ValidationState()
         _validationState.value = currentState.copy(
             isAmountValid = isAmountValid,
@@ -171,23 +182,23 @@ class TransactionAddViewModel @Inject constructor(
                     currency = _currency.value ?: "ZAR",
                     date = parseDate((_date.value ?: System.currentTimeMillis()).toString()),
                     note = _note.value ?: "",
-                    photoUrl = uploadImageAndGetUrl(),
-                    recurrenceRate = _recurrenceRate.value
+                    photoUrl = null, // TODO: Upload image to Firebase Storage
+                    recurrenceData = _recurrenceData.value ?: RecurrenceData.DEFAULT
                 )
 
                 when (val result = addTransactionUseCase.execute(newTransaction)) {
                     is AddTransactionResult.Success -> {
                         Log.d("TransactionAddViewModel", "Transaction added successfully: ${result.transactionId}")
-                        _uiState.value = Success
+                        _uiState.value = UiState.Success
                     }
                     is AddTransactionResult.Error -> {
                         Log.e("TransactionAddViewModel", "Error adding transaction: ${result.message}")
-                        _uiState.value = Error(result.message)
+                        _uiState.value = UiState.Error(result.message)
                     }
                 }
             } catch (e: Exception) {
                 Log.e("TransactionAddViewModel", "Exception adding transaction: ${e.message}")
-                _uiState.value = Error(e.message ?: "Failed to add transaction")
+                _uiState.value = UiState.Error(e.message ?: "Failed to add transaction")
             }
         }
     }
@@ -199,9 +210,10 @@ class TransactionAddViewModel @Inject constructor(
         _category.value = null
         _wallet.value = null
         _imageBytes.value = null
-        _recurrenceRate.value = null
+        _recurrenceData.value = RecurrenceData.DEFAULT
         _validationState.value = ValidationState(shouldShowErrors = false)
         _uiState.value = UiState.Initial
+        saveState.value = false
     }
 
     private fun getCurrentDate(): String {
@@ -216,23 +228,4 @@ class TransactionAddViewModel @Inject constructor(
             System.currentTimeMillis()
         }
     }
-
-
-    //method that calls the uploadImageUseCase to upload the image to imgur and get the url
-    private suspend fun uploadImageAndGetUrl(): String? {
-        val bytes = imageBytes.value
-        if (bytes == null) {
-            Log.e("UploadImage", "No image bytes provided")
-            return null
-        }
-
-        return when (val result = uploadImageUseCase.execute(bytes)) {
-            is UploadImageUseCase.UploadImageResult.Success -> result.imageUrl
-            is UploadImageUseCase.UploadImageResult.Error -> {
-                Log.e("UploadImage", "Failed: ${result.message}")
-                null
-            }
-        }
-    }
-
 }

@@ -49,15 +49,18 @@
                 android:layout_height="match_parent"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
-                android:paddingHorizontal="4dp">
+                android:paddingHorizontal="4dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp">
 
                 <ImageButton
                     android:id="@+id/btnGoBack"
+                    style="@style/ToolButtonIcon"
                     android:layout_width="48dp"
                     android:layout_height="48dp"
                     android:background="?attr/selectableItemBackgroundBorderless"
                     android:contentDescription="@string/back"
-                    android:src="?attr/actionModeCloseDrawable"
+                    android:src="@drawable/ic_ui_arrow_back"
                     app:tint="?attr/bb_primaryText" />
 
                 <TextView
@@ -66,9 +69,20 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="@string/add_new_transaction"
+                    android:textAlignment="center"
                     android:textColor="?attr/bb_primaryText"
                     android:textSize="20sp"
                     android:textStyle="bold" />
+
+                <ImageButton
+                    android:id="@+id/btnClear"
+                    style="@style/ToolButtonIcon"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="Clear form"
+                    android:src="@drawable/ic_ui_clear"
+                    app:tint="?attr/bb_primaryText" />
             </LinearLayout>
         </androidx.appcompat.widget.Toolbar>
     </com.google.android.material.appbar.AppBarLayout>
@@ -186,8 +200,8 @@
                         <ImageView
                             android:id="@+id/imgSelectedCategoryIcon"
                             style="@style/RowIconStyle"
-                            android:src="@drawable/ic_circle_24"
-                            app:tint="?attr/bb_button" />
+                            android:src="@drawable/ic_ui_categories"
+                            app:tint="?attr/bb_accent" />
 
                         <LinearLayout
                             android:layout_width="0dp"
@@ -213,11 +227,11 @@
                         </LinearLayout>
 
                         <ImageView
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:layout_marginStart="8dp"
-                            android:src="@drawable/ic_arrow_open_24"
+                            style="@style/IconButton"
+                            android:src="@drawable/ic_ui_croc_right"
                             app:tint="?attr/bb_secondaryText" />
+
+
                     </LinearLayout>
 
                     <!-- Error for category selection -->
@@ -231,12 +245,6 @@
                         android:layout_marginStart="70dp"
                         android:layout_marginTop="0dp"/>
 
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:layout_marginHorizontal="16dp"
-                        android:background="?attr/bb_secondaryText" />
-
                     <!-- Wallet Row -->
                     <LinearLayout
                         android:id="@+id/rowSelectWallet"
@@ -246,8 +254,8 @@
                         <ImageView
                             android:id="@+id/imgSelectedWalletIcon"
                             style="@style/RowIconStyle"
-                            android:src="@drawable/ic_wallet_24"
-                            app:tint="?attr/bb_button" />
+                            android:src="@drawable/ic_ui_wallet"
+                            app:tint="?attr/bb_accent" />
 
                         <LinearLayout
                             android:layout_width="0dp"
@@ -273,10 +281,8 @@
                         </LinearLayout>
 
                         <ImageView
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:layout_marginStart="8dp"
-                            android:src="@drawable/ic_arrow_open_24"
+                            style="@style/IconButton"
+                            android:src="@drawable/ic_ui_croc_right"
                             app:tint="?attr/bb_secondaryText" />
                     </LinearLayout>
 
@@ -291,12 +297,6 @@
                         android:layout_marginStart="70dp"
                         android:layout_marginTop="0dp"/>
 
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:layout_marginHorizontal="16dp"
-                        android:background="?attr/bb_secondaryText" />
-
                     <!-- Date Row -->
                     <LinearLayout
                         android:id="@+id/rowSelectDate"
@@ -305,8 +305,8 @@
 
                         <ImageView
                             style="@style/RowIconStyle"
-                            android:src="@drawable/ic_calendar_month_24"
-                            app:tint="?attr/bb_button" />
+                            android:src="@drawable/ic_ui_calendar"
+                            app:tint="?attr/bb_accent" />
 
                         <LinearLayout
                             android:layout_width="0dp"
@@ -332,10 +332,8 @@
                         </LinearLayout>
 
                         <ImageView
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:layout_marginStart="8dp"
-                            android:src="@drawable/ic_arrow_open_24"
+                            style="@style/IconButton"
+                            android:src="@drawable/ic_ui_croc_right"
                             app:tint="?attr/bb_secondaryText" />
                     </LinearLayout>
 
@@ -350,12 +348,6 @@
                         android:layout_marginStart="70dp"
                         android:layout_marginTop="0dp"/>
 
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:layout_marginHorizontal="16dp"
-                        android:background="?attr/bb_secondaryText" />
-
                     <!-- Note Row -->
                     <LinearLayout
                         android:id="@+id/rowSelectNote"
@@ -363,14 +355,15 @@
 
                         <ImageView
                             style="@style/RowIconStyle"
-                            android:src="@drawable/ic_edit_note_24"
-                            app:tint="?attr/bb_button" />
+                            android:src="@drawable/ic_ui_notebook"
+                            app:tint="?attr/bb_accent" />
 
                         <EditText
                             android:id="@+id/edtTextNote"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
+                            android:layout_marginStart="12dp"
                             android:background="@null"
                             android:hint="Add note"
                             android:inputType="textMultiLine"
@@ -404,8 +397,8 @@
 
                         <ImageView
                             style="@style/RowIconStyle"
-                            android:src="@drawable/ic_autorenew_24"
-                            app:tint="?attr/bb_button" />
+                            android:src="@drawable/ic_ui_recurrence"
+                            app:tint="?attr/bb_accent" />
 
                         <LinearLayout
                             android:layout_width="0dp"
@@ -425,24 +418,16 @@
                                 android:id="@+id/textSelectedRecurrenceRate"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="One time"
+                                android:text="One-time transaction"
                                 android:textColor="?attr/bb_secondaryText"
                                 android:textSize="14sp" />
                         </LinearLayout>
 
                         <ImageView
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:layout_marginStart="8dp"
-                            android:src="@drawable/ic_arrow_open_24"
+                            style="@style/IconButton"
+                            android:src="@drawable/ic_ui_croc_right"
                             app:tint="?attr/bb_secondaryText" />
                     </LinearLayout>
-
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:layout_marginHorizontal="16dp"
-                        android:background="?attr/bb_secondaryText" />
 
                     <!-- Photo Row -->
                     <LinearLayout
@@ -452,8 +437,8 @@
 
                         <ImageView
                             style="@style/RowIconStyle"
-                            android:src="@drawable/ic_add_photo_alternate_24"
-                            app:tint="?attr/bb_button" />
+                            android:src="@drawable/ic_ui_image_add"
+                            app:tint="?attr/bb_accent" />
 
                         <TextView
                             android:layout_width="0dp"
@@ -465,10 +450,8 @@
                             android:textSize="16sp" />
 
                         <ImageView
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:layout_marginStart="8dp"
-                            android:src="@drawable/ic_arrow_open_24"
+                            style="@style/IconButton"
+                            android:src="@drawable/ic_ui_croc_right"
                             app:tint="?attr/bb_secondaryText" />
                     </LinearLayout>
 
@@ -478,8 +461,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_margin="16dp"
-                        android:visibility="gone"
-                        tools:visibility="visible">
+                        android:visibility="gone">
 
                         <!-- Image Preview -->
                         <com.google.android.material.imageview.ShapeableImageView
@@ -498,13 +480,13 @@
                             android:layout_height="wrap_content"
                             android:layout_gravity="top|end"
                             android:layout_margin="8dp"
-                            android:src="@drawable/ic_add_circle_40"
+                            android:contentDescription="Remove selected photo"
+                            android:src="@drawable/ic_ui_circle_x"
                             app:fabSize="mini"
                             app:tint="@android:color/white"
-                            app:backgroundTint="@android:color/holo_red_light"/>
+                            app:backgroundTint="@color/expense_red" />
                     </FrameLayout>
                 </LinearLayout>
-
             </com.google.android.material.card.MaterialCardView>
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>

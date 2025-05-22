@@ -1,17 +1,11 @@
 package com.synaptix.budgetbuddy.presentation.ui.main.transaction
 
 import android.content.ContentValues
-import android.content.res.ColorStateList
-import android.graphics.Color
-import android.icu.util.Calendar
-import android.icu.util.TimeZone
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
-import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -19,33 +13,29 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
-import com.google.android.material.chip.Chip
-import com.google.android.material.color.MaterialColors
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.snackbar.Snackbar
 import com.synaptix.budgetbuddy.R
-import com.synaptix.budgetbuddy.core.model.Label
 import com.synaptix.budgetbuddy.databinding.FragmentTransactionAddBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.graphics.ImageDecoder
 import android.net.Uri
-import android.os.Build
 import android.provider.MediaStore
+import android.text.Editable
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
-import java.io.ByteArrayOutputStream
 import androidx.core.widget.doAfterTextChanged
 import com.synaptix.budgetbuddy.core.model.Category
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import android.widget.ImageView
+import com.synaptix.budgetbuddy.core.model.RecurrenceData
 import com.synaptix.budgetbuddy.core.model.Wallet
+import kotlin.toString
 
 @AndroidEntryPoint
 class TransactionAddFragment : Fragment() {
@@ -78,6 +68,7 @@ class TransactionAddFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
+        restoreState()
     }
 
     override fun onDestroyView() {
@@ -90,6 +81,18 @@ class TransactionAddFragment : Fragment() {
         setupCurrencySpinner()
         setupClickListeners()
         setupTextWatchers()
+    }
+
+    private fun restoreState() {
+        if (!viewModel.saveState.value!!) {
+            return
+        }
+
+        binding.apply {
+            edtTextAmount.setText(viewModel.amount.value?.toString() ?: "")
+            edtTextNote.setText(viewModel.note.value)
+            showImagePreview(viewModel.imageBytes.value)
+        }
     }
 
     //Handles the setup of the currency spinner.
@@ -108,6 +111,10 @@ class TransactionAddFragment : Fragment() {
         with(binding) {
             btnGoBack.setOnClickListener {
                 findNavController().popBackStack()
+            }
+
+            btnClear.setOnClickListener {
+                reset()
             }
 
             rowSelectCategory.setOnClickListener {
@@ -194,7 +201,12 @@ class TransactionAddFragment : Fragment() {
         picker.show(parentFragmentManager, "DATE_PICKER")
     }
 
-    private fun showImagePreview(bytes: ByteArray) {
+    private fun showImagePreview(bytes: ByteArray?) {
+        if (bytes == null) {
+            binding.imagePreviewContainer.visibility = View.GONE
+            return
+        }
+
         val bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
         binding.imagePreviewContainer.visibility = View.VISIBLE
         binding.imagePreview.setImageBitmap(bitmap)
@@ -263,6 +275,14 @@ class TransactionAddFragment : Fragment() {
 
     // --- Update Methods ---
 
+//    private fun updateSelectedLabels(labels: List<String>) {
+//        if (labels.isEmpty()) {
+//            binding.textSelectedLabelName.text = "No labels selected"
+//            return
+//        }
+//        binding.textSelectedLabelName.text = labels.joinToString(", ")
+//    }
+
     private fun updateSelectedCategory(category: Category?) {
         if (category == null) {
             binding.textSelectedCategoryName.text = "No category selected"
@@ -294,12 +314,8 @@ class TransactionAddFragment : Fragment() {
         binding.edtTextDate.text = date
     }
 
-    private fun updateSelectedRecurrenceRate(recurrenceRate: String?) {
-        if (recurrenceRate == null){
-            binding.textSelectedRecurrenceRate.text = "One time"
-            return
-        }
-        binding.textSelectedRecurrenceRate.text = recurrenceRate
+    private fun updateSelectedRecurrence(recurrence: RecurrenceData) {
+        binding.textSelectedRecurrenceRate.text = recurrence.toDisplayString()
     }
 
     // --- Save Logic ---
@@ -376,8 +392,8 @@ class TransactionAddFragment : Fragment() {
             updateSelectedDate(date.toString())
         }
 
-        viewModel.recurrenceRate.observe(viewLifecycleOwner) { rate ->
-            updateSelectedRecurrenceRate(rate)
+        viewModel.recurrenceData.observe(viewLifecycleOwner) { rate ->
+            updateSelectedRecurrence(rate)
         }
 
         viewModel.imageBytes.observe(viewLifecycleOwner) { bytes ->
@@ -452,5 +468,13 @@ class TransactionAddFragment : Fragment() {
         Snackbar.make(binding.root, message, Snackbar.LENGTH_SHORT)
             .setBackgroundTint(resources.getColor(R.color.success, null))
             .show()
+    }
+
+    private fun reset() {
+        viewModel.reset()
+        binding.apply {
+            edtTextAmount.setText("")
+            edtTextNote.setText("")
+        }
     }
 }

@@ -93,7 +93,7 @@ object FirebaseMapper {
         date = date,
         note = note,
         photo = photoUrl,
-        recurrenceRate = recurrenceRate,
+        recurrenceData = recurrenceData,
         labelIds = labels.map { it.id }
     )
 
@@ -113,7 +113,7 @@ object FirebaseMapper {
         date = date,
         note = note,
         photoUrl = photo,
-        recurrenceRate = recurrenceRate
+        recurrenceData = recurrenceData
     )
 
     // Budget mappings

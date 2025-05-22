@@ -31,10 +31,12 @@ class TransactionSelectCategoryViewModel @Inject constructor(
     
     // LiveData for filtered categories that the UI observes
     private val _filteredCategories = MutableLiveData<List<Category>>()
-    val filteredCategories: LiveData<List<Category>> get() = _filteredCategories
+    val filteredCategories: LiveData<List<Category>>
+        get() = _filteredCategories
 
     private val _error = MutableLiveData<String?>()
-    val error: LiveData<String?> = _error
+    val error: LiveData<String?>
+        get() = _error
 
     /**
      * Loads categories for the current user and updates both original and filtered lists.
