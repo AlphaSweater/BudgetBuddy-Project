@@ -205,7 +205,6 @@ class TransactionAddFragment : Fragment() {
         binding.imagePreviewContainer.visibility = View.GONE
         binding.imagePreview.setImageBitmap(null)
     }
-
     private fun showFullScreenImage() {
         viewModel.imageBytes.value?.let { bytes ->
             val dialog = AlertDialog.Builder(requireContext(), R.style.FullScreenDialog)
