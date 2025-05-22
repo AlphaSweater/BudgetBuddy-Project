@@ -21,60 +21,67 @@
 
 package com.synaptix.budgetbuddy.presentation.ui.main.budget
 
-import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.recyclerview.widget.RecyclerView
 import com.synaptix.budgetbuddy.R
-import com.synaptix.budgetbuddy.core.model.BudgetReportListItems
+import com.synaptix.budgetbuddy.core.model.Budget
+import com.synaptix.budgetbuddy.core.model.BudgetListItems
+import com.synaptix.budgetbuddy.presentation.ui.common.BaseAdapter
 
-class BudgetMainAdapter (private val budgetItems: List<BudgetReportListItems.BudgetItem>,
-                         private val onClick: (BudgetReportListItems.BudgetItem) -> Unit // <-- Add this
-) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+/**
+ * Adapter for displaying the main budget list in the budget screen.
+ * This adapter follows the standard pattern for RecyclerView adapters in the app:
+ * 1. Extends BaseAdapter for common functionality
+ * 2. Uses a dedicated ViewHolder class
+ * 3. Handles item click events through a callback
+ * 4. Displays budget icon, name, and status
+ *
+ * @param onBudgetClick Callback function that is triggered when a budget item is clicked
+ */
+class BudgetMainAdapter(
+    private val onBudgetClick: (Budget) -> Unit
+) : BaseAdapter<BudgetListItems.BudgetBudgetItem, BudgetMainAdapter.BudgetViewHolder>() {
 
-    companion object {
-        private const val VIEW_TYPE_BUDGET = 0
-    }
-
-    override fun getItemViewType(position: Int): Int {
-        return when (budgetItems[position]) {
-            is BudgetReportListItems.BudgetItem -> VIEW_TYPE_BUDGET
-            else -> throw IllegalArgumentException("Unsupported item type at position $position")
+    /**
+     * Creates a new ViewHolder instance for budget items.
+     * Uses the standard item_current_budget layout resource.
+     */
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BudgetViewHolder {
+        return createViewHolder(parent, R.layout.item_current_budget) { view ->
+            BudgetViewHolder(view, onBudgetClick)
         }
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        return when (viewType) {
-            VIEW_TYPE_BUDGET -> {
-                val view = LayoutInflater.from(parent.context)
-                    .inflate(R.layout.item_current_budget, parent, false) // Make sure this is not your fragment layout!
-                BudgetCardViewHolder(view)
-            }
-            else -> throw IllegalArgumentException("Unknown view type $viewType")
-        }
-    }
+    /**
+     * ViewHolder class for budget items in the main budget screen.
+     * Responsible for binding budget data to the view and handling click events.
+     * Displays:
+     * - Budget icon
+     * - Budget name
+     * - Budget status
+     */
+    class BudgetViewHolder(
+        itemView: View,
+        private val onBudgetClick: (Budget) -> Unit
+    ) : BaseViewHolder<BudgetListItems.BudgetBudgetItem>(itemView) {
 
-    override fun getItemCount(): Int = budgetItems.size
+        private val budgetIcon: ImageView = itemView.findViewById(R.id.budgetIcon)
+        private val budgetTitle: TextView = itemView.findViewById(R.id.budgetTitle)
+        private val budgetStatus: TextView = itemView.findViewById(R.id.budgetStatus)
 
-    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        when (val budgetItem = budgetItems[position]) {
-            is BudgetReportListItems.BudgetItem -> (holder as BudgetCardViewHolder).bind(budgetItem, onClick)
-            else -> throw IllegalArgumentException("Unsupported item type at position $position")
-        }
-    }
-
-    class BudgetCardViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        private val iconView: ImageView = itemView.findViewById(R.id.budgetIcon)
-        private val titleView: TextView = itemView.findViewById(R.id.budgetTitle)
-        private val statusView: TextView = itemView.findViewById(R.id.budgetStatus)
-
-        fun bind(item: BudgetReportListItems.BudgetItem, onClick: (BudgetReportListItems.BudgetItem) -> Unit) {
-            iconView.setImageResource(item.categoryIcon)
-            titleView.text = item.title
-            statusView.text = item.status
-            itemView.setOnClickListener { onClick(item) }
+        /**
+         * Binds budget data to the view.
+         * Sets the budget icon, name, and status.
+         * Attaches click listener to the entire item view.
+         */
+        override fun bind(item: BudgetListItems.BudgetBudgetItem) {
+            budgetIcon.setImageResource(R.drawable.ic_money_24)
+            budgetTitle.text = item.budget.name
+            budgetStatus.text = item.status
+            
+            itemView.setOnClickListener { onBudgetClick(item.budget) }
         }
     }
 }

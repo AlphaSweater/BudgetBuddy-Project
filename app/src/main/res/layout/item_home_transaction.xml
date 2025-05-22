@@ -21,78 +21,147 @@
 <!--    * https://www.youtube.com/watch?v=A_tPafV23DM&list=PLPgs125_L-X9H6J7x4beRU-AxJ4mXe5vX-->
 <!--    ======================================================================================-->
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical">
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="?attr/bb_surface"
-        android:orientation="vertical"
-        android:padding="16dp">
+    android:background="@android:color/transparent"
+    android:padding="12dp">
 
-        <!-- First Wallet -->
-        <LinearLayout
-            android:layout_width="match_parent"
+    <!-- Circular Icon -->
+    <LinearLayout
+        android:id="@+id/iconCategoryContainer"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:background="@drawable/bg_circle_shape"
+        android:gravity="center"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/iconCategory"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:scaleType="fitCenter"
+            app:tint="?attr/bb_primaryText" />
+    </LinearLayout>
+
+    <!-- Category and Text Information -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:orientation="vertical"
+        android:weightSum="1"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/linearLayout3"
+        app:layout_constraintStart_toEndOf="@id/iconCategoryContainer"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <!-- Category Title -->
+        <TextView
+            android:id="@+id/textCategoryName"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:text="Car"
+            android:textColor="?attr/bb_primaryText"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <!-- Wallet Info -->
+        <LinearLayout
+            android:id="@+id/row_wallet"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
             android:gravity="center_vertical"
-            android:orientation="horizontal"
-            android:paddingVertical="8dp">
+            android:orientation="horizontal">
 
             <ImageView
-                android:layout_width="36dp"
-                android:layout_height="36dp"
-                android:layout_marginEnd="12dp"
-                android:src="@drawable/ic_circle_24"/>
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/txtCategoryName"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Text"
-                    android:textColor="?attr/bb_primaryText"
-                    android:textSize="16sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/txtWalletName"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Wallet"
-                    android:textColor="?attr/bb_secondaryText"
-                    android:textSize="12sp" />
-
-                <TextView
-                    android:id="@+id/txtLabelName"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Label"
-                    android:textColor="?attr/bb_secondaryText"
-                    android:textSize="12sp" />
-            </LinearLayout>
+                android:layout_width="17dp"
+                android:layout_height="17dp"
+                android:contentDescription="Wallet Icon"
+                android:src="@drawable/ic_wallet_24"
+                app:tint="?attr/bb_primaryText" />
 
             <TextView
-                android:id="@+id/txtAmount"
+                android:id="@+id/textWalletName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="ZAR X"
-                android:textColor="?attr/bb_profit"
-                android:textSize="14sp" />
+                android:layout_marginStart="2dp"
+                android:text="Cash Wallet"
+                android:textColor="?attr/bb_primaryText"
+                android:textSize="10sp" />
         </LinearLayout>
 
-        <!-- Divider -->
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginVertical="4dp"
-            android:background="?attr/bb_secondaryText" />
+        <!-- Description Text -->
+        <LinearLayout
+            android:id="@+id/rowNote"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:visibility="visible">
+
+            <ImageView
+                android:layout_width="17dp"
+                android:layout_height="17dp"
+                android:contentDescription="Note Icon"
+                android:src="@drawable/ic_edit_24"
+                app:tint="?attr/bb_primaryText"
+                android:visibility="gone"/>
+
+            <TextView
+                android:id="@+id/textNote"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="2dp"
+                android:text="Label"
+                android:textColor="?attr/bb_primaryText"
+                android:textSize="10sp"
+                android:visibility="gone"/>
+        </LinearLayout>
     </LinearLayout>
-</LinearLayout>
+
+    <!-- Amount and Date -->
+    <LinearLayout
+        android:id="@+id/linearLayout3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="end"
+        android:orientation="vertical"
+        android:paddingEnd="12dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <!-- Amount -->
+        <TextView
+            android:id="@+id/text_amount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="-R 1,500"
+            android:textColor="?attr/bb_expense"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <!-- Date -->
+        <TextView
+            android:id="@+id/text_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:text="Yesterday"
+            android:textColor="?attr/bb_secondaryText"
+            android:textSize="10sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/text_amount" />
+    </LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

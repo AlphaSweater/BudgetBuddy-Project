@@ -1,22 +1,24 @@
 package com.synaptix.budgetbuddy.presentation.ui.main.wallet.walletAdd
 
-import android.graphics.BitmapFactory
 import androidx.fragment.app.viewModels
 import android.os.Bundle
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
-import android.widget.Toast
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.synaptix.budgetbuddy.R
-import com.synaptix.budgetbuddy.databinding.FragmentTransactionAddBinding
 import com.synaptix.budgetbuddy.databinding.FragmentWalletAddBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import android.text.Editable
+import android.text.TextWatcher
+import androidx.core.widget.doAfterTextChanged
+import com.google.android.material.snackbar.Snackbar
 
 @AndroidEntryPoint
 class WalletAddFragment : Fragment() {
@@ -25,7 +27,6 @@ class WalletAddFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val viewModel: WalletAddViewModel by viewModels()
-
 
     // --- Lifecycle ---
     override fun onCreateView(
@@ -51,10 +52,10 @@ class WalletAddFragment : Fragment() {
     // --- Setup Methods ---
     private fun setupUI() {
         setupCurrencySpinner()
-        setupOnClickListeners()
+        setupClickListeners()
+        setupTextWatchers()
     }
 
-    //Handles the setup of the currency spinner.
     private fun setupCurrencySpinner() {
         val adapter = ArrayAdapter(
             requireContext(),
@@ -65,75 +66,127 @@ class WalletAddFragment : Fragment() {
         binding.spinnerCurrency.adapter = adapter
     }
 
-    private fun setupOnClickListeners() {
-        binding.btnGoBack.setOnClickListener {
-            findNavController().popBackStack()
-        }
+    private fun setupClickListeners() {
+        with(binding) {
+            btnGoBack.setOnClickListener {
+                findNavController().popBackStack()
+            }
 
-        binding.btnWalletEdit.setOnClickListener {
-//            findNavController().navigate(R.id.action_walletAddFragment_to_walletSelectIconFragment)
-        }
+            switchNotifications.setOnCheckedChangeListener { _, isChecked ->
+                viewModel.updateEnableNotifications(isChecked)
+            }
 
-        binding.btnSave.setOnClickListener {
-            saveWallet()
-            findNavController().popBackStack()
-        }
+            switchExcludeTotal.setOnCheckedChangeListener { _, isChecked ->
+                viewModel.updateExcludeFromTotal(isChecked)
+            }
 
+            btnSave.setOnClickListener {
+                saveWallet()
+            }
+        }
+    }
+
+    private fun setupTextWatchers() {
+        with(binding){
+            binding.edtWalletName.doAfterTextChanged { text ->
+                viewModel.setWalletName(text.toString())
+            }
+
+            binding.edtInitialAmount.doAfterTextChanged { text ->
+                viewModel.setWalletAmount(text.toString())
+            }
+        }
     }
 
     // --- Save Logic ---
     private fun saveWallet() {
-        viewModel.walletName.value = binding.edtWalletName.text.toString()
-        viewModel.walletCurrency.value = binding.spinnerCurrency.selectedItem.toString()
-        viewModel.walletAmount.value = binding.edtInitialAmount.text.toString().toDoubleOrNull() ?: 0.0
+        val walletName = binding.edtWalletName.text.toString()
+        viewModel.setWalletName(walletName)
 
-        // Validate input
-        if (viewModel.walletName.value.isNullOrBlank()   ||
-            viewModel.walletCurrency.value.isNullOrBlank() ||
-            viewModel.walletAmount.value == null
-        ) {
-            Toast.makeText(
-                requireContext(),
-                "Please fill in all required fields correctly.",
-                Toast.LENGTH_SHORT
-            ).show()
-            return
-        }
+        val walletAmount = binding.edtInitialAmount.text.toString()
+        viewModel.setWalletAmount(walletAmount)
 
-        // Launch coroutine to call suspend function
+        val walletCurrency = binding.spinnerCurrency.selectedItem.toString()
+        viewModel.setWalletCurrency(walletCurrency)
+
+        // Show validation errors if any
+        viewModel.showValidationErrors()
+
+        // Check if form is valid before proceeding
+        if (!viewModel.validateForm()) return
+
         viewLifecycleOwner.lifecycleScope.launch {
             try {
                 viewModel.addWallet()
-                Toast.makeText(
-                    requireContext(),
-                    "Wallet saved successfully!",
-                    Toast.LENGTH_SHORT
-                ).show()
             } catch (e: Exception) {
-                Toast.makeText(
-                    requireContext(),
-                    "Wallet to save transaction: ${e.message}",
-                    Toast.LENGTH_SHORT
-                ).show()
+                showError("Failed to save wallet: ${e.message}")
             }
         }
     }
 
     // --- Observers ---
     private fun observeViewModel() {
-        viewModel.walletName.observe(viewLifecycleOwner) { walletName ->
-            Log.d("Wallet", "Selected Wallet Name: $walletName")
-            // Update UI based on the selected wallet
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.uiState.collect { state ->
+                    handleUiState(state)
+                }
+            }
         }
 
-        viewModel.walletCurrency.observe(viewLifecycleOwner) { walletCurrency ->
-            Log.d("Wallet", "Selected Wallet Currency: $walletCurrency")
-            // Update UI based on the selected wallet
+        viewModel.validationState.observe(viewLifecycleOwner) { state ->
+            handleValidationState(state)
         }
+    }
 
-        viewModel.walletAmount.observe(viewLifecycleOwner) { walletAmount ->
-            Log.d("Wallet", "Selected Wallet Amount: $walletAmount")
-            // Update UI based on the selected wallet
+    private fun handleUiState(state: WalletAddViewModel.UiState) {
+        when (state) {
+            is WalletAddViewModel.UiState.Loading -> {
+                binding.btnSave.isEnabled = false
+            }
+            is WalletAddViewModel.UiState.Success -> {
+                showSuccess("Wallet added successfully")
+                findNavController().popBackStack()
+            }
+            is WalletAddViewModel.UiState.Error -> {
+                binding.btnSave.isEnabled = false
+                showError(state.message)
+            }
+            else -> {
+                binding.btnSave.isEnabled = true
+            }
         }
+    }
+
+    private fun handleValidationState(state: WalletAddViewModel.ValidationState) {
+        with(binding) {
+            // Show/hide error messages for each field
+            textNameError.apply {
+                text = state.walletNameError
+                visibility = if (state.shouldShowErrors && state.walletNameError != null) View.VISIBLE else View.GONE
+            }
+
+            textAmountError.apply {
+                text = state.walletAmountError
+                visibility = if (state.shouldShowErrors && state.walletAmountError != null) View.VISIBLE else View.GONE
+            }
+
+            textCurrencyError.apply {
+                text = state.walletCurrencyError
+                visibility = if (state.shouldShowErrors && state.walletCurrencyError != null) View.VISIBLE else View.GONE
+            }
+        }
+    }
+
+    private fun showError(message: String) {
+        Snackbar.make(binding.root, message, Snackbar.LENGTH_SHORT)
+            .setBackgroundTint(resources.getColor(R.color.error, null))
+            .show()
+    }
+
+    private fun showSuccess(message: String) {
+        Snackbar.make(binding.root, message, Snackbar.LENGTH_SHORT)
+            .setBackgroundTint(resources.getColor(R.color.success, null))
+            .show()
     }
 }

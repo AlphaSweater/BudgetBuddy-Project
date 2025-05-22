@@ -21,7 +21,13 @@ class TransactionSelectWalletFragment : Fragment() {
 
     private val viewModel: TransactionAddViewModel by activityViewModels()
     private val walletViewModel: TransactionSelectWalletViewModel by viewModels()
-    private lateinit var transactionSelectWalletAdapter: TransactionSelectWalletAdapter
+
+    private val walletAdapter by lazy {
+        TransactionSelectWalletAdapter { wallet ->
+            viewModel.setWallet(wallet)
+            findNavController().popBackStack()
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -35,26 +41,27 @@ class TransactionSelectWalletFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupRecyclerView()
-        setupOnClickListeners()
-
-        walletViewModel.loadWallets()
-        walletViewModel.wallets.observe(viewLifecycleOwner) { walletList ->
-            transactionSelectWalletAdapter = TransactionSelectWalletAdapter(walletList) { wallet ->
-                viewModel.wallet.value = wallet
-                findNavController().popBackStack()
-            }
-            binding.walletRecyclerView.adapter = transactionSelectWalletAdapter
-        }
+        setupClickListeners()
+        observeWallets()
     }
 
     private fun setupRecyclerView() {
-        binding.walletRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+        binding.walletRecyclerView.apply {
+            layoutManager = LinearLayoutManager(requireContext())
+            adapter = walletAdapter
+        }
     }
 
-    private fun setupOnClickListeners() {
-        // Add this if you want a "back" button like in the Category fragment
+    private fun setupClickListeners() {
         binding.btnGoBack?.setOnClickListener {
             findNavController().popBackStack()
+        }
+    }
+
+    private fun observeWallets() {
+        walletViewModel.loadWallets()
+        walletViewModel.wallets.observe(viewLifecycleOwner) { wallets ->
+            walletAdapter.submitList(wallets)
         }
     }
 

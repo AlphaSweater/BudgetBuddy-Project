@@ -21,27 +21,57 @@
 
 package com.synaptix.budgetbuddy.core.usecase.auth
 
-import com.synaptix.budgetbuddy.data.local.dao.UserDao
-import com.synaptix.budgetbuddy.data.entity.UserEntity
+import com.synaptix.budgetbuddy.core.model.Result
+import com.synaptix.budgetbuddy.data.firebase.model.UserDTO
+import com.synaptix.budgetbuddy.data.firebase.repository.FirestoreUserRepository
 import javax.inject.Inject
+
+sealed class SignupResult {
+    object Success : SignupResult()
+    object EmailExists : SignupResult()
+    data class Error(val message: String) : SignupResult()
+}
 
 // UseCase class for handling user signup logic
 class SignupUserUseCase @Inject constructor(
-    // Injecting UserDao to interact with the local database for user operations
-    private val userDao: UserDao
+    private val userRepository: FirestoreUserRepository
 ) {
-    // Executes the user signup by inserting the user entity into the database
-    suspend fun execute(user: UserEntity): Long {
-        // Logging the user details to logcat for debugging purposes
-        println("User to be inserted: $user")
+    suspend operator fun invoke(email: String, password: String, firstName: String? = null, lastName: String? = null): SignupResult {
+        return try {
+            // Check if email exists
+            when (val emailCheck = userRepository.emailExists(email)) {
+                is Result.Success -> {
+                    if (emailCheck.data) {
+                        return SignupResult.EmailExists
+                    }
+                }
+                is Result.Error -> {
+                    return SignupResult.Error(emailCheck.exception.message ?: "Failed to check email")
+                }
+            }
 
-        // Inserts the user into the database using UserDao and returns the inserted user's ID
-        return userDao.insert(user)
+            // Create user data
+            val userData = UserDTO(
+                email = email,
+                firstName = firstName,
+                lastName = lastName
+            )
+
+            // Register user
+            when (val result = userRepository.registerUser(email, password, userData)) {
+                is Result.Success -> SignupResult.Success
+                is Result.Error -> SignupResult.Error(result.exception.message ?: "Failed to register user")
+            }
+        } catch (e: Exception) {
+            SignupResult.Error(e.localizedMessage ?: "Unknown error")
+        }
     }
 
-    // Checks if the email already exists in the database
+    // Function to check if the email already exists
     suspend fun emailExists(email: String): Boolean {
-        // Queries UserDao to see if the email already exists in the database
-        return userDao.emailExists(email)
+        return when (val result = userRepository.emailExists(email)) {
+            is Result.Success -> result.data
+            is Result.Error -> false
+        }
     }
 }

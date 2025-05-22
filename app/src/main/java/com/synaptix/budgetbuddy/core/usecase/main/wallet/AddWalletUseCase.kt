@@ -21,22 +21,42 @@
 
 package com.synaptix.budgetbuddy.core.usecase.main.wallet
 
-import com.synaptix.budgetbuddy.core.model.WalletIn
-import com.synaptix.budgetbuddy.data.local.dao.WalletDao
-import com.synaptix.budgetbuddy.data.entity.mapper.toEntity
+import android.util.Log
+import com.synaptix.budgetbuddy.core.model.Wallet
+import com.synaptix.budgetbuddy.data.firebase.mapper.FirebaseMapper.toDTO
+import com.synaptix.budgetbuddy.data.firebase.repository.FirestoreWalletRepository
+import com.synaptix.budgetbuddy.core.model.Result
 import javax.inject.Inject
 
 // UseCase class for adding a wallet to the user's profile
 class AddWalletUseCase @Inject constructor(
     // Injecting the WalletDao to handle wallet-related database operations
-    private val walletDao: WalletDao
+    private val walletRepository: FirestoreWalletRepository
 ) {
-    // Executes the operation to insert a new wallet
-    suspend fun execute(wallet: WalletIn): Long {
-        // Log statement for tracking the wallet to be inserted
-        println("wallet to be inserted: $wallet")
+    sealed class AddWalletResult {
+        data class Success(val walletId: String) : AddWalletResult()
+        data class Error(val message: String) : AddWalletResult()
+    }
 
-        // Converts the WalletIn object to its database entity representation and inserts it into the database
-        return walletDao.insertWallet(wallet.toEntity())
+    // Executes the operation to insert a new wallet
+    suspend fun execute(newWallet: Wallet): AddWalletResult {
+        val newWalletDTO = newWallet.toDTO()
+
+        return try {
+            when (val result = walletRepository.createWallet(newWalletDTO)) {
+                is Result.Success -> {
+                    Log.d("AddWalletUseCase", "Wallet added successfully: ${result.data}")
+                    AddWalletResult.Success(result.data)
+                }
+
+                is Result.Error -> {
+                    Log.e("AddWalletUseCase", "Error adding wallet: ${result.exception.message}")
+                    AddWalletResult.Error("Failed to add wallet: ${result.exception.message}")
+                }
+            }
+        } catch (e: Exception) {
+            Log.e("AddWalletUseCase", "Exception while adding wallet: ${e.message}")
+            AddWalletResult.Error("Failed to add wallet: ${e.message}")
+        }
     }
 }

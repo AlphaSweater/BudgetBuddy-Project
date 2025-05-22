@@ -133,5 +133,7 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <!-- =========================================================== -->
 
+    <string name="category_created_success">Category Created Successfully!</string>
+    <string name="category_creation_error">Please enter a name and choose an icon and color</string>
 
 </resources>

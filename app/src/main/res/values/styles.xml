@@ -55,6 +55,9 @@
             <!-- Make it clickable/focusable if needed -->
             <item name="android:clickable">true</item>
             <item name="android:focusable">true</item>
+
+            <!-- Added for horizontal layout -->
+            <item name="android:orientation">horizontal</item>
         </style>
 
         <!-- Row Icon Style -->
@@ -101,5 +104,18 @@
         <item name="android:textSize">18sp</item>
         <item name="android:textColor">?attr/bb_primaryText</item>
         <item name="android:background">?attr/selectableItemBackground</item>
+    </style>
+
+    <!-- Added for rounded image corners -->
+    <style name="RoundedImageView">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">16dp</item>
+    </style>
+
+    <style name="FullScreenDialog" parent="Theme.AppCompat.Dialog">
+        <item name="android:windowIsFloating">false</item>
+        <item name="android:windowBackground">@android:color/black</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowFullscreen">true</item>
     </style>
 </resources>

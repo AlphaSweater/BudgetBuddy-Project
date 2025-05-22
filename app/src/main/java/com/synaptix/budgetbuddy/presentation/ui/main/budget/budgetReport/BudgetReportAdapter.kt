@@ -22,18 +22,31 @@
 package com.synaptix.budgetbuddy.presentation.ui.main.budget.budgetReport
 
 import android.graphics.drawable.GradientDrawable
-import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.content.ContextCompat
-import androidx.recyclerview.widget.RecyclerView
 import com.synaptix.budgetbuddy.R
-import com.synaptix.budgetbuddy.core.model.BudgetReportListItems
+import com.synaptix.budgetbuddy.core.model.BudgetListItems
+import com.synaptix.budgetbuddy.core.model.Category
+import com.synaptix.budgetbuddy.core.model.HomeListItems.HomeCategoryItem
+import com.synaptix.budgetbuddy.core.model.Transaction
+import com.synaptix.budgetbuddy.presentation.ui.common.BaseAdapter
 
-class BudgetReportAdapter(private val items: List<BudgetReportListItems>) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+/**
+ * Adapter for displaying budget report items in the budget report screen.
+ * This adapter follows the standard pattern for RecyclerView adapters in the app:
+ * 1. Extends BaseAdapter for common functionality
+ * 2. Uses dedicated ViewHolder classes for each item type
+ * 3. Handles multiple view types (header, transaction, category)
+ * 4. Displays formatted data with proper styling
+ */
+class BudgetReportAdapter(
+    private val onTransactionClick: ((Transaction) -> Unit)? = null,
+    private val onCategoryClick: ((Category) -> Unit)? = null
+) : BaseAdapter<BudgetListItems, BaseAdapter.BaseViewHolder<BudgetListItems>>() {
 
     companion object {
         private const val VIEW_TYPE_HEADER = 0
@@ -43,97 +56,119 @@ class BudgetReportAdapter(private val items: List<BudgetReportListItems>) : Recy
 
     override fun getItemViewType(position: Int): Int {
         return when (items[position]) {
-            is BudgetReportListItems.DateHeader -> VIEW_TYPE_HEADER
-            is BudgetReportListItems.TransactionItem -> VIEW_TYPE_TRANSACTION
-            is BudgetReportListItems.CategoryItems -> VIEW_TYPE_CATEGORY
+            is BudgetListItems.BudgetDateHeader -> VIEW_TYPE_HEADER
+            is BudgetListItems.BudgetTransactionItem -> VIEW_TYPE_TRANSACTION
+            is BudgetListItems.BudgetCategoryItem -> VIEW_TYPE_CATEGORY
             else -> throw IllegalArgumentException("Invalid item type at position $position")
-
         }
     }
-    //took out if else statement this could be broken so note that
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int
+    ): BaseViewHolder<BudgetListItems> {
         return when (viewType) {
-            VIEW_TYPE_HEADER -> {
-                val view = LayoutInflater.from(parent.context).inflate(R.layout.item_date_header, parent, false)
-                DateHeaderViewHolder(view)
+            VIEW_TYPE_HEADER -> createViewHolder(
+                parent = parent,
+                layoutResId = R.layout.item_date_header
+            ) {
+                DateHeaderViewHolder(it)
             }
-            VIEW_TYPE_TRANSACTION -> {
-                val view = LayoutInflater.from(parent.context).inflate(R.layout.item_transaction, parent, false)
-                TransactionViewHolder(view)
+            VIEW_TYPE_TRANSACTION -> createViewHolder(parent, R.layout.item_home_transaction) { 
+                TransactionViewHolder(it, onTransactionClick)
             }
-            VIEW_TYPE_CATEGORY -> {
-                val view = LayoutInflater.from(parent.context).inflate(R.layout.item_budget_report, parent, false)
-                CategoryViewHolder(view)
+            VIEW_TYPE_CATEGORY -> createViewHolder(parent, R.layout.item_home_category) { 
+                CategoryViewHolder(it, onCategoryClick)
             }
-            else -> throw IllegalArgumentException("Unknown view type")
+            else -> throw IllegalArgumentException("Unknown view type $viewType")
         }
     }
 
-    override fun getItemCount() = items.size
-
-    //Calls the ItemList
-    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: BaseViewHolder<BudgetListItems>, position: Int) {
         when (val item = items[position]) {
-            is BudgetReportListItems.DateHeader -> (holder as DateHeaderViewHolder).bind(item)
-            is BudgetReportListItems.TransactionItem -> (holder as TransactionViewHolder).bind(item)
-            is BudgetReportListItems.CategoryItems -> (holder as CategoryViewHolder).bind(item)
+            is BudgetListItems.BudgetDateHeader -> (holder as DateHeaderViewHolder).bind(item)
+            is BudgetListItems.BudgetTransactionItem -> (holder as TransactionViewHolder).bind(item)
+            is BudgetListItems.BudgetCategoryItem -> (holder as CategoryViewHolder).bind(item)
             else -> throw IllegalArgumentException("Unexpected item type at position $position: ${item::class.simpleName}")
         }
     }
 
-    class DateHeaderViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        fun bind(item: BudgetReportListItems.DateHeader) {
-            itemView.findViewById<TextView>(R.id.textDayNumber).text = item.dateNumber
-            itemView.findViewById<TextView>(R.id.textRelativeDate).text = item.relativeDate
-            itemView.findViewById<TextView>(R.id.textMonthYearDate).text = item.monthYearDate
-            itemView.findViewById<TextView>(R.id.textTotalAmount).text = "R ${item.amountTotal}"
+    class DateHeaderViewHolder(
+        itemView: View
+    ) : BaseViewHolder<BudgetListItems>(itemView) {
+        private val dayNumber: TextView = itemView.findViewById(R.id.textDayNumber)
+        private val relativeDate: TextView = itemView.findViewById(R.id.textRelativeDate)
+        private val monthYearDate: TextView = itemView.findViewById(R.id.textMonthYearDate)
+        private val totalAmount: TextView = itemView.findViewById(R.id.textTotalAmount)
+
+        override fun bind(item: BudgetListItems) {
+
+            if (item !is BudgetListItems.BudgetDateHeader) return
+
+            dayNumber.text = item.dateNumber
+            relativeDate.text = item.relativeDate
+            monthYearDate.text = item.monthYearDate
+            totalAmount.text = "R ${item.amountTotal}"
         }
     }
 
-    class TransactionViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        fun bind(item: BudgetReportListItems.TransactionItem) {
-            val iconContainer = itemView.findViewById<LinearLayout>(R.id.iconCategoryContainer)
-            val iconView = itemView.findViewById<ImageView>(R.id.iconCategory)
+    class TransactionViewHolder(
+        itemView: View,
+        private val onClick: ((Transaction) -> Unit)?
+    ) : BaseViewHolder<BudgetListItems>(itemView) {
+        private val iconContainer: LinearLayout = itemView.findViewById(R.id.iconCategoryContainer)
+        private val iconView: ImageView = itemView.findViewById(R.id.iconCategory)
+        private val categoryName: TextView = itemView.findViewById(R.id.textCategoryName)
+        private val walletName: TextView = itemView.findViewById(R.id.textWalletName)
+        private val noteContainer: LinearLayout = itemView.findViewById(R.id.rowNote)
+        private val noteText: TextView = itemView.findViewById(R.id.textNote)
 
-            // Convert resource ID to actual color
+        override fun bind(item: BudgetListItems) {
+            if (item !is BudgetListItems.BudgetTransactionItem) return
+
+            // Set category icon and color
             val resolvedColor = ContextCompat.getColor(itemView.context, item.categoryColour)
-
-            // Set the background circle color
-            val background = iconContainer.background.mutate() as GradientDrawable
-            background.setColor(resolvedColor)
-
-            // Set the icon
+            (iconContainer.background.mutate() as GradientDrawable).setColor(resolvedColor)
             iconView.setImageResource(item.categoryIcon)
 
-            itemView.findViewById<TextView>(R.id.textCategoryName).text = item.categoryName
-            itemView.findViewById<TextView>(R.id.textWalletName).text = item.walletName
+            // Set text fields
+            categoryName.text = item.categoryName
+            walletName.text = item.transaction.wallet.name
 
-            if (item.note == null) {
-                itemView.findViewById<LinearLayout>(R.id.rowNote).visibility = View.GONE
+            // Handle note visibility
+            if (item.transaction.note.isEmpty()) {
+                noteContainer.visibility = View.GONE
             } else {
-                itemView.findViewById<LinearLayout>(R.id.rowNote).visibility = View.VISIBLE
-                itemView.findViewById<TextView>(R.id.textNote).text = item.note
+                noteContainer.visibility = View.VISIBLE
+                noteText.text = item.transaction.note
             }
         }
     }
 
-    class CategoryViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        fun bind(item: BudgetReportListItems.CategoryItems) {
-            val iconView = itemView.findViewById<ImageView>(R.id.iconCategory)
-            val iconContainer = itemView.findViewById<LinearLayout>(R.id.iconCategoryContainer)
+    class CategoryViewHolder(
+        itemView: View,
+        private val onClick: ((Category) -> Unit)?
+    ) : BaseViewHolder<BudgetListItems>(itemView) {
+        private val iconView: ImageView = itemView.findViewById(R.id.iconCategory)
+        private val iconContainer: LinearLayout = itemView.findViewById(R.id.iconCategoryContainer)
+        private val categoryName: TextView = itemView.findViewById(R.id.txtCategoryName)
+        private val transactionCount: TextView = itemView.findViewById(R.id.txtTransactions)
+        private val amount: TextView = itemView.findViewById(R.id.txtAmount)
+        private val date: TextView = itemView.findViewById(R.id.txtDate)
 
-            //Convert resource ID to actual color
-            val resolvedColor = ContextCompat.getColor(itemView.context, item.categoryColour)
+        override fun bind(item: BudgetListItems) {
+            if (item !is BudgetListItems.BudgetCategoryItem) return
+
+            // Set category icon and color
+            val resolvedColor = ContextCompat.getColor(itemView.context, item.category.color)
             (iconContainer.background.mutate() as GradientDrawable).setColor(resolvedColor)
+            iconView.setImageResource(item.category.icon)
 
-            //set icon
-            iconView.setImageResource(item.categoryIcon)
-
-            itemView.findViewById<TextView>(R.id.txtCategoryName).text = item.categoryName
-            itemView.findViewById<TextView>(R.id.txtTransactions).text = "${item.transactionCount} transactions"
-            itemView.findViewById<TextView>(R.id.txtAmount).text = item.amount
-            itemView.findViewById<TextView>(R.id.txtDate).text = item.relativeDate
+            // Set text fields
+            categoryName.text = item.category.name
+            transactionCount.text = "${item.transactionCount} transactions"
+            amount.text = item.amount
+            date.text = item.relativeDate
         }
     }
-
 }

@@ -21,421 +21,514 @@
 <!--    * https://www.youtube.com/watch?v=A_tPafV23DM&list=PLPgs125_L-X9H6J7x4beRU-AxJ4mXe5vX-->
 <!--    ======================================================================================-->
 
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/layout_add_transaction"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="16dp"
+    android:background="?attr/bb_background"
     tools:context=".presentation.ui.main.transaction.TransactionAddFragment">
 
-    <!-- Top Bar (Back Arrow + Title) -->
-    <LinearLayout
-        android:id="@+id/top_bar"
+    <!-- Top App Bar -->
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
-        android:layout_height="70dp"
-        android:orientation="horizontal"
-        android:gravity="center"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
-
-        <TextView
-            android:id="@+id/title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/add_new_transaction"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:textColor="?attr/bb_primaryText"
-            android:layout_marginStart="16dp"/>
-    </LinearLayout>
-
-    <ImageButton
-        android:id="@+id/btnGoBack"
-        android:layout_width="44dp"
-        android:layout_height="44dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:background="@null"
-        android:contentDescription="@string/back"
-        android:src="?attr/actionModeCloseDrawable"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:tint="?attr/bb_primaryText" />
-
-
-    <!-- Main Card -->
-    <ScrollView
-        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:fillViewport="true"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/btnGoBack">
+        android:background="@android:color/transparent"
+        app:elevation="0dp">
 
-        <androidx.cardview.widget.CardView
-            android:id="@+id/card_transaction_form"
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            app:cardBackgroundColor="?attr/bb_surface"
-            app:cardCornerRadius="20dp">
+            android:layout_height="?attr/actionBarSize"
+            android:background="@android:color/transparent">
 
             <LinearLayout
                 android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingHorizontal="4dp">
+
+                <ImageButton
+                    android:id="@+id/btnGoBack"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="@string/back"
+                    android:src="?attr/actionModeCloseDrawable"
+                    app:tint="?attr/bb_primaryText" />
+
+                <TextView
+                    android:id="@+id/toolbarTitle"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/add_new_transaction"
+                    android:textColor="?attr/bb_primaryText"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+        </androidx.appcompat.widget.Toolbar>
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <!-- Main Content -->
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/contentScrollView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:fillViewport="true"
+        android:paddingBottom="98dp"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <!-- Amount Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="16dp">
-
-                <!-- Category Row -->
-                <LinearLayout
-                    android:id="@+id/rowSelectCategory"
-                    style="@style/RowStyle">
-
-                    <ImageView
-                        style="@style/RowIconStyle"
-                        android:src="@drawable/ic_circle_24"
-                        app:tint="?attr/bb_button" />
-
-                    <!-- Container for Wallet title and selected name -->
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical"
-                        android:layout_marginStart="12dp">
-
-                        <!-- Top Label -->
-                        <TextView
-                            android:id="@+id/textCategoryLabel"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/category"
-                            android:textColor="?attr/bb_primaryText"
-                            android:textSize="18sp" />
-
-                        <!-- Selected wallet name -->
-                        <TextView
-                            android:id="@+id/textSelectedCategoryName"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="No category selected"
-                            android:textColor="?attr/bb_secondaryText"
-                            android:textSize="14sp"
-                            android:visibility="visible"
-                            android:paddingTop="2dp" />
-                    </LinearLayout>
-
-                    <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:layout_marginStart="8dp"
-                        android:background="@null"
-                        android:rotation="180"
-                        android:src="?attr/actionModeCloseDrawable" />
-                </LinearLayout>
-
-                <!-- Wallet Row -->
-                <LinearLayout
-                    android:id="@+id/rowSelectWallet"
-                    style="@style/RowStyle"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:paddingVertical="8dp">
-
-                    <ImageView
-                        style="@style/RowIconStyle"
-                        android:src="@drawable/ic_account_balance_wallet_24"
-                        app:tint="?attr/bb_button" />
-
-                    <!-- Container for Wallet title and selected name -->
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical"
-                        android:layout_marginStart="12dp">
-
-                        <!-- Top Label -->
-                        <TextView
-                            android:id="@+id/textWalletLabel"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/wallet"
-                            android:textColor="?attr/bb_primaryText"
-                            android:textSize="18sp" />
-
-                        <!-- Selected wallet name -->
-                        <TextView
-                            android:id="@+id/textSelectedWalletName"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="No wallet selected"
-                            android:textColor="?attr/bb_secondaryText"
-                            android:textSize="14sp"
-                            android:visibility="visible"
-                            android:paddingTop="2dp" />
-                    </LinearLayout>
-
-                    <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:layout_marginStart="8dp"
-                        android:background="@null"
-                        android:rotation="180"
-                        android:src="?attr/actionModeCloseDrawable" />
-                </LinearLayout>
+                android:layout_marginBottom="16dp"
+                app:cardBackgroundColor="?attr/bb_surface"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0dp">
 
                 <LinearLayout
-                    android:id="@+id/rowCurrencyAmount"
-                    style="@style/RowStyle">
-
-                    <ImageView
-                        style="@style/RowIconStyle"
-                        android:src="@drawable/baseline_savings_24"
-                        app:tint="?attr/bb_button" />
-
-                    <!-- Amount Input -->
-                    <EditText
-                        android:id="@+id/edtTextAmount"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:hint="@string/amount"
-                        android:inputType="numberDecimal"
-                        android:textColor="?attr/bb_primaryText"
-                        android:textColorHint="?attr/bb_primaryText" />
-
-                    <!-- Spacer -->
-                    <View
-                        android:layout_width="16dp"
-                        android:layout_height="0dp" />
-
-                    <!-- Currency Spinner -->
-                    <Spinner
-                        android:id="@+id/spinnerCurrency"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="12dp"
-                        android:spinnerMode="dropdown"
-                        tools:ignore="TouchTargetSizeCheck" />
-
-
-                </LinearLayout>
-
-                <!-- Date Row -->
-                <LinearLayout
-                    android:id="@+id/rowSelectDate"
-                    style="@style/RowStyle">
-
-                    <ImageView
-                        style="@style/RowIconStyle"
-                        android:src="@drawable/ic_calendar_month_24"
-                        app:tint="?attr/bb_button" />
-
-                    <EditText
-                        android:id="@+id/edtTextDate"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:clickable="true"
-                        android:focusable="false"
-                        android:hint="@string/date"
-                        android:inputType="date"
-                        android:textColor="?attr/bb_primaryText"
-                        android:textColorHint="?attr/bb_primaryText" />
-
-                    <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:layout_marginStart="8dp"
-                        android:background="@null"
-                        android:rotation="180"
-                        android:src="?attr/actionModeCloseDrawable" />
-                </LinearLayout>
-
-                <!-- Note Row -->
-                <LinearLayout
-                    android:id="@+id/rowSelectNote"
-                    style="@style/RowStyle">
-
-                    <ImageView
-                        style="@style/RowIconStyle"
-                        android:src="@drawable/ic_edit_note_24"
-                        app:tint="?attr/bb_button" />
-
-                    <EditText
-                        android:id="@+id/edtTextNote"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:hint="Description"
-                        android:inputType="text"
-                        android:textColor="?attr/bb_primaryText"
-                        android:textColorHint="?attr/bb_primaryText" />
-                </LinearLayout>
-
-                <!-- Label Row -->
-<!--                <LinearLayout-->
-<!--                    android:id="@+id/rowSelectLabel"-->
-<!--                    style="@style/RowStyle"-->
-<!--                    android:orientation="vertical">-->
-
-<!--                    <LinearLayout-->
-<!--                        android:layout_width="match_parent"-->
-<!--                        android:layout_height="wrap_content"-->
-<!--                        android:orientation="horizontal">-->
-
-<!--                        <ImageView-->
-<!--                            style="@style/RowIconStyle"-->
-<!--                            android:src="@drawable/ic_discount_24"-->
-<!--                            app:tint="?attr/bb_button" />-->
-
-<!--                        <TextView-->
-<!--                            android:layout_width="0dp"-->
-<!--                            android:layout_height="wrap_content"-->
-<!--                            android:layout_marginStart="12dp"-->
-<!--                            android:layout_weight="1"-->
-<!--                            android:gravity="center_vertical"-->
-<!--                            android:text="@string/label"-->
-<!--                            android:textColor="?attr/bb_primaryText"-->
-<!--                            android:textSize="18sp" />-->
-
-<!--                        <ImageView-->
-<!--                            android:layout_width="24dp"-->
-<!--                            android:layout_height="24dp"-->
-<!--                            android:layout_marginStart="8dp"-->
-<!--                            android:background="@null"-->
-<!--                            android:rotation="180"-->
-<!--                            android:src="?attr/actionModeCloseDrawable" />-->
-<!--                    </LinearLayout>-->
-
-<!--                    &lt;!&ndash; Chip Group for Selected Labels &ndash;&gt;-->
-<!--                    <com.google.android.material.chip.ChipGroup-->
-<!--                        android:id="@+id/chipGroupLabels"-->
-<!--                        android:layout_width="match_parent"-->
-<!--                        android:layout_height="wrap_content"-->
-<!--                        android:layout_marginStart="48dp"-->
-<!--                        android:layout_marginTop="4dp"-->
-<!--                        android:layout_marginEnd="8dp"-->
-<!--                        android:visibility="gone"-->
-<!--                        app:chipSpacing="4dp"-->
-<!--                        app:singleLine="false" />-->
-<!--                </LinearLayout>-->
-
-                <!-- Recurrence Row -->
-                <LinearLayout
-                    android:id="@+id/rowSelectRecurrenceRate"
-                    style="@style/RowStyle">
-
-                    <ImageView
-                        style="@style/RowIconStyle"
-                        android:src="@drawable/ic_autorenew_24"
-                        app:tint="?attr/bb_button" />
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical"
-                        android:layout_marginStart="12dp">
-
-                        <!-- Top Label -->
-                        <TextView
-                            android:id="@+id/textRecurrenceRateLabel"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/recurrence"
-                            android:textColor="?attr/bb_primaryText"
-                            android:textSize="18sp" />
-
-                        <!-- Selected wallet name -->
-                        <TextView
-                            android:id="@+id/textSelectedRecurrenceRate"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="No selected recurrence rate"
-                            android:textColor="?attr/bb_secondaryText"
-                            android:textSize="14sp"
-                            android:visibility="visible"
-                            android:paddingTop="2dp" />
-                    </LinearLayout>
-
-                    <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:layout_marginStart="8dp"
-                        android:background="@null"
-                        android:rotation="180"
-                        android:src="?attr/actionModeCloseDrawable" />
-                </LinearLayout>
-
-                <!-- Photo Row -->
-                <LinearLayout
-                    android:id="@+id/rowSelectPhoto"
-                    style="@style/RowStyle">
-
-                    <ImageView
-                        style="@style/RowIconStyle"
-                        android:src="@drawable/ic_add_photo_alternate_24"
-                        app:tint="?attr/bb_button" />
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="12dp"
-                        android:layout_weight="1"
-                        android:gravity="center_vertical"
-                        android:text="@string/add_photo"
-                        android:textColor="?attr/bb_primaryText"
-                        android:textSize="18sp" />
-
-                    <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:layout_marginStart="8dp"
-                        android:background="@null"
-                        android:rotation="180"
-                        android:src="?attr/actionModeCloseDrawable" />
-                </LinearLayout>
-
-                <ImageView
-                    android:id="@+id/imagePreview"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginEnd="8dp"
-                    android:adjustViewBounds="true"
-                    android:background="?attr/selectableItemBackground"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:maxHeight="180dp"
-                    android:scaleType="fitCenter"
-                    android:visibility="gone" />
+                    android:orientation="vertical"
+                    android:padding="16dp">
 
-            </LinearLayout>
-        </androidx.cardview.widget.CardView>
-    </ScrollView>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Amount"
+                        android:textColor="?attr/bb_secondaryText"
+                        android:textSize="14sp" />
 
-    <!-- Save Button sticks to bottom -->
-    <Button
-        android:id="@+id/btnSave"
-        android:layout_width="wrap_content"
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <Spinner
+                            android:id="@+id/spinnerCurrency"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@null"
+                            android:minWidth="80dp"
+                            android:spinnerMode="dropdown" />
+
+                        <EditText
+                            android:id="@+id/edtTextAmount"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:background="@null"
+                            android:hint="0.00"
+                            android:inputType="numberDecimal"
+                            android:textColor="?attr/bb_primaryText"
+                            android:textColorHint="?attr/bb_secondaryText"
+                            android:textSize="32sp" />
+                    </LinearLayout>
+
+                    <!-- Error for amount selection -->
+                    <TextView
+                        android:id="@+id/textAmountError"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@android:color/holo_red_light"
+                        android:textSize="12sp"
+                        android:visibility="gone"
+                        android:layout_marginStart="82dp"
+                        android:layout_marginTop="0dp"/>
+
+                    <!-- Add after currency spinner -->
+                    <TextView
+                        android:id="@+id/textCurrencyError"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@android:color/holo_red_light"
+                        android:textSize="12sp"
+                        android:visibility="gone"
+                        android:layout_marginStart="6dp"
+                        android:layout_marginTop="0dp"/>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Details Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardBackgroundColor="?attr/bb_surface"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <!-- Category Row -->
+                    <LinearLayout
+                        android:id="@+id/rowSelectCategory"
+                        style="@style/RowStyle"
+                        android:background="?attr/selectableItemBackground">
+
+                        <ImageView
+                            android:id="@+id/imgSelectedCategoryIcon"
+                            style="@style/RowIconStyle"
+                            android:src="@drawable/ic_circle_24"
+                            app:tint="?attr/bb_button" />
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:layout_marginStart="12dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/category"
+                                android:textColor="?attr/bb_primaryText"
+                                android:textSize="16sp" />
+
+                            <TextView
+                                android:id="@+id/textSelectedCategoryName"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Select category"
+                                android:textColor="?attr/bb_secondaryText"
+                                android:textSize="14sp" />
+                        </LinearLayout>
+
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:layout_marginStart="8dp"
+                            android:src="@drawable/ic_arrow_open_24"
+                            app:tint="?attr/bb_secondaryText" />
+                    </LinearLayout>
+
+                    <!-- Error for category selection -->
+                    <TextView
+                        android:id="@+id/textCategoryError"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@android:color/holo_red_light"
+                        android:textSize="12sp"
+                        android:visibility="gone"
+                        android:layout_marginStart="70dp"
+                        android:layout_marginTop="0dp"/>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginHorizontal="16dp"
+                        android:background="?attr/bb_secondaryText" />
+
+                    <!-- Wallet Row -->
+                    <LinearLayout
+                        android:id="@+id/rowSelectWallet"
+                        style="@style/RowStyle"
+                        android:background="?attr/selectableItemBackground">
+
+                        <ImageView
+                            android:id="@+id/imgSelectedWalletIcon"
+                            style="@style/RowIconStyle"
+                            android:src="@drawable/ic_wallet_24"
+                            app:tint="?attr/bb_button" />
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:layout_marginStart="12dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/wallet"
+                                android:textColor="?attr/bb_primaryText"
+                                android:textSize="16sp" />
+
+                            <TextView
+                                android:id="@+id/textSelectedWalletName"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Select wallet"
+                                android:textColor="?attr/bb_secondaryText"
+                                android:textSize="14sp" />
+                        </LinearLayout>
+
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:layout_marginStart="8dp"
+                            android:src="@drawable/ic_arrow_open_24"
+                            app:tint="?attr/bb_secondaryText" />
+                    </LinearLayout>
+
+                    <!-- Error for wallet selection -->
+                    <TextView
+                        android:id="@+id/textWalletError"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@android:color/holo_red_light"
+                        android:textSize="12sp"
+                        android:visibility="gone"
+                        android:layout_marginStart="70dp"
+                        android:layout_marginTop="0dp"/>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginHorizontal="16dp"
+                        android:background="?attr/bb_secondaryText" />
+
+                    <!-- Date Row -->
+                    <LinearLayout
+                        android:id="@+id/rowSelectDate"
+                        style="@style/RowStyle"
+                        android:background="?attr/selectableItemBackground">
+
+                        <ImageView
+                            style="@style/RowIconStyle"
+                            android:src="@drawable/ic_calendar_month_24"
+                            app:tint="?attr/bb_button" />
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:layout_marginStart="12dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/date"
+                                android:textColor="?attr/bb_primaryText"
+                                android:textSize="16sp" />
+
+                            <TextView
+                                android:id="@+id/edtTextDate"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Select Date"
+                                android:textColor="?attr/bb_secondaryText"
+                                android:textSize="14sp" />
+                        </LinearLayout>
+
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:layout_marginStart="8dp"
+                            android:src="@drawable/ic_arrow_open_24"
+                            app:tint="?attr/bb_secondaryText" />
+                    </LinearLayout>
+
+                    <!-- Error for date selection -->
+                    <TextView
+                        android:id="@+id/textDateError"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@android:color/holo_red_light"
+                        android:textSize="12sp"
+                        android:visibility="gone"
+                        android:layout_marginStart="70dp"
+                        android:layout_marginTop="0dp"/>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginHorizontal="16dp"
+                        android:background="?attr/bb_secondaryText" />
+
+                    <!-- Note Row -->
+                    <LinearLayout
+                        android:id="@+id/rowSelectNote"
+                        style="@style/RowStyle">
+
+                        <ImageView
+                            style="@style/RowIconStyle"
+                            android:src="@drawable/ic_edit_note_24"
+                            app:tint="?attr/bb_button" />
+
+                        <EditText
+                            android:id="@+id/edtTextNote"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:background="@null"
+                            android:hint="Add note"
+                            android:inputType="textMultiLine"
+                            android:maxLines="3"
+                            android:textColor="?attr/bb_primaryText"
+                            android:textColorHint="?attr/bb_secondaryText"
+                            android:textSize="16sp" />
+                    </LinearLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Additional Options Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardBackgroundColor="?attr/bb_surface"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <!-- Recurrence Row -->
+                    <LinearLayout
+                        android:id="@+id/rowSelectRecurrenceRate"
+                        style="@style/RowStyle"
+                        android:background="?attr/selectableItemBackground">
+
+                        <ImageView
+                            style="@style/RowIconStyle"
+                            android:src="@drawable/ic_autorenew_24"
+                            app:tint="?attr/bb_button" />
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:layout_marginStart="12dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/recurrence"
+                                android:textColor="?attr/bb_primaryText"
+                                android:textSize="16sp" />
+
+                            <TextView
+                                android:id="@+id/textSelectedRecurrenceRate"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="One time"
+                                android:textColor="?attr/bb_secondaryText"
+                                android:textSize="14sp" />
+                        </LinearLayout>
+
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:layout_marginStart="8dp"
+                            android:src="@drawable/ic_arrow_open_24"
+                            app:tint="?attr/bb_secondaryText" />
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginHorizontal="16dp"
+                        android:background="?attr/bb_secondaryText" />
+
+                    <!-- Photo Row -->
+                    <LinearLayout
+                        android:id="@+id/rowSelectPhoto"
+                        style="@style/RowStyle"
+                        android:background="?attr/selectableItemBackground">
+
+                        <ImageView
+                            style="@style/RowIconStyle"
+                            android:src="@drawable/ic_add_photo_alternate_24"
+                            app:tint="?attr/bb_button" />
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="12dp"
+                            android:layout_weight="1"
+                            android:text="@string/add_photo"
+                            android:textColor="?attr/bb_primaryText"
+                            android:textSize="16sp" />
+
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:layout_marginStart="8dp"
+                            android:src="@drawable/ic_arrow_open_24"
+                            app:tint="?attr/bb_secondaryText" />
+                    </LinearLayout>
+
+                    <!-- Image Preview Container -->
+                    <FrameLayout
+                        android:id="@+id/imagePreviewContainer"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="16dp"
+                        android:visibility="gone"
+                        tools:visibility="visible">
+
+                        <!-- Image Preview -->
+                        <com.google.android.material.imageview.ShapeableImageView
+                            android:id="@+id/imagePreview"
+                            android:layout_width="match_parent"
+                            android:layout_height="200dp"
+                            android:adjustViewBounds="true"
+                            android:scaleType="centerCrop"
+                            app:shapeAppearanceOverlay="@style/RoundedImageView"
+                            android:foreground="?attr/selectableItemBackground"/>
+
+                        <!-- Remove Photo Button -->
+                        <com.google.android.material.floatingactionbutton.FloatingActionButton
+                            android:id="@+id/btnRemovePhoto"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="top|end"
+                            android:layout_margin="8dp"
+                            android:src="@drawable/ic_add_circle_40"
+                            app:fabSize="mini"
+                            app:tint="@android:color/white"
+                            app:backgroundTint="@android:color/holo_red_light"/>
+                    </FrameLayout>
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <!-- Bottom Save Button -->
+    <FrameLayout
+        android:id="@+id/bottomButtonContainer"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:layout_marginBottom="16dp"
-        android:paddingHorizontal="32dp"
-        android:paddingVertical="12dp"
-        android:text="@string/save"
-        android:textColor="@android:color/white"
-        android:textSize="18sp"
-        app:backgroundTint="?attr/bb_button"
-        app:cornerRadius="24dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        android:layout_gravity="bottom"
+        android:background="?attr/bb_background"
+        android:elevation="8dp"
+        android:padding="16dp">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnSave"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingVertical="16dp"
+            android:text="@string/save"
+            android:textColor="@android:color/white"
+            android:textSize="16sp"
+            app:backgroundTint="?attr/bb_button"
+            app:cornerRadius="16dp" />
+    </FrameLayout>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

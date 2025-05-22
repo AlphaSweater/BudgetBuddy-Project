@@ -1,60 +1,65 @@
 package com.synaptix.budgetbuddy.presentation.ui.main.wallet
 
-import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.recyclerview.widget.RecyclerView
 import com.synaptix.budgetbuddy.R
-import com.synaptix.budgetbuddy.core.model.BudgetReportListItems
-import com.synaptix.budgetbuddy.core.model.Wallet
+import com.synaptix.budgetbuddy.core.model.BudgetListItems
+import com.synaptix.budgetbuddy.presentation.ui.common.BaseAdapter
 
-class WalletMainAdapter(private val walletItems: List<BudgetReportListItems.WalletItem>,
-                        private val onClick: (BudgetReportListItems.WalletItem) -> Unit // <-- Add this
-) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+/**
+ * Adapter for displaying the main wallet list in the wallet screen.
+ * This adapter follows the standard pattern for RecyclerView adapters in the app:
+ * 1. Extends BaseAdapter for common functionality
+ * 2. Uses a dedicated ViewHolder class
+ * 3. Handles item click events through a callback
+ * 4. Displays wallet icon, name, and balance
+ *
+ * @param onWalletClick Callback function that is triggered when a wallet item is clicked
+ */
+class WalletMainAdapter(
+    private val onWalletClick: (BudgetListItems.BudgetWalletItem) -> Unit
+) : BaseAdapter<BudgetListItems.BudgetWalletItem, WalletMainAdapter.WalletViewHolder>() {
 
-    companion object {
-        private const val VIEW_TYPE_BUDGET = 0
-    }
-
-    override fun getItemViewType(position: Int): Int {
-        return when (walletItems[position]) {
-            is BudgetReportListItems.WalletItem -> VIEW_TYPE_BUDGET
-            else -> throw IllegalArgumentException("Unsupported item type at position $position")
+    /**
+     * Creates a new ViewHolder instance for wallet items.
+     * Uses the standard item_wallet_main layout resource.
+     */
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): WalletViewHolder {
+        return createViewHolder(parent, R.layout.item_wallet_main) { view ->
+            WalletViewHolder(view, onWalletClick)
         }
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        return when (viewType) {
-            VIEW_TYPE_BUDGET -> {
-                val view = LayoutInflater.from(parent.context)
-                    .inflate(R.layout.item_wallet_main, parent, false) // Make sure this is not your fragment layout!
-                WalletViewHolder(view)
-            }
-            else -> throw IllegalArgumentException("Unknown view type $viewType")
-        }
-    }
+    /**
+     * ViewHolder class for wallet items in the main wallet screen.
+     * Responsible for binding wallet data to the view and handling click events.
+     * Displays:
+     * - Wallet icon
+     * - Wallet name
+     * - Wallet balance
+     */
+    class WalletViewHolder(
+        itemView: View,
+        private val onWalletClick: (BudgetListItems.BudgetWalletItem) -> Unit
+    ) : BaseViewHolder<BudgetListItems.BudgetWalletItem>(itemView) {
 
-    override fun getItemCount(): Int = walletItems.size
-
-    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        when (val walletItems = walletItems[position]) {
-            is BudgetReportListItems.WalletItem -> (holder as WalletViewHolder).bind(walletItems, onClick)
-            else -> throw IllegalArgumentException("Unsupported item type at position $position")
-        }
-    }
-
-    class WalletViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val walletIcon: ImageView = itemView.findViewById(R.id.walletIcon)
         private val walletName: TextView = itemView.findViewById(R.id.walletName)
         private val walletBalance: TextView = itemView.findViewById(R.id.walletBalance)
 
-        fun bind(item: BudgetReportListItems.WalletItem, onClick: (BudgetReportListItems.WalletItem) -> Unit) {
+        /**
+         * Binds wallet data to the view.
+         * Sets the wallet icon, name, and balance.
+         * Attaches click listener to the entire item view.
+         */
+        override fun bind(item: BudgetListItems.BudgetWalletItem) {
             walletIcon.setImageResource(item.walletIcon)
             walletName.text = item.walletName
             walletBalance.text = item.walletBalance.toString()
-            itemView.setOnClickListener { onClick(item) }
+            
+            itemView.setOnClickListener { onWalletClick(item) }
         }
     }
 }

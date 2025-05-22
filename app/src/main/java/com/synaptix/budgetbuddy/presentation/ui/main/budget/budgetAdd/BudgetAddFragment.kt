@@ -35,6 +35,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.synaptix.budgetbuddy.R
+import com.synaptix.budgetbuddy.core.model.Category
 import com.synaptix.budgetbuddy.databinding.FragmentBudgetAddBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -87,20 +88,18 @@ class BudgetAddFragment : Fragment() {
     }
 
     private fun setupClickListeners() {
-        binding.btnSave.setOnClickListener { saveTransaction() }
+        binding.btnSave.setOnClickListener { saveBudget() }
         binding.btnGoBack.setOnClickListener { findNavController().popBackStack() }
         binding.rowSelectCategory.setOnClickListener { showCategorySelector() }
         binding.rowSelectWallet.setOnClickListener { showWalletSelector() }
     }
 
     // --- Save Logic ---
-    private fun saveTransaction() {
-        // Update ViewModel LiveData
+    private fun saveBudget() {
         viewModel.budgetName.value = binding.budgetName.text.toString()
         viewModel.budgetAmount.value = binding.amount.text.toString().toDoubleOrNull() ?: 0.0
 
-        // Validate input
-        if (viewModel.category.value == null  ||
+        if (viewModel.selectedCategories.value.isNullOrEmpty() ||
             viewModel.wallet.value == null ||
             viewModel.budgetName.value.isNullOrBlank() ||
             viewModel.budgetAmount.value!! <= 0.0
@@ -113,7 +112,6 @@ class BudgetAddFragment : Fragment() {
             return
         }
 
-        // Launch coroutine to call suspend function
         viewLifecycleOwner.lifecycleScope.launch {
             try {
                 viewModel.addBudget()
@@ -127,7 +125,7 @@ class BudgetAddFragment : Fragment() {
             } catch (e: Exception) {
                 Toast.makeText(
                     requireContext(),
-                    "Failed to save transaction: ${e.message}",
+                    "Failed to save budget: ${e.message}",
                     Toast.LENGTH_SHORT
                 ).show()
             }
@@ -139,19 +137,11 @@ class BudgetAddFragment : Fragment() {
         findNavController().navigate(R.id.action_budgetAddFragment_to_budgetSelectWalletFragment)
     }
 
-    private fun showCategorySelector(){
+    private fun showCategorySelector() {
         findNavController().navigate(R.id.action_budgetAddFragment_to_budgetSelectCategoryFragment)
     }
 
     // --- Update Methods ---
-    private fun updateSelectedCategory(categoryName: String) {
-        if (categoryName.isBlank()) {
-            binding.textSelectedCategoryName.text = "No category selected"
-            return
-        }
-        binding.textSelectedCategoryName.text = categoryName
-    }
-
     private fun updateSelectedWallet(walletName: String) {
         if (walletName.isBlank()) {
             binding.textSelectedWalletName.text = "No wallet selected"
@@ -160,16 +150,24 @@ class BudgetAddFragment : Fragment() {
         binding.textSelectedWalletName.text = walletName
     }
 
+    private fun updateSelectedCategories() {
+        val selectedCategories = viewModel.selectedCategories.value
+        if (selectedCategories.isNullOrEmpty()) {
+            binding.textSelectedCategoryName.text = "No categories selected"
+            return
+        }
+        val categoryNames = selectedCategories.joinToString(", ") { it.name }
+        binding.textSelectedCategoryName.text = categoryNames
+    }
+
     // --- Observers ---
     private fun observeViewModel() {
-
-        viewModel.category.observe(viewLifecycleOwner) { category ->
-            updateSelectedCategory(category?.categoryName ?: "")
-            Log.d("Category", "Selected Category: $category")
+        viewModel.selectedCategories.observe(viewLifecycleOwner) { categories ->
+            updateSelectedCategories()
         }
 
         viewModel.wallet.observe(viewLifecycleOwner) { wallet ->
-            updateSelectedWallet(wallet?.walletName ?: "")
+            updateSelectedWallet(wallet?.name ?: "")
             Log.d("Wallet", "Selected Wallet ID: $wallet")
         }
 

@@ -21,45 +21,110 @@
 
 package com.synaptix.budgetbuddy.presentation.ui.auth.signup
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.synaptix.budgetbuddy.core.usecase.auth.SignupResult
 import com.synaptix.budgetbuddy.core.usecase.auth.SignupUserUseCase
-import com.synaptix.budgetbuddy.data.entity.UserEntity
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
-import org.mindrot.jbcrypt.BCrypt
 import javax.inject.Inject
+
+sealed class SignupUiState {
+    object Idle : SignupUiState()
+    object Loading : SignupUiState()
+    object Success : SignupUiState()
+    data class Error(val message: String) : SignupUiState()
+    data class ValidationError(
+        val emailError: String? = null,
+        val passwordError: String? = null,
+        val confirmPasswordError: String? = null
+    ) : SignupUiState()
+}
 
 @HiltViewModel
 class SignupViewModel @Inject constructor(
     private val signupUserUseCase: SignupUserUseCase
 ) : ViewModel() {
 
+    private val _signupState = MutableLiveData<SignupUiState>(SignupUiState.Idle)
+    val signupState: LiveData<SignupUiState> = _signupState
+
+    fun validateEmail(email: String): String? {
+        return when {
+            email.isBlank() -> "Email is required"
+            !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches() -> "Invalid email format"
+            else -> null
+        }
+    }
+
+    fun validatePassword(password: String): String? {
+        return when {
+            password.isBlank() -> "Password is required"
+            password.length < 8 -> "Password must be at least 8 characters"
+            !password.matches(Regex(".*[A-Z].*")) -> "Password must contain at least one uppercase letter"
+            !password.matches(Regex(".*[0-9].*")) -> "Password must contain at least one number"
+            !password.matches(Regex(".*[!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>\\/?].*")) -> 
+                "Password must contain at least one special character"
+            else -> null
+        }
+    }
+
+    fun validatePasswordConfirmation(password: String, confirmPassword: String): String? {
+        return when {
+            confirmPassword.isBlank() -> "Please confirm your password"
+            confirmPassword != password -> "Passwords do not match"
+            else -> null
+        }
+    }
+
+    fun validateInputs(email: String, password: String, confirmPassword: String): Boolean {
+        val emailError = validateEmail(email)
+        val passwordError = validatePassword(password)
+        val confirmPasswordError = validatePasswordConfirmation(password, confirmPassword)
+
+        if (emailError != null || passwordError != null || confirmPasswordError != null) {
+            _signupState.value = SignupUiState.ValidationError(
+                emailError,
+                passwordError,
+                confirmPasswordError
+            )
+            return false
+        }
+        return true
+    }
+
     // Function that handles user sign-up
     // Takes email and password, hashes the password securely
     // and creates a new UserEntity object to register the user
     fun signUp(email: String, password: String) {
-        // Hash the password using BCrypt before saving it to the database
-        val hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt())
+        if (!validateInputs(email, password, password)) {
+            return
+        }
 
-        // Instantiate the UserEntity object with hashed password and provided email
-        val userEntity = UserEntity(
-            user_id = 0,       // User ID will be auto-generated in the database
-            firstName = null,  // First name is currently set to null (can be updated later)
-            lastName = null,   // Last name is currently set to null (can be updated later)
-            email = email,
-            password = hashedPassword
-        )
+        _signupState.value = SignupUiState.Loading
 
-        // Use coroutine scope to perform database operation asynchronously
         viewModelScope.launch {
-            val result = signupUserUseCase.execute(userEntity)
-            // Currently, result is not handled but can be used for future error/success handling
+            try {
+                val result = signupUserUseCase.invoke(email, password)
+                _signupState.value = when (result) {
+                    is SignupResult.Success -> SignupUiState.Success
+                    is SignupResult.EmailExists -> SignupUiState.Error("Email already in use")
+                    is SignupResult.Error -> SignupUiState.Error(result.message)
+                }
+            } catch (e: Exception) {
+                _signupState.value = SignupUiState.Error(e.localizedMessage ?: "Unknown error")
+            }
         }
     }
 
     // Function to check if the provided email already exists in the database
     suspend fun checkEmailExists(email: String): Boolean {
         return signupUserUseCase.emailExists(email)
+    }
+
+    fun resetState() {
+        _signupState.value = SignupUiState.Idle
     }
 }

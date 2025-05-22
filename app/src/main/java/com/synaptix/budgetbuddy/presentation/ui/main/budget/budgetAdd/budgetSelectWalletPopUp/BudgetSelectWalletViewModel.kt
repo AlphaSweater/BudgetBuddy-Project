@@ -21,6 +21,7 @@
 
 package com.synaptix.budgetbuddy.presentation.ui.main.budget.budgetAdd.budgetSelectWalletPopUp
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -48,8 +49,14 @@ class BudgetSelectWalletViewModel @Inject constructor(
     fun loadWallets() {
         viewModelScope.launch {
             val userId = getUserIdUseCase.execute()
-            val walletsList = getWalletUseCase.execute(userId)
-            _wallets.value = walletsList
+            when (val result = getWalletUseCase.execute(userId)) {
+                is GetWalletUseCase.GetWalletResult.Success -> {
+                    _wallets.value = result.wallets
+                }
+                is GetWalletUseCase.GetWalletResult.Error -> {
+                    Log.e("BudgetSelectWalletViewModel", "Failed to load wallets: ${result.message}")
+                }
+            }
         }
     }
 }

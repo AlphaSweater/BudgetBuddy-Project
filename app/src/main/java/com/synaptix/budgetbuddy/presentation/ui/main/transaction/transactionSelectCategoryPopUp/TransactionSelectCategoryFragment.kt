@@ -1,37 +1,45 @@
 package com.synaptix.budgetbuddy.presentation.ui.main.transaction.transactionSelectCategoryPopUp
 
+import android.graphics.Rect
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
+import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.synaptix.budgetbuddy.R
 import com.synaptix.budgetbuddy.core.model.Category
-import com.synaptix.budgetbuddy.core.model.CategoryIn
-import com.synaptix.budgetbuddy.core.usecase.auth.GetUserIdUseCase
 import com.synaptix.budgetbuddy.databinding.FragmentTransactionSelectCategoryBinding
 import com.synaptix.budgetbuddy.presentation.ui.main.transaction.TransactionAddViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class TransactionSelectCategoryFragment : Fragment() {
 
-    @Inject
-    lateinit var getUserIdUseCase: GetUserIdUseCase
     private var _binding: FragmentTransactionSelectCategoryBinding? = null
     private val binding get() = _binding!!
 
     private val viewModel: TransactionAddViewModel by activityViewModels()
-    private val categoryViewmodel: TransactionSelectCategoryViewModel by viewModels()
+    private val categoryViewModel: TransactionSelectCategoryViewModel by viewModels()
 
+    private val expenseAdapter by lazy {
+        TransactionSelectCategoryAdapter { category ->
+            viewModel.setCategory(category)
+            findNavController().popBackStack()
+        }
+    }
+
+    private val incomeAdapter by lazy {
+        TransactionSelectCategoryAdapter { category ->
+            viewModel.setCategory(category)
+            findNavController().popBackStack()
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -44,52 +52,85 @@ class TransactionSelectCategoryFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setupRecyclerViews()
-        setupOnClickListeners()
-        showExpenseCategories()
-        instantiateDBS()
+        setupViews()
+        setupSearch()
+        observeCategories()
     }
 
+    private fun setupViews() {
+        with(binding) {
+            btnGoBack.setOnClickListener {
+                findNavController().popBackStack()
+            }
+
+            btnAddCategory.setOnClickListener { showAddCategory() }
+            btnAddCategoryEmpty.setOnClickListener { showAddCategory() }
+
+            btnExpenseToggle.setOnClickListener { showExpenseCategories() }
+            btnIncomeToggle.setOnClickListener { showIncomeCategories() }
+
+            setupRecyclerViews()
+        }
+    }
 
     private fun setupRecyclerViews() {
-        binding.recyclerViewExpenseCategory.layoutManager = LinearLayoutManager(requireContext())
-        binding.recyclerViewIncomeCategory.layoutManager = LinearLayoutManager(requireContext())
+        val gridSpacing = GridSpacingItemDecoration(2, 8, true)
+        
+        binding.recyclerViewExpenseCategory.apply {
+            layoutManager = GridLayoutManager(context, 2)
+            adapter = expenseAdapter
+            addItemDecoration(gridSpacing)
+        }
+
+        binding.recyclerViewIncomeCategory.apply {
+            layoutManager = GridLayoutManager(context, 2)
+            adapter = incomeAdapter
+            addItemDecoration(gridSpacing)
+        }
     }
-    private fun setupOnClickListeners() {
-        binding.btnGoBack.setOnClickListener {
-            findNavController().popBackStack()
-        }
 
-        binding.btnExpenseToggle.setOnClickListener {
-            showExpenseCategories()
+    private fun setupSearch() {
+        binding.searchEditText.doAfterTextChanged { text ->
+            categoryViewModel.filterCategories(text?.toString() ?: "")
         }
+    }
 
-        binding.btnIncomeToggle.setOnClickListener {
-            showIncomeCategories()
-        }
-
-        binding.btnAddCategory.setOnClickListener {
-            showAddCategory()
+    private fun observeCategories() {
+        categoryViewModel.loadCategories()
+        categoryViewModel.filteredCategories.observe(viewLifecycleOwner) { categories ->
+            val (expenseCategories, incomeCategories) = categories.partition { it.type == "expense" }
+            expenseAdapter.submitList(expenseCategories)
+            incomeAdapter.submitList(incomeCategories)
+            updateEmptyState()
         }
     }
 
     private fun showExpenseCategories() {
-        binding.recyclerViewExpenseCategory.visibility = View.VISIBLE
-        binding.recyclerViewIncomeCategory.visibility = View.GONE
-
-        highlightToggle(binding.btnExpenseToggle, binding.btnIncomeToggle)
+        with(binding) {
+            recyclerViewExpenseCategory.visibility = View.VISIBLE
+            recyclerViewIncomeCategory.visibility = View.GONE
+            btnExpenseToggle.setBackgroundResource(R.drawable.toggle_selected)
+            btnIncomeToggle.background = null
+            updateEmptyState()
+        }
     }
 
     private fun showIncomeCategories() {
-        binding.recyclerViewExpenseCategory.visibility = View.GONE
-        binding.recyclerViewIncomeCategory.visibility = View.VISIBLE
-
-        highlightToggle(binding.btnIncomeToggle, binding.btnExpenseToggle)
+        with(binding) {
+            recyclerViewExpenseCategory.visibility = View.GONE
+            recyclerViewIncomeCategory.visibility = View.VISIBLE
+            btnIncomeToggle.setBackgroundResource(R.drawable.toggle_selected)
+            btnExpenseToggle.background = null
+            updateEmptyState()
+        }
     }
 
-    private fun highlightToggle(selected: TextView, unselected: TextView) {
-        selected.setBackgroundResource(R.drawable.toggle_selected)
-        unselected.setBackgroundResource(android.R.color.transparent)
+    private fun updateEmptyState() {
+        with(binding) {
+            val isExpenseVisible = recyclerViewExpenseCategory.visibility == View.VISIBLE
+            val currentAdapter = if (isExpenseVisible) expenseAdapter else incomeAdapter
+            emptyState.visibility = if (currentAdapter.itemCount == 0) View.VISIBLE else View.GONE
+        }
     }
 
     private fun showAddCategory() {
@@ -101,21 +142,30 @@ class TransactionSelectCategoryFragment : Fragment() {
         _binding = null
     }
 
-    private fun instantiateDBS() {
-        categoryViewmodel.loadCategories()
+    private class GridSpacingItemDecoration(
+        private val spanCount: Int,
+        private val spacing: Int,
+        private val includeEdge: Boolean
+    ) : RecyclerView.ItemDecoration() {
 
-        categoryViewmodel.categories.observe(viewLifecycleOwner) { categories ->
+        override fun getItemOffsets(
+            outRect: Rect,
+            view: View,
+            parent: RecyclerView,
+            state: RecyclerView.State
+        ) {
+            val position = parent.getChildAdapterPosition(view)
+            val column = position % spanCount
 
-            val (expenseCategories, incomeCategories) = categories.partition { it.categoryType == "expense" }
-
-            binding.recyclerViewExpenseCategory.adapter = TransactionSelectCategoryAdapter(expenseCategories) { category ->
-                viewModel.category.value = category
-                findNavController().popBackStack()
-            }
-
-            binding.recyclerViewIncomeCategory.adapter = TransactionSelectCategoryAdapter(incomeCategories) { category ->
-                viewModel.category.value = category
-                findNavController().popBackStack()
+            if (includeEdge) {
+                outRect.left = spacing - column * spacing / spanCount
+                outRect.right = (column + 1) * spacing / spanCount
+                if (position < spanCount) outRect.top = spacing
+                outRect.bottom = spacing
+            } else {
+                outRect.left = column * spacing / spanCount
+                outRect.right = spacing - (column + 1) * spacing / spanCount
+                if (position >= spanCount) outRect.top = spacing
             }
         }
     }

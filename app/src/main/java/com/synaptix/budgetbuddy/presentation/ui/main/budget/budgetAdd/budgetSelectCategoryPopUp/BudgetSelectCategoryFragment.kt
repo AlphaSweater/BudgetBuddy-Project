@@ -28,6 +28,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.synaptix.budgetbuddy.R
@@ -35,6 +36,8 @@ import com.synaptix.budgetbuddy.core.usecase.auth.GetUserIdUseCase
 import com.synaptix.budgetbuddy.databinding.FragmentBudgetSelectCategoryBinding
 import com.synaptix.budgetbuddy.presentation.ui.main.budget.budgetAdd.BudgetAddViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -51,7 +54,13 @@ class BudgetSelectCategoryFragment : Fragment() {
     private val viewModel: BudgetAddViewModel by activityViewModels()
 
     // ViewModel specific to this fragment
-    private val categoryViewmodel: BudgetSelectCategoryViewModel by viewModels()
+    private val categoryViewModel: BudgetSelectCategoryViewModel by viewModels()
+
+    private val categoryAdapter by lazy {
+        BudgetSelectCategoryAdapter { selectedCategories ->
+            viewModel.selectedCategories.value = selectedCategories
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -64,19 +73,25 @@ class BudgetSelectCategoryFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setupRecyclerViews()
-        setupOnClickListeners()
-        showExpenseCategories()
-        instantiateDBS()
+        setupRecyclerView()
+        setupClickListeners()
+        observeCategories()
     }
 
     // Setup for RecyclerViews with LinearLayoutManager
-    private fun setupRecyclerViews() {
-        binding.recyclerViewExpenseCategory.layoutManager = LinearLayoutManager(requireContext())
+    private fun setupRecyclerView() {
+        binding.recyclerViewExpenseCategory.apply {
+            layoutManager = LinearLayoutManager(requireContext())
+            adapter = categoryAdapter
+        }
+
+        // Initialize with selected categories from ViewModel
+        val initialSelected = viewModel.selectedCategories.value ?: emptyList()
+        categoryAdapter.submitList(emptyList(), initialSelected)
     }
 
     // Handles button click listeners
-    private fun setupOnClickListeners() {
+    private fun setupClickListeners() {
         binding.btnGoBack.setOnClickListener {
             findNavController().popBackStack() // Go back in navigation stack
         }
@@ -84,11 +99,6 @@ class BudgetSelectCategoryFragment : Fragment() {
         binding.btnAddCategory.setOnClickListener {
             showAddCategory() // Navigate to add category screen
         }
-    }
-
-    // Makes expense category list visible
-    private fun showExpenseCategories() {
-        binding.recyclerViewExpenseCategory.visibility = View.VISIBLE
     }
 
     // Navigates to category addition screen
@@ -102,19 +112,12 @@ class BudgetSelectCategoryFragment : Fragment() {
         _binding = null
     }
 
-    // Loads categories from DB and observes changes
-    private fun instantiateDBS() {
-        categoryViewmodel.loadCategories()
-
-        categoryViewmodel.categories.observe(viewLifecycleOwner) { categories ->
-
-            // Splits categories into expenses and incomes
-            val (expenseCategories, incomeCategories) = categories.partition { it.categoryType == "expense" }
-
-            // Sets adapter with expense categories
-            binding.recyclerViewExpenseCategory.adapter = BudgetSelectCategoryAdapter(expenseCategories) { category ->
-                viewModel.category.value = category // Sets selected category in shared ViewModel
-                findNavController().popBackStack() // Navigate back after selection
+    private fun observeCategories() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            categoryViewModel.loadCategories()
+            categoryViewModel.categories.collectLatest { categories ->
+                val selectedCategories = viewModel.selectedCategories.value ?: emptyList()
+                categoryAdapter.submitList(categories, selectedCategories)
             }
         }
     }

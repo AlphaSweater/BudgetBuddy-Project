@@ -21,81 +21,109 @@
 <!--    * https://www.youtube.com/watch?v=A_tPafV23DM&list=PLPgs125_L-X9H6J7x4beRU-AxJ4mXe5vX-->
 <!--    ======================================================================================-->
 
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:padding="16dp"
-    android:background="?attr/bb_background"
-    android:elevation="8dp">
+    android:layout_height="match_parent"
+    android:background="?attr/bb_background">
 
-    <LinearLayout
+    <!-- Top App Bar -->
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
         android:background="@android:color/transparent"
->
+        app:elevation="0dp">
 
-        <!-- Back Button -->
-        <ImageButton
-            android:id="@+id/btnGoBack"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:src="?attr/actionModeCloseDrawable"
-            android:contentDescription="@string/back"
-            app:tint="?attr/bb_primaryText" />
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@android:color/transparent">
 
-        <!-- Title -->
-        <TextView
-            android:id="@+id/txtRecurrence"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Select Recurrence"
-            android:textSize="22sp"
-            android:textStyle="bold"
-            android:textColor="?attr/bb_primaryText"
-            android:layout_marginTop="12dp"
-            android:layout_marginBottom="16dp" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingHorizontal="4dp">
 
-        <!-- Recurrence Options -->
-        <com.google.android.material.button.MaterialButtonToggleGroup
-            android:id="@+id/toggleRecurrenceGroup"
+                <ImageButton
+                    android:id="@+id/btnGoBack"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="@string/back"
+                    android:src="?attr/actionModeCloseDrawable"
+                    app:tint="?attr/bb_primaryText" />
+
+                <TextView
+                    android:id="@+id/toolbarTitle"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Select Recurrence"
+                    android:textColor="?attr/bb_primaryText"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+        </androidx.appcompat.widget.Toolbar>
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <!-- Main Content -->
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/contentScrollView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:fillViewport="true"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="16dp"
-            app:singleSelection="true"
-            app:selectionRequired="true">
+            android:orientation="vertical"
+            android:padding="16dp">
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnDaily"
-                android:layout_width="0dp"
-                android:layout_weight="1"
+            <!-- Recurrence Options -->
+            <com.google.android.material.button.MaterialButtonToggleGroup
+                android:id="@+id/toggleRecurrenceGroup"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Daily" />
+                android:layout_marginTop="8dp"
+                app:singleSelection="true"
+                app:selectionRequired="true">
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnWeekly"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="wrap_content"
-                android:text="Weekly" />
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnDaily"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:text="Daily" />
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnMonthly"
-                android:layout_width="0dp"
-                android:layout_weight="1.1"
-                android:layout_height="wrap_content"
-                android:text="Monthly" />
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnWeekly"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:text="Weekly" />
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnYearly"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="wrap_content"
-                android:text="Yearly" />
-        </com.google.android.material.button.MaterialButtonToggleGroup>
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnMonthly"
+                    android:layout_width="0dp"
+                    android:layout_weight="1.1"
+                    android:layout_height="wrap_content"
+                    android:text="Monthly" />
 
-    </LinearLayout>
-</FrameLayout>
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnYearly"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:text="Yearly" />
+            </com.google.android.material.button.MaterialButtonToggleGroup>
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

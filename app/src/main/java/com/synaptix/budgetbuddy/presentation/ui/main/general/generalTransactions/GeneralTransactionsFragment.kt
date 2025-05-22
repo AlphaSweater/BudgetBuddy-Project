@@ -9,7 +9,7 @@ import android.view.ViewGroup
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.synaptix.budgetbuddy.R
-import com.synaptix.budgetbuddy.core.model.BudgetReportListItems
+import com.synaptix.budgetbuddy.core.model.BudgetListItems
 import com.synaptix.budgetbuddy.databinding.FragmentGeneralTransactionsBinding
 
 class GeneralTransactionsFragment : Fragment() {
@@ -18,7 +18,7 @@ class GeneralTransactionsFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val viewModel: GeneralTransactionsViewModel by viewModels()
-    private lateinit var generalTransactionsAdapter: GeneralTransactionsAdapter
+//    private lateinit var generalTransactionsAdapter: GeneralTransactionsAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,26 +45,26 @@ class GeneralTransactionsFragment : Fragment() {
         generalTransactionsRecycler()
     }
     private fun generalTransactionsRecycler() {
-        // Code for the transaction recycler
-        val items = listOf(
-            BudgetReportListItems.DateHeader("1", "Monday", "May 2025", -2000.00),
-            BudgetReportListItems.TransactionItem("Lunchhh", R.drawable.ic_car_24, R.color.cat_orange, 200.00, "Cash", null, "Today"),
-            BudgetReportListItems.TransactionItem("Lunch", R.drawable.ic_car_24, R.color.cat_orange, 200.00, "Cash", null, "Today"),
-            BudgetReportListItems.DateHeader("1", "Monday", "April 2025", -4000.00),
-            BudgetReportListItems.TransactionItem("Lunch", R.drawable.ic_car_24, R.color.cat_orange, 200.00, "Cash", null, "Today"),
-            BudgetReportListItems.TransactionItem("Lunch", R.drawable.ic_car_24, R.color.cat_orange, 200.00, "Cash", null, "Today"),
-        )
-
-        generalTransactionsAdapter = GeneralTransactionsAdapter(items)
-
-        binding.recyclerViewGeneralTransactions.apply {
-            layoutManager = LinearLayoutManager(requireContext())
-            adapter = generalTransactionsAdapter
-        }
-
-        binding.btnGoBack.setOnClickListener {
-            findNavController().popBackStack()
-        }
+//        // Code for the transaction recycler
+//        val items = listOf(
+//            BudgetListItems.BudgetDateHeader("1", "Monday", "May 2025", -2000.00),
+//            BudgetListItems.BudgetTransactionItem("Lunchhh", R.drawable.ic_car_24, R.color.cat_orange, 200.00, "Cash", null, "Today"),
+//            BudgetListItems.BudgetTransactionItem("Lunch", R.drawable.ic_car_24, R.color.cat_orange, 200.00, "Cash", null, "Today"),
+//            BudgetListItems.BudgetDateHeader("1", "Monday", "April 2025", -4000.00),
+//            BudgetListItems.BudgetTransactionItem("Lunch", R.drawable.ic_car_24, R.color.cat_orange, 200.00, "Cash", null, "Today"),
+//            BudgetListItems.BudgetTransactionItem("Lunch", R.drawable.ic_car_24, R.color.cat_orange, 200.00, "Cash", null, "Today"),
+//        )
+//
+//        generalTransactionsAdapter = GeneralTransactionsAdapter(items)
+//
+//        binding.recyclerViewGeneralTransactions.apply {
+//            layoutManager = LinearLayoutManager(requireContext())
+//            adapter = generalTransactionsAdapter
+//        }
+//
+//        binding.btnGoBack.setOnClickListener {
+//            findNavController().popBackStack()
+//        }
     }
 
     override fun onDestroyView() {

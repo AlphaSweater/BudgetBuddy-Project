@@ -24,6 +24,7 @@ package com.synaptix.budgetbuddy.presentation.ui.main.budget.budgetAdd.budgetSel
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.CheckBox
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
@@ -33,14 +34,25 @@ import com.synaptix.budgetbuddy.core.model.Category
 
 // Adapter class for displaying a list of categories in RecyclerView
 class BudgetSelectCategoryAdapter(
-    private val categories: List<Category>,
-    private val onCategoryClick: (Category) -> Unit // Lambda to handle category click
+    private val onSelectionChanged: (List<Category>) -> Unit
 ) : RecyclerView.Adapter<BudgetSelectCategoryAdapter.CategoryViewHolder>() {
+
+    private var categories: List<Category> = emptyList()
+    private val selectedCategories = mutableSetOf<Category>()
+
+    fun submitList(newCategories: List<Category>, initialSelected: List<Category> = emptyList()) {
+        categories = newCategories
+        selectedCategories.clear()
+        selectedCategories.addAll(initialSelected)
+        notifyDataSetChanged()
+    }
+
+    fun getSelectedCategories(): List<Category> = selectedCategories.toList()
 
     // Inflates the item layout and creates the ViewHolder
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CategoryViewHolder {
         val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_expense, parent, false)
+            .inflate(R.layout.item_category, parent, false)
         return CategoryViewHolder(view)
     }
 
@@ -56,23 +68,39 @@ class BudgetSelectCategoryAdapter(
     inner class CategoryViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val categoryIcon: ImageView = itemView.findViewById(R.id.imgCategoryIcon)
         private val categoryName: TextView = itemView.findViewById(R.id.txtCategoryName)
+        private val checkBox: CheckBox = itemView.findViewById(R.id.checkSelect)
 
         // Binds a Category object to the item layout
         fun bind(category: Category) {
             val context = itemView.context
 
             // Set category name and icon
-            categoryName.text = category.categoryName
-            categoryIcon.setImageResource(category.categoryIcon)
+            categoryName.text = category.name
+            categoryIcon.setImageResource(category.icon)
+            checkBox.isChecked = selectedCategories.contains(category)
 
             // Set color filter for icon based on category color
-            val colorInt = ContextCompat.getColor(context, category.categoryColor)
+            val colorInt = ContextCompat.getColor(context, category.color)
             categoryIcon.setColorFilter(colorInt)
 
             // Handle item click event
             itemView.setOnClickListener {
-                onCategoryClick(category)
+                toggleCategorySelection(category)
             }
+
+            checkBox.setOnClickListener {
+                toggleCategorySelection(category)
+            }
+        }
+
+        private fun toggleCategorySelection(category: Category) {
+            if (selectedCategories.contains(category)) {
+                selectedCategories.remove(category)
+            } else {
+                selectedCategories.add(category)
+            }
+            checkBox.isChecked = selectedCategories.contains(category)
+            onSelectionChanged(selectedCategories.toList())
         }
     }
 }

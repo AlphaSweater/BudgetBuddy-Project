@@ -21,40 +21,35 @@
 
 package com.synaptix.budgetbuddy.core.model
 
-import java.io.Serializable
-
-// Data class representing a WalletIn (for input operations)
-data class WalletIn (
-    // Unique identifier for the wallet (default is 0)
-    val walletId: Int = 0,
-
-    // ID of the user to whom the wallet belongs
-    val userId: Int,
-
-    // Name of the wallet
-    val walletName: String,
-
-    // Currency type of the wallet (e.g., USD, EUR)
-    val walletCurrency: String,
-
-    // Current balance in the wallet
-    var walletBalance: Double
-) : Serializable
-
-// Data class representing a Wallet (with associated User)
-data class Wallet (
-    // Unique identifier for the wallet (default is 0)
-    val walletId: Int = 0,
-
-    // User to whom the wallet belongs (optional, can be null)
-    val user: User?,
-
-    // Name of the wallet
-    val walletName: String,
-
-    // Currency type of the wallet (e.g., USD, EUR)
-    val walletCurrency: String,
-
-    // Current balance in the wallet
-    var walletBalance: Double
-)
+//======================================================================================
+// Data Model: Wallet
+// Represents the full wallet entity including related user object.
+//======================================================================================
+data class Wallet(
+    override val id: String,
+    val user: User,
+    val name: String,
+    val currency: String = "ZAR",
+    val balance: Double = 0.0,
+    val excludeFromTotal: Boolean = false,
+    val lastTransactionAt: Long? = null
+) : Entity {
+    companion object {
+        fun new(
+            user: User,
+            name: String,
+            currency: String = "ZAR",
+            balance: Double = 0.0,
+            excludeFromTotal: Boolean = false,
+            lastTransactionAt: Long? = null
+        ): Wallet = Wallet(
+            id = "",
+            user = user,
+            name = name,
+            currency = currency,
+            balance = balance,
+            excludeFromTotal = excludeFromTotal,
+            lastTransactionAt = lastTransactionAt
+        )
+    }
+}

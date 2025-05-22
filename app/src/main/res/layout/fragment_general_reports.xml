@@ -133,7 +133,7 @@
                             android:layout_height="20dp"
                             android:layout_alignParentStart="true"
                             android:layout_centerVertical="true"
-                            android:src="@drawable/ic_account_balance_wallet_24"
+                            android:src="@drawable/ic_wallet_24"
                             app:tint="@color/cat_light_brown" />
 
                         <Spinner

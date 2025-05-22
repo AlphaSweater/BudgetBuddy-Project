@@ -47,25 +47,25 @@ class GeneralIndividualTransactionFragment : Fragment() {
         val recurrenceText = view?.findViewById<TextView>(R.id.textRecurrence)
         val photoPreview = view?.findViewById<ImageView>(R.id.transactionImage)
 
-        viewModel.selectedTransaction.observe(viewLifecycleOwner) { transaction ->
-            transaction?.let {
-                nameText?.text = it.category?.categoryName ?: "Unknown"
-                amountTop?.text = "R ${"%.2f".format(it.amount)}"
-                walletText?.text = it.wallet?.walletName ?: "No Wallet"
-                amountRow?.text = "R ${"%.2f".format(it.amount)}"
-                noteRow?.text = it.note ?: "No note provided"
-                startDateText?.text = it.date
-                recurrenceText?.text = it.recurrenceRate ?: "None"
-
-                // Optional: display the photo if available
-                if (it.photo != null) {
-                    val bitmap = BitmapFactory.decodeByteArray(it.photo, 0, it.photo.size)
-                    photoPreview?.setImageBitmap(bitmap)
-                } else {
-                    photoPreview?.visibility = View.GONE
-                }
-            }
-        }
+//        viewModel.selectedTransaction.observe(viewLifecycleOwner) { transaction ->
+//            transaction?.let {
+//                nameText?.text = it.category.name
+//                amountTop?.text = "R ${"%.2f".format(it.amount)}"
+//                walletText?.text = it.wallet?.walletName ?: "No Wallet"
+//                amountRow?.text = "R ${"%.2f".format(it.amount)}"
+//                noteRow?.text = it.note ?: "No note provided"
+//                startDateText?.text = it.date
+//                recurrenceText?.text = it.recurrenceRate ?: "None"
+//
+//                // Optional: display the photo if available
+//                if (it.photo != null) {
+//                    val bitmap = BitmapFactory.decodeByteArray(it.photo, 0, it.photo.size)
+//                    photoPreview?.setImageBitmap(bitmap)
+//                } else {
+//                    photoPreview?.visibility = View.GONE
+//                }
+//            }
+//        }
 
         view?.findViewById<ImageButton>(R.id.btnGoBack)?.setOnClickListener {
             findNavController().popBackStack()
