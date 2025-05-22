@@ -1,0 +1,38 @@
+name: Auto Version from Commit Count
+
+on:
+  push:
+    branches:
+      - development
+
+jobs:
+  update-version:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Ensure full history for accurate commit count
+
+      - name: Set up Git config
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+
+      - name: Generate version from commit count
+        id: generate_version
+        run: |
+          MAJOR=1
+          MINOR=0
+          PATCH=0
+          BUILD=$(git rev-list --count HEAD)
+          VERSION="v$MAJOR.$MINOR.$PATCH.$BUILD"
+          echo "$VERSION" > version.txt
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+
+      - name: Commit and push version.txt
+        run: |
+          git add version.txt
+          git commit -m "chore: update version to $VERSION" || echo "No changes to commit"
+          git push
