@@ -79,4 +79,8 @@ dependencies {
     implementation(libs.firebase.auth.ktx)
     implementation(libs.firebase.storage.ktx)
     implementation(libs.firebase.firestore.ktx)
+
+    // Imgur dependencies
+    implementation(libs.okhttp)
+    implementation(libs.moshi)
 }
