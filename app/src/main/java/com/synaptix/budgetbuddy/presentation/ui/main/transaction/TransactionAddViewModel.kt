@@ -23,7 +23,6 @@ import com.synaptix.budgetbuddy.core.usecase.main.transaction.AddTransactionUseC
 import com.synaptix.budgetbuddy.core.usecase.main.transaction.AddTransactionUseCase.AddTransactionResult
 import com.synaptix.budgetbuddy.core.usecase.main.transaction.UploadImageUseCase
 import com.synaptix.budgetbuddy.presentation.ui.main.transaction.TransactionAddViewModel.UiState.*
-import kotlinx.coroutines.withContext
 
 @HiltViewModel
 class TransactionAddViewModel @Inject constructor(
@@ -218,14 +217,14 @@ class TransactionAddViewModel @Inject constructor(
         }
     }
 
-    private suspend fun uploadImageAndGetUrl(): String? = withContext(kotlinx.coroutines.Dispatchers.IO) {
+    private suspend fun uploadImageAndGetUrl(): String? {
         val bytes = imageBytes.value
         if (bytes == null) {
             Log.e("UploadImage", "No image bytes provided")
-            return@withContext null
+            return null
         }
 
-        return@withContext when (val result = uploadImageUseCase.execute(bytes)) {
+        return when (val result = uploadImageUseCase.execute(bytes)) {
             is UploadImageUseCase.UploadImageResult.Success -> result.imageUrl
             is UploadImageUseCase.UploadImageResult.Error -> {
                 Log.e("UploadImage", "Failed: ${result.message}")
