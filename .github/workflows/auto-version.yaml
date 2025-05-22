@@ -1,51 +1,80 @@
-name: Auto Versioning
+name: Auto Versioning 🚀
 
 on:
-  push:
-    branches:
-      - 'feature/*'   # Run on any feature branch
-  workflow_dispatch:
+  push:        # 🔁 Trigger workflow on any push to any branch
+  workflow_dispatch:  # 🛠️ Also allow manual workflow trigger
 
 permissions:
-  contents: write
+  contents: write  # ✍️ Permission to push commits back to the repo
 
 jobs:
   update-version:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest  # 🐧 Use latest Ubuntu runner
 
     steps:
-      - name: Checkout repository
+      - name: Checkout repository 🧾
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 0  # 📜 Fetch full commit history for accurate counts
 
-      - name: Set up Git config
+      - name: Set up Git config 🛠️
         run: |
-          git config --global user.name "github-actions"
-          git config --global user.email "github-actions@github.com"
+          git config --global user.name "github-actions"      # 🤖 Use bot name
+          git config --global user.email "github-actions@github.com"  # 🤖 Use bot email
 
-      - name: Generate version from commit count
+      - name: Generate version number ✨
         id: generate_version
         run: |
-          MAJOR=1
-          MINOR=0
+          #Generate Version number
+          
+          # Fetch tags
+          git fetch --tags
+          # Get latest tag starting with 'v' (sorted by version semver)
+          LATEST_TAG=$(git tag --list 'v*' --sort=-v:refname | head -n 1)
 
-          # Total commits in the repo = build number
-          BUILD=$(git rev-list --count HEAD)
+          # Extract the first digit after the 'v'
+          if [[ $LATEST_TAG =~ ^v([0-9]) ]]; then
+            MAJOR_VERSION="${BASH_REMATCH[1]}"
+          else
+            MAJOR_VERSION=0  # fallback if no matching tag found
+          fi
 
-          # Commits since branch point with development = patch number
+          # 🔢 Count total commits in repo (used for minor & patch version)
+          TOTAL_COMMITS=$(git rev-list --count origin/development)
+          
+          # 🔢 Calculate MINOR_VERSION by hundreds of commits (e.g., 117 commits = 1)
+          MINOR_VERSION=$(( TOTAL_COMMITS / 100 ))
+          
+          # 🔢 Calculate PATCH_VERSION as remainder commits after hundreds (e.g., 117 commits = 17)
+          PATCH_VERSION=$(( TOTAL_COMMITS % 100 ))
+          
+          # 🌿 Base branch to compare against for branch-specific commit count
           BASE_BRANCH="origin/development"
-          PATCH=$(git rev-list --count $BASE_BRANCH..HEAD)
+          
+          # 🔢 Count commits made on current branch since base branch (for build number)
+          BRANCH_COMMITS=$(git rev-list --count $BASE_BRANCH..HEAD || echo 0)
+          
+          # 🏷️ Compose full version string vMAJOR.MINOR.PATCH.BUILD
+          VERSION="v$MAJOR_VERSION.$MINOR_VERSION.$PATCH_VERSION.$BRANCH_COMMITS"
 
-          VERSION="v$MAJOR.$MINOR.$PATCH.$BUILD"
-          echo "$VERSION" > version.txt
+          # 📝 Write version string to version.txt file
+          echo "$VERSION" > app/src/main/version.txt
+          
+          # ⚙️ Export version string to workflow environment variables
           echo "VERSION=$VERSION" >> $GITHUB_ENV
 
-      - name: Commit and push version.txt
+      - name: Commit and push version.txt 💾
         env:
-          TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}  # 🔐 Use GitHub token for authentication
         run: |
+          # 🔧 Setup remote URL with token for push access
           git remote set-url origin https://x-access-token:${TOKEN}@github.com/${{ github.repository }}
-          git add version.txt
-          git commit -m "chore: update version to $VERSION" || echo "No changes to commit"
+          
+          # ➕ Stage the updated version.txt file
+          git add app/src/main/version.txt
+          
+          # 💬 Commit the change or skip if no changes
+          git commit -m "chore: update version to $VERSION 🚀" || echo "No changes to commit"
+          
+          # 📤 Push commit back to the current branch
           git push
