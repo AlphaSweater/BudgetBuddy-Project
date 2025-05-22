@@ -25,8 +25,18 @@ jobs:
       - name: Generate version number ✨
         id: generate_version
         run: |
-          # 🎯 Major version is count total releases (tags starting with "v")
-          MAJOR_VERSION=$(git tag --list 'v*' | wc -l)
+
+          # Fetch tags
+          git fetch --tags
+          # Get latest tag starting with 'v' (sorted by version semver)
+          LATEST_TAG=$(git tag --list 'v*' --sort=-v:refname | head -n 1)
+
+          # Extract the first digit after the 'v'
+          if [[ $LATEST_TAG =~ ^v([0-9]) ]]; then
+            MAJOR_VERSION="${BASH_REMATCH[1]}"
+          else
+            MAJOR_VERSION=0  # fallback if no matching tag found
+          fi
 
           # 🔢 Count total commits in repo (used for minor & patch version)
           TOTAL_COMMITS=$(git rev-list --count origin/development)
