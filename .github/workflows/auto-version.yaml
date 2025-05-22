@@ -29,7 +29,7 @@ jobs:
           MAJOR_VERSION=1
 
           # 🔢 Count total commits in repo (used for minor & patch version)
-          TOTAL_COMMITS=$(git rev-list --count HEAD)
+          TOTAL_COMMITS=$(git rev-list --count origin/development)
           
           # 🔢 Calculate MINOR_VERSION by hundreds of commits (e.g., 117 commits = 1)
           MINOR_VERSION=$(( TOTAL_COMMITS / 100 ))
