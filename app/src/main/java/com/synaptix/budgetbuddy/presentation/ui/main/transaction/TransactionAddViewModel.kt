@@ -217,6 +217,8 @@ class TransactionAddViewModel @Inject constructor(
         }
     }
 
+
+    //method that calls the uploadImageUseCase to upload the image to imgur and get the url
     private suspend fun uploadImageAndGetUrl(): String? {
         val bytes = imageBytes.value
         if (bytes == null) {
