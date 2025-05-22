@@ -35,6 +35,7 @@ import java.time.format.DateTimeFormatter
 import android.widget.ImageView
 import com.synaptix.budgetbuddy.core.model.RecurrenceData
 import com.synaptix.budgetbuddy.core.model.Wallet
+import kotlin.toString
 
 @AndroidEntryPoint
 class TransactionAddFragment : Fragment() {
@@ -110,6 +111,10 @@ class TransactionAddFragment : Fragment() {
         with(binding) {
             btnGoBack.setOnClickListener {
                 findNavController().popBackStack()
+            }
+
+            btnClear.setOnClickListener {
+                reset()
             }
 
             rowSelectCategory.setOnClickListener {
@@ -269,6 +274,14 @@ class TransactionAddFragment : Fragment() {
     }
 
     // --- Update Methods ---
+
+//    private fun updateSelectedLabels(labels: List<String>) {
+//        if (labels.isEmpty()) {
+//            binding.textSelectedLabelName.text = "No labels selected"
+//            return
+//        }
+//        binding.textSelectedLabelName.text = labels.joinToString(", ")
+//    }
 
     private fun updateSelectedCategory(category: Category?) {
         if (category == null) {
@@ -455,5 +468,13 @@ class TransactionAddFragment : Fragment() {
         Snackbar.make(binding.root, message, Snackbar.LENGTH_SHORT)
             .setBackgroundTint(resources.getColor(R.color.success, null))
             .show()
+    }
+
+    private fun reset() {
+        viewModel.reset()
+        binding.apply {
+            edtTextAmount.setText("")
+            edtTextNote.setText("")
+        }
     }
 }

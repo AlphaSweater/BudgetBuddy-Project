@@ -81,7 +81,7 @@
                     android:layout_height="48dp"
                     android:background="?attr/selectableItemBackgroundBorderless"
                     android:contentDescription="Clear form"
-                    android:src="@drawable/ic_ui_circle_x"
+                    android:src="@drawable/ic_ui_clear"
                     app:tint="?attr/bb_primaryText" />
             </LinearLayout>
         </androidx.appcompat.widget.Toolbar>
