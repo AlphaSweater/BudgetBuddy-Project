@@ -425,7 +425,7 @@
                                 android:id="@+id/textSelectedRecurrenceRate"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="One time"
+                                android:text="One-time transaction"
                                 android:textColor="?attr/bb_secondaryText"
                                 android:textSize="14sp" />
                         </LinearLayout>

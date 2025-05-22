@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.synaptix.budgetbuddy.core.model.Category
 import com.synaptix.budgetbuddy.core.model.Label
+import com.synaptix.budgetbuddy.core.model.RecurrenceData
 import com.synaptix.budgetbuddy.core.model.Wallet
 import com.synaptix.budgetbuddy.core.usecase.auth.GetUserIdUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -21,7 +22,6 @@ import com.synaptix.budgetbuddy.core.model.Transaction
 import com.synaptix.budgetbuddy.core.model.User
 import com.synaptix.budgetbuddy.core.usecase.main.transaction.AddTransactionUseCase
 import com.synaptix.budgetbuddy.core.usecase.main.transaction.AddTransactionUseCase.AddTransactionResult
-import com.synaptix.budgetbuddy.presentation.ui.main.transaction.TransactionAddViewModel.UiState.*
 
 @HiltViewModel
 class TransactionAddViewModel @Inject constructor(
@@ -78,8 +78,8 @@ class TransactionAddViewModel @Inject constructor(
     private val _imageBytes = MutableLiveData<ByteArray?>()
     val imageBytes: LiveData<ByteArray?> = _imageBytes
 
-    private val _recurrenceRate = MutableLiveData<String?>()
-    val recurrenceRate: LiveData<String?> = _recurrenceRate
+    private val _recurrenceData = MutableLiveData<RecurrenceData>()
+    val recurrenceData: LiveData<RecurrenceData> = _recurrenceData
 
     var selectedLabels = MutableLiveData<List<Label>>(emptyList())
 
@@ -112,8 +112,8 @@ class TransactionAddViewModel @Inject constructor(
         _note.value = note
     }
 
-    fun setRecurrenceRate(rate: String) {
-        _recurrenceRate.value = rate
+    fun setRecurrenceData(data: RecurrenceData) {
+        _recurrenceData.value = data
     }
 
     fun setImageBytes(bytes: ByteArray?) {
@@ -170,22 +170,22 @@ class TransactionAddViewModel @Inject constructor(
                     date = parseDate((_date.value ?: System.currentTimeMillis()).toString()),
                     note = _note.value ?: "",
                     photoUrl = null, // TODO: Upload image to Firebase Storage
-                    recurrenceRate = _recurrenceRate.value
+                    recurrenceData = _recurrenceData.value ?: RecurrenceData.DEFAULT
                 )
 
                 when (val result = addTransactionUseCase.execute(newTransaction)) {
                     is AddTransactionResult.Success -> {
                         Log.d("TransactionAddViewModel", "Transaction added successfully: ${result.transactionId}")
-                        _uiState.value = Success
+                        _uiState.value = UiState.Success
                     }
                     is AddTransactionResult.Error -> {
                         Log.e("TransactionAddViewModel", "Error adding transaction: ${result.message}")
-                        _uiState.value = Error(result.message)
+                        _uiState.value = UiState.Error(result.message)
                     }
                 }
             } catch (e: Exception) {
                 Log.e("TransactionAddViewModel", "Exception adding transaction: ${e.message}")
-                _uiState.value = Error(e.message ?: "Failed to add transaction")
+                _uiState.value = UiState.Error(e.message ?: "Failed to add transaction")
             }
         }
     }
@@ -197,7 +197,7 @@ class TransactionAddViewModel @Inject constructor(
         _category.value = null
         _wallet.value = null
         _imageBytes.value = null
-        _recurrenceRate.value = null
+        _recurrenceData.value = RecurrenceData.DEFAULT
         _validationState.value = ValidationState(shouldShowErrors = false)
         _uiState.value = UiState.Initial
     }
