@@ -1,8 +1,12 @@
 name: Auto Versioning 🚀
 
 on:
-  push:        # 🔁 Trigger workflow on any push to any branch
-  workflow_dispatch:  # 🛠️ Also allow manual workflow trigger
+  push:                  # 🔁 Trigger workflow on push...
+    branches-ignore:     # ⛔ ...except these branches
+      - main
+      - development
+  workflow_dispatch:     # 🛠️ Allow manual workflow trigger
+
 
 permissions:
   contents: write  # ✍️ Permission to push commits back to the repo
