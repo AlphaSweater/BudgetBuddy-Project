@@ -80,10 +80,30 @@ class ValidateUserTotalsUseCase @Inject constructor(
 
     }
 
-    fun calculateWalletTotals(
+    suspend fun calculateWalletTotals(
         transactions: List<Transaction>,
         wallets: List<Wallet>,
     ) {
+        wallets.forEach { wallet ->
+            val walletTransactions = transactions.filter { it.wallet.id == wallet.id }
+
+            // Calculate totals based on income and expense
+            val incomeTotal = walletTransactions
+                .filter { it.category.type == "income" }
+                .sumOf { it.amount }
+
+            val expenseTotal = walletTransactions
+                .filter { it.category.type == "expense" }
+                .sumOf { it.amount }
+
+            val newBalance = incomeTotal - expenseTotal
+
+            // Update the wallet in Firestore
+            val updateResult = walletRepository.updateWalletBalance(wallet.id, newBalance)
+            if (updateResult is Result.Error) {
+                throw Exception("Failed to update wallet ${wallet.name}: ${updateResult.exception.message}")
+            }
+        }
 
 
     }
