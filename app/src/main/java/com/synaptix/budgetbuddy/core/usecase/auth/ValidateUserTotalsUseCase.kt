@@ -77,6 +77,7 @@ class ValidateUserTotalsUseCase @Inject constructor(
         }
 
         calculateWalletTotals(transactions, wallets)
+        calculateBudgetTotals(transactions, budgets)
 
     }
 
@@ -104,7 +105,30 @@ class ValidateUserTotalsUseCase @Inject constructor(
                 throw Exception("Failed to update wallet ${wallet.name}: ${updateResult.exception.message}")
             }
         }
-
-
     }
+
+    suspend fun calculateBudgetTotals(
+        transactions: List<Transaction>,
+        budgets: List<Budget>
+    ) {
+        budgets.forEach { budget ->
+            // Get all category IDs for this budget
+            val budgetCategoryIds = budget.categories.map { it.id }
+
+            // Filter expense transactions with matching category ID
+            val matchingTransactions = transactions.filter {
+                it.category.type == "expense" &&
+                        budgetCategoryIds.contains(it.category.id)
+            }
+
+            val totalSpent = matchingTransactions.sumOf { it.amount }
+
+            // Update in Firestore
+            val result = budgetRepository.updateBudgetSpent(budget.id, totalSpent)
+            if (result is Result.Error) {
+                throw Exception("Failed to update budget ${budget.name}: ${result.exception.message}")
+            }
+        }
+    }
+
 }
