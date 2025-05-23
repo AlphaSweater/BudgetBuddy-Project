@@ -51,7 +51,7 @@ class FirestoreTransactionRepository @Inject constructor(
         }
     }
 
-    // Get all transactions for a user with their labels
+    // Get all transactions for a user based on userId
     fun getTransactionsForUser(userId: String): Flow<Result<List<TransactionDTO>>> = getAll(createBaseQueryWithUserId(userId)) { query ->
         callbackFlow {
             val listener = query.addSnapshotListener { snapshot, error ->
