@@ -72,3 +72,4 @@ class GetBudgetsUseCase @Inject constructor(
         return Result.Success(budgetDTO.toDomain(user, categories))
     }
 }
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~EOF~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\

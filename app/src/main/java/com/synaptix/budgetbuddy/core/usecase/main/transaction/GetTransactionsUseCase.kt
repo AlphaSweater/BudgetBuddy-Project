@@ -111,3 +111,4 @@ class GetTransactionsUseCase @Inject constructor(
         return Result.Success(transaction.toDomain(user, wallet, category, labels))
     }
 }
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~EOF~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
