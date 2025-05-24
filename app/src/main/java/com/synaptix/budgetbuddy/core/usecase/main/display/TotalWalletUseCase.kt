@@ -13,6 +13,8 @@ class TotalWalletUseCase @Inject constructor(
     private val walletRepository: FirestoreWalletRepository
     )
 {
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // Executes the operation to fetch the total balance of all wallets for the specified user
     suspend fun execute(userId: String): Double{
         // Ensure userId is not null or empty
         if (userId.isEmpty()) {

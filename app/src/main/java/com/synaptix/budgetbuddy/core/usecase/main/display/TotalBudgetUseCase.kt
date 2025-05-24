@@ -15,6 +15,8 @@ class TotalBudgetUseCase @Inject constructor(
     private val categoryRepository: FirestoreCategoryRepository
 ) {
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // Executes the operation to calculate the total budget for the specified user
     suspend fun execute(userId: String): Double {
         // Ensure userId is not null or empty
         if (userId.isEmpty()) {

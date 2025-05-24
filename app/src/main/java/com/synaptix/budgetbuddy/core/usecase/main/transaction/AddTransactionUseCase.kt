@@ -38,6 +38,7 @@ class AddTransactionUseCase @Inject constructor(
         data class Error(val message: String) : AddTransactionResult()
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     // Executes the operation to add a new transaction
     suspend fun execute(newTransaction: Transaction): AddTransactionResult {
 

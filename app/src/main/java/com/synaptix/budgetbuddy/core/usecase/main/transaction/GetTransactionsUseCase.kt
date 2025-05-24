@@ -30,6 +30,8 @@ class GetTransactionsUseCase @Inject constructor(
         data class Error(val message: String) : GetTransactionsResult()
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // Executes the operation to fetch transactions for the specified user
     @OptIn(ExperimentalCoroutinesApi::class)
     fun execute(userId: String): Flow<GetTransactionsResult> {
         if (userId.isEmpty()) return flowOf(GetTransactionsResult.Error("Invalid user ID"))
@@ -58,6 +60,8 @@ class GetTransactionsUseCase @Inject constructor(
             }
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // Executes the operation to fetch transactions for the specified user within a date range
     @OptIn(ExperimentalCoroutinesApi::class)
     fun executeWithDateRange(userId: String, startDate: Long, endDate: Long): Flow<GetTransactionsResult> {
         if (userId.isEmpty()) return flowOf(GetTransactionsResult.Error("Invalid user ID"))
@@ -87,6 +91,8 @@ class GetTransactionsUseCase @Inject constructor(
             }
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // Helper function to get full transaction data including user, wallet, category, and labels
     private suspend fun getTransactionData(transaction: TransactionDTO): Result<Transaction> {
         val user = when (val result = userRepository.getUserProfile(transaction.userId).first()) {
             is Result.Success -> result.data?.toDomain()
