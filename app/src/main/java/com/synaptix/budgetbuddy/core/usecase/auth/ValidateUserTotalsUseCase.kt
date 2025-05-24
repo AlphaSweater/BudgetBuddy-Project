@@ -28,7 +28,8 @@ class ValidateUserTotalsUseCase @Inject constructor(
             throw Exception("Invalid user ID")
         }
 
-
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+        // Fetch user profile based on provided userid
         val userResult = userRepository.getUserProfile(userId).first()
         val user = when (userResult) {
             is Result.Success -> userResult.data?.toDomain()
@@ -39,12 +40,16 @@ class ValidateUserTotalsUseCase @Inject constructor(
             throw Exception("User not found")
         }
 
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+        // Fetch wallets based on user id
         val walletResult = walletRepository.getWalletsForUser(userId).first()
         val wallets = when (walletResult) {
             is Result.Success -> walletResult.data.map { it.toDomain(user) }
             is Result.Error -> throw Exception("Failed to get wallets: ${walletResult.exception.message}")
         }
 
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+        // Fetch categories based on user id
         val categorieResult = categoryRepository.getCategoriesForUser(userId).first()
         val categories = when (categorieResult) {
             is Result.Success -> categorieResult.data.map { it.toDomain(user) }
@@ -53,12 +58,16 @@ class ValidateUserTotalsUseCase @Inject constructor(
 
         val labels = emptyList<Label>()
 
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+        // Fetch budgets for the user
         val budgetResult = budgetRepository.getBudgetsForUser(userId).first()
         val budgets = when (budgetResult) {
             is Result.Success -> budgetResult.data.map { it.toDomain(user, categories) }
             is Result.Error -> throw Exception("Failed to get budgets: ${budgetResult.exception.message}")
         }
 
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+        // Fetch transactions for the user
         val transactionResult = transactionRepository.getTransactionsForUser(userId).first()
         val transactions = when (transactionResult) {
             is Result.Success -> transactionResult.data.map { dto ->
@@ -81,6 +90,8 @@ class ValidateUserTotalsUseCase @Inject constructor(
 
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // Function to calculate wallet totals based on transactions
     suspend fun calculateWalletTotals(
         transactions: List<Transaction>,
         wallets: List<Wallet>,
@@ -107,6 +118,8 @@ class ValidateUserTotalsUseCase @Inject constructor(
         }
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // Function that calculates amount spent for each budget based on transactions and categories
     suspend fun calculateBudgetTotals(
         transactions: List<Transaction>,
         budgets: List<Budget>
@@ -132,3 +145,4 @@ class ValidateUserTotalsUseCase @Inject constructor(
     }
 
 }
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~EOF~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
