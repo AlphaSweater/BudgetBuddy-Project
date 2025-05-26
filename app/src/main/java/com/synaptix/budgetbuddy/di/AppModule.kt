@@ -1,144 +1,197 @@
+//======================================================================================
+//Group 2 - Group Members:
+//======================================================================================
+//* Chad Fairlie ST10269509
+//* Dhiren Ruthenavelu ST10256859
+//* Kayla Ferreira ST10259527
+//* Nathan Teixeira ST10249266
+//======================================================================================
+//Declaration:
+//======================================================================================
+//We declare that this work is our own original work and that no part of it has been
+//copied from any other source, except where explicitly acknowledged.
+//======================================================================================
+//References:
+//======================================================================================
+//* ChatGPT was used to help with the design and planning. As well as assisted with
+//finding and fixing errors in the code.
+//* ChatGPT also helped with the forming of comments for the code.
+//* https://www.youtube.com/watch?v=A_tPafV23DM&list=PLPgs125_L-X9H6J7x4beRU-AxJ4mXe5vX
+//======================================================================================
+
 package com.synaptix.budgetbuddy.di
 
-import android.content.Context
-import androidx.room.Room
-import androidx.room.RoomDatabase
-import androidx.sqlite.db.SupportSQLiteDatabase
+import android.app.Application
+import com.google.firebase.Firebase
+import com.google.firebase.FirebaseApp
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.auth
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.firestore
 import com.synaptix.budgetbuddy.core.usecase.auth.GetUserIdUseCase
-import com.synaptix.budgetbuddy.data.repository.UserRepository
-import com.synaptix.budgetbuddy.core.usecase.main.transaction.AddTransactionUseCase
 import com.synaptix.budgetbuddy.core.usecase.auth.LoginUserUseCase
-import com.synaptix.budgetbuddy.data.AppDatabase
-import com.synaptix.budgetbuddy.data.entity.CategoryEntity
-import com.synaptix.budgetbuddy.data.local.CategoryDatabaseCallback
-import com.synaptix.budgetbuddy.data.local.LabelDatabaseCallback
-import com.synaptix.budgetbuddy.data.local.dao.BudgetDao
-import com.synaptix.budgetbuddy.data.local.dao.CategoryDao
-import com.synaptix.budgetbuddy.data.local.dao.LabelDao
-import com.synaptix.budgetbuddy.data.local.dao.TransactionDao
-import com.synaptix.budgetbuddy.data.local.dao.UserDao
-import com.synaptix.budgetbuddy.data.local.dao.WalletDao
-import com.synaptix.budgetbuddy.data.local.datastore.DataStoreManager
-import com.synaptix.budgetbuddy.data.repository.BudgetRepository
-import com.synaptix.budgetbuddy.data.repository.LabelRepository
-import com.synaptix.budgetbuddy.data.repository.TransactionRepository
+import com.synaptix.budgetbuddy.core.usecase.main.budget.GetBudgetsUseCase
+import com.synaptix.budgetbuddy.core.usecase.main.transaction.AddTransactionUseCase
+import com.synaptix.budgetbuddy.core.usecase.main.category.GetCategoriesUseCase
+import com.synaptix.budgetbuddy.core.usecase.main.transaction.GetTransactionsUseCase
+import com.synaptix.budgetbuddy.core.usecase.main.transaction.UploadImageUseCase
+import com.synaptix.budgetbuddy.data.firebase.repository.FirestoreBudgetRepository
+import com.synaptix.budgetbuddy.data.firebase.repository.FirestoreCategoryRepository
+import com.synaptix.budgetbuddy.data.firebase.repository.FirestoreLabelRepository
+import com.synaptix.budgetbuddy.data.firebase.repository.FirestoreTransactionRepository
+import com.synaptix.budgetbuddy.data.firebase.repository.FirestoreUserRepository
+import com.synaptix.budgetbuddy.data.firebase.repository.FirestoreWalletRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import javax.inject.Qualifier
 import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
+    @IoDispatcher
+    @Provides
+    fun providesIoDispatcher(): CoroutineDispatcher = Dispatchers.IO
+
+    @MainDispatcher
+    @Provides
+    fun providesMainDispatcher(): CoroutineDispatcher = Dispatchers.Main
+
+    @DefaultDispatcher
+    @Provides
+    fun providesDefaultDispatcher(): CoroutineDispatcher = Dispatchers.Default
+
+    // Firebase
+    @Provides
+    @Singleton
+    fun provideFirebaseFirestore(): FirebaseFirestore = Firebase.firestore
 
     @Provides
     @Singleton
-    fun provideAddTransactionUseCase(repository: TransactionRepository): AddTransactionUseCase {
-        return AddTransactionUseCase(repository)
+    fun provideFirebaseAuth(): FirebaseAuth = Firebase.auth
+
+
+    // Provide Firebase Repositories
+    @Provides
+    @Singleton
+    fun provideFirestoreUserRepository(
+        firebaseAuth: FirebaseAuth,
+        firestore: FirebaseFirestore
+    ): FirestoreUserRepository {
+        return FirestoreUserRepository(firebaseAuth, firestore)
     }
 
     @Provides
     @Singleton
-    fun provideGetUserIdUseCase(repository: UserRepository): GetUserIdUseCase {
+    fun provideFirestoreBudgetRepository(
+        firestore: FirebaseFirestore,
+        categoryRepository: FirestoreCategoryRepository
+    ): FirestoreBudgetRepository {
+        return FirestoreBudgetRepository(firestore, categoryRepository)
+    }
+
+    @Provides
+    @Singleton
+    fun provideFirestoreCategoryRepository(
+        firestore: FirebaseFirestore
+    ): FirestoreCategoryRepository {
+        return FirestoreCategoryRepository(firestore)
+    }
+
+    @Provides
+    @Singleton
+    fun provideFirestoreTransactionRepository(
+        firestore: FirebaseFirestore
+    ): FirestoreTransactionRepository {
+        return FirestoreTransactionRepository(firestore)
+    }
+
+    @Provides
+    @Singleton
+    fun provideFirestoreWalletRepository(
+        firestore: FirebaseFirestore
+    ): FirestoreWalletRepository {
+        return FirestoreWalletRepository(firestore)
+    }
+
+    @Provides
+    @Singleton
+    fun provideFirestoreLabelRepository(
+        firestore: FirebaseFirestore
+    ): FirestoreLabelRepository {
+        return FirestoreLabelRepository(firestore)
+    }
+
+    // Provide Use Cases
+    @Provides
+    @Singleton
+    fun provideGetUserIdUseCase(repository: FirestoreUserRepository): GetUserIdUseCase {
         return GetUserIdUseCase(repository)
     }
 
     @Provides
     @Singleton
-    fun provideUserDao(appDatabase: AppDatabase): UserDao {
-        return appDatabase.userDao()
-    }
-
-
-
-    @Provides
-    @Singleton
-    fun provideAppDatabase(@ApplicationContext context: Context): AppDatabase {
-        lateinit var db: AppDatabase
-        db = Room.databaseBuilder(
-            context,
-            AppDatabase::class.java,
-            "budgetbuddy_db"
-        )
-            //this destroys database if version changes to allow for easier migration when testing and developing app
-            .fallbackToDestructiveMigration()
-
-            //AI assisted with callback to allow for default categories to be added to the database on creation
-            .addCallback(CategoryDatabaseCallback { db })
-            .addCallback(LabelDatabaseCallback {db})
-            .build()
-        return db
-    }
-
-    @Provides
-    @Singleton
-    fun provideUserRepository(userDao: UserDao, dataStoreManager: DataStoreManager): UserRepository {
-        return UserRepository(userDao, dataStoreManager)
-    }
-
-    @Provides
-    @Singleton
-    fun providesDataStoreManager(@ApplicationContext context: Context): DataStoreManager {
-        return DataStoreManager(context)
-    }
-
-    @Provides
-    @Singleton
-    fun provideLoginUseCase(repository: UserRepository): LoginUserUseCase {
+    fun provideLoginUseCase(repository: FirestoreUserRepository): LoginUserUseCase {
         return LoginUserUseCase(repository)
     }
 
     @Provides
     @Singleton
-    fun provideWalletDao(appDatabase: AppDatabase): WalletDao {
-        return appDatabase.walletDao()
+    fun provideAddTransactionUseCase(repository: FirestoreTransactionRepository): AddTransactionUseCase {
+        return AddTransactionUseCase(repository)
     }
 
     @Provides
     @Singleton
-    fun provideCategoryDao(appDatabase: AppDatabase): CategoryDao {
-        return appDatabase.categoryDao()
+    fun provideGetTransactionsUseCase(
+        transactionRepository: FirestoreTransactionRepository,
+        userRepository: FirestoreUserRepository,
+        walletRepository: FirestoreWalletRepository,
+        categoryRepository: FirestoreCategoryRepository,
+        labelRepository: FirestoreLabelRepository
+    ): GetTransactionsUseCase {
+        return GetTransactionsUseCase(
+            transactionRepository,
+            userRepository,
+            walletRepository,
+            categoryRepository,
+            labelRepository
+        )
     }
 
     @Provides
     @Singleton
-    fun provideLabelDao(appDatabase: AppDatabase): LabelDao {
-        return appDatabase.labelDao()
+    fun provideGetCategoriesUseCase(categoryRepository: FirestoreCategoryRepository, userRepository: FirestoreUserRepository): GetCategoriesUseCase {
+        return GetCategoriesUseCase(categoryRepository, userRepository)
     }
 
     @Provides
     @Singleton
-    fun providelabelrepository(labelDao: LabelDao): LabelRepository {
-        return LabelRepository(labelDao)
+    fun provideGetBudgetsUseCase(budgetRepository: FirestoreBudgetRepository, userRepository: FirestoreUserRepository, categoryRepository: FirestoreCategoryRepository): com.synaptix.budgetbuddy.core.usecase.main.budget.GetBudgetsUseCase {
+        return GetBudgetsUseCase(budgetRepository, userRepository, categoryRepository)
     }
 
     @Provides
     @Singleton
-    fun provideTransactionDao(appDatabase: AppDatabase): TransactionDao {
-        return appDatabase.transactionDao()
+    fun provideUploadImageUseCase() : UploadImageUseCase {
+        return UploadImageUseCase()
     }
-
-    @Provides
-    @Singleton
-    fun provideTransactionRepository(transactionDao: TransactionDao): TransactionRepository {
-        return TransactionRepository(transactionDao)
-    }
-
-    @Provides
-    @Singleton
-    fun provideBudgetDao(appDatabase: AppDatabase): BudgetDao {
-        return appDatabase.budgetDao()
-    }
-
-    @Provides
-    @Singleton
-    fun provideBudgetRepository(budgetDao: BudgetDao): BudgetRepository {
-        return BudgetRepository(budgetDao)
-    }
-
 }
+
+@Retention(AnnotationRetention.BINARY)
+@Qualifier
+annotation class IoDispatcher
+
+@Retention(AnnotationRetention.BINARY)
+@Qualifier
+annotation class MainDispatcher
+
+@Retention(AnnotationRetention.BINARY)
+@Qualifier
+annotation class DefaultDispatcher
+

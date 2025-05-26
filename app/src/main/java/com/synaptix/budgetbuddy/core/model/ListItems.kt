@@ -21,11 +21,52 @@
 
 package com.synaptix.budgetbuddy.core.model
 
-// Sealed class representing different types of items in the budget report
-sealed class BudgetReportListItems {
+/**
+ * Sealed class for items used in the home screen.
+ * Contains items specific to the home screen display.
+ */
+sealed class HomeListItems {
+    /**
+     * Represents a wallet item in the home screen.
+     * Maintains the original Wallet object while adding UI-specific data.
+     */
+    data class HomeWalletItem(
+        val wallet: Wallet,
+        val walletIcon: Int,
+        val relativeDate: String
+    ) : HomeListItems()
 
-    // Data class for a date header item in the budget report
-    data class DateHeader(
+    /**
+     * Represents a transaction item in the home screen.
+     * Maintains the original Transaction object while adding UI-specific data.
+     */
+    data class HomeTransactionItem(
+        val transaction: Transaction,
+        val relativeDate: String
+    ) : HomeListItems()
+
+    /**
+     * Represents a category summary in the home screen.
+     * Maintains the original Category object while adding UI-specific data.
+     */
+    data class HomeCategoryItem(
+        val category: Category,
+        val transactionCount: Int,
+        val amount: String,
+        val relativeDate: String
+    ) : HomeListItems()
+}
+
+/**
+ * Sealed class for items used in budget reports.
+ * Contains items specific to budget report display.
+ */
+sealed class BudgetListItems {
+    /**
+     * Represents a date header in the budget report.
+     * Contains UI-specific date formatting and total amount.
+     */
+    data class BudgetDateHeader(
         // The date number (e.g., 01, 02, etc.)
         val dateNumber: String,
 
@@ -37,10 +78,14 @@ sealed class BudgetReportListItems {
 
         // The total amount for the given date
         val amountTotal: Double
-    ) : BudgetReportListItems()
+    ) : BudgetListItems()
 
-    // Data class for a transaction item in the budget report
-    data class TransactionItem(
+    /**
+     * Represents a transaction item in the budget report.
+     * Maintains the original Transaction object while adding UI-specific data.
+     */
+    data class BudgetTransactionItem(
+        val transaction: Transaction,
         // The name of the category the transaction belongs to
         val categoryName: String,
 
@@ -50,30 +95,16 @@ sealed class BudgetReportListItems {
         // The color associated with the category
         val categoryColour: Int,
 
-        // The amount for the transaction
-        val amount: Double,
-
-        // The name of the wallet used in the transaction
-        val walletName: String,
-
-        // The note associated with the transaction, can be null
-        val note: String?,
-
         // The relative date of the transaction
         val relativeDate: String
-    ) : BudgetReportListItems()
+    ) : BudgetListItems()
 
-    // Data class for category items summary in the budget report
-    data class CategoryItems(
-        // The name of the category
-        val categoryName: String,
-
-        // The drawable resource ID for the category icon
-        val categoryIcon: Int,
-
-        // The color associated with the category
-        val categoryColour: Int,
-
+    /**
+     * Represents a category summary in the budget report.
+     * Maintains the original Category object while adding UI-specific data.
+     */
+    data class BudgetCategoryItem(
+        val category: Category,
         // The number of transactions in this category
         val transactionCount: Int,
 
@@ -82,23 +113,26 @@ sealed class BudgetReportListItems {
 
         // The relative date for the category item
         val relativeDate: String,
-    ) : BudgetReportListItems()
+    ) : BudgetListItems()
 
-    // Data class for a budget item in the budget report
-    data class BudgetItem(
-        val id: Int,
-        // The title of the budget item
-        val title: String,
+    /**
+     * Represents a budget item in the budget report.
+     * Maintains the original Budget object while adding UI-specific data.
+     */
+    data class BudgetBudgetItem(
+        // The original Budget object
+        val budget: Budget,
 
         // The status of the budget (e.g., 'Completed', 'Pending')
         val status: String,
+    ) : BudgetListItems()
 
-        // The drawable resource ID for the budget item icon
-        val categoryIcon: Int // Drawable resource ID for the icon (e.g., R.drawable.ic_circle_24)
-    )
-
-    // Data class for a wallet item in the budget report
-    data class WalletItem(
+    /**
+     * Represents a wallet item in the budget report.
+     * Maintains the original Wallet object while adding UI-specific data.
+     */
+    data class BudgetWalletItem(
+        val wallet: Wallet,
         // The name of the wallet
         val walletName: String,
 
@@ -106,11 +140,18 @@ sealed class BudgetReportListItems {
         val walletIcon: Int,
 
         // The balance of the wallet
-        var walletBalance: Double
-    )
+        var walletBalance: Double,
 
-    // Data class for label items in the budget report
-    data class LabelItems(
+        // The relative date for the wallet item
+        val relativeDate: String
+    ) : BudgetListItems()
+
+    /**
+     * Represents a label item in the budget report.
+     * Maintains the original Label object while adding UI-specific data.
+     */
+    data class BudgetLabelItem(
+        val label: Label,
         // The name of the label
         val labelName: String,
 
@@ -128,12 +169,75 @@ sealed class BudgetReportListItems {
 
         // The relative date for the label item
         val relativeDate: String,
-    ) : BudgetReportListItems()
+    ) : BudgetListItems()
+}
 
-    data class HomeWalletItem(
-        val walletName: String,
+/**
+ * Sealed class for items used in wallet management.
+ * Contains items specific to wallet display and management.
+ */
+sealed class WalletListItems {
+    /**
+     * Represents a wallet item in wallet management screens.
+     * Maintains the original Wallet object while adding UI-specific data.
+     */
+    data class WalletItem(
+        val wallet: Wallet,
         val walletIcon: Int,
-        var walletBalance: Double,
-        val relativeDate: String,
-    ) : BudgetReportListItems()
+        val relativeDate: String
+    ) : WalletListItems()
+}
+
+/**
+ * Sealed class for items used in category management.
+ * Contains items specific to category display and management.
+ */
+sealed class CategoryListItems {
+    /**
+     * Represents a category item in category management screens.
+     * Maintains the original Category object while adding UI-specific data.
+     */
+    data class CategoryItem(
+        val category: Category,
+        val transactionCount: Int,
+        val amount: String,
+        val relativeDate: String
+    ) : CategoryListItems()
+}
+
+/**
+ * Sealed class for items used in transaction management.
+ * Contains items specific to transaction display and management.
+ */
+sealed class TransactionListItems {
+    /**
+     * Represents a transaction item in transaction management screens.
+     * Maintains the original Transaction object while adding UI-specific data.
+     */
+    data class TransactionItem(
+        val transaction: Transaction,
+        val categoryName: String,
+        val categoryIcon: Int,
+        val categoryColour: Int,
+        val relativeDate: String
+    ) : TransactionListItems()
+}
+
+/**
+ * Sealed class for items used in label management.
+ * Contains items specific to label display and management.
+ */
+sealed class LabelListItems {
+    /**
+     * Represents a label item in label management screens.
+     * Maintains the original Label object while adding UI-specific data.
+     */
+    data class LabelItem(
+        val label: Label,
+        val labelIcon: Int,
+        val labelColour: Int,
+        val transactionCount: Int,
+        val amount: String,
+        val relativeDate: String
+    ) : LabelListItems()
 }

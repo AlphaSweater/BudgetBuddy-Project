@@ -1,58 +1,61 @@
 package com.synaptix.budgetbuddy.presentation.ui.main.transaction.transactionSelectLabelPopUp
 
-import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.TextView
-import androidx.recyclerview.widget.RecyclerView
 import com.synaptix.budgetbuddy.R
 import com.synaptix.budgetbuddy.core.model.Label
+import com.synaptix.budgetbuddy.presentation.ui.common.BaseAdapter
 
 class TransactionSelectLabelAdapter(
-    private var labels: List<Label>,
     private val onSelectionChanged: (List<Label>) -> Unit
-) : RecyclerView.Adapter<TransactionSelectLabelAdapter.LabelViewHolder>() {
+) : BaseAdapter<Label, TransactionSelectLabelAdapter.LabelViewHolder>() {
+
+    private val selectedLabels = mutableSetOf<Label>()
+
+    fun submitList(newLabels: List<Label>, initialSelected: List<Label> = emptyList()) {
+        selectedLabels.clear()
+        selectedLabels.addAll(initialSelected)
+        super.submitList(newLabels)
+    }
+
+    fun getSelectedLabels(): List<Label> = selectedLabels.toList()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): LabelViewHolder {
-        val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_label, parent, false)
-        return LabelViewHolder(view)
+        return createViewHolder(
+            parent = parent,
+            layoutResId = R.layout.item_label
+        ) { LabelViewHolder(it) }
     }
 
-    override fun onBindViewHolder(holder: LabelViewHolder, position: Int) {
-        holder.bind(labels[position])
-    }
-
-    override fun getItemCount(): Int = labels.size
-
-    fun updateLabels(newLabels: List<Label>) {
-        labels = newLabels
-        notifyDataSetChanged()
-    }
-
-    inner class LabelViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+    inner class LabelViewHolder(view: View) : BaseViewHolder<Label>(view) {
         private val labelTitle: TextView = view.findViewById(R.id.textLabelTitle)
         private val labelDescription: TextView = view.findViewById(R.id.textLabelDescription)
         private val checkBox: CheckBox = view.findViewById(R.id.checkSelect)
 
-        fun bind(label: Label) {
-            labelTitle.text = label.labelName
-            labelDescription.text = label.transactionInfo
-            checkBox.isChecked = label.isSelected
+        override fun bind(item: Label) {
+            labelTitle.text = item.name
+            labelDescription.text = "0 transactions in 0 wallets" // TODO: Get actual transaction info
+            checkBox.isChecked = selectedLabels.contains(item)
 
             itemView.setOnClickListener {
-                label.isSelected = !label.isSelected
-                checkBox.isChecked = label.isSelected
-                onSelectionChanged(labels.filter { it.isSelected })
+                toggleLabelSelection(item)
             }
 
             checkBox.setOnClickListener {
-                label.isSelected = checkBox.isChecked
-                onSelectionChanged(labels.filter { it.isSelected })
+                toggleLabelSelection(item)
             }
         }
-    }
 
-    fun getSelectedLabels(): List<Label> = labels.filter { it.isSelected }
+        private fun toggleLabelSelection(label: Label) {
+            if (selectedLabels.contains(label)) {
+                selectedLabels.remove(label)
+            } else {
+                selectedLabels.add(label)
+            }
+            checkBox.isChecked = selectedLabels.contains(label)
+            onSelectionChanged(selectedLabels.toList())
+        }
+    }
 }

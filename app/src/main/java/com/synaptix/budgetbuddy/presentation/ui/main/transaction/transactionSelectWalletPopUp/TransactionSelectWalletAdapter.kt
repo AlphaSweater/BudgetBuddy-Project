@@ -1,41 +1,55 @@
 package com.synaptix.budgetbuddy.presentation.ui.main.transaction.transactionSelectWalletPopUp
 
-import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import androidx.recyclerview.widget.RecyclerView
 import com.synaptix.budgetbuddy.R
 import com.synaptix.budgetbuddy.core.model.Wallet
+import com.synaptix.budgetbuddy.presentation.ui.common.BaseAdapter
 
+/**
+ * Adapter for displaying a list of wallets in a RecyclerView.
+ * This adapter follows the standard pattern for RecyclerView adapters in the app:
+ * 1. Extends BaseAdapter for common functionality
+ * 2. Uses a dedicated ViewHolder class
+ * 3. Handles item click events through a callback
+ * 4. Formats currency values consistently
+ *
+ * @param onWalletClick Callback function that is triggered when a wallet item is clicked
+ */
 class TransactionSelectWalletAdapter(
-    private val wallets: List<Wallet>,
-    private val onWalletClick: (Wallet) -> Unit // Callback with selected wallet
-) : RecyclerView.Adapter<TransactionSelectWalletAdapter.WalletViewHolder>() {
+    private val onWalletClick: (Wallet) -> Unit
+) : BaseAdapter<Wallet, TransactionSelectWalletAdapter.WalletViewHolder>() {
 
+    /**
+     * Creates a new ViewHolder instance for wallet items.
+     * Uses the standard item_wallet layout resource.
+     */
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): WalletViewHolder {
-        val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_wallet, parent, false)
-        return WalletViewHolder(view)
+        return createViewHolder(
+            parent = parent,
+            layoutResId = R.layout.item_wallet
+        ) { WalletViewHolder(it) }
     }
 
-    override fun onBindViewHolder(holder: WalletViewHolder, position: Int) {
-        holder.bind(wallets[position])
-    }
+    /**
+     * ViewHolder class for wallet items.
+     * Responsible for binding wallet data to the view and handling click events.
+     */
+    inner class WalletViewHolder(itemView: View) : BaseViewHolder<Wallet>(itemView) {
+        private val name: TextView = itemView.findViewById(R.id.txtWalletName)
+        private val balance: TextView = itemView.findViewById(R.id.txtWalletBalance)
 
-    override fun getItemCount(): Int = wallets.size
-
-    inner class WalletViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        private val name: TextView = itemView.findViewById(R.id.walletName)
-        private val balance: TextView = itemView.findViewById(R.id.walletBalance)
-
-        fun bind(wallet: Wallet) {
-            name.text = wallet.walletName
-            balance.text = "R %.2f".format(wallet.walletBalance)
+        /**
+         * Binds wallet data to the view.
+         * Formats the balance with the R currency symbol and 2 decimal places.
+         */
+        override fun bind(item: Wallet) {
+            name.text = item.name
+            balance.text = "R %.2f".format(item.balance)
 
             itemView.setOnClickListener {
-                onWalletClick(wallet)
-
+                onWalletClick(item)
             }
         }
     }

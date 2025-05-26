@@ -1,186 +1,162 @@
 <?xml version="1.0" encoding="utf-8"?>
+
+<!--    ======================================================================================-->
+<!--    Group 2 - Group Members:-->
+<!--    ======================================================================================-->
+<!--    * Chad Fairlie ST10269509-->
+<!--    * Dhiren Ruthenavelu ST10256859-->
+<!--    * Kayla Ferreira ST10259527-->
+<!--    * Nathan Teixeira ST10249266-->
+<!--    ======================================================================================-->
+<!--    Declaration:-->
+<!--    ======================================================================================-->
+<!--    We declare that this work is our own original work and that no part of it has been-->
+<!--    copied from any other source, except where explicitly acknowledged.-->
+<!--    ======================================================================================-->
+<!--    References:-->
+<!--    ======================================================================================-->
+<!--    * ChatGPT was used to help with the design and planning. As well as assisted with-->
+<!--    finding and fixing errors in the code.-->
+<!--    * ChatGPT also helped with the forming of comments for the code.-->
+<!--    * https://www.youtube.com/watch?v=A_tPafV23DM&list=PLPgs125_L-X9H6J7x4beRU-AxJ4mXe5vX-->
+<!--    ======================================================================================-->
+
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:background="?attr/bb_background"
     tools:context=".presentation.ui.auth.login.LoginFragment">
 
-
-    <!-- ==================================== Back button ====================================== -->
+    <!-- Back Button -->
     <ImageButton
         android:id="@+id/btnBackLogin"
         android:layout_width="48dp"
         android:layout_height="48dp"
-        android:background="@null"
+        android:layout_margin="@dimen/margin_small"
+        android:background="?attr/selectableItemBackgroundBorderless"
         android:src="?attr/actionModeCloseDrawable"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-
-    <!-- ==================================== Login label ====================================== -->
+    <!-- Title -->
     <TextView
         android:id="@+id/lblSignup"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="50dp"
+        android:layout_marginTop="@dimen/margin_large"
         android:fontFamily="@font/tilt_warp"
         android:text="@string/login"
         android:textAlignment="center"
         android:textColor="?attr/bb_primaryText"
-        android:textSize="48sp"
+        android:textSize="@dimen/header_text_size"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-
-    <!-- ==================================== Google button ====================================== -->
-    <LinearLayout
-        android:id="@+id/btnLoginGoogle"
-        android:layout_width="250dp"
-        android:layout_height="48dp"
-        android:layout_gravity="center"
-        android:layout_marginTop="42dp"
-        android:clickable="true"
-        android:focusable="true"
-        android:gravity="center_vertical"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/lblSignup">
-
-        <include layout="@layout/component_google_style_button" />
-    </LinearLayout>
-
-
-    <!-- ================================== Microsoft button ==================================== -->
-    <LinearLayout
-        android:id="@+id/btnLoginMicrosoft"
-        android:layout_width="250dp"
-        android:layout_height="48dp"
-        android:layout_gravity="center"
-        android:layout_marginTop="20dp"
-        android:clickable="true"
-        android:focusable="true"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btnLoginGoogle">
-
-        <include layout="@layout/component_google_style_button" />
-    </LinearLayout>
-
-
-    <!-- ================================== Divider ==================================== -->
-    <View
-        android:id="@+id/divider"
-        android:layout_width="match_parent"
-        android:layout_height="4dp"
-        android:layout_marginTop="50dp"
-        android:background="?attr/bb_surface"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btnLoginMicrosoft" />
-
-
-    <!-- ================================ Email input and Label ================================= -->
+    <!-- Email Input -->
     <TextView
         android:id="@+id/lblEmail"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="@dimen/margin_large"
         android:text="@string/email"
-        android:textSize="20sp"
-        app:layout_constraintStart_toStartOf="@+id/edtEmailAddress"
-        app:layout_constraintTop_toBottomOf="@+id/divider" />
+        android:textSize="@dimen/body_text_size"
+        app:layout_constraintStart_toStartOf="@+id/tilEmail"
+        app:layout_constraintTop_toBottomOf="@+id/lblSignup" />
 
-    <EditText
-        android:id="@+id/edtEmailAddress"
-        android:layout_width="362dp"
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/tilEmail"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="3dp"
-        android:background="@drawable/bg_rounded_edit_grey"
-        android:ems="10"
-        android:inputType="textEmailAddress"
-        android:padding="12dp"
-        android:textColor="?attr/bb_primaryText"
+        android:layout_marginHorizontal="@dimen/margin_xlarge"
+        android:layout_marginTop="@dimen/margin_small"
+        app:errorEnabled="true"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.492"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/lblEmail" />
+        app:layout_constraintTop_toBottomOf="@+id/lblEmail">
 
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/edtEmailAddress"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_rounded_edit_grey"
+            android:inputType="textEmailAddress"
+            android:minHeight="@dimen/input_field_height"
+            android:padding="@dimen/input_field_padding"
+            android:textColor="?attr/bb_primaryText" />
+    </com.google.android.material.textfield.TextInputLayout>
 
-    <!-- =============================== Password input and Label =============================== -->
+    <!-- Password Input -->
     <TextView
         android:id="@+id/lblPassword"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="@dimen/margin_medium"
         android:text="@string/password"
-        android:textSize="20sp"
-        app:layout_constraintStart_toStartOf="@+id/edtPassword"
-        app:layout_constraintTop_toBottomOf="@+id/edtEmailAddress" />
+        android:textSize="@dimen/body_text_size"
+        app:layout_constraintStart_toStartOf="@+id/tilPassword"
+        app:layout_constraintTop_toBottomOf="@+id/tilEmail" />
 
-    <EditText
-        android:id="@+id/edtPassword"
-        android:layout_width="362dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="3dp"
-        android:background="@drawable/bg_rounded_edit_grey"
-        android:ems="10"
-        android:inputType="textPassword"
-        android:padding="12dp"
-        android:textColor="?attr/bb_primaryText"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/lblPassword" />
-
-    <!-- ===================================== Login Button ==================================== -->
-    <Button
-        android:id="@+id/btnLogin"
-        android:layout_width="268dp"
-        android:layout_height="60dp"
-        android:layout_marginTop="50dp"
-        android:backgroundTint="?attr/bb_button"
-        android:text="@string/login"
-        android:textColor="@android:color/white"
-        android:textSize="24sp"
-        app:cornerRadius="24dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/edtPassword" />
-
-
-    <!-- ===================================== Version Label ==================================== -->
-    <TextView
-        android:id="@+id/lblVersionLogin"
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/tilPassword"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="50dp"
-        android:layout_marginEnd="50dp"
-        android:layout_marginBottom="20dp"
-        android:text="@string/version"
-        android:textAlignment="center"
-        android:textSize="20sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <!-- =============================== Loading Spinner Overlay =============================== -->
-    <ProgressBar
-        android:id="@+id/progressSpinner"
-        android:layout_width="120dp"
-        android:layout_height="120dp"
-        android:indeterminate="true"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="@+id/edtPassword"
+        android:layout_marginHorizontal="@dimen/margin_xlarge"
+        android:layout_marginTop="@dimen/margin_small"
+        app:errorEnabled="true"
+        app:endIconMode="password_toggle"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/edtEmailAddress" />
+        app:layout_constraintTop_toBottomOf="@+id/lblPassword">
 
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/edtPassword"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_rounded_edit_grey"
+            android:inputType="textPassword"
+            android:minHeight="@dimen/input_field_height"
+            android:padding="@dimen/input_field_padding"
+            android:textColor="?attr/bb_primaryText" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <!-- Login Button -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnLogin"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/margin_xlarge"
+        android:layout_marginTop="32dp"
+        android:backgroundTint="?attr/bb_button"
+        android:minHeight="@dimen/button_height"
+        android:text="@string/login"
+        android:textColor="@android:color/white"
+        android:textSize="@dimen/button_text_size"
+        app:cornerRadius="@dimen/button_corner_radius"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tilPassword" />
+
+    <!-- Loading Overlay -->
+    <FrameLayout
+        android:id="@+id/loadingOverlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#80000000"
+        android:clickable="true"
+        android:focusable="true"
+        android:visibility="gone">
+
+        <com.google.android.material.progressindicator.CircularProgressIndicator
+            android:id="@+id/progressSpinner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:indeterminate="true"
+            app:indicatorColor="@android:color/white"
+            app:trackColor="#4DFFFFFF" />
+    </FrameLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,5 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Default screen margins, per the Android Design guidelines. -->
-    <dimen name="activity_horizontal_margin">16dp</dimen>
-    <dimen name="activity_vertical_margin">16dp</dimen>
+    <!-- Text Sizes -->
+    <dimen name="header_text_size">48sp</dimen>
+    <dimen name="title_text_size">24sp</dimen>
+    <dimen name="body_text_size">16sp</dimen>
+    <dimen name="button_text_size">18sp</dimen>
+    <dimen name="label_text_size">14sp</dimen>
+
+    <!-- Margins and Padding -->
+    <dimen name="margin_small">8dp</dimen>
+    <dimen name="margin_medium">16dp</dimen>
+    <dimen name="margin_large">24dp</dimen>
+    <dimen name="margin_xlarge">32dp</dimen>
+
+    <!-- Button Dimensions -->
+    <dimen name="button_height">56dp</dimen>
+    <dimen name="button_min_width">200dp</dimen>
+    <dimen name="button_corner_radius">24dp</dimen>
+
+    <!-- Input Field Dimensions -->
+    <dimen name="input_field_height">48dp</dimen>
+    <dimen name="input_field_corner_radius">8dp</dimen>
+    <dimen name="input_field_padding">12dp</dimen>
 </resources>

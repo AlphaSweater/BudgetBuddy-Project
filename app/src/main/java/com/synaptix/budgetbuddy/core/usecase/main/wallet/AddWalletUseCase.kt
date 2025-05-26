@@ -1,19 +1,62 @@
+//======================================================================================
+//Group 2 - Group Members:
+//======================================================================================
+//* Chad Fairlie ST10269509
+//* Dhiren Ruthenavelu ST10256859
+//* Kayla Ferreira ST10259527
+//* Nathan Teixeira ST10249266
+//======================================================================================
+//Declaration:
+//======================================================================================
+//We declare that this work is our own original work and that no part of it has been
+//copied from any other source, except where explicitly acknowledged.
+//======================================================================================
+//References:
+//======================================================================================
+//* ChatGPT was used to help with the design and planning. As well as assisted with
+//finding and fixing errors in the code.
+//* ChatGPT also helped with the forming of comments for the code.
+//* https://www.youtube.com/watch?v=A_tPafV23DM&list=PLPgs125_L-X9H6J7x4beRU-AxJ4mXe5vX
+//======================================================================================
+
 package com.synaptix.budgetbuddy.core.usecase.main.wallet
 
-import com.synaptix.budgetbuddy.core.model.WalletIn
-
-import com.synaptix.budgetbuddy.data.local.dao.WalletDao
-import com.synaptix.budgetbuddy.data.entity.mapper.toEntity
-
+import android.util.Log
+import com.synaptix.budgetbuddy.core.model.Wallet
+import com.synaptix.budgetbuddy.data.firebase.mapper.FirebaseMapper.toDTO
+import com.synaptix.budgetbuddy.data.firebase.repository.FirestoreWalletRepository
+import com.synaptix.budgetbuddy.core.model.Result
 import javax.inject.Inject
 
+// UseCase class for adding a wallet to the user's profile
 class AddWalletUseCase @Inject constructor(
-    private val walletDao: WalletDao
+    // Injecting the WalletDao to handle wallet-related database operations
+    private val walletRepository: FirestoreWalletRepository
 ) {
-    suspend fun execute(wallet: WalletIn): Long {
-        //println for logcat
-        println("wallet to be inserted: $wallet")
+    sealed class AddWalletResult {
+        data class Success(val walletId: String) : AddWalletResult()
+        data class Error(val message: String) : AddWalletResult()
+    }
 
-        return walletDao.insertWallet(wallet.toEntity())
+    // Executes the operation to insert a new wallet
+    suspend fun execute(newWallet: Wallet): AddWalletResult {
+        val newWalletDTO = newWallet.toDTO()
+
+        return try {
+            when (val result = walletRepository.createWallet(newWalletDTO)) {
+                is Result.Success -> {
+                    Log.d("AddWalletUseCase", "Wallet added successfully: ${result.data}")
+                    AddWalletResult.Success(result.data)
+                }
+
+                is Result.Error -> {
+                    Log.e("AddWalletUseCase", "Error adding wallet: ${result.exception.message}")
+                    AddWalletResult.Error("Failed to add wallet: ${result.exception.message}")
+                }
+            }
+        } catch (e: Exception) {
+            Log.e("AddWalletUseCase", "Exception while adding wallet: ${e.message}")
+            AddWalletResult.Error("Failed to add wallet: ${e.message}")
+        }
     }
 }

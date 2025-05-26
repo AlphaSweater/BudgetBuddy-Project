@@ -1,4 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
+
+<!--    ======================================================================================-->
+<!--    Group 2 - Group Members:-->
+<!--    ======================================================================================-->
+<!--    * Chad Fairlie ST10269509-->
+<!--    * Dhiren Ruthenavelu ST10256859-->
+<!--    * Kayla Ferreira ST10259527-->
+<!--    * Nathan Teixeira ST10249266-->
+<!--    ======================================================================================-->
+<!--    Declaration:-->
+<!--    ======================================================================================-->
+<!--    We declare that this work is our own original work and that no part of it has been-->
+<!--    copied from any other source, except where explicitly acknowledged.-->
+<!--    ======================================================================================-->
+<!--    References:-->
+<!--    ======================================================================================-->
+<!--    * ChatGPT was used to help with the design and planning. As well as assisted with-->
+<!--    finding and fixing errors in the code.-->
+<!--    * ChatGPT also helped with the forming of comments for the code.-->
+<!--    * https://www.youtube.com/watch?v=A_tPafV23DM&list=PLPgs125_L-X9H6J7x4beRU-AxJ4mXe5vX-->
+<!--    ======================================================================================-->
+
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -7,76 +29,74 @@
     android:background="?attr/bb_background"
     tools:context=".presentation.ui.auth.landing.LandingFragment">
 
+    <!-- App Title -->
     <TextView
         android:id="@+id/lblBuddyBuddy"
-        android:layout_width="218dp"
-        android:layout_height="0dp"
-        android:layout_marginTop="5dp"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/margin_xlarge"
+        android:layout_marginTop="@dimen/margin_large"
         android:fontFamily="@font/tilt_warp"
         android:text="@string/app_name"
         android:textAlignment="center"
         android:textColor="?attr/bb_primaryText"
-        android:textSize="48sp"
+        android:textSize="@dimen/header_text_size"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <!-- App Logo -->
     <ImageView
         android:id="@+id/imgBuddy"
-        android:layout_width="match_parent"
-        android:layout_height="200dp"
-        android:layout_marginStart="30dp"
-        android:layout_marginTop="58dp"
-        android:layout_marginEnd="30dp"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginHorizontal="@dimen/margin_xlarge"
+        android:layout_marginTop="@dimen/margin_large"
         android:src="@drawable/ic_budget_buddy_icon"
+        android:adjustViewBounds="true"
+        android:scaleType="fitCenter"
+        app:layout_constraintDimensionRatio="1:1"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/lblBuddyBuddy" />
+        app:layout_constraintTop_toBottomOf="@+id/lblBuddyBuddy"
+        app:layout_constraintHeight_max="200dp" />
 
+    <!-- Sign Up Button -->
     <Button
         android:id="@+id/btnSignup"
-        android:layout_width="268dp"
-        android:layout_height="68dp"
-        android:layout_marginTop="70dp"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/margin_xlarge"
+        android:layout_marginTop="60dp"
+        android:layout_marginBottom="32dp"
         android:backgroundTint="?attr/bb_button"
+        android:minHeight="@dimen/button_height"
         android:text="@string/signupText"
         android:textColor="@android:color/white"
-        android:textSize="24sp"
-        app:cornerRadius="24dp"
+        android:textSize="@dimen/button_text_size"
+        app:cornerRadius="@dimen/button_corner_radius"
+        app:layout_constraintBottom_toTopOf="@+id/btnLogin"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imgBuddy" />
+        app:layout_constraintTop_toBottomOf="@+id/imgBuddy"
+        app:layout_constraintVertical_bias="0.8" />
 
+    <!-- Login Button -->
     <Button
         android:id="@+id/btnLogin"
-        android:layout_width="268dp"
-        android:layout_height="68dp"
-        android:layout_marginTop="15dp"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/margin_xlarge"
+        android:layout_marginTop="32dp"
         android:background="@android:color/transparent"
+        android:minHeight="@dimen/button_height"
         android:text="@string/loginText"
         android:textColor="?attr/bb_accent"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        app:cornerRadius="24dp"
+        android:textSize="@dimen/button_text_size"
+        app:cornerRadius="@dimen/button_corner_radius"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/btnSignup" />
-
-    <TextView
-        android:id="@+id/lblVersionOpenPage"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="50dp"
-        android:layout_marginEnd="50dp"
-        android:layout_marginBottom="20dp"
-        android:text="@string/version"
-        android:textAlignment="center"
-        android:textSize="20sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>

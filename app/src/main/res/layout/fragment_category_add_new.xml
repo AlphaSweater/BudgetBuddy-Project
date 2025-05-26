@@ -1,502 +1,263 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+<!--    ======================================================================================-->
+<!--    Group 2 - Group Members:-->
+<!--    ======================================================================================-->
+<!--    * Chad Fairlie ST10269509-->
+<!--    * Dhiren Ruthenavelu ST10256859-->
+<!--    * Kayla Ferreira ST10259527-->
+<!--    * Nathan Teixeira ST10249266-->
+<!--    ======================================================================================-->
+<!--    Declaration:-->
+<!--    ======================================================================================-->
+<!--    We declare that this work is our own original work and that no part of it has been-->
+<!--    copied from any other source, except where explicitly acknowledged.-->
+<!--    ======================================================================================-->
+<!--    References:-->
+<!--    ======================================================================================-->
+<!--    * ChatGPT was used to help with the design and planning. As well as assisted with-->
+<!--    finding and fixing errors in the code.-->
+<!--    * ChatGPT also helped with the forming of comments for the code.-->
+<!--    * https://www.youtube.com/watch?v=A_tPafV23DM&list=PLPgs125_L-X9H6J7x4beRU-AxJ4mXe5vX-->
+<!--    ======================================================================================-->
+
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?attr/bb_background"
-    android:padding="16dp">
+    android:background="?attr/bb_background">
 
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="11dp"
-        android:text="@string/category_colour"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageView6" />
-
-    <HorizontalScrollView
-        android:id="@+id/horizontalScrollView"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:fillViewport="true"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView">
-
-        <LinearLayout
-            android:id="@+id/buttonContainer"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:padding="8dp">
-
-            <Button
-                android:id="@+id/btnLightPink"
-                android:layout_width="60dp"
-                android:layout_height="60dp"
-                android:layout_gravity="center"
-                android:layout_marginEnd="12dp"
-                android:background="@drawable/circle_button_background"
-                android:gravity="center"
-                app:backgroundTint="@color/cat_light_pink" />
-
-            <Button
-                android:id="@+id/btnDarkPink"
-                android:layout_width="60dp"
-                android:layout_height="60dp"
-                android:layout_gravity="center"
-                android:layout_marginEnd="12dp"
-                android:background="@drawable/circle_button_background"
-                android:gravity="center"
-                app:backgroundTint="@color/cat_dark_pink" />
-
-            <Button
-                android:id="@+id/btnLightPurple"
-                android:layout_width="60dp"
-                android:layout_height="60dp"
-                android:layout_gravity="center"
-                android:layout_marginEnd="12dp"
-                android:background="@drawable/circle_button_background"
-                android:gravity="center"
-                app:backgroundTint="@color/cat_light_purple" />
-
-            <Button
-                android:id="@+id/btnDarkPurple"
-                android:layout_width="60dp"
-                android:layout_height="60dp"
-                android:layout_gravity="center"
-                android:layout_marginEnd="12dp"
-                android:background="@drawable/circle_button_background"
-                android:gravity="center"
-                app:backgroundTint="@color/cat_dark_purple" />
-
-
-            <Button
-                android:id="@+id/btnLightBlue"
-                android:layout_width="60dp"
-                android:layout_height="60dp"
-                android:layout_gravity="center"
-                android:layout_marginEnd="12dp"
-                android:background="@drawable/circle_button_background"
-                android:gravity="center"
-                app:backgroundTint="@color/cat_light_blue" />
-
-            <Button
-                android:id="@+id/btnDarkBlue"
-                android:layout_width="60dp"
-                android:layout_height="60dp"
-                android:layout_gravity="center"
-                android:layout_marginEnd="12dp"
-                android:background="@drawable/circle_button_background"
-                android:gravity="center"
-                app:backgroundTint="@color/cat_dark_blue" />
-
-            <Button
-                android:id="@+id/btnLightGreen"
-                android:layout_width="60dp"
-                android:layout_height="60dp"
-                android:layout_gravity="center"
-                android:layout_marginEnd="12dp"
-                android:background="@drawable/circle_button_background"
-                android:gravity="center"
-                app:backgroundTint="@color/cat_light_green" />
-
-            <Button
-                android:id="@+id/btnDarkGreen"
-                android:layout_width="60dp"
-                android:layout_height="60dp"
-                android:layout_gravity="center"
-                android:layout_marginEnd="12dp"
-                android:background="@drawable/circle_button_background"
-                android:gravity="center"
-                app:backgroundTint="@color/cat_dark_green" />
-
-            <Button
-                android:id="@+id/btnYellow"
-                android:layout_width="60dp"
-                android:layout_height="60dp"
-                android:layout_gravity="center"
-                android:layout_marginEnd="12dp"
-                android:background="@drawable/circle_button_background"
-                android:gravity="center"
-                app:backgroundTint="@color/cat_yellow" />
-
-            <Button
-                android:id="@+id/btnOrange"
-                android:layout_width="60dp"
-                android:layout_height="60dp"
-                android:layout_gravity="center"
-                android:layout_marginEnd="12dp"
-                android:background="@drawable/circle_button_background"
-                android:gravity="center"
-                app:backgroundTint="@color/cat_orange" />
-
-            <Button
-                android:id="@+id/btnGold"
-                android:layout_width="60dp"
-                android:layout_height="60dp"
-                android:layout_gravity="center"
-                android:layout_marginEnd="12dp"
-                android:background="@drawable/circle_button_background"
-                android:gravity="center"
-                app:backgroundTint="@color/cat_gold" />
-
-        </LinearLayout>
-    </HorizontalScrollView>
-    <!-- Back Button -->
-    <ImageButton
-        android:id="@+id/btnGoBack"
-        android:layout_width="44dp"
-        android:layout_height="44dp"
-        android:background="@null"
-        android:contentDescription="@string/back"
-        android:src="?attr/actionModeCloseDrawable"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:tint="?attr/bb_primaryText" />
-
-    <ImageView
-        android:id="@+id/imageView6"
-        android:layout_width="118dp"
-        android:layout_height="115dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btnGoBack"
-        app:srcCompat="@drawable/ic_circle_24"
-        app:tint="?attr/bb_surface" />
-
-
-    <EditText
-        android:id="@+id/editTxtText"
-        android:layout_width="207dp"
-        android:layout_height="39dp"
-        android:layout_marginTop="68dp"
-        android:layout_marginEnd="68dp"
-        android:hint="Category name"
-        android:inputType="text"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:ignore="TouchTargetSizeCheck" />
-
-    <TextView
-        android:id="@+id/textView2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:paddingTop="10dp"
-        android:paddingBottom="10dp"
-        android:text="@string/category_icon"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/horizontalScrollView" />
-
-    <ScrollView
-        android:id="@+id/scrollView2"
+    <!-- Top App Bar -->
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
-        android:layout_height="400dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView2">
+        android:layout_height="wrap_content"
+        android:background="@android:color/transparent"
+        app:elevation="0dp">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@android:color/transparent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingHorizontal="4dp">
+
+                <ImageButton
+                    android:id="@+id/btnGoBack"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="@string/back"
+                    android:src="?attr/actionModeCloseDrawable"
+                    app:tint="?attr/bb_primaryText" />
+
+                <TextView
+                    android:id="@+id/toolbarTitle"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Add New Category"
+                    android:textColor="?attr/bb_primaryText"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+        </androidx.appcompat.widget.Toolbar>
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <!-- Main Content -->
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/contentScrollView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:fillViewport="true"
+        android:paddingBottom="98dp"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:padding="16dp"
+            android:spacing="16dp">
 
-            <LinearLayout
+            <!-- Preview Card -->
+            <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:paddingTop="20dp"
-                android:paddingBottom="20dp">
+                android:layout_marginBottom="24dp"
+                app:cardBackgroundColor="?attr/bb_surface"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="2dp">
 
-                <ImageView
-                    android:id="@+id/imageView4"
-                    android:layout_width="wrap_content"
-                    android:layout_height="40dp"
-                    android:layout_weight="1"
-                    app:srcCompat="@drawable/baseline_fastfood_24"
-                    app:tint="?attr/colorOnPrimary" />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:padding="24dp">
 
-                <ImageView
-                    android:id="@+id/imageView5"
-                    android:layout_width="wrap_content"
-                    android:layout_height="40dp"
-                    android:layout_weight="1"
-                    app:srcCompat="@drawable/baseline_lightbulb_24"
-                    app:tint="?attr/colorOnPrimary" />
+                    <ImageView
+                        android:id="@+id/previewIcon"
+                        android:layout_width="72dp"
+                        android:layout_height="72dp"
+                        android:layout_marginBottom="20dp"
+                        android:src="@drawable/ic_circle_24"
+                        app:tint="?attr/bb_button"/>
 
-                <ImageView
-                    android:id="@+id/imageView7"
-                    android:layout_width="wrap_content"
-                    android:layout_height="40dp"
-                    android:layout_weight="1"
-                    app:srcCompat="@drawable/baseline_local_gas_station_24"
-                    app:tint="?attr/colorOnPrimary" />
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Category Name"
+                        app:boxBackgroundColor="?attr/bb_surface"
+                        app:hintTextColor="?attr/bb_secondaryText">
 
-                <ImageView
-                    android:id="@+id/imageView8"
-                    android:layout_width="wrap_content"
-                    android:layout_height="40dp"
-                    android:layout_weight="1"
-                    app:srcCompat="@drawable/baseline_shopping_bag_24"
-                    app:tint="?attr/colorOnPrimary" />
-            </LinearLayout>
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/categoryNameInput"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:background="?attr/bb_surface"
+                            android:inputType="text"
+                            android:maxLines="1"
+                            android:textColor="?attr/bb_primaryText"/>
+                    </com.google.android.material.textfield.TextInputLayout>
 
-            <LinearLayout
+                    <TextView
+                        android:id="@+id/statusMessage"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:textColor="?attr/bb_secondaryText"/>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Category Type Selection -->
+            <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:paddingTop="20dp"
-                android:paddingBottom="20dp">
+                android:layout_marginBottom="24dp"
+                app:cardBackgroundColor="?attr/bb_surface"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="2dp">
 
-                <ImageView
-                    android:id="@+id/btnPlane"
-                    android:layout_width="95dp"
-                    android:layout_height="40dp"
-                    app:srcCompat="@drawable/baseline_airplanemode_active_24"
-                    app:tint="?attr/colorOnPrimary" />
+                <RadioGroup
+                    android:id="@+id/categoryTypeGroup"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:padding="16dp">
 
-                <ImageView
-                    android:id="@+id/btnBaby"
-                    android:layout_width="wrap_content"
-                    android:layout_height="40dp"
-                    android:layout_weight="1"
-                    app:srcCompat="@drawable/baseline_child_friendly_24"
-                    app:tint="?attr/colorOnPrimary" />
+                    <com.google.android.material.radiobutton.MaterialRadioButton
+                        android:id="@+id/btnExpenseToggle"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:checked="true"
+                        android:text="Expense"
+                        android:textColor="?attr/bb_primaryText"
+                        android:textSize="16sp"/>
 
-                <ImageView
-                    android:id="@+id/btnTheatre"
-                    android:layout_width="wrap_content"
-                    android:layout_height="40dp"
-                    android:layout_weight="1"
-                    app:srcCompat="@drawable/baseline_theater_comedy_24"
-                    app:tint="?attr/colorOnPrimary" />
+                    <com.google.android.material.radiobutton.MaterialRadioButton
+                        android:id="@+id/btnIncomeToggle"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Income"
+                        android:textColor="?attr/bb_primaryText"
+                        android:textSize="16sp"/>
+                </RadioGroup>
+            </com.google.android.material.card.MaterialCardView>
 
-                <ImageView
-                    android:id="@+id/btnVacation"
-                    android:layout_width="wrap_content"
-                    android:layout_height="40dp"
-                    android:layout_weight="1"
-                    app:srcCompat="@drawable/baseline_beach_access_24"
-                    app:tint="?attr/colorOnPrimary" />
-            </LinearLayout>
+            <!-- Color Selection -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                android:text="@string/category_colour"
+                android:textColor="?attr/bb_primaryText"
+                android:textSize="16sp"
+                android:textStyle="bold"/>
 
-            <LinearLayout
+            <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:paddingTop="20dp"
-                android:paddingBottom="20dp">
+                android:layout_marginBottom="24dp"
+                app:cardBackgroundColor="?attr/bb_surface"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="2dp">
 
-                <ImageView
-                    android:id="@+id/btnBirthday"
-                    android:layout_width="95dp"
-                    android:layout_height="40dp"
-                    app:srcCompat="@drawable/baseline_cake_24"
-                    app:tint="?attr/colorOnPrimary" />
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recyclerViewColors"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:clipToPadding="false"
+                    android:minHeight="90dp"
+                    android:orientation="horizontal"
+                    android:paddingHorizontal="8dp"
+                    android:paddingVertical="16dp"
+                    app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+                    app:spanCount="2"/>
+            </com.google.android.material.card.MaterialCardView>
 
-                <ImageView
-                    android:id="@+id/btnGift"
-                    android:layout_width="wrap_content"
-                    android:layout_height="40dp"
-                    android:layout_weight="1"
-                    app:srcCompat="@drawable/baseline_card_giftcard_24"
-                    app:tint="?attr/colorOnPrimary" />
+            <!-- Icon Selection -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                android:text="@string/category_icon"
+                android:textColor="?attr/bb_primaryText"
+                android:textSize="16sp"
+                android:textStyle="bold"/>
 
-                <ImageView
-                    android:id="@+id/btnMusic"
-                    android:layout_width="wrap_content"
-                    android:layout_height="40dp"
-                    android:layout_weight="1"
-                    app:srcCompat="@drawable/baseline_music_note_24"
-                    app:tint="?attr/colorOnPrimary" />
-
-                <ImageView
-                    android:id="@+id/btnArt"
-                    android:layout_width="wrap_content"
-                    android:layout_height="40dp"
-                    android:layout_weight="1"
-                    app:srcCompat="@drawable/baseline_palette_24"
-                    app:tint="?attr/colorOnPrimary" />
-
-            </LinearLayout>
-
-            <LinearLayout
+            <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:paddingTop="20dp"
-                android:paddingBottom="20dp">
+                android:layout_marginBottom="24dp"
+                app:cardBackgroundColor="?attr/bb_surface"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="2dp">
 
-                <ImageView
-                    android:id="@+id/btnFix"
-                    android:layout_width="95dp"
-                    android:layout_height="40dp"
-                    app:srcCompat="@drawable/baseline_build_24"
-                    app:tint="?attr/colorOnPrimary" />
-
-                <ImageView
-                    android:id="@+id/btnHair"
-                    android:layout_width="wrap_content"
-                    android:layout_height="40dp"
-                    android:layout_weight="1"
-                    app:srcCompat="@drawable/baseline_content_cut_24"
-                    app:tint="?attr/colorOnPrimary" />
-
-                <ImageView
-                    android:id="@+id/btnTaxi"
-                    android:layout_width="wrap_content"
-                    android:layout_height="40dp"
-                    android:layout_weight="1"
-                    app:srcCompat="@drawable/baseline_local_taxi_24"
-                    app:tint="?attr/colorOnPrimary" />
-
-                <ImageView
-                    android:id="@+id/btnPets"
-                    android:layout_width="wrap_content"
-                    android:layout_height="40dp"
-                    android:layout_weight="1"
-                    app:srcCompat="@drawable/baseline_pets_24"
-                    app:tint="?attr/colorOnPrimary" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:paddingTop="20dp"
-                android:paddingBottom="20dp">
-
-                <ImageView
-                    android:id="@+id/btnCruise"
-                    android:layout_width="95dp"
-                    android:layout_height="40dp"
-                    app:srcCompat="@drawable/baseline_directions_boat_filled_24"
-                    app:tint="?attr/colorOnPrimary" />
-
-                <ImageView
-                    android:id="@+id/btnChildSupport"
-                    android:layout_width="wrap_content"
-                    android:layout_height="40dp"
-                    android:layout_weight="1"
-                    app:srcCompat="@drawable/baseline_escalator_warning_24"
-                    app:tint="?attr/colorOnPrimary" />
-
-                <ImageView
-                    android:id="@+id/btnGym"
-                    android:layout_width="wrap_content"
-                    android:layout_height="40dp"
-                    android:layout_weight="1"
-                    app:srcCompat="@drawable/baseline_fitness_center_24"
-                    app:tint="?attr/colorOnPrimary" />
-
-                <ImageView
-                    android:id="@+id/btnFlower"
-                    android:layout_width="wrap_content"
-                    android:layout_height="40dp"
-                    android:layout_weight="1"
-                    app:srcCompat="@drawable/baseline_filter_vintage_24"
-                    app:tint="?attr/colorOnPrimary" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:paddingTop="20dp"
-                android:paddingBottom="20dp">
-
-                <ImageView
-                    android:id="@+id/btnBar"
-                    android:layout_width="95dp"
-                    android:layout_height="40dp"
-                    app:srcCompat="@drawable/baseline_local_bar_24"
-                    app:tint="?attr/colorOnPrimary" />
-
-                <ImageView
-                    android:id="@+id/btnWork"
-                    android:layout_width="wrap_content"
-                    android:layout_height="40dp"
-                    android:layout_weight="1"
-                    app:srcCompat="@drawable/baseline_home_repair_service_24"
-                    app:tint="?attr/colorOnPrimary" />
-
-                <ImageView
-                    android:id="@+id/btnTravel"
-                    android:layout_width="wrap_content"
-                    android:layout_height="40dp"
-                    android:layout_weight="1"
-                    app:srcCompat="@drawable/baseline_public_24"
-                    app:tint="?attr/colorOnPrimary" />
-
-                <ImageView
-                    android:id="@+id/btnRestaurant"
-                    android:layout_width="wrap_content"
-                    android:layout_height="40dp"
-                    android:layout_weight="1"
-                    app:srcCompat="@drawable/baseline_restaurant_menu_24"
-                    app:tint="?attr/colorOnPrimary" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:paddingTop="20dp"
-                android:paddingBottom="20dp">
-
-                <ImageView
-                    android:id="@+id/btnSchool"
-                    android:layout_width="95dp"
-                    android:layout_height="40dp"
-                    app:srcCompat="@drawable/baseline_school_24"
-                    app:tint="?attr/colorOnPrimary" />
-
-                <ImageView
-                    android:id="@+id/btnSAVINGS"
-                    android:layout_width="wrap_content"
-                    android:layout_height="40dp"
-                    android:layout_weight="1"
-                    app:srcCompat="@drawable/baseline_savings_24"
-                    app:tint="?attr/colorOnPrimary" />
-
-                <ImageView
-                    android:id="@+id/btnPhone"
-                    android:layout_width="wrap_content"
-                    android:layout_height="40dp"
-                    android:layout_weight="1"
-                    app:srcCompat="@drawable/baseline_phone_android_24"
-                    app:tint="?attr/colorOnPrimary" />
-
-                <ImageView
-                    android:id="@+id/btnComputer"
-                    android:layout_width="wrap_content"
-                    android:layout_height="40dp"
-                    android:layout_weight="1"
-                    app:srcCompat="@drawable/baseline_computer_24"
-                    app:tint="?attr/colorOnPrimary" />
-
-            </LinearLayout>
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recyclerViewIcons"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:clipToPadding="false"
+                    android:minHeight="160dp"
+                    android:paddingHorizontal="8dp"
+                    android:paddingVertical="16dp"
+                    app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+                    app:spanCount="4"/>
+            </com.google.android.material.card.MaterialCardView>
         </LinearLayout>
-    </ScrollView>
+    </androidx.core.widget.NestedScrollView>
 
-    <Button
-        android:id="@+id/btnCreate"
-        android:layout_width="200dp"
-        android:layout_height="59dp"
-        android:layout_gravity="center"
-        android:layout_marginStart="97dp"
-        android:layout_marginTop="10dp"
-        android:text="Create"
-        android:textColor="@android:color/white"
-        android:textSize="20sp"
-        app:backgroundTint="?attr/bb_button"
-        app:cornerRadius="24dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/scrollView2" />
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <!-- Bottom Save Button -->
+    <FrameLayout
+        android:id="@+id/bottomButtonContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:background="?attr/bb_background"
+        android:elevation="8dp"
+        android:padding="16dp">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnCreate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingVertical="16dp"
+            android:text="Create Category"
+            android:textColor="@android:color/white"
+            android:textSize="16sp"
+            app:backgroundTint="?attr/bb_button"
+            app:cornerRadius="16dp"/>
+    </FrameLayout>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

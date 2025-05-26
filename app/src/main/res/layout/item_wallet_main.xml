@@ -1,80 +1,109 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+<!--    ======================================================================================-->
+<!--    Group 2 - Group Members:-->
+<!--    ======================================================================================-->
+<!--    * Chad Fairlie ST10269509-->
+<!--    * Dhiren Ruthenavelu ST10256859-->
+<!--    * Kayla Ferreira ST10259527-->
+<!--    * Nathan Teixeira ST10249266-->
+<!--    ======================================================================================-->
+<!--    Declaration:-->
+<!--    ======================================================================================-->
+<!--    We declare that this work is our own original work and that no part of it has been-->
+<!--    copied from any other source, except where explicitly acknowledged.-->
+<!--    ======================================================================================-->
+<!--    References:-->
+<!--    ======================================================================================-->
+<!--    * ChatGPT was used to help with the design and planning. As well as assisted with-->
+<!--    finding and fixing errors in the code.-->
+<!--    * ChatGPT also helped with the forming of comments for the code.-->
+<!--    * https://www.youtube.com/watch?v=A_tPafV23DM&list=PLPgs125_L-X9H6J7x4beRU-AxJ4mXe5vX-->
+<!--    ======================================================================================-->
+
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/walletCard"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:padding="16dp">
+    android:layout_marginHorizontal="8dp"
+    android:layout_marginVertical="4dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="0dp"
+    android:clickable="true"
+    android:focusable="true"
+    app:rippleColor="?attr/bb_surfaceAlt"
+    android:backgroundTint="?attr/bb_surface">
 
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/budgetCard"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:cardCornerRadius="16dp"
-        app:cardElevation="4dp"
-        android:backgroundTint="?attr/bb_surface">
+        android:padding="16dp">
 
-        <!-- Budget Item Container -->
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/budgetItemContainer"
-            android:layout_width="match_parent"
-            android:layout_height="77dp"
-            android:padding="16dp">
+        <!-- Wallet Icon Container -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/iconContainer"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="0dp"
+            android:backgroundTint="?attr/bb_background"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent">
 
-            <!-- Icon (Burger) -->
             <ImageView
                 android:id="@+id/walletIcon"
-                android:layout_width="36dp"
-                android:layout_height="36dp"
-                android:contentDescription="Wallet Icon"
-                android:paddingRight="8dp"
-                android:src="@drawable/ic_account_balance_wallet_24"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:tint="?attr/colorOnPrimary" />
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_wallet_24"
+                app:tint="?attr/bb_button" />
 
-            <!-- Budget Info -->
-            <LinearLayout
-                android:id="@+id/walletDetails"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:layout_marginStart="12dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toEndOf="@id/walletIcon"
-                app:layout_constraintTop_toTopOf="parent">
+        </com.google.android.material.card.MaterialCardView>
 
-                <TextView
-                    android:id="@+id/walletName"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Wallet Name"
-                    android:textColor="?attr/bb_primaryText"
-                    android:textSize="18sp" />
+        <!-- Wallet Details -->
+        <TextView
+            android:id="@+id/walletName"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:textColor="?attr/bb_primaryText"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:maxLines="1"
+            android:ellipsize="end"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toEndOf="@id/iconContainer"
+            app:layout_constraintEnd_toStartOf="@id/arrowIconWallet"
+            tools:text="Personal Wallet" />
 
-                <TextView
-                    android:id="@+id/walletBalance"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Amount"
-                    android:textColor="?attr/bb_secondaryText"
-                    android:textSize="14sp" />
-            </LinearLayout>
+        <TextView
+            android:id="@+id/walletBalance"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:textColor="?attr/bb_profit"
+            android:textSize="14sp"
+            app:layout_constraintTop_toBottomOf="@id/walletName"
+            app:layout_constraintStart_toStartOf="@id/walletName"
+            app:layout_constraintEnd_toEndOf="@id/walletName"
+            tools:text="R 12,500.00" />
 
-            <!-- Navigation Arrow -->
-            <ImageView
-                android:id="@+id/arrowIconWallet"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:contentDescription="Navigate"
-                android:src="@drawable/baseline_arrow_forward_ios_24"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:tint="?attr/colorOnPrimary" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
+        <!-- Navigation Arrow -->
+        <ImageView
+            android:id="@+id/arrowIconWallet"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/ic_arrow_open_24"
+            app:tint="?attr/bb_secondaryText"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
 
-    </com.google.android.material.card.MaterialCardView>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
-</LinearLayout>
+</com.google.android.material.card.MaterialCardView>

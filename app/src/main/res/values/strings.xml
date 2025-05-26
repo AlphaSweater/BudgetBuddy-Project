@@ -1,3 +1,24 @@
+<!--    ======================================================================================-->
+<!--    Group 2 - Group Members:-->
+<!--    ======================================================================================-->
+<!--    * Chad Fairlie ST10269509-->
+<!--    * Dhiren Ruthenavelu ST10256859-->
+<!--    * Kayla Ferreira ST10259527-->
+<!--    * Nathan Teixeira ST10249266-->
+<!--    ======================================================================================-->
+<!--    Declaration:-->
+<!--    ======================================================================================-->
+<!--    We declare that this work is our own original work and that no part of it has been-->
+<!--    copied from any other source, except where explicitly acknowledged.-->
+<!--    ======================================================================================-->
+<!--    References:-->
+<!--    ======================================================================================-->
+<!--    * ChatGPT was used to help with the design and planning. As well as assisted with-->
+<!--    finding and fixing errors in the code.-->
+<!--    * ChatGPT also helped with the forming of comments for the code.-->
+<!--    * https://www.youtube.com/watch?v=A_tPafV23DM&list=PLPgs125_L-X9H6J7x4beRU-AxJ4mXe5vX-->
+<!--    ======================================================================================-->
+
 <resources>
 
     <!-- ====================== Global Strings ====================== -->
@@ -18,7 +39,7 @@
     <!-- ============ Open, Sign In and Sign Up Strings ============-->
     <string name="signupText">SIGN UP</string>
     <string name="loginText">LOGIN</string>
-    <string name="version">Version 0.0.0.0</string>
+    <string name="version_format">Version %1$s</string>
     <string name="googleSignUp">SIGN UP WITH GOOGLE</string>
     <string name="microsoftSignUp">SIGN UP WITH MIRCOSOFT</string>\
     <string name="confirm_password">Confirm Password</string>
@@ -108,7 +129,11 @@
     <string name="total_budget">Total budget</string>
     <string name="total_spent">Total spent</string>
     <string name="end_of_month">End of Month</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
     <!-- =========================================================== -->
 
+    <string name="category_created_success">Category Created Successfully!</string>
+    <string name="category_creation_error">Please enter a name and choose an icon and color</string>
 
 </resources>
