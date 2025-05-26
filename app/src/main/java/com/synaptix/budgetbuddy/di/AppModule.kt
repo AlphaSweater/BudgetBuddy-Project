@@ -184,6 +184,7 @@ object AppModule {
     }
 
     @Provides
+    @Singleton
     fun provideTotalBudgetUseCase(budgetRepository: FirestoreBudgetRepository, userRepository: FirestoreUserRepository, categoryRepository: FirestoreCategoryRepository): TotalBudgetUseCase {
         return TotalBudgetUseCase(budgetRepository, userRepository, categoryRepository)
     }
