@@ -15,15 +15,16 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.github.mikephil.charting.charts.BarChart
-import com.github.mikephil.charting.charts.LineChart
+import com.github.mikephil.charting.charts.PieChart
 import com.github.mikephil.charting.components.Description
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.BarData
 import com.github.mikephil.charting.data.BarDataSet
 import com.github.mikephil.charting.data.BarEntry
-import com.github.mikephil.charting.data.Entry
-import com.github.mikephil.charting.data.LineDataSet
-import com.github.mikephil.charting.data.LineData
+import com.github.mikephil.charting.animation.Easing
+import com.github.mikephil.charting.data.PieData
+import com.github.mikephil.charting.data.PieDataSet
+import com.github.mikephil.charting.data.PieEntry
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
 import com.synaptix.budgetbuddy.R
 import com.synaptix.budgetbuddy.core.model.HomeListItems
@@ -99,7 +100,7 @@ class HomeMainFragment : Fragment() {
         setupViews()
         observeStates()
         setupBarChart()
-        setupLineChart()
+        setupPieChart()
     }
 
     private fun setupViews() {
@@ -207,66 +208,42 @@ class HomeMainFragment : Fragment() {
         barChart.invalidate()
     }
 
-    private fun setupLineChart() {
-        val lineChart: LineChart = binding.lineChart
-        val context = lineChart.context
+    private fun setupPieChart() {
+        val pieChart: PieChart = binding.pieChart
 
-        val months = listOf("Jan", "Feb", "Mar", "Apr", "May", "Jun")
-        val incomeValues = listOf(3000f, 3200f, 3100f, 4000f, 4200f, 4100f)
-        val expenseValues = listOf(1500f, 1800f, 1600f, 2000f, 2300f, 2200f)
+        // Sample expense categories and values
+        val expenseCategories = listOf("Food", "Transport", "Entertainment", "Bills", "Shopping")
+        val expenseAmounts = listOf(800f, 400f, 300f, 500f, 600f)
 
-        val incomeEntries = incomeValues.mapIndexed { index, value ->
-            Entry(index.toFloat(), value)
-        }
-        val expenseEntries = expenseValues.mapIndexed { index, value ->
-            Entry(index.toFloat(), value)
+        val pieEntries = expenseCategories.mapIndexed { index, category ->
+            PieEntry(expenseAmounts[index], category)
         }
 
-        val incomeDataSet = LineDataSet(incomeEntries, "Income").apply {
-            color = ContextCompat.getColor(context, R.color.profit_green)
-            valueTextColor = Color.BLACK
-            lineWidth = 2f
-            setCircleColor(ContextCompat.getColor(context, R.color.profit_green))
-            circleRadius = 4f
-            mode = LineDataSet.Mode.CUBIC_BEZIER
-
-            // Gradient fill
-            setDrawFilled(true)
-            fillDrawable = ContextCompat.getDrawable(context, R.drawable.gradient_income)
+        val pieDataSet = PieDataSet(pieEntries, "Expense Categories").apply {
+            colors = listOf(
+                ContextCompat.getColor(requireContext(), R.color.cat_dark_green),
+                ContextCompat.getColor(requireContext(), R.color.cat_light_pink),
+                ContextCompat.getColor(requireContext(), R.color.cat_dark_blue),
+                ContextCompat.getColor(requireContext(), R.color.cat_yellow),
+                ContextCompat.getColor(requireContext(), R.color.cat_orange)
+            )
+            valueTextSize = 14f
+            valueTextColor = Color.WHITE
+            sliceSpace = 2f
         }
 
-        val expenseDataSet = LineDataSet(expenseEntries, "Expense").apply {
-            color = ContextCompat.getColor(context, R.color.expense_red)
-            valueTextColor = Color.BLACK
-            lineWidth = 2f
-            setCircleColor(ContextCompat.getColor(context, R.color.expense_red))
-            circleRadius = 4f
-            mode = LineDataSet.Mode.CUBIC_BEZIER
+        val pieData = PieData(pieDataSet)
 
-            // Gradient fill
-            setDrawFilled(true)
-            fillDrawable = ContextCompat.getDrawable(context, R.drawable.gradient_expense)
-        }
+        pieChart.data = pieData
+        pieChart.description.isEnabled = false
+        pieChart.centerText = "Expenses"
+        pieChart.setUsePercentValues(true)
+        pieChart.setEntryLabelColor(Color.BLACK)
 
-        val lineData = LineData(incomeDataSet, expenseDataSet)
-        lineChart.data = lineData
-
-        // X-axis
-        lineChart.xAxis.apply {
-            valueFormatter = IndexAxisValueFormatter(months)
-            granularity = 1f
-            position = XAxis.XAxisPosition.BOTTOM
-            setDrawGridLines(false)
-            labelRotationAngle = -45f
-        }
-
-        lineChart.axisRight.isEnabled = false
-        lineChart.description.text = "Income vs Expense (6 Months)"
-        lineChart.animateX(1000)
-        lineChart.invalidate()
+        // ✅ Correct easing import from MPAndroidChart
+        pieChart.animateY(1000, Easing.EaseInOutQuad)
+        pieChart.invalidate()
     }
-
-
 
 
     private fun handleWalletsState(state: HomeMainViewModel.WalletState) {
