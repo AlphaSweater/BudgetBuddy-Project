@@ -22,6 +22,8 @@ class GetBudgetsUseCase @Inject constructor(
         data class Error(val message: String) : GetBudgetsResult()
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // Executes the operation to fetch budgets for the specified user
     suspend fun execute(userId: String): GetBudgetsResult {
         if (userId.isEmpty()) {
             return Error("Invalid user ID")
@@ -58,6 +60,8 @@ class GetBudgetsUseCase @Inject constructor(
         }
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // Helper function to get full budget data including user and categories
     private suspend fun getBudgetData(budgetDTO: BudgetDTO): Result<Budget> {
         val user = when (val result = userRepository.getUserProfile(budgetDTO.userId).first()) {
             is Result.Success -> result.data?.toDomain()
@@ -72,3 +76,4 @@ class GetBudgetsUseCase @Inject constructor(
         return Result.Success(budgetDTO.toDomain(user, categories))
     }
 }
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~EOF~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\

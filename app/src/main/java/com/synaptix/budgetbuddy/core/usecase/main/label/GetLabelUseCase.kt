@@ -41,6 +41,7 @@ class GetLabelUseCase @Inject constructor(
         data class Error(val message: String) : GetLabelsResult()
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     // Executes the operation to fetch labels for the specified user
     suspend fun execute(userId: String): GetLabelsResult {
         // Input validation
@@ -71,3 +72,4 @@ class GetLabelUseCase @Inject constructor(
         }
     }
 }
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~EOF~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
