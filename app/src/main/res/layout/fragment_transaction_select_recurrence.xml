@@ -400,6 +400,15 @@
                                 app:chipStrokeWidth="0dp"
                                 app:rippleColor="@android:color/transparent"/>
                         </com.google.android.material.chip.ChipGroup>
+
+                        <!-- Add error text for week days -->
+                        <TextView
+                            android:id="@+id/weekDaysError"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:textColor="@color/error"
+                            android:visibility="gone"/>
                     </LinearLayout>
 
                     <!-- Monthly Options -->
@@ -599,6 +608,14 @@
                             android:inputType="number"/>
                     </com.google.android.material.textfield.TextInputLayout>
 
+                    <TextView
+                        android:id="@+id/occurrencesError"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:textColor="@color/error"
+                        android:visibility="gone"/>
+
                     <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/endDateLayout"
                         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
@@ -615,6 +632,14 @@
                             android:focusable="false"
                             android:clickable="true"/>
                     </com.google.android.material.textfield.TextInputLayout>
+
+                    <TextView
+                        android:id="@+id/endDateError"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:textColor="@color/error"
+                        android:visibility="gone"/>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
         </LinearLayout>

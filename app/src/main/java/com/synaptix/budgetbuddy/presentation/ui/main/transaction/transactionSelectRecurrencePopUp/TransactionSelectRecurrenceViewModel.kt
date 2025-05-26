@@ -24,7 +24,10 @@ class TransactionSelectRecurrenceViewModel : ViewModel() {
         val isEndDateValid: Boolean = true,
         val isOccurrencesValid: Boolean = true,
         val shouldShowErrors: Boolean = false,
-        val weekDaysError: String? = null
+        val weekDaysError: String? = null,
+        val endDateError: String? = null,
+        val occurrencesError: String? = null,
+        val intervalError: String? = null
     )
 
     private val _uiState = MutableLiveData<UiState>(UiState.Initial)
@@ -72,30 +75,37 @@ class TransactionSelectRecurrenceViewModel : ViewModel() {
 
     fun setRecurrenceType(type: RecurrenceType) {
         _recurrenceType = type
+        validateForm()
     }
 
     fun setEndType(type: EndType) {
         _endType = type
+        validateForm()
     }
 
     fun setEndDate(date: Date?) {
         _endDate = date
+        validateForm()
     }
 
     fun setOccurrences(count: Int?) {
         _occurrences = count
+        validateForm()
     }
 
     fun setInterval(value: Int) {
         _interval = value
+        validateForm()
     }
 
     fun setWeekDays(days: List<String>) {
         _weekDays = days
+        validateForm()
     }
 
     fun setIsDayOfWeek(value: Boolean) {
         _isDayOfWeek = value
+        validateForm()
     }
 
     fun saveRecurrenceData() {
@@ -152,17 +162,44 @@ class TransactionSelectRecurrenceViewModel : ViewModel() {
         val isEndDateValid = _endType != EndType.ON || (_endDate != null && _endDate!!.after(Date()))
         val isOccurrencesValid = _endType != EndType.AFTER || (_occurrences ?: 0) > 0
 
+        // Create more descriptive error messages
+        val weekDaysError = when {
+            _recurrenceType == RecurrenceType.WEEKLY && _weekDays.isEmpty() -> 
+                "Please select at least one day of the week for weekly recurrence"
+            else -> null
+        }
+
+        val endDateError = when {
+            _endType == EndType.ON && _endDate == null -> 
+                "Please select an end date"
+            _endType == EndType.ON && !_endDate!!.after(Date()) -> 
+                "End date must be in the future"
+            else -> null
+        }
+
+        val occurrencesError = when {
+            _endType == EndType.AFTER && (_occurrences == null || _occurrences!! <= 0) -> 
+                "Please enter a valid number of occurrences (greater than 0)"
+            else -> null
+        }
+
+        val intervalError = when {
+            !isIntervalValid -> "Please select a valid interval (greater than 0)"
+            else -> null
+        }
+
         _validationState.value = ValidationState(
             isIntervalValid = isIntervalValid,
             isWeekDaysValid = isWeekDaysValid,
             isEndDateValid = isEndDateValid,
             isOccurrencesValid = isOccurrencesValid,
-            weekDaysError = if (_recurrenceType == RecurrenceType.WEEKLY && _weekDays.isEmpty()) 
-                "Please select at least one day" else null
+            weekDaysError = weekDaysError,
+            endDateError = endDateError,
+            occurrencesError = occurrencesError,
+            intervalError = intervalError
         )
 
-        return isIntervalValid &&
-               isWeekDaysValid && isEndDateValid && isOccurrencesValid
+        return isIntervalValid && isWeekDaysValid && isEndDateValid && isOccurrencesValid
     }
 
     private fun createRecurrenceData(

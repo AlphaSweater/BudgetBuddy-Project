@@ -126,15 +126,21 @@ class TransactionSelectRecurrenceFragment : Fragment() {
             when (checkedId) {
                 binding.radioEndAfter.id -> {
                     binding.occurrencesLayout.isVisible = true
+                    binding.occurrencesError.visibility = View.GONE
                     binding.endDateLayout.isVisible = false
+                    binding.endDateError.visibility = View.GONE
                 }
                 binding.radioEndOn.id -> {
                     binding.occurrencesLayout.isVisible = false
+                    binding.occurrencesError.visibility = View.GONE
                     binding.endDateLayout.isVisible = true
+                    binding.endDateError.visibility = View.GONE
                 }
                 else -> {
                     binding.occurrencesLayout.isVisible = false
+                    binding.occurrencesError.visibility = View.GONE
                     binding.endDateLayout.isVisible = false
+                    binding.endDateError.visibility = View.GONE
                 }
             }
         }
@@ -243,19 +249,80 @@ class TransactionSelectRecurrenceFragment : Fragment() {
 
         recurrenceViewModel.validationState.observe(viewLifecycleOwner) { validationState ->
             if (validationState.shouldShowErrors) {
-                binding.occurrencesInput.error = if (!validationState.isOccurrencesValid) "Invalid occurrences" else null
-                binding.endDateInput.error = if (!validationState.isEndDateValid) "Invalid end date" else null
-                
-                // Show week days validation error
-                if (!validationState.isWeekDaysValid) {
-                    Snackbar.make(binding.root, validationState.weekDaysError ?: "Please select at least one day", Snackbar.LENGTH_LONG).show()
+                // Handle occurrences validation
+                if (!validationState.isOccurrencesValid) {
+                    binding.occurrencesError.apply {
+                        text = validationState.occurrencesError
+                        visibility = View.VISIBLE
+                    }
+                    binding.occurrencesInput.error = null
+                    scrollToView(binding.occurrencesLayout)
+                } else {
+                    binding.occurrencesError.visibility = View.GONE
                 }
+
+                // Handle end date validation
+                if (!validationState.isEndDateValid) {
+                    binding.endDateError.apply {
+                        text = validationState.endDateError
+                        visibility = View.VISIBLE
+                    }
+                    binding.endDateInput.error = null
+                    scrollToView(binding.endDateLayout)
+                } else {
+                    binding.endDateError.visibility = View.GONE
+                }
+
+                // Handle week days validation
+                if (!validationState.isWeekDaysValid) {
+                    binding.weekDaysError.apply {
+                        text = validationState.weekDaysError
+                        visibility = View.VISIBLE
+                    }
+                    scrollToView(binding.weekDaysChipGroup)
+                } else {
+                    binding.weekDaysError.visibility = View.GONE
+                }
+
+                // Handle interval validation
+                if (!validationState.isIntervalValid) {
+                    val errorMessage = validationState.intervalError ?: "Please select a valid interval"
+                    when (recurrenceViewModel.recurrenceType) {
+                        TransactionSelectRecurrenceViewModel.RecurrenceType.DAILY -> {
+                            scrollToView(binding.dailyOptions)
+                        }
+                        TransactionSelectRecurrenceViewModel.RecurrenceType.WEEKLY -> {
+                            scrollToView(binding.weeklyOptions)
+                        }
+                        TransactionSelectRecurrenceViewModel.RecurrenceType.MONTHLY -> {
+                            scrollToView(binding.monthlyOptions)
+                        }
+                        TransactionSelectRecurrenceViewModel.RecurrenceType.YEARLY -> {
+                            scrollToView(binding.yearlyOptions)
+                        }
+                        else -> {}
+                    }
+                    Snackbar.make(binding.root, errorMessage, Snackbar.LENGTH_LONG).show()
+                }
+            } else {
+                // Clear all error states when validation is successful
+                binding.occurrencesError.visibility = View.GONE
+                binding.endDateError.visibility = View.GONE
+                binding.weekDaysError.visibility = View.GONE
+                binding.occurrencesInput.error = null
+                binding.endDateInput.error = null
             }
         }
 
         recurrenceViewModel.eventSave.observe(viewLifecycleOwner) { recurrenceData ->
             viewModel.setRecurrenceData(recurrenceData)
             findNavController().popBackStack()
+        }
+    }
+
+    private fun scrollToView(view: View) {
+        binding.contentScrollView.post {
+            binding.contentScrollView.smoothScrollTo(0, view.top)
         }
     }
 
