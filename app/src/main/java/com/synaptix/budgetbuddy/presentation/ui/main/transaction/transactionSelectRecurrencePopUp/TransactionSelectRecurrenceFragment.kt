@@ -56,6 +56,21 @@ class TransactionSelectRecurrenceFragment : Fragment() {
         binding.btnOnceOff.isChecked = true
         binding.recurrenceDetailsCard.isVisible = false
         binding.endDateCard.isVisible = false
+        
+        // Set all week day chips to checked by default
+        listOf(
+            binding.chipMon,
+            binding.chipTue,
+            binding.chipWed,
+            binding.chipThu,
+            binding.chipFri,
+            binding.chipSat,
+            binding.chipSun
+        ).forEach { chip ->
+            chip.isChecked = true
+            val color = requireContext().getThemeColor(R.attr.bb_buttonSelected)
+            chip.chipBackgroundColor = ColorStateList.valueOf(color)
+        }
     }
 
     private fun setupClickListeners() {
@@ -206,12 +221,13 @@ class TransactionSelectRecurrenceFragment : Fragment() {
 
         recurrenceViewModel.validationState.observe(viewLifecycleOwner) { validationState ->
             if (validationState.shouldShowErrors) {
-//                binding.dailyIntervalSlider.error = if (!validationState.isIntervalValid) "Invalid interval" else null
-//                binding.weeklyIntervalSlider.error = if (!validationState.isIntervalValid) "Invalid interval" else null
-//                binding.monthlyIntervalSlider.error = if (!validationState.isIntervalValid) "Invalid interval" else null
-//                binding.yearlyIntervalSlider.error = if (!validationState.isIntervalValid) "Invalid interval" else null
                 binding.occurrencesInput.error = if (!validationState.isOccurrencesValid) "Invalid occurrences" else null
                 binding.endDateInput.error = if (!validationState.isEndDateValid) "Invalid end date" else null
+                
+                // Show week days validation error
+                if (!validationState.isWeekDaysValid) {
+                    Snackbar.make(binding.root, validationState.weekDaysError ?: "Please select at least one day", Snackbar.LENGTH_LONG).show()
+                }
             }
         }
 

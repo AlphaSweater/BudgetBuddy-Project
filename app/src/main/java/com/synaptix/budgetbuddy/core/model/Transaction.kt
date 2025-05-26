@@ -114,7 +114,8 @@ data class RecurrenceData(
             else -> ""
         }
 
-        val weekDaysStr = if (weekDays.isNotEmpty()) " on ${weekDays.joinToString(", ")}" else ""
+        val weekDaysStr = if (weekDays.isNotEmpty() && weekDays.count() != 7) " on ${weekDays.joinToString(", ")}" else ""
+
         val monthlyTypeStr = if (type == "Monthly" && isDayOfWeek) " on the same day of week" else ""
 
         val endStr = when (endType) {

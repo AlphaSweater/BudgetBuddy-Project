@@ -23,7 +23,8 @@ class TransactionSelectRecurrenceViewModel : ViewModel() {
         val isWeekDaysValid: Boolean = true,
         val isEndDateValid: Boolean = true,
         val isOccurrencesValid: Boolean = true,
-        val shouldShowErrors: Boolean = false
+        val shouldShowErrors: Boolean = false,
+        val weekDaysError: String? = null
     )
 
     private val _uiState = MutableLiveData<UiState>(UiState.Initial)
@@ -155,7 +156,9 @@ class TransactionSelectRecurrenceViewModel : ViewModel() {
             isIntervalValid = isIntervalValid,
             isWeekDaysValid = isWeekDaysValid,
             isEndDateValid = isEndDateValid,
-            isOccurrencesValid = isOccurrencesValid
+            isOccurrencesValid = isOccurrencesValid,
+            weekDaysError = if (_recurrenceType == RecurrenceType.WEEKLY && _weekDays.isEmpty()) 
+                "Please select at least one day" else null
         )
 
         return isIntervalValid &&
