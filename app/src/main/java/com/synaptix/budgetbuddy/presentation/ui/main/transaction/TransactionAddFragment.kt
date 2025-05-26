@@ -86,6 +86,7 @@ class TransactionAddFragment : Fragment() {
 
     private fun restoreState() {
         if (!viewModel.saveState.value!!) {
+            reset()
             return
         }
 
@@ -436,17 +437,21 @@ class TransactionAddFragment : Fragment() {
         when (state) {
             is TransactionAddViewModel.UiState.Loading -> {
                 binding.btnSave.isEnabled = false
+                binding.loadingOverlay.visibility = View.VISIBLE
             }
             is TransactionAddViewModel.UiState.Success -> {
+                binding.loadingOverlay.visibility = View.GONE
                 showSuccess("Transaction added successfully")
                 findNavController().popBackStack()
             }
             is TransactionAddViewModel.UiState.Error -> {
-                binding.btnSave.isEnabled = false
+                binding.btnSave.isEnabled = true
+                binding.loadingOverlay.visibility = View.GONE
                 showError(state.message)
             }
             else -> {
                 binding.btnSave.isEnabled = true
+                binding.loadingOverlay.visibility = View.GONE
             }
         }
     }

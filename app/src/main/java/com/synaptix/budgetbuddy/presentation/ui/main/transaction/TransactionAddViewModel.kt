@@ -167,44 +167,72 @@ class TransactionAddViewModel @Inject constructor(
         validateForm()
     }
 
-    fun addTransaction() {
+    suspend fun addTransaction() {
         if (!validateForm()) return
 
-        viewModelScope.launch {
-            _uiState.value = UiState.Loading
-            try {
-                val userId = getUserIdUseCase.execute()
-                val newTransaction = Transaction.new(
-                    user = User(userId, "", "", ""),
-                    wallet = _wallet.value!!,
-                    category = _category.value!!,
-                    labels = _selectedLabels.value!!,
-                    amount = _amount.value ?: 0.0,
-                    currency = _currency.value ?: "ZAR",
-                    date = parseDate(_date.value ?: System.currentTimeMillis().toString()),
-                    note = _note.value ?: "",
-                    photoUrl = null, // TODO: Upload image to Firebase Storage
-                    recurrenceData = _recurrenceData.value ?: RecurrenceData.DEFAULT
-                )
+        _uiState.value = UiState.Loading
 
-                when (val result = addTransactionUseCase.execute(newTransaction)) {
-                    is AddTransactionResult.Success -> {
-                        Log.d("TransactionAddViewModel", "Transaction added successfully: ${result.transactionId}")
-                        _uiState.value = UiState.Success
+        try {
+            val userId = getUserIdUseCase.execute()
+
+            // Create transaction object first without image
+            val tempUser = User(userId, "", "", "")
+            val newTransaction = Transaction.new(
+                user = tempUser,
+                wallet = _wallet.value!!,
+                category = _category.value!!,
+                labels = selectedLabels.value!!,
+                amount = _amount.value ?: 0.0,
+                currency = _currency.value ?: "ZAR",
+                date = parseDate((_date.value ?: System.currentTimeMillis()).toString()),
+                note = _note.value ?: "",
+                photoUrl = null, // Will be updated after upload
+                recurrenceData = _recurrenceData.value ?: RecurrenceData.DEFAULT
+            )
+
+            // Upload image in parallel if exists
+            val imageUrl = _imageBytes.value?.let { bytes ->
+                try {
+                    when (val result = uploadImageUseCase.execute(bytes)) {
+                        is UploadImageUseCase.UploadImageResult.Success -> result.imageUrl
+                        is UploadImageUseCase.UploadImageResult.Error -> {
+                            Log.e("TransactionAddViewModel", "Error uploading image: ${result.message}")
+                            null
+                        }
                     }
-                    is AddTransactionResult.Error -> {
-                        Log.e("TransactionAddViewModel", "Error adding transaction: ${result.message}")
-                        _uiState.value = UiState.Error(result.message)
-                    }
+                } catch (e: Exception) {
+                    Log.e("TransactionAddViewModel", "Exception uploading image: ${e.message}")
+                    null
                 }
-            } catch (e: Exception) {
-                Log.e("TransactionAddViewModel", "Exception adding transaction: ${e.message}")
-                _uiState.value = UiState.Error(e.message ?: "Failed to add transaction")
             }
+
+            // Update transaction with image URL if upload was successful
+            val finalTransaction = if (imageUrl != null) {
+                newTransaction.copy(photoUrl = imageUrl)
+            } else {
+                newTransaction
+            }
+
+            // Save transaction
+            when (val result = addTransactionUseCase.execute(finalTransaction)) {
+                is AddTransactionResult.Success -> {
+                    Log.d("TransactionAddViewModel", "Transaction added successfully: ${result.transactionId}")
+                    reset()
+                    _uiState.value = UiState.Success
+                }
+                is AddTransactionResult.Error -> {
+                    Log.e("TransactionAddViewModel", "Error adding transaction: ${result.message}")
+                    _uiState.value = UiState.Error(result.message)
+                }
+            }
+        } catch (e: Exception) {
+            Log.e("TransactionAddViewModel", "Exception adding transaction: ${e.message}")
+            _uiState.value = UiState.Error(e.message ?: "Failed to add transaction")
         }
     }
 
     fun reset() {
+        saveState.value = false
         _amount.value = null
         _date.value = getCurrentDate()
         _note.value = null
@@ -218,7 +246,7 @@ class TransactionAddViewModel @Inject constructor(
         saveState.value = false
     }
 
-    private fun getCurrentDate(): String = 
+    private fun getCurrentDate(): String =
         SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date())
 
     private fun parseDate(dateStr: String): Long = try {

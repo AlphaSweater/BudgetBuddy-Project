@@ -1,9 +1,7 @@
 package com.synaptix.budgetbuddy.data.firebase.model
 
 import com.google.firebase.firestore.DocumentId
-import com.google.firebase.firestore.Exclude
 import com.synaptix.budgetbuddy.core.model.RecurrenceData
-import java.io.Serializable
 
 data class TransactionDTO(
     @DocumentId
@@ -16,10 +14,9 @@ data class TransactionDTO(
     val currency: String = "ZAR", // Default to ZAR
     val date: Long = System.currentTimeMillis(),
     val note: String = "",
-    val photo: String? = null, // URL to the photo in Firebase Storage
-    val recurrenceData: RecurrenceData = RecurrenceData.DEFAULT, 
+    val photoUrl: String? = null, // URL to the photo in Firebase Storage
+    val recurrenceData: RecurrenceData = RecurrenceData.DEFAULT,
     val createdAt: Long = System.currentTimeMillis(),
     val updatedAt: Long = System.currentTimeMillis(),
-    val isRecurring: Boolean = false,
     val nextOccurrence: Long? = null // When the next recurring transaction should occur
 )

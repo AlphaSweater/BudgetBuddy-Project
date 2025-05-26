@@ -92,7 +92,7 @@ object FirebaseMapper {
         currency = currency,
         date = date,
         note = note,
-        photo = photoUrl,
+        photoUrl = photoUrl,
         recurrenceData = recurrenceData,
         labelIds = labels.map { it.id }
     )
@@ -112,7 +112,7 @@ object FirebaseMapper {
         currency = currency,
         date = date,
         note = note,
-        photoUrl = photo,
+        photoUrl = photoUrl,
         recurrenceData = recurrenceData
     )
 
