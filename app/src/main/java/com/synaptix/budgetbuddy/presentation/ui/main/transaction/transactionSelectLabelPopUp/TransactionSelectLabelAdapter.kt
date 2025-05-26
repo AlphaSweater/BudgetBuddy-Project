@@ -29,7 +29,7 @@ class TransactionSelectLabelAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): LabelViewHolder {
         return createViewHolder(
             parent = parent,
-            layoutResId = R.layout.item_label
+            layoutResId = R.layout.item_transaction_label
         ) { LabelViewHolder(it) }
     }
 

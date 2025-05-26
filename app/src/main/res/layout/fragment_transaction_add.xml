@@ -56,23 +56,13 @@
                 <ImageButton
                     android:id="@+id/btnGoBack"
                     style="@style/ToolButtonIcon"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    android:background="?attr/selectableItemBackgroundBorderless"
                     android:contentDescription="@string/back"
-                    android:src="@drawable/ic_ui_arrow_back"
-                    app:tint="?attr/bb_primaryText" />
+                    android:src="@drawable/ic_ui_arrow_back" />
 
                 <TextView
                     android:id="@+id/toolbarTitle"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/add_new_transaction"
-                    android:textAlignment="center"
-                    android:textColor="?attr/bb_primaryText"
-                    android:textSize="20sp"
-                    android:textStyle="bold" />
+                    style="@style/ToolBarTitle"
+                    android:text="@string/add_new_transaction" />
 
                 <ImageButton
                     android:id="@+id/btnClear"
