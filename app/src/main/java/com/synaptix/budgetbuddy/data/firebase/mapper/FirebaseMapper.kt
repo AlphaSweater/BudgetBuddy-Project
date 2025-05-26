@@ -82,6 +82,27 @@ object FirebaseMapper {
         updatedAt = updatedAt
     )
 
+    // RecurrenceData mappings
+    fun RecurrenceData.toDTO(): RecurrenceDataDTO = RecurrenceDataDTO(
+        type = type,
+        interval = interval,
+        weekDays = weekDays,
+        isDayOfWeek = isDayOfWeek,
+        endType = endType,
+        endValue = endValue,
+        occurrenceCount = occurrenceCount
+    )
+
+    fun RecurrenceDataDTO.toDomain(): RecurrenceData = RecurrenceData(
+        type = type,
+        interval = interval,
+        weekDays = weekDays,
+        isDayOfWeek = isDayOfWeek,
+        endType = endType,
+        endValue = endValue,
+        occurrenceCount = occurrenceCount
+    )
+
     // Transaction mappings
     fun Transaction.toDTO(): TransactionDTO = TransactionDTO(
         id = id,
@@ -92,8 +113,8 @@ object FirebaseMapper {
         currency = currency,
         date = date,
         note = note,
-        photo = photoUrl,
-        recurrenceData = recurrenceData,
+        photoUrl = photoUrl,
+        recurrenceData = recurrenceData.toDTO(),
         labelIds = labels.map { it.id }
     )
 
@@ -112,8 +133,8 @@ object FirebaseMapper {
         currency = currency,
         date = date,
         note = note,
-        photoUrl = photo,
-        recurrenceData = recurrenceData
+        photoUrl = photoUrl,
+        recurrenceData = recurrenceData.toDomain()
     )
 
     // Budget mappings

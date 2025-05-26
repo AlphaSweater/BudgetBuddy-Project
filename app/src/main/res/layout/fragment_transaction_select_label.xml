@@ -21,11 +21,11 @@
 <!--    * https://www.youtube.com/watch?v=A_tPafV23DM&list=PLPgs125_L-X9H6J7x4beRU-AxJ4mXe5vX-->
 <!--    ======================================================================================-->
 
-<androidx.coordinatorlayout.widget.CoordinatorLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
     android:background="?attr/bb_background">
 
     <!-- Top App Bar -->
@@ -47,26 +47,25 @@
                 android:layout_height="match_parent"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
-                android:paddingHorizontal="4dp">
+                android:paddingHorizontal="4dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp">
 
                 <ImageButton
                     android:id="@+id/btnGoBack"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    android:background="?attr/selectableItemBackgroundBorderless"
+                    style="@style/ToolButtonIcon"
                     android:contentDescription="@string/back"
-                    android:src="?attr/actionModeCloseDrawable"
-                    app:tint="?attr/bb_primaryText" />
+                    android:src="@drawable/ic_ui_arrow_back" />
 
                 <TextView
                     android:id="@+id/toolbarTitle"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Choose a Label"
-                    android:textColor="?attr/bb_primaryText"
-                    android:textSize="20sp"
-                    android:textStyle="bold" />
+                    style="@style/ToolBarTitle"
+                    android:text="Choose Labels" />
+
+                <Space
+                    android:layout_width="48dp"
+                    android:layout_height="48dp" />
+
             </LinearLayout>
         </androidx.appcompat.widget.Toolbar>
     </com.google.android.material.appbar.AppBarLayout>
@@ -86,21 +85,29 @@
             android:orientation="vertical"
             android:padding="16dp">
 
-            <!-- Search Box -->
-            <EditText
-                android:id="@+id/searchEditText"
+            <!-- Search Bar -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/searchLayout"
+                style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
                 android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:hint="Search or add new labels"
-                android:background="@drawable/bg_rounded_edit_grey"
-                android:drawableStart="@drawable/ic_circle_24"
-                android:drawableTint="?attr/bb_secondaryText"
-                android:drawablePadding="8dp"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp"
-                android:textColor="?attr/bb_primaryText"
-                android:textColorHint="?attr/bb_secondaryText"
-                android:inputType="text" />
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:background="@android:color/transparent"
+                android:hint="Search categories"
+                android:textColor="?attr/bb_secondaryText"
+                app:endIconMode="clear_text"
+                app:startIconDrawable="@drawable/ic_ui_search"
+                app:iconTint="?attr/bb_secondaryText">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/searchEditText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@android:color/transparent"
+                    android:textColor="?attr/bb_secondaryText"
+                    android:inputType="text"
+                    android:maxLines="1" />
+            </com.google.android.material.textfield.TextInputLayout>
 
             <!-- RecyclerView -->
             <androidx.recyclerview.widget.RecyclerView
@@ -108,8 +115,31 @@
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
-                android:layout_marginTop="16dp" />
+                android:layout_marginTop="16dp"
+                tools:listitem="@layout/item_transaction_label"/>
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
+
+    <!-- Bottom Save Button -->
+    <FrameLayout
+        android:id="@+id/bottomButtonContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:background="?attr/bb_background"
+        android:elevation="8dp"
+        android:padding="16dp">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnSave"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginTop="16dp"
+            android:text="Add Labels"
+            android:textColor="?attr/bb_buttonText"
+            android:textSize="16sp"
+            app:cornerRadius="28dp"
+            app:backgroundTint="?attr/bb_button" />
+    </FrameLayout>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

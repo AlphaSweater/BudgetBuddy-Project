@@ -21,23 +21,23 @@
 
 package com.synaptix.budgetbuddy.presentation.ui.main.budget.budgetReport
 
-//import androidx.fragment.app.viewModels
-//import android.os.Bundle
-//import androidx.fragment.app.Fragment
-//import android.view.LayoutInflater
-//import android.view.View
-//import android.view.ViewGroup
-//import android.widget.Toast
-//import androidx.navigation.fragment.findNavController
-//import androidx.navigation.fragment.navArgs
-//import androidx.recyclerview.widget.LinearLayoutManager
-//import com.synaptix.budgetbuddy.R
-//import com.synaptix.budgetbuddy.core.model.BudgetListItems
-//import com.synaptix.budgetbuddy.databinding.FragmentBudgetReportBinding
-//import dagger.hilt.android.AndroidEntryPoint
+import androidx.fragment.app.viewModels
+import android.os.Bundle
+import androidx.fragment.app.Fragment
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.Toast
+import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.synaptix.budgetbuddy.R
+import com.synaptix.budgetbuddy.core.model.BudgetListItems
+import com.synaptix.budgetbuddy.databinding.FragmentBudgetReportBinding
+import dagger.hilt.android.AndroidEntryPoint
 //
-//@AndroidEntryPoint
-//class BudgetReportFragment : Fragment() {
+@AndroidEntryPoint
+class BudgetReportFragment : Fragment() {
 //
 //    private var _binding: FragmentBudgetReportBinding? = null
 //    private val binding get() = _binding!!
@@ -127,4 +127,4 @@ package com.synaptix.budgetbuddy.presentation.ui.main.budget.budgetReport
 //        super.onDestroyView()
 //        _binding = null
 //    }
-//}
+}
