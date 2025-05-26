@@ -1,7 +1,7 @@
 package com.synaptix.budgetbuddy.data.firebase.repository
 
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.Query
+import com.google.firebase.firestore.Source
 import com.synaptix.budgetbuddy.core.model.Result
 import com.synaptix.budgetbuddy.data.firebase.model.BudgetDTO
 import kotlinx.coroutines.channels.awaitClose
