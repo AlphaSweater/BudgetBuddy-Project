@@ -84,7 +84,7 @@
         android:layout_height="match_parent"
         android:clipToPadding="false"
         android:fillViewport="true"
-        android:paddingBottom="98dp"
+        android:layout_marginBottom="90dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <LinearLayout
@@ -555,8 +555,7 @@
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnSave"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingVertical="16dp"
+            android:layout_height="56dp"
             android:text="@string/save"
             android:textColor="@android:color/white"
             android:textSize="16sp"

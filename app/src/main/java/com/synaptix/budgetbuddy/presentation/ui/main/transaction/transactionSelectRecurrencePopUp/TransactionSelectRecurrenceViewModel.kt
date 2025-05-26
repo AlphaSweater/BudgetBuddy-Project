@@ -149,7 +149,7 @@ class TransactionSelectRecurrenceViewModel : ViewModel() {
     private fun validateForm(): Boolean {
         val isIntervalValid = _interval > 0
         val isWeekDaysValid = _recurrenceType != RecurrenceType.WEEKLY || _weekDays.isNotEmpty()
-        val isEndDateValid = _endType != EndType.ON || _endDate != null
+        val isEndDateValid = _endType != EndType.ON || (_endDate != null && _endDate!!.after(Date()))
         val isOccurrencesValid = _endType != EndType.AFTER || (_occurrences ?: 0) > 0
 
         _validationState.value = ValidationState(
@@ -189,7 +189,12 @@ class TransactionSelectRecurrenceViewModel : ViewModel() {
     private fun formatDate(date: Date): String {
         val calendar = Calendar.getInstance()
         calendar.time = date
-        return "${calendar.get(Calendar.MONTH) + 1}/${calendar.get(Calendar.DAY_OF_MONTH)}/${calendar.get(Calendar.YEAR)}"
+        // Format as MM/dd/yyyy for consistency
+        return String.format("%02d/%02d/%04d",
+            calendar.get(Calendar.MONTH) + 1,
+            calendar.get(Calendar.DAY_OF_MONTH),
+            calendar.get(Calendar.YEAR)
+        )
     }
 
     fun saveState(recurrenceData: RecurrenceData) {

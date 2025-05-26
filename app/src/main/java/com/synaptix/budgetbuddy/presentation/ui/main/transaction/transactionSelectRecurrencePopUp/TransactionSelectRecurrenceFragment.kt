@@ -123,8 +123,20 @@ class TransactionSelectRecurrenceFragment : Fragment() {
 
         // End type radio group
         binding.endDateGroup.setOnCheckedChangeListener { _, checkedId ->
-            binding.occurrencesLayout.isVisible = checkedId == binding.radioEndAfter.id
-            binding.endDateLayout.isVisible = checkedId == binding.radioEndOn.id
+            when (checkedId) {
+                binding.radioEndAfter.id -> {
+                    binding.occurrencesLayout.isVisible = true
+                    binding.endDateLayout.isVisible = false
+                }
+                binding.radioEndOn.id -> {
+                    binding.occurrencesLayout.isVisible = false
+                    binding.endDateLayout.isVisible = true
+                }
+                else -> {
+                    binding.occurrencesLayout.isVisible = false
+                    binding.endDateLayout.isVisible = false
+                }
+            }
         }
 
         // Date picker
@@ -175,16 +187,26 @@ class TransactionSelectRecurrenceFragment : Fragment() {
     }
 
     private fun showDatePicker() {
+        val currentDate = calendar.time
         DatePickerDialog(
             requireContext(),
             { _, year, month, day ->
                 calendar.set(year, month, day)
+                // Ensure the time is set to the end of the day
+                calendar.set(Calendar.HOUR_OF_DAY, 23)
+                calendar.set(Calendar.MINUTE, 59)
+                calendar.set(Calendar.SECOND, 59)
                 binding.endDateInput.setText(dateFormatter.format(calendar.time))
+                // Update the ViewModel with the new date
+                recurrenceViewModel.setEndDate(calendar.time)
             },
             calendar.get(Calendar.YEAR),
             calendar.get(Calendar.MONTH),
             calendar.get(Calendar.DAY_OF_MONTH)
-        ).show()
+        ).apply {
+            // Set minimum date to today
+            datePicker.minDate = currentDate.time
+        }.show()
     }
 
     private fun getSelectedWeekDays(): List<String> {
