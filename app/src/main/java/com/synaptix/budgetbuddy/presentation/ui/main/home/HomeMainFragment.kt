@@ -1,10 +1,12 @@
 package com.synaptix.budgetbuddy.presentation.ui.main.home
 
+import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -12,6 +14,17 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.github.mikephil.charting.charts.BarChart
+import com.github.mikephil.charting.charts.LineChart
+import com.github.mikephil.charting.components.Description
+import com.github.mikephil.charting.components.XAxis
+import com.github.mikephil.charting.data.BarData
+import com.github.mikephil.charting.data.BarDataSet
+import com.github.mikephil.charting.data.BarEntry
+import com.github.mikephil.charting.data.Entry
+import com.github.mikephil.charting.data.LineDataSet
+import com.github.mikephil.charting.data.LineData
+import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
 import com.synaptix.budgetbuddy.R
 import com.synaptix.budgetbuddy.core.model.HomeListItems
 import com.synaptix.budgetbuddy.databinding.FragmentHomeBinding
@@ -85,6 +98,8 @@ class HomeMainFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setupViews()
         observeStates()
+        setupBarChart()
+        setupLineChart()
     }
 
     private fun setupViews() {
@@ -143,6 +158,116 @@ class HomeMainFragment : Fragment() {
             }
         }
     }
+
+    private fun setupBarChart() {
+        val barChart: BarChart = binding.barChart
+
+        // Sample data: one month's income and expense
+        val income = BarEntry(0f, 5000f) // X = 0
+        val expense = BarEntry(1f, 3200f) // X = 1
+
+        val incomeSet = BarDataSet(listOf(income), "Income").apply {
+            color = resources.getColor(R.color.expense_red, null)
+        }
+
+        val expenseSet = BarDataSet(listOf(expense), "Expense").apply {
+            color = resources.getColor(R.color.profit_green, null)
+        }
+
+        val data = BarData(incomeSet, expenseSet)
+
+        // Adjust bar width and spacing
+        val groupSpace = 0.4f
+        val barSpace = 0.05f
+        val barWidth = 0.25f
+
+        data.barWidth = barWidth
+        barChart.data = data
+
+        // Set X-axis range so both bars fit
+        barChart.xAxis.axisMinimum = -0.5f
+        barChart.xAxis.axisMaximum = 2f
+
+        // Group the bars
+        barChart.groupBars(0f, groupSpace, barSpace)
+
+        // Setup labels
+        barChart.xAxis.apply {
+            granularity = 1f
+            isGranularityEnabled = true
+            setDrawGridLines(false)
+            setCenterAxisLabels(true)
+            position = XAxis.XAxisPosition.BOTTOM
+            valueFormatter = IndexAxisValueFormatter(listOf("March")) // <-- or dynamically set month
+        }
+
+        barChart.description = Description().apply { text = "Monthly Budget" }
+        barChart.axisRight.isEnabled = false
+        barChart.animateY(1000)
+        barChart.invalidate()
+    }
+
+    private fun setupLineChart() {
+        val lineChart: LineChart = binding.lineChart
+        val context = lineChart.context
+
+        val months = listOf("Jan", "Feb", "Mar", "Apr", "May", "Jun")
+        val incomeValues = listOf(3000f, 3200f, 3100f, 4000f, 4200f, 4100f)
+        val expenseValues = listOf(1500f, 1800f, 1600f, 2000f, 2300f, 2200f)
+
+        val incomeEntries = incomeValues.mapIndexed { index, value ->
+            Entry(index.toFloat(), value)
+        }
+        val expenseEntries = expenseValues.mapIndexed { index, value ->
+            Entry(index.toFloat(), value)
+        }
+
+        val incomeDataSet = LineDataSet(incomeEntries, "Income").apply {
+            color = ContextCompat.getColor(context, R.color.profit_green)
+            valueTextColor = Color.BLACK
+            lineWidth = 2f
+            setCircleColor(ContextCompat.getColor(context, R.color.profit_green))
+            circleRadius = 4f
+            mode = LineDataSet.Mode.CUBIC_BEZIER
+
+            // Gradient fill
+            setDrawFilled(true)
+            fillDrawable = ContextCompat.getDrawable(context, R.drawable.gradient_income)
+        }
+
+        val expenseDataSet = LineDataSet(expenseEntries, "Expense").apply {
+            color = ContextCompat.getColor(context, R.color.expense_red)
+            valueTextColor = Color.BLACK
+            lineWidth = 2f
+            setCircleColor(ContextCompat.getColor(context, R.color.expense_red))
+            circleRadius = 4f
+            mode = LineDataSet.Mode.CUBIC_BEZIER
+
+            // Gradient fill
+            setDrawFilled(true)
+            fillDrawable = ContextCompat.getDrawable(context, R.drawable.gradient_expense)
+        }
+
+        val lineData = LineData(incomeDataSet, expenseDataSet)
+        lineChart.data = lineData
+
+        // X-axis
+        lineChart.xAxis.apply {
+            valueFormatter = IndexAxisValueFormatter(months)
+            granularity = 1f
+            position = XAxis.XAxisPosition.BOTTOM
+            setDrawGridLines(false)
+            labelRotationAngle = -45f
+        }
+
+        lineChart.axisRight.isEnabled = false
+        lineChart.description.text = "Income vs Expense (6 Months)"
+        lineChart.animateX(1000)
+        lineChart.invalidate()
+    }
+
+
+
 
     private fun handleWalletsState(state: HomeMainViewModel.WalletState) {
         binding.apply {
