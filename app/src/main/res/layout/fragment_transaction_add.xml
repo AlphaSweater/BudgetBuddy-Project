@@ -323,7 +323,7 @@
                                 android:textSize="16sp" />
 
                             <TextView
-                                android:id="@+id/edtTextDate"
+                                android:id="@+id/textSelectedDate"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="Select Date"
@@ -340,6 +340,67 @@
                     <!-- Error for date selection -->
                     <TextView
                         android:id="@+id/textDateError"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@android:color/holo_red_light"
+                        android:textSize="12sp"
+                        android:visibility="gone"
+                        android:layout_marginStart="70dp"
+                        android:layout_marginTop="0dp"/>
+
+                    <!-- Label Row -->
+                    <LinearLayout
+                        android:id="@+id/rowSelectLabels"
+                        style="@style/RowStyle"
+                        android:background="?attr/selectableItemBackground">
+
+                        <ImageView
+                            style="@style/RowIconStyle"
+                            android:src="@drawable/ic_add_circle_40"
+                            app:tint="?attr/bb_accent" />
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:layout_marginStart="12dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/labels"
+                                android:textColor="?attr/bb_primaryText"
+                                android:textSize="16sp" />
+
+                            <TextView
+                                android:id="@+id/textSelectedLabels"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="No labels selected"
+                                android:textColor="?attr/bb_secondaryText"
+                                android:textSize="14sp" />
+
+                            <!-- Label Pills Container -->
+                            <com.google.android.material.chip.ChipGroup
+                                android:id="@+id/chipGroupLabels"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                app:singleLine="true"
+                                app:singleSelection="false" />
+
+                        </LinearLayout>
+
+                        <ImageView
+                            style="@style/IconButton"
+                            android:src="@drawable/ic_ui_croc_right"
+                            app:tint="?attr/bb_secondaryText" />
+                    </LinearLayout>
+
+                    <!-- Error for label selection -->
+                    <TextView
+                        android:id="@+id/textLabelError"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textColor="@android:color/holo_red_light"

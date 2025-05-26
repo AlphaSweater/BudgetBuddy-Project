@@ -63,7 +63,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Choose a Label"
+                    android:text="Choose Labels"
                     android:textColor="?attr/bb_primaryText"
                     android:textSize="20sp"
                     android:textStyle="bold" />
@@ -91,9 +91,9 @@
                 android:id="@+id/searchEditText"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
-                android:hint="Search or add new labels"
+                android:hint="Search labels"
                 android:background="@drawable/bg_rounded_edit_grey"
-                android:drawableStart="@drawable/ic_circle_24"
+                android:drawableStart="@drawable/ic_add_circle_40"
                 android:drawableTint="?attr/bb_secondaryText"
                 android:drawablePadding="8dp"
                 android:paddingStart="16dp"
@@ -109,6 +109,16 @@
                 android:layout_height="0dp"
                 android:layout_weight="1"
                 android:layout_marginTop="16dp" />
+
+            <!-- Save Button -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnSave"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:layout_marginTop="16dp"
+                android:text="Save"
+                android:textSize="16sp"
+                app:cornerRadius="28dp" />
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 

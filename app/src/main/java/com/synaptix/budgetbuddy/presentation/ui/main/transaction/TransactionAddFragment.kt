@@ -25,7 +25,6 @@ import java.util.Locale
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.provider.MediaStore
-import android.text.Editable
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.core.widget.doAfterTextChanged
@@ -37,6 +36,7 @@ import com.synaptix.budgetbuddy.core.model.RecurrenceData
 import com.synaptix.budgetbuddy.core.model.Wallet
 import com.synaptix.budgetbuddy.extentions.getThemeColor
 import kotlin.toString
+import com.synaptix.budgetbuddy.core.model.Label
 
 @AndroidEntryPoint
 class TransactionAddFragment : Fragment() {
@@ -124,6 +124,10 @@ class TransactionAddFragment : Fragment() {
 
             rowSelectWallet.setOnClickListener {
                 showWalletSelector()
+            }
+
+            rowSelectLabels.setOnClickListener {
+                showLabelsSelector()
             }
 
             rowSelectDate.setOnClickListener {
@@ -276,13 +280,27 @@ class TransactionAddFragment : Fragment() {
 
     // --- Update Methods ---
 
-//    private fun updateSelectedLabels(labels: List<String>) {
-//        if (labels.isEmpty()) {
-//            binding.textSelectedLabelName.text = "No labels selected"
-//            return
-//        }
-//        binding.textSelectedLabelName.text = labels.joinToString(", ")
-//    }
+    private fun updateSelectedLabels(labels: List<Label>) {
+        binding.chipGroupLabels.removeAllViews()
+        
+        if (labels.isEmpty()) {
+            binding.textSelectedLabels.visibility = View.VISIBLE
+            return
+        }
+
+        binding.textSelectedLabels.visibility = View.GONE
+        
+        labels.forEach { label ->
+            val chip = com.google.android.material.chip.Chip(requireContext()).apply {
+                text = label.name
+                isCloseIconVisible = true
+                setOnCloseIconClickListener {
+                    viewModel.removeLabel(label)
+                }
+            }
+            binding.chipGroupLabels.addView(chip)
+        }
+    }
 
     private fun updateSelectedCategory(category: Category?) {
         if (category == null) {
@@ -309,10 +327,10 @@ class TransactionAddFragment : Fragment() {
         if (date == null) {
             val currentDate = LocalDate.now()
             val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
-            binding.edtTextDate.text = currentDate.format(formatter)
+            binding.textSelectedDate.text = currentDate.format(formatter)
             return
         }
-        binding.edtTextDate.text = date
+        binding.textSelectedDate.text = date
     }
 
     private fun updateSelectedRecurrence(recurrence: RecurrenceData) {
@@ -324,7 +342,7 @@ class TransactionAddFragment : Fragment() {
         val amount = binding.edtTextAmount.text.toString().toDoubleOrNull()
         viewModel.setAmount(amount)
 
-        val date = binding.edtTextDate.text.toString()
+        val date = binding.textSelectedDate.text.toString()
         viewModel.setDate(date)
 
         val note = binding.edtTextNote.text.toString()
@@ -351,7 +369,7 @@ class TransactionAddFragment : Fragment() {
     }
 
     // --- Popup Navigation ---
-    private fun showLabelSelector() {
+    private fun showLabelsSelector() {
         findNavController().navigate(R.id.action_transactionAddFragment_to_transactionSelectLabelFragment)
     }
 
@@ -395,6 +413,10 @@ class TransactionAddFragment : Fragment() {
 
         viewModel.recurrenceData.observe(viewLifecycleOwner) { rate ->
             updateSelectedRecurrence(rate)
+        }
+
+        viewModel.selectedLabels.observe(viewLifecycleOwner) { labels ->
+            updateSelectedLabels(labels)
         }
 
         viewModel.imageBytes.observe(viewLifecycleOwner) { bytes ->
