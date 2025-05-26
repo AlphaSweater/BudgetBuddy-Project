@@ -4,9 +4,6 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.synaptix.budgetbuddy.core.model.Result
 import com.synaptix.budgetbuddy.data.firebase.model.BudgetDTO
-import kotlinx.coroutines.channels.awaitClose
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -18,6 +15,8 @@ class FirestoreBudgetRepository @Inject constructor(
 ) : BaseFirestoreRepository<BudgetDTO>(firestore) {
     
     override val collection = firestore.collection("budgets")
+
+    override fun getType(): Class<BudgetDTO> = BudgetDTO::class.java
 
     // Create a new budget
     suspend fun createBudget(budget: BudgetDTO): Result<String> {
@@ -38,76 +37,62 @@ class FirestoreBudgetRepository @Inject constructor(
     suspend fun deleteBudget(budgetId: String): Result<Unit> = delete(budgetId)
 
     // Get a single budget by ID with its categories
-    fun getBudgetById(budgetId: String): Flow<Result<BudgetDTO?>> = getById(budgetId) { docRef ->
-        callbackFlow {
-            val listener = docRef.addSnapshotListener { snapshot, error ->
-                if (error != null) {
-                    trySend(Result.Error(error))
-                    return@addSnapshotListener
-                }
-                val budget = snapshot?.toObject(BudgetDTO::class.java)
-                trySend(Result.Success(budget))
-            }
-            awaitClose { listener.remove() }
+    suspend fun getBudgetById(budgetId: String): Result<BudgetDTO?> {
+        return try {
+            val snapshot = collection.document(budgetId).get().await()
+            Result.Success(snapshot.toObject(BudgetDTO::class.java))
+        } catch (e: Exception) {
+            Result.Error(e)
         }
     }
 
     // Get all budgets for a user with their categories
-    fun getBudgetsForUser(userId: String): Flow<Result<List<BudgetDTO>>> = callbackFlow {
-        val query = collection.whereEqualTo("userId", userId)
-        
-        val listener = query.addSnapshotListener { snapshot, error ->
-            if (error != null) {
-                trySend(Result.Error(error))
-                return@addSnapshotListener
-            }
-            val budgets = snapshot?.documents?.mapNotNull { 
+    suspend fun getBudgetsForUser(userId: String): Result<List<BudgetDTO>> {
+        return try {
+            val snapshot = collection.whereEqualTo("userId", userId).get().await()
+            val budgets = snapshot.documents.mapNotNull { 
                 it.toObject(BudgetDTO::class.java)
-            } ?: emptyList()
-            trySend(Result.Success(budgets))
+            }
+            Result.Success(budgets)
+        } catch (e: Exception) {
+            Result.Error(e)
         }
-
-        awaitClose { listener.remove() }
     }
 
     // Get active budgets for a user with their categories
-    fun getActiveBudgetsForUser(userId: String): Flow<Result<List<BudgetDTO>>> = callbackFlow {
-        val query = collection
-            .whereEqualTo("userId", userId)
-            .whereEqualTo("isActive", true)
-        
-        val listener = query.addSnapshotListener { snapshot, error ->
-            if (error != null) {
-                trySend(Result.Error(error))
-                return@addSnapshotListener
-            }
-            val budgets = snapshot?.documents?.mapNotNull { 
+    suspend fun getActiveBudgetsForUser(userId: String): Result<List<BudgetDTO>> {
+        return try {
+            val snapshot = collection
+                .whereEqualTo("userId", userId)
+                .whereEqualTo("isActive", true)
+                .get()
+                .await()
+            
+            val budgets = snapshot.documents.mapNotNull { 
                 it.toObject(BudgetDTO::class.java)
-            } ?: emptyList()
-            trySend(Result.Success(budgets))
+            }
+            Result.Success(budgets)
+        } catch (e: Exception) {
+            Result.Error(e)
         }
-
-        awaitClose { listener.remove() }
     }
 
-    fun getBudgetsByPeriod(userId: String, startDate: Long, endDate: Long): Flow<Result<List<BudgetDTO>>> = callbackFlow {
-        val query = collection
-            .whereEqualTo("userId", userId)
-            .whereGreaterThanOrEqualTo("startDate", startDate)
-            .whereLessThanOrEqualTo("startDate", endDate)
-        
-        val listener = query.addSnapshotListener { snapshot, error ->
-            if (error != null) {
-                trySend(Result.Error(error))
-                return@addSnapshotListener
-            }
-            val budgets = snapshot?.documents?.mapNotNull { 
+    suspend fun getBudgetsByPeriod(userId: String, startDate: Long, endDate: Long): Result<List<BudgetDTO>> {
+        return try {
+            val snapshot = collection
+                .whereEqualTo("userId", userId)
+                .whereGreaterThanOrEqualTo("startDate", startDate)
+                .whereLessThanOrEqualTo("startDate", endDate)
+                .get()
+                .await()
+            
+            val budgets = snapshot.documents.mapNotNull { 
                 it.toObject(BudgetDTO::class.java)
-            } ?: emptyList()
-            trySend(Result.Success(budgets))
+            }
+            Result.Success(budgets)
+        } catch (e: Exception) {
+            Result.Error(e)
         }
-
-        awaitClose { listener.remove() }
     }
 
     // Update budget spent amount

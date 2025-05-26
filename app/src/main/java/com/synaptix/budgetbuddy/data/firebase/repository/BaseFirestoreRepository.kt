@@ -6,11 +6,9 @@ import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.synaptix.budgetbuddy.core.model.Result
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.tasks.await
 
-abstract class BaseFirestoreRepository<T>(
+abstract class BaseFirestoreRepository<T : Any>(
     protected val firestore: FirebaseFirestore
 ) {
     protected abstract val collection: CollectionReference
@@ -22,9 +20,7 @@ abstract class BaseFirestoreRepository<T>(
             } else {
                 collection.document()
             }
-            if (item != null) {
-                docRef.set(item).await()
-            }
+            docRef.set(item).await()
             Result.Success(docRef.id)
         } catch (e: Exception) {
             Result.Error(e)
@@ -33,9 +29,7 @@ abstract class BaseFirestoreRepository<T>(
 
     protected suspend fun update(id: String, item: T): Result<Unit> {
         return try {
-            if (item != null) {
-                collection.document(id).set(item).await()
-            }
+            collection.document(id).set(item).await()
             Result.Success(Unit)
         } catch (e: Exception) {
             Result.Error(e)
@@ -51,12 +45,25 @@ abstract class BaseFirestoreRepository<T>(
         }
     }
 
-    protected fun getById(id: String, mapper: (DocumentReference) -> Flow<Result<T?>>): Flow<Result<T?>> {
-        return mapper(collection.document(id))
+    protected suspend fun getById(id: String): Result<T?> {
+        return try {
+            val snapshot = collection.document(id).get().await()
+            Result.Success(snapshot.toObject(getType()))
+        } catch (e: Exception) {
+            Result.Error(e)
+        }
     }
 
-    protected fun getAll(query: Query, mapper: (Query) -> Flow<Result<List<T>>>): Flow<Result<List<T>>> {
-        return mapper(query)
+    protected suspend fun getAll(query: Query): Result<List<T>> {
+        return try {
+            val snapshot = query.get().await()
+            val items = snapshot.documents.mapNotNull { 
+                it.toObject(getType())
+            }
+            Result.Success(items)
+        } catch (e: Exception) {
+            Result.Error(e)
+        }
     }
 
     protected fun createBaseQuery(): Query = collection
@@ -65,26 +72,24 @@ abstract class BaseFirestoreRepository<T>(
         return collection.whereEqualTo("userId", userId)
     }
 
-    protected fun getItemsByIds(ids: List<String>, mapper: (DocumentSnapshot) -> T?): Flow<Result<List<T>>> = flow {
+    protected suspend fun getItemsByIds(ids: List<String>): Result<List<T>> {
         if (ids.isEmpty()) {
-            emit(Result.Success(emptyList()))
-            return@flow
+            return Result.Success(emptyList())
         }
 
-        try {
+        return try {
             val items = mutableListOf<T>()
             ids.chunked(10).forEach { chunk ->
                 val snapshots = chunk.map { id ->
                     collection.document(id).get().await()
                 }
-                items.addAll(snapshots.mapNotNull { mapper(it) })
+                items.addAll(snapshots.mapNotNull { it.toObject(getType()) })
             }
-            emit(Result.Success(items))
+            Result.Success(items)
         } catch (e: Exception) {
-            emit(Result.Error(e))
+            Result.Error(e)
         }
     }
-
 
     protected suspend fun checkNameExists(userId: String, name: String): Result<Boolean> {
         return try {
@@ -99,4 +104,6 @@ abstract class BaseFirestoreRepository<T>(
             Result.Error(e)
         }
     }
+
+    protected abstract fun getType(): Class<T>
 }

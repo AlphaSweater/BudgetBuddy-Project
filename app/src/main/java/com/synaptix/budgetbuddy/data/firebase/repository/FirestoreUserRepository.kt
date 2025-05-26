@@ -5,9 +5,6 @@ import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FirebaseFirestore
 import com.synaptix.budgetbuddy.core.model.Result
 import com.synaptix.budgetbuddy.data.firebase.model.UserDTO
-import kotlinx.coroutines.channels.awaitClose
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -19,15 +16,6 @@ class FirestoreUserRepository @Inject constructor(
 ) {
 
     private val usersCollection = firestore.collection("users")
-
-    // Auth state observer as Flow
-    fun getAuthState(): Flow<Result<FirebaseUser?>> = callbackFlow {
-        val listener = FirebaseAuth.AuthStateListener { firebaseAuth ->
-            trySend(Result.Success(firebaseAuth.currentUser))
-        }
-        auth.addAuthStateListener(listener)
-        awaitClose { auth.removeAuthStateListener(listener) }
-    }
 
     // Get current Firebase authenticated user
     fun getCurrentUser(): FirebaseUser? = auth.currentUser
@@ -82,26 +70,19 @@ class FirestoreUserRepository @Inject constructor(
         }
     }
 
-    // Observe user profile changes in real-time
-    fun getUserProfile(userId: String): Flow<Result<UserDTO?>> = callbackFlow {
-        val listener = usersCollection.document(userId)
-            .addSnapshotListener { snapshot, error ->
-                if (error != null) {
-                    trySend(Result.Error(error))
-                    return@addSnapshotListener
-                }
-                val user = snapshot?.toObject(UserDTO::class.java)
-                trySend(Result.Success(user))
-            }
-        awaitClose { listener.remove() }
+    // Get user profile
+    suspend fun getUserProfile(userId: String): Result<UserDTO?> {
+        return try {
+            val snapshot = usersCollection.document(userId).get().await()
+            Result.Success(snapshot.toObject(UserDTO::class.java))
+        } catch (e: Exception) {
+            Result.Error(e)
+        }
     }
 
     // Get current user profile
-    fun getCurrentUserProfile(): Flow<Result<UserDTO?>> {
-        val userId = getCurrentUserId() ?: return callbackFlow { 
-            trySend(Result.Error(Exception("No user logged in")))
-            awaitClose()
-        }
+    suspend fun getCurrentUserProfile(): Result<UserDTO?> {
+        val userId = getCurrentUserId() ?: return Result.Error(Exception("No user logged in"))
         return getUserProfile(userId)
     }
 

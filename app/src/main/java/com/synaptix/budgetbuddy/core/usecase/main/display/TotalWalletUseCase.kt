@@ -23,7 +23,7 @@ class TotalWalletUseCase @Inject constructor(
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
         // Fetch user profile based on provided userid
-        val userResult = userRepository.getUserProfile(userId).first()
+        val userResult = userRepository.getUserProfile(userId)
         val user = when (userResult) {
             is Result.Success -> userResult.data?.toDomain()
             is Result.Error -> throw Exception("Failed to get user data: ${userResult.exception.message}")
@@ -35,7 +35,7 @@ class TotalWalletUseCase @Inject constructor(
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
         // Fetch wallets based on user id
-        val walletResult = walletRepository.getWalletsForUser(userId).first()
+        val walletResult = walletRepository.getWalletsForUser(userId)
         val wallets = when (walletResult) {
             is Result.Success -> walletResult.data.map { it.toDomain(user) }
             is Result.Error -> throw Exception("Failed to get wallets: ${walletResult.exception.message}")
