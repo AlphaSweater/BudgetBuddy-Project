@@ -19,6 +19,7 @@ class GetCategoriesUseCase @Inject constructor(
         data class Error(val message: String) : GetCategoriesResult()
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     // Executes the operation to fetch the categories for the specified user
     suspend fun execute(userId: String): GetCategoriesResult {
         // Input validation
@@ -50,3 +51,4 @@ class GetCategoriesUseCase @Inject constructor(
         }
     }
 }
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~EOF~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\

@@ -15,6 +15,8 @@ class AddCategoryUseCase @Inject constructor(
         data class Error(val message: String) : AddCategoryResult()
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // Executes the operation to add a new category
     suspend fun execute(newCategory: Category): AddCategoryResult {
         val newCategoryDTO = newCategory.toDTO()
 
@@ -36,3 +38,4 @@ class AddCategoryUseCase @Inject constructor(
         }
     }
 }
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~EOF~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
