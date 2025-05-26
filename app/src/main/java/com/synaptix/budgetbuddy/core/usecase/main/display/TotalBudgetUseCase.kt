@@ -9,6 +9,14 @@ import com.synaptix.budgetbuddy.data.firebase.repository.FirestoreUserRepository
 import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+//data class that allows use case to return both amount and spent values for budgets
+data class BudgetSummary(
+    val totalBudgeted: Double,
+    val totalSpent: Double
+)
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
 class TotalBudgetUseCase @Inject constructor(
     private val budgetRepository: FirestoreBudgetRepository,
     private val userRepository: FirestoreUserRepository,
@@ -17,7 +25,7 @@ class TotalBudgetUseCase @Inject constructor(
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     // Executes the operation to calculate the total budget for the specified user
-    suspend fun execute(userId: String): Double {
+    suspend fun execute(userId: String): BudgetSummary {
         // Ensure userId is not null or empty
         if (userId.isEmpty()) {
             throw IllegalArgumentException("Invalid user ID")
@@ -53,12 +61,15 @@ class TotalBudgetUseCase @Inject constructor(
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
         // Calculate the total budget by summing up the amounts of all budgets
-        return calculateTotalBudget(budgets)
+        return calculateBudgetSummary(budgets)
     }
 
-    fun calculateTotalBudget(budgets: List<Budget>): Double {
-        // Calculate the total budget by summing up the amounts of all budgets
-        return budgets.sumOf { it.amount }
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // Function to calculate the total budget summary
+    private fun calculateBudgetSummary(budgets: List<Budget>): BudgetSummary {
+        val totalBudgeted = budgets.sumOf { it.amount }
+        val totalSpent = budgets.sumOf { it.spent }
+        return BudgetSummary(totalBudgeted, totalSpent)
     }
 
 }
