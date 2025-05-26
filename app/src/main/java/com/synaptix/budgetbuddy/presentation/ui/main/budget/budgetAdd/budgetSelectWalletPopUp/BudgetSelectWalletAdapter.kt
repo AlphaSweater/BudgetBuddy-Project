@@ -37,7 +37,7 @@ class BudgetSelectWalletAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): WalletViewHolder {
         val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_wallet, parent, false)
+            .inflate(R.layout.item_transaction_wallet, parent, false)
         return WalletViewHolder(view)
     }
 

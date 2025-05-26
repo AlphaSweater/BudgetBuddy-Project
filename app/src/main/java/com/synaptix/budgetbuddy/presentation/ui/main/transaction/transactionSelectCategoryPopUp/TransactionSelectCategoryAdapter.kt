@@ -30,7 +30,7 @@ class TransactionSelectCategoryAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CategoryViewHolder {
         return createViewHolder(
             parent = parent,
-            layoutResId = R.layout.item_category
+            layoutResId = R.layout.item_transaction_category
         ) { CategoryViewHolder(it) }
     }
 

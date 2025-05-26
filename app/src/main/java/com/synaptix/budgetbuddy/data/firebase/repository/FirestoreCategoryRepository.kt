@@ -97,106 +97,106 @@ class FirestoreCategoryRepository @Inject constructor(
         awaitClose { userListener.remove() }
     }
 
-    suspend fun createDefaultCategories(): Result<Unit> {
-        return try {
-            val defaultCategories = listOf(
-                CategoryDTO(
-                    userId = null,
-                    name = "Food",
-                    type = "expense",
-                    color = android.graphics.Color.parseColor("#FF1493"), // cat_dark_pink
-                    icon = android.R.drawable.ic_menu_compass,
-                    isDefault = true
-                ),
-                CategoryDTO(
-                    userId = null,
-                    name = "Transport",
-                    type = "expense",
-                    color = android.graphics.Color.parseColor("#FFD700"), // cat_yellow
-                    icon = android.R.drawable.ic_menu_directions,
-                    isDefault = true
-                ),
-                CategoryDTO(
-                    userId = null,
-                    name = "HealthCare",
-                    type = "expense",
-                    color = android.graphics.Color.parseColor("#FFA500"), // cat_gold
-                    icon = android.R.drawable.ic_menu_help,
-                    isDefault = true
-                ),
-                CategoryDTO(
-                    userId = null,
-                    name = "Beauty",
-                    type = "expense",
-                    color = android.graphics.Color.parseColor("#800080"), // cat_dark_purple
-                    icon = android.R.drawable.ic_menu_gallery,
-                    isDefault = true
-                ),
-                CategoryDTO(
-                    userId = null,
-                    name = "Bills & Fees",
-                    type = "expense",
-                    color = android.graphics.Color.parseColor("#90EE90"), // cat_light_green
-                    icon = android.R.drawable.ic_menu_save,
-                    isDefault = true
-                ),
-                CategoryDTO(
-                    userId = null,
-                    name = "Education",
-                    type = "expense",
-                    color = android.graphics.Color.parseColor("#FFD700"), // cat_yellow
-                    icon = android.R.drawable.ic_menu_edit,
-                    isDefault = true
-                ),
-                CategoryDTO(
-                    userId = null,
-                    name = "Entertainment",
-                    type = "expense",
-                    color = android.graphics.Color.parseColor("#E6E6FA"), // cat_light_purple
-                    icon = android.R.drawable.ic_menu_view,
-                    isDefault = true
-                ),
-                CategoryDTO(
-                    userId = null,
-                    name = "Family & Friends",
-                    type = "expense",
-                    color = android.graphics.Color.parseColor("#00008B"), // cat_dark_blue
-                    icon = android.R.drawable.ic_menu_myplaces,
-                    isDefault = true
-                ),
-                CategoryDTO(
-                    userId = null,
-                    name = "Groceries",
-                    type = "expense",
-                    color = android.graphics.Color.parseColor("#ADD8E6"), // cat_light_blue
-                    icon = android.R.drawable.ic_menu_compass,
-                    isDefault = true
-                ),
-                CategoryDTO(
-                    userId = null,
-                    name = "Salary",
-                    type = "Income",
-                    color = android.graphics.Color.parseColor("#ADD8E6"), // cat_light_blue
-                    icon = android.R.drawable.ic_menu_save,
-                    isDefault = true
-                )
-            )
-
-            val batch = firestoreInstance.batch()
-            defaultCategories.forEach { category ->
-                val docRef = collection.document()
-                batch.set(docRef, category.copy(
-                    id = docRef.id,
-                    createdAt = System.currentTimeMillis(),
-                    updatedAt = System.currentTimeMillis()
-                ))
-            }
-            batch.commit().await()
-            Result.Success(Unit)
-        } catch (e: Exception) {
-            Result.Error(e)
-        }
-    }
+//    suspend fun createDefaultCategories(): Result<Unit> {
+//        return try {
+//            val defaultCategories = listOf(
+//                CategoryDTO(
+//                    userId = null,
+//                    name = "Food",
+//                    type = "expense",
+//                    color = android.graphics.Color.parseColor("#FF1493"), // cat_dark_pink
+//                    icon = android.R.drawable.ic_menu_compass,
+//                    isDefault = true
+//                ),
+//                CategoryDTO(
+//                    userId = null,
+//                    name = "Transport",
+//                    type = "expense",
+//                    color = android.graphics.Color.parseColor("#FFD700"), // cat_yellow
+//                    icon = android.R.drawable.ic_menu_directions,
+//                    isDefault = true
+//                ),
+//                CategoryDTO(
+//                    userId = null,
+//                    name = "HealthCare",
+//                    type = "expense",
+//                    color = android.graphics.Color.parseColor("#FFA500"), // cat_gold
+//                    icon = android.R.drawable.ic_menu_help,
+//                    isDefault = true
+//                ),
+//                CategoryDTO(
+//                    userId = null,
+//                    name = "Beauty",
+//                    type = "expense",
+//                    color = android.graphics.Color.parseColor("#800080"), // cat_dark_purple
+//                    icon = android.R.drawable.ic_menu_gallery,
+//                    isDefault = true
+//                ),
+//                CategoryDTO(
+//                    userId = null,
+//                    name = "Bills & Fees",
+//                    type = "expense",
+//                    color = android.graphics.Color.parseColor("#90EE90"), // cat_light_green
+//                    icon = android.R.drawable.ic_menu_save,
+//                    isDefault = true
+//                ),
+//                CategoryDTO(
+//                    userId = null,
+//                    name = "Education",
+//                    type = "expense",
+//                    color = android.graphics.Color.parseColor("#FFD700"), // cat_yellow
+//                    icon = android.R.drawable.ic_menu_edit,
+//                    isDefault = true
+//                ),
+//                CategoryDTO(
+//                    userId = null,
+//                    name = "Entertainment",
+//                    type = "expense",
+//                    color = android.graphics.Color.parseColor("#E6E6FA"), // cat_light_purple
+//                    icon = android.R.drawable.ic_menu_view,
+//                    isDefault = true
+//                ),
+//                CategoryDTO(
+//                    userId = null,
+//                    name = "Family & Friends",
+//                    type = "expense",
+//                    color = android.graphics.Color.parseColor("#00008B"), // cat_dark_blue
+//                    icon = android.R.drawable.ic_menu_myplaces,
+//                    isDefault = true
+//                ),
+//                CategoryDTO(
+//                    userId = null,
+//                    name = "Groceries",
+//                    type = "expense",
+//                    color = android.graphics.Color.parseColor("#ADD8E6"), // cat_light_blue
+//                    icon = android.R.drawable.ic_menu_compass,
+//                    isDefault = true
+//                ),
+//                CategoryDTO(
+//                    userId = null,
+//                    name = "Salary",
+//                    type = "Income",
+//                    color = android.graphics.Color.parseColor("#ADD8E6"), // cat_light_blue
+//                    icon = android.R.drawable.ic_menu_save,
+//                    isDefault = true
+//                )
+//            )
+//
+//            val batch = firestoreInstance.batch()
+//            defaultCategories.forEach { category ->
+//                val docRef = collection.document()
+//                batch.set(docRef, category.copy(
+//                    id = docRef.id,
+//                    createdAt = System.currentTimeMillis(),
+//                    updatedAt = System.currentTimeMillis()
+//                ))
+//            }
+//            batch.commit().await()
+//            Result.Success(Unit)
+//        } catch (e: Exception) {
+//            Result.Error(e)
+//        }
+//    }
 
     suspend fun categoryNameExists(userId: String, name: String): Result<Boolean> =
         checkNameExists(userId, name)

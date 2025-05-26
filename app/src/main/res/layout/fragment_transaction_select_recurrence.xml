@@ -47,26 +47,24 @@
                 android:layout_height="match_parent"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
-                android:paddingHorizontal="4dp">
+                android:paddingHorizontal="4dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp">
 
                 <ImageButton
                     android:id="@+id/btnGoBack"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    android:background="?attr/selectableItemBackgroundBorderless"
+                    style="@style/ToolButtonIcon"
                     android:contentDescription="@string/back"
-                    android:src="?attr/actionModeCloseDrawable"
-                    app:tint="?attr/bb_primaryText" />
+                    android:src="@drawable/ic_ui_arrow_back" />
 
                 <TextView
                     android:id="@+id/toolbarTitle"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Select Recurrence"
-                    android:textColor="?attr/bb_primaryText"
-                    android:textSize="20sp"
-                    android:textStyle="bold" />
+                    style="@style/ToolBarTitle"
+                    android:text="Select Recurrence" />
+
+                <Space
+                    android:layout_width="48dp"
+                    android:layout_height="48dp" />
             </LinearLayout>
         </androidx.appcompat.widget.Toolbar>
     </com.google.android.material.appbar.AppBarLayout>
@@ -76,13 +74,13 @@
         android:id="@+id/contentScrollView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:clipToPadding="false"
+        android:layout_marginBottom="90dp"
         android:fillViewport="true"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
             android:orientation="vertical"
             android:padding="16dp">
 
@@ -402,6 +400,15 @@
                                 app:chipStrokeWidth="0dp"
                                 app:rippleColor="@android:color/transparent"/>
                         </com.google.android.material.chip.ChipGroup>
+
+                        <!-- Add error text for week days -->
+                        <TextView
+                            android:id="@+id/weekDaysError"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:textColor="@color/error"
+                            android:visibility="gone"/>
                     </LinearLayout>
 
                     <!-- Monthly Options -->
@@ -601,6 +608,14 @@
                             android:inputType="number"/>
                     </com.google.android.material.textfield.TextInputLayout>
 
+                    <TextView
+                        android:id="@+id/occurrencesError"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:textColor="@color/error"
+                        android:visibility="gone"/>
+
                     <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/endDateLayout"
                         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
@@ -617,6 +632,14 @@
                             android:focusable="false"
                             android:clickable="true"/>
                     </com.google.android.material.textfield.TextInputLayout>
+
+                    <TextView
+                        android:id="@+id/endDateError"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:textColor="@color/error"
+                        android:visibility="gone"/>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
         </LinearLayout>
@@ -635,13 +658,12 @@
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnSave"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingVertical="16dp"
-            android:text="@string/save"
-            android:textColor="@android:color/white"
+            android:layout_height="56dp"
+            android:text="Add Recurrence"
+            android:textColor="?attr/bb_buttonText"
             android:textSize="16sp"
-            app:backgroundTint="?attr/bb_button"
-            app:cornerRadius="16dp" />
+            app:cornerRadius="28dp"
+            app:backgroundTint="?attr/bb_button" />
     </FrameLayout>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
