@@ -48,14 +48,14 @@ class GetWalletUseCase @Inject constructor(
         }
 
         return try {
-            val userResult = userRepository.getUserProfile(userId).first()
+            val userResult = userRepository.getUserProfile(userId)
             val user = when (userResult) {
                 is Result.Success -> userResult.data!!.toDomain()
                 is Result.Error -> return GetWalletResult.Error("Failed to get user data: ${userResult.exception.message}")
             }
 
             // Attempt to retrieve wallets from the repository
-            val walletsResult = walletRepository.getWalletsForUser(userId).first()
+            val walletsResult = walletRepository.getWalletsForUser(userId)
             val wallets = when (walletsResult) {
                 is Result.Success -> walletsResult.data.map { it.toDomain(user) }
                 is Result.Error -> return GetWalletResult.Error("Failed to get wallets: ${walletsResult.exception.message}")

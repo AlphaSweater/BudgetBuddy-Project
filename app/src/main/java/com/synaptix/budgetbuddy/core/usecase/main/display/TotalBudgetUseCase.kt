@@ -33,7 +33,7 @@ class TotalBudgetUseCase @Inject constructor(
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
         // Fetch user profile based on provided userid
-        val userResult = userRepository.getUserProfile(userId).first()
+        val userResult = userRepository.getUserProfile(userId)
         val user = when (userResult) {
             is Result.Success -> userResult.data?.toDomain()
             is Result.Error -> throw Exception("Failed to get user data: ${userResult.exception.message}")
@@ -45,7 +45,7 @@ class TotalBudgetUseCase @Inject constructor(
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
         // Fetch categories based on user id
-        val categorieResult = categoryRepository.getCategoriesForUser(userId).first()
+        val categorieResult = categoryRepository.getCategoriesForUser(userId)
         val categories = when (categorieResult) {
             is Result.Success -> categorieResult.data.map { it.toDomain(user) }
             is Result.Error -> throw Exception("Failed to get categories: ${categorieResult.exception.message}")
@@ -53,7 +53,7 @@ class TotalBudgetUseCase @Inject constructor(
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
         // Fetch budgets for the user
-        val budgetResult = budgetRepository.getBudgetsForUser(userId).first()
+        val budgetResult = budgetRepository.getBudgetsForUser(userId)
         val budgets = when (budgetResult) {
             is Result.Success -> budgetResult.data.map { it.toDomain(user, categories) }
             is Result.Error -> throw Exception("Failed to get budgets: ${budgetResult.exception.message}")

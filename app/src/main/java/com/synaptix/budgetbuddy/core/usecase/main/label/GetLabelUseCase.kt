@@ -50,14 +50,14 @@ class GetLabelUseCase @Inject constructor(
         }
 
         return try {
-            val userResult = userRepository.getUserProfile(userId).first()
+            val userResult = userRepository.getUserProfile(userId)
             val user = when (userResult) {
                 is Result.Success -> userResult.data?.toDomain()
                 is Result.Error -> return Error("Failed to get user data: ${userResult.exception.message}")
             }
 
             // Attempt to retrieve labels from the repository
-            val labelsResult = labelRepository.getLabelsForUser(userId).first()
+            val labelsResult = labelRepository.getLabelsForUser(userId)
             val labels = when (labelsResult) {
                 is Result.Success -> labelsResult.data.map { it.toDomain(user) }
                 is Result.Error -> return Error("Failed to get labels: ${labelsResult.exception.message}")
