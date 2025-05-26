@@ -15,8 +15,26 @@ data class TransactionDTO(
     val date: Long = System.currentTimeMillis(),
     val note: String = "",
     val photoUrl: String? = null, // URL to the photo in Firebase Storage
-    val recurrenceData: RecurrenceData = RecurrenceData.DEFAULT,
+    val recurrenceData: RecurrenceDataDTO = RecurrenceDataDTO.DEFAULT,
     val createdAt: Long = System.currentTimeMillis(),
     val updatedAt: Long = System.currentTimeMillis(),
     val nextOccurrence: Long? = null // When the next recurring transaction should occur
 )
+
+data class RecurrenceDataDTO(
+    val type: String = "Once Off",
+    val interval: Int = 1,
+    val weekDays: List<String> = emptyList(),
+    val isDayOfWeek: Boolean = false,
+    val endType: String = "Never",
+    val endValue: String? = null,
+    val occurrenceCount: Int = 0
+) {
+    companion object {
+        val DEFAULT = RecurrenceDataDTO(
+            type = "Once Off",
+            interval = 1,
+            endType = "Never"
+        )
+    }
+}
