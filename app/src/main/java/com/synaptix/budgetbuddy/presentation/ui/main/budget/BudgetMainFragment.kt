@@ -42,6 +42,7 @@ class BudgetMainFragment : Fragment() {
         setupUI()
         observeViewModel()
         viewModel.fetchBudgets()
+        viewModel.fetchBudgetSummary()
     }
 
     private fun setupUI() {
@@ -101,6 +102,12 @@ class BudgetMainFragment : Fragment() {
             }
             budgetAdapter.submitList(budgetItems)
         }
+
+        viewModel.budgetSummary.observe(viewLifecycleOwner) { summary ->
+            binding.totalBudgetedTextView.text = "ZAR %.2f".format(summary.totalBudgeted)
+            binding.totalSpentTextView.text = "ZAR %.2f".format(summary.totalSpent)
+        }
+
     }
 
     private fun onBudgetClicked(budget: Budget) {

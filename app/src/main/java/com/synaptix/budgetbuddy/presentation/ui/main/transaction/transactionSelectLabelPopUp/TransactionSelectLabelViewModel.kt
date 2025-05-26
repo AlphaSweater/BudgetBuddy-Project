@@ -9,32 +9,56 @@ import com.synaptix.budgetbuddy.core.usecase.main.label.GetLabelUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class TransactionSelectLabelViewModel @Inject constructor(
-    private val getLabelUseCase: GetLabelUseCase, // Inject dependencies here
+    private val getLabelUseCase: GetLabelUseCase,
     private val getUserIdUseCase: GetUserIdUseCase
 ) : ViewModel() {
 
     private val _labels = MutableStateFlow<List<Label>>(emptyList())
-    val labels: StateFlow<List<Label>> get()
-        = _labels
+    val labels: StateFlow<List<Label>> = _labels
 
-    // Fetch labels for a specific user
+    private val _filteredLabels = MutableStateFlow<List<Label>>(emptyList())
+    val filteredLabels: StateFlow<List<Label>> = _filteredLabels
+
+    private var searchQuery: String = ""
+
     fun loadLabelsForUser() {
         viewModelScope.launch {
             val userId = getUserIdUseCase.execute()
             when (val result = getLabelUseCase.execute(userId)) {
                 is GetLabelUseCase.GetLabelsResult.Success -> {
                     _labels.value = result.labels
-                    Log.d("TransactionSelectLabelViewModel", "Labels loaded: ${result.labels}")
+                    filterLabels()
                 }
                 is GetLabelUseCase.GetLabelsResult.Error -> {
-                    Log.e("TransactionSelectLabelViewModel", "Error loading labels: ${result.message}")
+                    // Handle error case if needed
                 }
             }
         }
+    }
+
+    fun filterLabels(query: String = searchQuery) {
+        searchQuery = query
+        _filteredLabels.value = if (query.isEmpty()) {
+            _labels.value
+        } else {
+            _labels.value.filter { label ->
+                label.name.contains(query, ignoreCase = true)
+            }
+        }
+    }
+
+    fun updateSelectedLabels(selectedLabels: List<Label>) {
+        _labels.update { currentLabels ->
+            currentLabels.map { label ->
+                label.copy(isSelected = selectedLabels.contains(label))
+            }
+        }
+        filterLabels()
     }
 }

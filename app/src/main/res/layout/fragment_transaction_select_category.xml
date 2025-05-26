@@ -48,37 +48,31 @@
                 android:layout_height="match_parent"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
-                android:paddingHorizontal="4dp">
+                android:paddingHorizontal="4dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp">
 
                 <ImageButton
                     android:id="@+id/btnGoBack"
+                    style="@style/ToolButtonIcon"
                     android:layout_width="48dp"
                     android:layout_height="48dp"
                     android:background="?attr/selectableItemBackgroundBorderless"
                     android:contentDescription="@string/back"
-                    android:src="?attr/actionModeCloseDrawable"
-                    app:tint="?attr/bb_primaryText" />
+                    android:src="@drawable/ic_ui_arrow_back" />
 
                 <TextView
                     android:id="@+id/toolbarTitle"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Choose Category"
-                    android:textColor="?attr/bb_primaryText"
-                    android:textSize="20sp"
-                    android:textStyle="bold" />
+                    style="@style/ToolBarTitle"
+                    android:text="Choose Category" />
 
                 <Button
                     android:id="@+id/btnAddCategory"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="8dp"
-                    android:background="@android:color/transparent"
-                    android:text="Add New"
-                    android:textColor="?attr/bb_primaryText"
-                    app:icon="@drawable/ic_add_circle_40"
-                    app:iconTint="?attr/bb_primaryText" />
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:text="+ Add New"
+                    android:textColor="?attr/bb_primaryText" />
             </LinearLayout>
         </androidx.appcompat.widget.Toolbar>
     </com.google.android.material.appbar.AppBarLayout>
@@ -144,7 +138,7 @@
                 android:hint="Search categories"
                 android:textColor="?attr/bb_secondaryText"
                 app:endIconMode="clear_text"
-                app:startIconDrawable="@drawable/ic_add_circle_40"
+                app:startIconDrawable="@drawable/ic_ui_search"
                 app:iconTint="?attr/bb_secondaryText">
 
                 <com.google.android.material.textfield.TextInputEditText
@@ -170,8 +164,8 @@
                     android:clipToPadding="false"
                     android:visibility="visible"
                     app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
-                    app:spanCount="2"
-                    tools:listitem="@layout/item_category"/>
+                    app:spanCount="1"
+                    tools:listitem="@layout/item_transaction_category"/>
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/recyclerViewIncomeCategory"
@@ -180,7 +174,7 @@
                     android:clipToPadding="false"
                     android:visibility="gone"
                     app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
-                    app:spanCount="2"
+                    app:spanCount="1"
                     tools:listitem="@layout/item_category"/>
 
                 <!-- Empty State -->
@@ -195,7 +189,7 @@
                     <ImageView
                         android:layout_width="120dp"
                         android:layout_height="120dp"
-                        android:src="@drawable/ic_circle_24"
+                        android:src="@drawable/ic_ui_categories"
                         app:tint="?attr/bb_secondaryText"/>
 
                     <TextView

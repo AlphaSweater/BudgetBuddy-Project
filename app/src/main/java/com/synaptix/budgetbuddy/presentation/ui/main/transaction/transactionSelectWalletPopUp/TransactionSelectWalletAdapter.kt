@@ -28,7 +28,7 @@ class TransactionSelectWalletAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): WalletViewHolder {
         return createViewHolder(
             parent = parent,
-            layoutResId = R.layout.item_wallet
+            layoutResId = R.layout.item_transaction_wallet
         ) { WalletViewHolder(it) }
     }
 

@@ -19,6 +19,7 @@ class GetCategoriesUseCase @Inject constructor(
         data class Error(val message: String) : GetCategoriesResult()
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     // Executes the operation to fetch the categories for the specified user
     suspend fun execute(userId: String): GetCategoriesResult {
         // Input validation
@@ -29,14 +30,14 @@ class GetCategoriesUseCase @Inject constructor(
         // Attempt to retrieve categories from the repository
         return try {
             // First get the user data
-            val userResult = userRepository.getUserProfile(userId).first()
+            val userResult = userRepository.getUserProfile(userId)
             val user = when (userResult) {
                 is Result.Success -> userResult.data!!.toDomain()
                 is Result.Error -> return GetCategoriesResult.Error("Failed to get user data: ${userResult.exception.message}")
             }
 
             // Then get the categories
-            val categoryResult = categoryRepository.getCategoriesForUser(userId).first()
+            val categoryResult = categoryRepository.getCategoriesForUser(userId)
             val categories = when (categoryResult) {
                 is Result.Success -> categoryResult.data.map { it.toDomain(user) }
                 is Result.Error -> return GetCategoriesResult.Error("Failed to get categories: ${categoryResult.exception.message}")
@@ -50,3 +51,4 @@ class GetCategoriesUseCase @Inject constructor(
         }
     }
 }
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~EOF~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\

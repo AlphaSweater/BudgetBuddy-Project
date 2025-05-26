@@ -117,10 +117,23 @@ class HomeMainViewModel @Inject constructor(
             _transactionsState.value = TransactionState.Loading
             try {
                 val userId = getUserIdUseCase.execute()
-                when (val result = getTransactionsUseCase.execute(userId)) {
+                if (userId.isEmpty()) {
+                    _transactionsState.value = TransactionState.Error("User ID is empty")
+                    return@launch
+                }
+
+                val result = if (_selectedStartDate.isNotEmpty() && _selectedEndDate.isNotEmpty()) {
+                    val startDate = dateFormat.parse(_selectedStartDate)?.time ?: 0L
+                    val endDate = dateFormat.parse(_selectedEndDate)?.time ?: 0L
+                    getTransactionsUseCase.executeWithDateRange(userId, startDate, endDate)
+                } else {
+                    getTransactionsUseCase.execute(userId)
+                }
+
+                when (result) {
                     is GetTransactionsUseCase.GetTransactionsResult.Success -> {
-                        val filteredTransactions = filterTransactions(result.transactions)
-                        _transactionsState.value = TransactionState.Success(filteredTransactions)
+                        val filtered = filterTransactions(result.transactions)
+                        _transactionsState.value = TransactionState.Success(filtered)
                     }
                     is GetTransactionsUseCase.GetTransactionsResult.Error -> {
                         _transactionsState.value = TransactionState.Error(result.message)
@@ -135,13 +148,6 @@ class HomeMainViewModel @Inject constructor(
     private fun filterTransactions(transactions: List<Transaction>): List<Transaction> {
         var filtered = transactions
 
-        // Apply date range filter if dates are selected
-        if (_selectedStartDate.isNotEmpty() && _selectedEndDate.isNotEmpty()) {
-            filtered = filtered.filter { transaction ->
-                isTransactionInDateRange(transaction.date, _selectedStartDate, _selectedEndDate)
-            }
-        }
-
         // Apply current filter
         filtered = when (currentFilter) {
             TransactionFilter.ALL -> filtered
@@ -151,18 +157,6 @@ class HomeMainViewModel @Inject constructor(
         }
 
         return filtered.sortedByDescending { it.date }
-    }
-
-    private fun isTransactionInDateRange(transactionDate: Long, startDate: String, endDate: String): Boolean {
-        return try {
-            val start = dateFormat.parse(startDate)?.time ?: return false
-            val end = dateFormat.parse(endDate)?.time ?: return false
-
-            transactionDate in start..end
-        } catch (e: Exception) {
-            println("Date parsing error: ${e.message}")
-            false
-        }
     }
 
     private fun isToday(date: Long): Boolean {

@@ -30,7 +30,10 @@ data class Label(
     val user: User?, // Nullable to allow for default labels
     val name: String,
     val createdAt: Long = System.currentTimeMillis(),
-    val updatedAt: Long = System.currentTimeMillis()
+    val updatedAt: Long = System.currentTimeMillis(),
+
+    // Not Mapped
+    var isSelected: Boolean = false
 ) : Entity {
     companion object {
         fun new(
