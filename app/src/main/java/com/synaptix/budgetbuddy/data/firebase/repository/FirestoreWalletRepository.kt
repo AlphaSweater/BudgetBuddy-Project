@@ -71,22 +71,6 @@ class FirestoreWalletRepository @Inject constructor(
         }
     }
 
-    //updates wallet balance with income or expense
-    suspend fun updateWalletBalanceTrans(walletId: String, amount: Double, isIncome: Boolean): Result<Unit> {
-        return try {
-            val wallet = collection.document(walletId).get().await()
-                .toObject(WalletDTO::class.java)
-                ?: return Result.Error(Exception("Wallet not found"))
-
-            val finalAmount = if (isIncome) wallet.balance + amount else wallet.balance - amount
-            val updatedWallet = wallet.copy(balance = finalAmount, updatedAt = System.currentTimeMillis())
-
-            update(walletId, updatedWallet)
-        } catch (e: Exception) {
-            Result.Error(e)
-        }
-    }
-
     // Get total balance for a user (excluding wallets marked as excludeFromTotal)
     suspend fun getTotalBalanceForUser(userId: String): Result<Double> {
         return try {
