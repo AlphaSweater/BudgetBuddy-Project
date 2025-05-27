@@ -9,6 +9,7 @@ import com.synaptix.budgetbuddy.core.model.Transaction
 import com.synaptix.budgetbuddy.core.model.Wallet
 import com.synaptix.budgetbuddy.core.usecase.auth.GetUserIdUseCase
 import com.synaptix.budgetbuddy.core.usecase.main.category.GetCategoriesUseCase
+import com.synaptix.budgetbuddy.core.usecase.main.display.TotalWalletUseCase
 import com.synaptix.budgetbuddy.core.usecase.main.transaction.GetTransactionsUseCase
 import com.synaptix.budgetbuddy.core.usecase.main.wallet.GetWalletUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -26,7 +27,8 @@ class HomeMainViewModel @Inject constructor(
     private val getWalletUseCase: GetWalletUseCase,
     private val getTransactionsUseCase: GetTransactionsUseCase,
     private val getCategoriesUseCase: GetCategoriesUseCase,
-    private val getUserIdUseCase: GetUserIdUseCase
+    private val getUserIdUseCase: GetUserIdUseCase,
+    private val getTotalWalletUseCase: TotalWalletUseCase
 ) : ViewModel() {
 
     sealed class WalletState {
@@ -55,6 +57,10 @@ class HomeMainViewModel @Inject constructor(
 
     private val _categoriesState = MutableStateFlow<CategoryState>(CategoryState.Loading)
     val categoriesState: StateFlow<CategoryState> = _categoriesState
+
+    //for total wallet balance
+    private val _totalWalletBalance = MutableStateFlow<Double?>(null)
+    val totalWalletBalance: StateFlow<Double?> get() = _totalWalletBalance
 
     private val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
 
@@ -91,6 +97,7 @@ class HomeMainViewModel @Inject constructor(
         loadWallets()
         loadTransactions()
         loadCategories()
+        loadTotalWalletBalance()
     }
 
     private fun loadWallets() {
@@ -213,6 +220,18 @@ class HomeMainViewModel @Inject constructor(
                 }
             } catch (e: Exception) {
                 _categoriesState.value = CategoryState.Error(e.message ?: "Failed to load categories")
+            }
+        }
+    }
+
+    fun loadTotalWalletBalance() {
+        viewModelScope.launch {
+            try {
+                val userId = getUserIdUseCase.execute()
+                val total = getTotalWalletUseCase.execute(userId)
+                _totalWalletBalance.value = total
+            } catch (e: Exception) {
+                _totalWalletBalance.value = 0.0
             }
         }
     }

@@ -140,6 +140,12 @@ class HomeMainFragment : Fragment() {
                         handleCategoriesState(state)
                     }
                 }
+                launch {
+                    viewModel.totalWalletBalance.collect { total ->
+                        val formatted = String.format("R %.2f", total)
+                        binding.textViewCurrencyTotal.text = formatted
+                    }
+                }
             }
         }
     }
