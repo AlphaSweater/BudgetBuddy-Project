@@ -21,6 +21,9 @@
 
 package com.synaptix.budgetbuddy.presentation.ui.main.budget
 
+import android.text.style.ForegroundColorSpan
+import android.text.Spannable
+import android.text.SpannableStringBuilder
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
@@ -77,9 +80,42 @@ class BudgetMainAdapter(
          * Attaches click listener to the entire item view.
          */
         override fun bind(item: BudgetListItems.BudgetBudgetItem) {
-            budgetIcon.setImageResource(R.drawable.ic_money_24)
+            budgetIcon.setImageResource(R.drawable.ic_ui_budget)
             budgetTitle.text = item.budget.name
-            budgetStatus.text = item.status
+
+            // Format the budget status with spent and amount
+            val context = itemView.context
+            val spent = item.budget.spent
+            val amount = item.budget.amount
+
+            val statusText = SpannableStringBuilder()
+
+            // "R {spent}" in expense red
+            val spentStr = "R %.2f".format(spent)
+            val spentStart = statusText.length
+            statusText.append(spentStr)
+            statusText.setSpan(
+                ForegroundColorSpan(context.getColor(R.color.expense_red)),
+                spentStart,
+                spentStart + spentStr.length,
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
+
+            // " spent of "
+            statusText.append(" spent of ")
+
+            // "R {amount}" in profit green
+            val amountStr = "R %.2f".format(amount)
+            val amountStart = statusText.length
+            statusText.append(amountStr)
+            statusText.setSpan(
+                ForegroundColorSpan(context.getColor(R.color.profit_green)),
+                amountStart,
+                amountStart + amountStr.length,
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
+
+            budgetStatus.setText(statusText, TextView.BufferType.SPANNABLE)
             
             itemView.setOnClickListener { onBudgetClick(item.budget) }
         }
