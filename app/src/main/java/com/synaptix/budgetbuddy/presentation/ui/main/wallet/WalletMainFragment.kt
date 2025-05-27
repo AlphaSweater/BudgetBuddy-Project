@@ -7,6 +7,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -100,7 +101,7 @@ class WalletMainFragment : Fragment() {
 
         val dataSet = PieDataSet(entries, "").apply {
             colors = ColorTemplate.MATERIAL_COLORS.toList()
-            valueTextColor = Color.WHITE
+            valueTextColor = ContextCompat.getColor(context, R.color.light_text)
             valueTextSize = 14f
         }
 
@@ -113,9 +114,11 @@ class WalletMainFragment : Fragment() {
             this.data = data
             isDrawHoleEnabled = true
             holeRadius = 50f
+            setHoleColor(Color.TRANSPARENT)
+            holeRadius = 50f
             setUsePercentValues(true)
             setDrawEntryLabels(true) // Shows labels like wallet name
-            setEntryLabelColor(Color.BLACK)
+            setEntryLabelColor(ContextCompat.getColor(context, R.color.light_text))
             setEntryLabelTextSize(12f)
             description.isEnabled = false // Hides the description label
             legend.isEnabled = false      // Hides the legend at the bottom
