@@ -116,7 +116,6 @@ class BudgetReportAdapter(
         itemView: View,
         private val onClick: ((Transaction) -> Unit)?
     ) : BaseViewHolder<BudgetListItems>(itemView) {
-        private val iconContainer: LinearLayout = itemView.findViewById(R.id.iconCategoryContainer)
         private val iconView: ImageView = itemView.findViewById(R.id.iconCategory)
         private val categoryName: TextView = itemView.findViewById(R.id.textCategoryName)
         private val walletName: TextView = itemView.findViewById(R.id.textWalletName)
@@ -128,8 +127,9 @@ class BudgetReportAdapter(
 
             // Set category icon and color
             val resolvedColor = ContextCompat.getColor(itemView.context, item.categoryColour)
-            (iconContainer.background.mutate() as GradientDrawable).setColor(resolvedColor)
+            //(iconContainer.background.mutate() as GradientDrawable).setColor(resolvedColor)
             iconView.setImageResource(item.categoryIcon)
+            iconView.setColorFilter(resolvedColor)
 
             // Set text fields
             categoryName.text = item.categoryName
@@ -149,20 +149,20 @@ class BudgetReportAdapter(
         itemView: View,
         private val onClick: ((Category) -> Unit)?
     ) : BaseViewHolder<BudgetListItems>(itemView) {
-        private val iconView: ImageView = itemView.findViewById(R.id.iconCategory)
-        private val iconContainer: LinearLayout = itemView.findViewById(R.id.iconCategoryContainer)
-        private val categoryName: TextView = itemView.findViewById(R.id.txtCategoryName)
-        private val transactionCount: TextView = itemView.findViewById(R.id.txtTransactions)
-        private val amount: TextView = itemView.findViewById(R.id.txtAmount)
-        private val date: TextView = itemView.findViewById(R.id.txtDate)
+        private val iconView: ImageView = itemView.findViewById(R.id.categoryIcon)
+        private val categoryName: TextView = itemView.findViewById(R.id.categoryName)
+        private val transactionCount: TextView = itemView.findViewById(R.id.categoryTransactions)
+        private val amount: TextView = itemView.findViewById(R.id.categoryAmount)
+        private val date: TextView = itemView.findViewById(R.id.categoryDate)
 
         override fun bind(item: BudgetListItems) {
             if (item !is BudgetListItems.BudgetCategoryItem) return
 
             // Set category icon and color
             val resolvedColor = ContextCompat.getColor(itemView.context, item.category.color)
-            (iconContainer.background.mutate() as GradientDrawable).setColor(resolvedColor)
+            //(iconContainer.background.mutate() as GradientDrawable).setColor(resolvedColor)
             iconView.setImageResource(item.category.icon)
+            iconView.setColorFilter(resolvedColor)
 
             // Set text fields
             categoryName.text = item.category.name

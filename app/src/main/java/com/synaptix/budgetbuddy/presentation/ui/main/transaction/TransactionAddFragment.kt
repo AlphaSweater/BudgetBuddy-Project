@@ -37,6 +37,7 @@ import com.synaptix.budgetbuddy.core.model.Wallet
 import com.synaptix.budgetbuddy.extentions.getThemeColor
 import kotlin.toString
 import com.synaptix.budgetbuddy.core.model.Label
+import kotlinx.coroutines.delay
 
 @AndroidEntryPoint
 class TransactionAddFragment : Fragment() {
@@ -388,15 +389,8 @@ class TransactionAddFragment : Fragment() {
         // Check if form is valid before proceeding
         if (!viewModel.validateForm()) return
 
-        // Launch coroutine to call suspend function
-        viewLifecycleOwner.lifecycleScope.launch {
-            try {
-                viewModel.addTransaction()
-                findNavController().popBackStack()
-            } catch (e: Exception) {
-                showError("Failed to save transaction: ${e.message}")
-            }
-        }
+        // Call addTransaction
+        viewModel.addTransaction()
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
@@ -422,45 +416,78 @@ class TransactionAddFragment : Fragment() {
     private fun observeViewModel() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.uiState.collect { state ->
-                    handleUiState(state)
+                // Collect UI state
+                launch {
+                    viewModel.uiState.collect { state ->
+                        handleUiState(state)
+                    }
                 }
-            }
-        }
 
-        viewModel.validationState.observe(viewLifecycleOwner) { state ->
-            handleValidationState(state)
-        }
-
-        viewModel.category.observe(viewLifecycleOwner) { category ->
-            updateSelectedCategory(category)
-        }
-
-        viewModel.wallet.observe(viewLifecycleOwner) { wallet ->
-            updateSelectedWallet(wallet)
-        }
-
-        viewModel.date.observe(viewLifecycleOwner) { date ->
-            updateSelectedDate(date.toString())
-        }
-
-        viewModel.recurrenceData.observe(viewLifecycleOwner) { rate ->
-            updateSelectedRecurrence(rate)
-        }
-
-        viewModel.selectedLabels.observe(viewLifecycleOwner) { labels ->
-            updateSelectedLabels(labels)
-        }
-
-        viewModel.imageBytes.observe(viewLifecycleOwner) { bytes ->
-            if (bytes != null) {
-                val bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
-                binding.imagePreview.apply {
-                    setImageBitmap(bitmap)
-                    visibility = View.VISIBLE
+                // Collect validation state
+                launch {
+                    viewModel.validationState.collect { state ->
+                        handleValidationState(state)
+                    }
                 }
-            } else {
-                binding.imagePreview.visibility = View.GONE
+
+                // Collect category
+                launch {
+                    viewModel.category.collect { category ->
+                        updateSelectedCategory(category)
+                    }
+                }
+
+                // Collect wallet
+                launch {
+                    viewModel.wallet.collect { wallet ->
+                        updateSelectedWallet(wallet)
+                    }
+                }
+
+                // Collect date
+                launch {
+                    viewModel.date.collect { date ->
+                        updateSelectedDate(date)
+                    }
+                }
+
+                // Collect recurrence data
+                launch {
+                    viewModel.recurrenceData.collect { rate ->
+                        updateSelectedRecurrence(rate)
+                    }
+                }
+
+                // Collect selected labels
+                launch {
+                    viewModel.selectedLabels.collect { labels ->
+                        updateSelectedLabels(labels)
+                    }
+                }
+
+                // Collect image bytes
+                launch {
+                    viewModel.imageBytes.collect { bytes ->
+                        if (bytes != null) {
+                            val bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
+                            binding.imagePreview.apply {
+                                setImageBitmap(bitmap)
+                                visibility = View.VISIBLE
+                            }
+                        } else {
+                            binding.imagePreview.visibility = View.GONE
+                        }
+                    }
+                }
+
+                // Collect save state
+                launch {
+                    viewModel.saveState.collect { shouldSave ->
+                        if (!shouldSave) {
+                            reset()
+                        }
+                    }
+                }
             }
         }
     }
@@ -472,11 +499,22 @@ class TransactionAddFragment : Fragment() {
             is TransactionAddViewModel.UiState.Loading -> {
                 binding.btnSave.isEnabled = false
                 binding.loadingOverlay.visibility = View.VISIBLE
+                binding.progressBar.visibility = View.VISIBLE
+                binding.successCheckmark.visibility = View.GONE
+                binding.loadingText.text = "Saving transaction..."
             }
             is TransactionAddViewModel.UiState.Success -> {
-                binding.loadingOverlay.visibility = View.GONE
-                showSuccess("Transaction added successfully")
-                findNavController().popBackStack()
+                binding.progressBar.visibility = View.GONE
+                binding.successCheckmark.visibility = View.VISIBLE
+                binding.loadingText.text = "Transaction saved successfully!"
+                
+                // Add a slight delay before closing to show the success state
+                viewLifecycleOwner.lifecycleScope.launch {
+                    delay(1000) // Show success state for 1 second
+                    binding.loadingOverlay.visibility = View.GONE
+                    viewModel.reset()
+                    findNavController().popBackStack()
+                }
             }
             is TransactionAddViewModel.UiState.Error -> {
                 binding.btnSave.isEnabled = true

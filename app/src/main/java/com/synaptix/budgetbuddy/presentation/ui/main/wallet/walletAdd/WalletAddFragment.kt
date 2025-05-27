@@ -128,14 +128,20 @@ class WalletAddFragment : Fragment() {
     private fun observeViewModel() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.uiState.collect { state ->
-                    handleUiState(state)
+                // Collect UI state
+                launch {
+                    viewModel.uiState.collect { state ->
+                        handleUiState(state)
+                    }
+                }
+                
+                // Collect validation state
+                launch {
+                    viewModel.validationState.collect { state ->
+                        handleValidationState(state)
+                    }
                 }
             }
-        }
-
-        viewModel.validationState.observe(viewLifecycleOwner) { state ->
-            handleValidationState(state)
         }
     }
 

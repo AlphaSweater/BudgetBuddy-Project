@@ -1,14 +1,12 @@
 package com.synaptix.budgetbuddy.presentation.ui.main.wallet
 
-import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.synaptix.budgetbuddy.core.model.Wallet
 import com.synaptix.budgetbuddy.core.usecase.auth.GetUserIdUseCase
 import com.synaptix.budgetbuddy.core.usecase.main.wallet.GetWalletUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -18,46 +16,67 @@ class WalletMainViewModel @Inject constructor(
     private val getUserIdUseCase: GetUserIdUseCase
 ) : ViewModel() {
 
-    private val _wallets = MutableLiveData<List<Wallet>>()
-    val wallets: LiveData<List<Wallet>> = _wallets
+    sealed class WalletState {
+        object Loading : WalletState()
+        data class Success(val wallets: List<Wallet>) : WalletState()
+        data class Error(val message: String) : WalletState()
+        object Empty : WalletState()
+    }
 
-    private val _totalBalance = MutableLiveData<Double>()
-    val totalBalance: LiveData<Double> = _totalBalance
+    private val _walletState = MutableStateFlow<WalletState>(WalletState.Loading)
+    val walletState: StateFlow<WalletState> = _walletState
 
-    private val _isBalanceVisible = MutableLiveData(true)
-    val isBalanceVisible: LiveData<Boolean> = _isBalanceVisible
+    private val _totalBalance = MutableStateFlow(0.0)
+    val totalBalance: StateFlow<Double> = _totalBalance
 
-    fun fetchWallets() {
+    private val _isBalanceVisible = MutableStateFlow(true)
+    val isBalanceVisible: StateFlow<Boolean> = _isBalanceVisible
+
+    init {
+        refreshData()
+    }
+
+    fun refreshData() {
         viewModelScope.launch {
-            try {
-                val userId = getUserIdUseCase.execute()
-                when (val result = getWalletUseCase.execute(userId)) {
-                    is GetWalletUseCase.GetWalletResult.Success -> {
-                        val walletsList = result.wallets
-                        _wallets.value = walletsList
-                        Log.d("WalletMainViewModel", "Fetched wallets: $walletsList")
-                        calculateTotalBalance(walletsList)
-                    }
-                    is GetWalletUseCase.GetWalletResult.Error -> {
-                        Log.e("WalletMainViewModel", "Error fetching wallets: ${result.message}")
+            val userId = getUserIdUseCase.execute()
+            if (userId.isEmpty()) {
+                _walletState.value = WalletState.Empty
+                _totalBalance.value = 0.0
+                return@launch
+            }
+
+            getWalletUseCase.execute(userId)
+                .catch { e ->
+                    _walletState.value = WalletState.Empty
+                    _totalBalance.value = 0.0
+                }
+                .collect { result ->
+                    when (result) {
+                        is GetWalletUseCase.GetWalletResult.Success -> {
+                            val walletsList = result.wallets
+                            if (walletsList.isEmpty()) {
+                                _walletState.value = WalletState.Empty
+                            } else {
+                                _walletState.value = WalletState.Success(walletsList)
+                            }
+                            calculateTotalBalance(walletsList)
+                        }
+                        is GetWalletUseCase.GetWalletResult.Error -> {
+                            _walletState.value = WalletState.Empty
+                            _totalBalance.value = 0.0
+                        }
                     }
                 }
-            } catch (e: Exception) {
-                // TODO: Handle error state
-                _wallets.value = emptyList()
-                _totalBalance.value = 0.0
-            }
         }
     }
 
     private fun calculateTotalBalance(wallets: List<Wallet>) {
-        // Calculate the total balance of all wallets that are not excluded from the total
         val total = wallets.filter { !it.excludeFromTotal }
             .sumOf { it.balance }
         _totalBalance.value = total
     }
 
     fun toggleBalanceVisibility() {
-        _isBalanceVisible.value = _isBalanceVisible.value?.not() != false
+        _isBalanceVisible.value = !_isBalanceVisible.value
     }
 }

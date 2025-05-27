@@ -111,7 +111,7 @@ class ValidateUserTotalsUseCase @Inject constructor(
             val newBalance = incomeTotal - expenseTotal
 
             // Update the wallet in Firestore
-            val updateResult = walletRepository.updateWalletBalance(wallet.id, newBalance)
+            val updateResult = walletRepository.updateWalletBalance(wallet.user.id ,wallet.id, newBalance)
             if (updateResult is Result.Error) {
                 throw Exception("Failed to update wallet ${wallet.name}: ${updateResult.exception.message}")
             }
@@ -137,7 +137,7 @@ class ValidateUserTotalsUseCase @Inject constructor(
             val totalSpent = matchingTransactions.sumOf { it.amount }
 
             // Update in Firestore
-            val result = budgetRepository.updateBudgetSpent(budget.id, totalSpent)
+            val result = budgetRepository.updateBudgetSpent(budget.user.id, budget.id, totalSpent)
             if (result is Result.Error) {
                 throw Exception("Failed to update budget ${budget.name}: ${result.exception.message}")
             }

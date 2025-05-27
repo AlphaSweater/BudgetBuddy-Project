@@ -7,8 +7,13 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
+import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.github.mikephil.charting.animation.Easing
@@ -29,6 +34,8 @@ import com.synaptix.budgetbuddy.R
 import com.synaptix.budgetbuddy.core.model.BudgetListItems
 import com.synaptix.budgetbuddy.core.model.Wallet
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class WalletMainFragment : Fragment() {
@@ -36,7 +43,7 @@ class WalletMainFragment : Fragment() {
     private var _binding: FragmentWalletMainBinding? = null
     private val binding get() = _binding!!
 
-    private val viewModel: WalletMainViewModel by viewModels()
+    private val walletViewModel: WalletMainViewModel by activityViewModels()
     private val walletAdapter by lazy {
         WalletMainAdapter { walletItem ->
             onWalletClicked(walletItem)
@@ -54,40 +61,25 @@ class WalletMainFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setupUI()
+        setupViews()
         observeViewModel()
-        viewModel.fetchWallets()
     }
 
-    private fun setupUI() {
-        setupRecyclerView()
-        setupClickListeners()
-        setupBalanceVisibility()
-    }
+    private fun setupViews() {
+        binding.apply {
+            // Setup RecyclerView
+            recyclerViewWalletMain.apply {
+                layoutManager = LinearLayoutManager(requireContext())
+                adapter = walletAdapter
+            }
 
-    private fun setupRecyclerView() {
-        binding.recyclerViewWalletMain.apply {
-            layoutManager = LinearLayoutManager(requireContext())
-            adapter = walletAdapter
-        }
-    }
+            // Setup click listeners
+            btnCreateWallet.setOnClickListener {
+                findNavController().navigate(R.id.action_walletMainFragment_to_addWalletFragment)
+            }
 
-    private fun setupClickListeners() {
-        binding.btnCreateWallet.setOnClickListener {
-            findNavController().navigate(R.id.action_walletMainFragment_to_addWalletFragment)
-        }
-
-        binding.ivEye.setOnClickListener {
-            viewModel.toggleBalanceVisibility()
-        }
-    }
-
-    private fun setupBalanceVisibility() {
-        viewModel.isBalanceVisible.observe(viewLifecycleOwner) { isVisible ->
-            binding.tvCurrencyTotal.text = if (isVisible) {
-                viewModel.totalBalance.value?.toString() ?: "0"
-            } else {
-                "****"
+            ivEye.setOnClickListener {
+                walletViewModel.toggleBalanceVisibility()
             }
         }
     }
@@ -131,14 +123,68 @@ class WalletMainFragment : Fragment() {
 
 
     private fun observeViewModel() {
-        viewModel.wallets.observe(viewLifecycleOwner) { wallets ->
-            updateWalletsList(wallets)
-            setupPieChart(wallets)
-        }
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                // Collect wallet state
+                launch {
+                    walletViewModel.walletState.collectLatest { state ->
+                        handleWalletState(state)
+                    }
+                }
 
-        viewModel.totalBalance.observe(viewLifecycleOwner) { total ->
-            if (viewModel.isBalanceVisible.value == true) {
-                binding.tvCurrencyTotal.text = total.toString()
+                // Collect balance visibility
+                launch {
+                    walletViewModel.isBalanceVisible.collectLatest { isVisible ->
+                        updateBalanceVisibility(isVisible)
+                    }
+                }
+
+                // Collect total balance
+                launch {
+                    walletViewModel.totalBalance.collectLatest { total ->
+                        if (walletViewModel.isBalanceVisible.value) {
+                            binding.tvCurrencyTotal.text = total.toString()
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun handleWalletState(state: WalletMainViewModel.WalletState) {
+        binding.apply {
+            when (state) {
+                is WalletMainViewModel.WalletState.Loading -> {
+                    showLoadingState(
+                        recyclerView = recyclerViewWalletMain,
+                        progressBar = progressBarWallets,
+                        emptyText = txtEmptyWallets
+                    )
+                }
+                is WalletMainViewModel.WalletState.Success -> {
+                    hideLoadingState(progressBarWallets)
+                    showContentState(
+                        recyclerView = recyclerViewWalletMain,
+                        emptyText = txtEmptyWallets
+                    )
+                    updateWalletsList(state.wallets)
+                }
+                is WalletMainViewModel.WalletState.Empty -> {
+                    hideLoadingState(progressBarWallets)
+                    showEmptyState(
+                        recyclerView = recyclerViewWalletMain,
+                        emptyText = txtEmptyWallets,
+                        message = getString(R.string.no_wallets_found)
+                    )
+                }
+                is WalletMainViewModel.WalletState.Error -> {
+                    hideLoadingState(progressBarWallets)
+                    showEmptyState(
+                        recyclerView = recyclerViewWalletMain,
+                        emptyText = txtEmptyWallets,
+                        message = getString(R.string.no_wallets_found)
+                    )
+                }
             }
         }
     }
@@ -148,16 +194,53 @@ class WalletMainFragment : Fragment() {
             BudgetListItems.BudgetWalletItem(
                 wallet = wallet,
                 walletName = wallet.name,
-                walletIcon = R.drawable.baseline_shopping_bag_24,
+                walletIcon = R.drawable.ic_ui_wallet,
                 walletBalance = wallet.balance,
                 relativeDate = wallet.formatDate(wallet.lastTransactionAt)
             )
         }
-
-        binding.txtEmptyWallets.isVisible = budgetWalletItems.isEmpty()
-        binding.recyclerViewWalletMain.isVisible = budgetWalletItems.isNotEmpty()
-        
         walletAdapter.submitList(budgetWalletItems)
+    }
+
+    private fun updateBalanceVisibility(isVisible: Boolean) {
+        binding.tvCurrencyTotal.text = if (isVisible) {
+            walletViewModel.totalBalance.value.toString()
+        } else {
+            "****"
+        }
+    }
+
+    // Helper functions for UI state management
+    private fun showLoadingState(
+        recyclerView: androidx.recyclerview.widget.RecyclerView,
+        progressBar: View,
+        emptyText: TextView
+    ) {
+        recyclerView.isVisible = false
+        emptyText.isVisible = false
+        progressBar.isVisible = true
+    }
+
+    private fun hideLoadingState(progressBar: View) {
+        progressBar.isVisible = false
+    }
+
+    private fun showEmptyState(
+        recyclerView: androidx.recyclerview.widget.RecyclerView,
+        emptyText: TextView,
+        message: String
+    ) {
+        recyclerView.isVisible = false
+        emptyText.isVisible = true
+        emptyText.text = message
+    }
+
+    private fun showContentState(
+        recyclerView: androidx.recyclerview.widget.RecyclerView,
+        emptyText: TextView
+    ) {
+        recyclerView.isVisible = true
+        emptyText.isVisible = false
     }
 
     private fun onWalletClicked(wallet: BudgetListItems.BudgetWalletItem) {

@@ -130,6 +130,15 @@
                     </com.google.android.material.textfield.TextInputLayout>
 
                     <TextView
+                        android:id="@+id/textNameError"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:textColor="@color/error"
+                        android:textSize="12sp"
+                        android:visibility="gone"/>
+
+                    <TextView
                         android:id="@+id/statusMessage"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -173,6 +182,16 @@
                         android:textColor="?attr/bb_primaryText"
                         android:textSize="16sp"/>
                 </RadioGroup>
+
+                <TextView
+                    android:id="@+id/textTypeError"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginHorizontal="16dp"
+                    android:textColor="@color/error"
+                    android:textSize="12sp"
+                    android:visibility="gone"/>
             </com.google.android.material.card.MaterialCardView>
 
             <!-- Color Selection -->
@@ -206,6 +225,15 @@
                     app:spanCount="2"/>
             </com.google.android.material.card.MaterialCardView>
 
+            <TextView
+                android:id="@+id/textColorError"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:textColor="@color/error"
+                android:textSize="12sp"
+                android:visibility="gone"/>
+
             <!-- Icon Selection -->
             <TextView
                 android:layout_width="wrap_content"
@@ -235,6 +263,15 @@
                     app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
                     app:spanCount="4"/>
             </com.google.android.material.card.MaterialCardView>
+
+            <TextView
+                android:id="@+id/textIconError"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:textColor="@color/error"
+                android:textSize="12sp"
+                android:visibility="gone"/>
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 

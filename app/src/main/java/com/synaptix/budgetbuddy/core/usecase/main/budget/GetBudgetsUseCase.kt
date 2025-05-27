@@ -1,21 +1,24 @@
 package com.synaptix.budgetbuddy.core.usecase.main.budget
 
+import android.util.Log
 import com.synaptix.budgetbuddy.core.model.Budget
-import com.synaptix.budgetbuddy.core.usecase.main.budget.GetBudgetsUseCase.GetBudgetsResult.*
+import com.synaptix.budgetbuddy.core.model.Result
+import com.synaptix.budgetbuddy.core.usecase.main.transaction.GetTransactionsUseCase.GetTransactionsResult
+import com.synaptix.budgetbuddy.data.firebase.mapper.FirebaseMapper.toDomain
 import com.synaptix.budgetbuddy.data.firebase.repository.FirestoreBudgetRepository
 import com.synaptix.budgetbuddy.data.firebase.repository.FirestoreCategoryRepository
 import com.synaptix.budgetbuddy.data.firebase.repository.FirestoreUserRepository
-import com.synaptix.budgetbuddy.core.model.Result
-import com.synaptix.budgetbuddy.data.firebase.mapper.FirebaseMapper.toDomain
-import com.synaptix.budgetbuddy.data.firebase.model.BudgetDTO
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class GetBudgetsUseCase @Inject constructor(
     private val budgetRepository: FirestoreBudgetRepository,
     private val userRepository: FirestoreUserRepository,
     private val categoryRepository: FirestoreCategoryRepository
-
 ) {
     sealed class GetBudgetsResult {
         data class Success(val budgets: List<Budget>) : GetBudgetsResult()
@@ -24,56 +27,82 @@ class GetBudgetsUseCase @Inject constructor(
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     // Executes the operation to fetch budgets for the specified user
-    suspend fun execute(userId: String): GetBudgetsResult {
+    fun execute(userId: String): Flow<GetBudgetsResult> {
         if (userId.isEmpty()) {
-            return Error("Invalid user ID")
+            return kotlinx.coroutines.flow.flow { 
+                emit(GetBudgetsResult.Error("Invalid user ID")) 
+            }
         }
 
-        return try {
-            val userResult = userRepository.getUserProfile(userId)
-            val user = when (userResult) {
-                is Result.Success -> userResult.data?.toDomain()
-                is Result.Error -> return Error("Failed to get user data: ${userResult.exception.message}")
+        return combine(
+            userRepository.observeUserProfile(userId),
+            budgetRepository.observeBudgetsForUser(userId),
+            categoryRepository.observeCategoriesForUser(userId)
+        ) { user, budgets, categories ->
+            if (user == null) {
+                return@combine GetBudgetsResult.Error("User not found")
             }
 
-            val budgetResult = budgetRepository.getBudgetsForUser(userId)
-            val budgetDTOs = when (budgetResult) {
-                is Result.Success -> budgetResult.data
-                is Result.Error -> return Error("Failed to get budgets: ${budgetResult.exception.message}")
-            }
+            val domainUser = user.toDomain()
 
-            val budgets = budgetDTOs.mapNotNull { budgetDTO ->
-                when (val result = getBudgetData(budgetDTO)) {
-                    is Result.Success -> result.data
-                    is Result.Error -> {
-                        println("Failed to get budget data: ${result.exception.message}")
-                        null
-                    }
+            val categoryMap = categories.associateBy { it.id }
+
+            val fullBudgets = budgets.mapNotNull { dto ->
+                try {
+                    dto.toDomain(
+                        user = domainUser,
+                        categories = dto.categoryIds.mapNotNull { categoryMap[it]?.toDomain(domainUser) }
+                    )
+                } catch (e: Exception) {
+                    Log.e("GetBudgetsUseCase", "Error converting a budget DTO to domain: ${e.message}")
+                    null
                 }
             }
 
-            println("Retrieved ${budgets.size} budgets for user $userId")
-            Success(budgets)
-        } catch (e: Exception) {
-            println("Failed to get budgets: ${e.message}")
-            Error("Failed to get budgets: ${e.message}")
-        }
+            GetBudgetsResult.Success(fullBudgets)
+        }.flowOn(Dispatchers.IO) // Optional for heavy mapping
     }
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-    // Helper function to get full budget data including user and categories
-    private suspend fun getBudgetData(budgetDTO: BudgetDTO): Result<Budget> {
-        val user = when (val result = userRepository.getUserProfile(budgetDTO.userId)) {
-            is Result.Success -> result.data?.toDomain()
-            is Result.Error -> return Result.Error(result.exception)
-        } ?: return Result.Error(Exception("User not found"))
-
-        val categories = when (val result = categoryRepository.getCategoriesByIds(budgetDTO.categoryIds)) {
-            is Result.Success -> result.data.map { it.toDomain(user) }
-            is Result.Error -> return Result.Error(result.exception)
+    fun executeWithDateRange(userId: String, startDate: Long, endDate: Long): Flow<GetBudgetsResult> {
+        if (userId.isEmpty()) {
+            return kotlinx.coroutines.flow.flow {
+                emit(GetBudgetsResult.Error("Invalid user ID"))
+            }
+        }
+        if (startDate > endDate) {
+            return kotlinx.coroutines.flow.flow {
+                emit(GetBudgetsResult.Error("Invalid date range"))
+            }
         }
 
-        return Result.Success(budgetDTO.toDomain(user, categories))
+        return combine(
+            userRepository.observeUserProfile(userId),
+            budgetRepository.observeBudgetsForUser(userId),
+            categoryRepository.observeCategoriesForUser(userId)
+        ) { user, budgets, categories ->
+            if (user == null) {
+                return@combine GetBudgetsResult.Error("User not found")
+            }
+
+            val domainUser = user.toDomain()
+
+            val budgetMap = budgets.associateBy { it.id }
+            val categoryMap = categories.associateBy { it.id }
+
+            val fullBudgets = budgets.mapNotNull { dto ->
+                try {
+                    dto.toDomain(
+                        user = domainUser,
+                        categories = dto.categoryIds.mapNotNull { categoryMap[it]?.toDomain(domainUser) }
+                    )
+                } catch (e: Exception) {
+                    Log.e("GetBudgetsUseCase", "Error converting a budget DTO to domain: ${e.message}")
+                    null
+                }
+            }
+
+            GetBudgetsResult.Success(fullBudgets)
+        }.flowOn(Dispatchers.IO) // Optional for heavy mapping
     }
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~EOF~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
