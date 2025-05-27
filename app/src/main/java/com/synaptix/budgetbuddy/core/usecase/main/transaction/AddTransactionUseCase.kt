@@ -66,6 +66,8 @@ class AddTransactionUseCase @Inject constructor(
 //    }
 //}
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // Executes the operation to add a new transaction
     suspend fun execute(newTransaction: Transaction): AddTransactionResult {
         val newTransactionDTO = newTransaction.toDTO()
 
