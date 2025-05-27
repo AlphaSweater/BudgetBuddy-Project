@@ -21,10 +21,14 @@
 
 package com.synaptix.budgetbuddy.presentation.ui.main.budget
 
+import android.text.style.ForegroundColorSpan
+import android.text.Spannable
+import android.text.SpannableStringBuilder
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import com.google.android.material.progressindicator.LinearProgressIndicator
 import com.synaptix.budgetbuddy.R
 import com.synaptix.budgetbuddy.core.model.Budget
 import com.synaptix.budgetbuddy.core.model.BudgetListItems
@@ -70,6 +74,7 @@ class BudgetMainAdapter(
         private val budgetIcon: ImageView = itemView.findViewById(R.id.budgetIcon)
         private val budgetTitle: TextView = itemView.findViewById(R.id.budgetTitle)
         private val budgetStatus: TextView = itemView.findViewById(R.id.budgetStatus)
+        private val budgetProgress: LinearProgressIndicator = itemView.findViewById(R.id.budgetProgress)
 
         /**
          * Binds budget data to the view.
@@ -77,10 +82,48 @@ class BudgetMainAdapter(
          * Attaches click listener to the entire item view.
          */
         override fun bind(item: BudgetListItems.BudgetBudgetItem) {
-            budgetIcon.setImageResource(R.drawable.ic_money_24)
+            budgetIcon.setImageResource(R.drawable.ic_ui_budget)
             budgetTitle.text = item.budget.name
-            budgetStatus.text = item.status
-            
+
+            val context = itemView.context
+            val spent = item.budget.spent
+            val amount = item.budget.amount
+
+            // --- Setup status text with color ---
+            val statusText = SpannableStringBuilder()
+
+            val spentStr = "R %.2f".format(spent)
+            val spentStart = statusText.length
+            statusText.append(spentStr)
+            statusText.setSpan(
+                ForegroundColorSpan(context.getColor(R.color.expense_red)),
+                spentStart,
+                spentStart + spentStr.length,
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
+
+            statusText.append(" spent of ")
+
+            val amountStr = "R %.2f".format(amount)
+            val amountStart = statusText.length
+            statusText.append(amountStr)
+            statusText.setSpan(
+                ForegroundColorSpan(context.getColor(R.color.profit_green)),
+                amountStart,
+                amountStart + amountStr.length,
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
+
+            budgetStatus.setText(statusText, TextView.BufferType.SPANNABLE)
+
+            // --- Set progress ---
+            val progress = if (amount > 0) {
+                ((spent / amount) * 100).coerceIn(0.0, 100.0)
+            } else {
+                0.0
+            }
+            budgetProgress.progress = progress.toInt()
+
             itemView.setOnClickListener { onBudgetClick(item.budget) }
         }
     }
