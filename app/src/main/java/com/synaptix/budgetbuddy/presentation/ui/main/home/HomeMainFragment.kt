@@ -1,10 +1,12 @@
 package com.synaptix.budgetbuddy.presentation.ui.main.home
 
+import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -12,6 +14,18 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.github.mikephil.charting.charts.BarChart
+import com.github.mikephil.charting.charts.PieChart
+import com.github.mikephil.charting.components.Description
+import com.github.mikephil.charting.components.XAxis
+import com.github.mikephil.charting.data.BarData
+import com.github.mikephil.charting.data.BarDataSet
+import com.github.mikephil.charting.data.BarEntry
+import com.github.mikephil.charting.animation.Easing
+import com.github.mikephil.charting.data.PieData
+import com.github.mikephil.charting.data.PieDataSet
+import com.github.mikephil.charting.data.PieEntry
+import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
 import com.synaptix.budgetbuddy.R
 import com.synaptix.budgetbuddy.core.model.HomeListItems
 import com.synaptix.budgetbuddy.databinding.FragmentHomeBinding
@@ -90,6 +104,8 @@ class HomeMainFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setupViews()
         observeStates()
+        setupBarChart()
+        setupPieChart()
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
@@ -159,6 +175,92 @@ class HomeMainFragment : Fragment() {
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     // Handle different states for wallets, transactions, and categories
+    private fun setupBarChart() {
+        val barChart: BarChart = binding.barChart
+
+        // Sample data: one month's income and expense
+        val income = BarEntry(0f, 5000f) // X = 0
+        val expense = BarEntry(1f, 3200f) // X = 1
+
+        val incomeSet = BarDataSet(listOf(income), "Income").apply {
+            color = resources.getColor(R.color.expense_red, null)
+        }
+
+        val expenseSet = BarDataSet(listOf(expense), "Expense").apply {
+            color = resources.getColor(R.color.profit_green, null)
+        }
+
+        val data = BarData(incomeSet, expenseSet)
+
+        // Adjust bar width and spacing
+        val groupSpace = 0.4f
+        val barSpace = 0.05f
+        val barWidth = 0.25f
+
+        data.barWidth = barWidth
+        barChart.data = data
+
+        // Set X-axis range so both bars fit
+        barChart.xAxis.axisMinimum = -0.5f
+        barChart.xAxis.axisMaximum = 2f
+
+        // Group the bars
+        barChart.groupBars(0f, groupSpace, barSpace)
+
+        // Setup labels
+        barChart.xAxis.apply {
+            granularity = 1f
+            isGranularityEnabled = true
+            setDrawGridLines(false)
+            setCenterAxisLabels(true)
+            position = XAxis.XAxisPosition.BOTTOM
+            valueFormatter = IndexAxisValueFormatter(listOf("March")) // <-- or dynamically set month
+        }
+
+        barChart.description = Description().apply { text = "Monthly Budget" }
+        barChart.axisRight.isEnabled = false
+        barChart.animateY(1000)
+        barChart.invalidate()
+    }
+
+    private fun setupPieChart() {
+        val pieChart: PieChart = binding.pieChart
+
+        // Sample expense categories and values
+        val expenseCategories = listOf("Food", "Transport", "Entertainment", "Bills", "Shopping")
+        val expenseAmounts = listOf(800f, 400f, 300f, 500f, 600f)
+
+        val pieEntries = expenseCategories.mapIndexed { index, category ->
+            PieEntry(expenseAmounts[index], category)
+        }
+
+        val pieDataSet = PieDataSet(pieEntries, "Expense Categories").apply {
+            colors = listOf(
+                ContextCompat.getColor(requireContext(), R.color.cat_dark_green),
+                ContextCompat.getColor(requireContext(), R.color.cat_light_pink),
+                ContextCompat.getColor(requireContext(), R.color.cat_dark_blue),
+                ContextCompat.getColor(requireContext(), R.color.cat_yellow),
+                ContextCompat.getColor(requireContext(), R.color.cat_orange)
+            )
+            valueTextSize = 14f
+            valueTextColor = Color.WHITE
+            sliceSpace = 2f
+        }
+
+        val pieData = PieData(pieDataSet)
+
+        pieChart.data = pieData
+        pieChart.description.isEnabled = false
+        pieChart.centerText = "Expenses"
+        pieChart.setUsePercentValues(true)
+        pieChart.setEntryLabelColor(Color.BLACK)
+
+        // ✅ Correct easing import from MPAndroidChart
+        pieChart.animateY(1000, Easing.EaseInOutQuad)
+        pieChart.invalidate()
+    }
+
+
     private fun handleWalletsState(state: HomeMainViewModel.WalletState) {
         binding.apply {
             when (state) {
