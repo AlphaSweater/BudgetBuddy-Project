@@ -155,7 +155,7 @@ class GeneralReportsFragment : Fragment() {
 
         val incomeDataSet = LineDataSet(incomeEntries, "Income").apply {
             color = ContextCompat.getColor(context, R.color.profit_green)
-            valueTextColor = Color.BLACK
+            valueTextColor = R.attr.bb_primaryText
             lineWidth = 2f
             setCircleColor(ContextCompat.getColor(context, R.color.profit_green))
             circleRadius = 4f
@@ -168,7 +168,7 @@ class GeneralReportsFragment : Fragment() {
 
         val expenseDataSet = LineDataSet(expenseEntries, "Expense").apply {
             color = ContextCompat.getColor(context, R.color.expense_red)
-            valueTextColor = Color.BLACK
+            valueTextColor = R.attr.bb_primaryText
             lineWidth = 2f
             setCircleColor(ContextCompat.getColor(context, R.color.expense_red))
             circleRadius = 4f
