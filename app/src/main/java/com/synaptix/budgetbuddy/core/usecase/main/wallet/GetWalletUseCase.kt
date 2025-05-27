@@ -26,7 +26,8 @@ import com.synaptix.budgetbuddy.data.firebase.repository.FirestoreUserRepository
 import com.synaptix.budgetbuddy.data.firebase.repository.FirestoreWalletRepository
 import com.synaptix.budgetbuddy.core.model.Result
 import com.synaptix.budgetbuddy.data.firebase.mapper.FirebaseMapper.toDomain
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 // UseCase class for fetching the wallets associated with a user
@@ -40,32 +41,29 @@ class GetWalletUseCase @Inject constructor(
         data class Error(val message: String) : GetWalletResult()
     }
 
-    // Executes the operation to get wallets for the specified user
-    suspend fun execute(userId: String): GetWalletResult {
-        // Input validation
+    fun execute(userId: String): Flow<GetWalletResult> {
         if (userId.isEmpty()) {
-            return GetWalletResult.Error("Invalid user ID")
+            return kotlinx.coroutines.flow.flow { 
+                emit(GetWalletResult.Error("Invalid user ID")) 
+            }
         }
 
-        return try {
-            val userResult = userRepository.getUserProfile(userId)
-            val user = when (userResult) {
-                is Result.Success -> userResult.data!!.toDomain()
-                is Result.Error -> return GetWalletResult.Error("Failed to get user data: ${userResult.exception.message}")
+        return userRepository.observeUserProfile(userId)
+            .map { user ->
+                when (user) {
+                    null -> GetWalletResult.Error("User not found")
+                    else -> {
+                        val domainUser = user.toDomain()
+                        walletRepository.observeWalletsForUser(userId)
+                            .map { wallets ->
+                                GetWalletResult.Success(wallets.map { it.toDomain(domainUser) })
+                            }
+                    }
+                }
             }
+    }
 
-            // Attempt to retrieve wallets from the repository
-            val walletsResult = walletRepository.getWalletsForUser(userId)
-            val wallets = when (walletsResult) {
-                is Result.Success -> walletsResult.data.map { it.toDomain(user) }
-                is Result.Error -> return GetWalletResult.Error("Failed to get wallets: ${walletsResult.exception.message}")
-            }
-
-            println("Retrieved ${wallets.size} wallets for user $userId")
-            GetWalletResult.Success(wallets)
-        } catch (e: Exception) {
-            println("Failed to get wallets: ${e.message}")
-            GetWalletResult.Error("An error occurred: ${e.message}")
-        }
+    fun observeTotalBalance(userId: String): Flow<Double> {
+        return walletRepository.observeTotalBalance(userId)
     }
 }

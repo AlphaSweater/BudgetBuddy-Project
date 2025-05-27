@@ -9,6 +9,12 @@ import com.synaptix.budgetbuddy.data.firebase.repository.FirestoreCategoryReposi
 import com.synaptix.budgetbuddy.data.firebase.repository.FirestoreLabelRepository
 import com.synaptix.budgetbuddy.data.firebase.repository.FirestoreUserRepository
 import com.synaptix.budgetbuddy.data.firebase.repository.FirestoreWalletRepository
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class GetTransactionsUseCase @Inject constructor(
@@ -23,83 +29,89 @@ class GetTransactionsUseCase @Inject constructor(
         data class Error(val message: String) : GetTransactionsResult()
     }
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-    // Executes the operation to fetch transactions for the specified user
-    suspend fun execute(userId: String): GetTransactionsResult {
+    fun execute(userId: String): Flow<GetTransactionsResult> {
         if (userId.isEmpty()) {
-            return GetTransactionsResult.Error("Invalid user ID")
+            return flow { emit(GetTransactionsResult.Error("Invalid user ID")) }
         }
 
-        return try {
-            when (val result = transactionRepository.getTransactionsForUser(userId)) {
-                is Result.Success -> {
-                    val fullTransactions = result.data.mapNotNull { dto ->
-                        when (val full = getTransactionData(dto)) {
-                            is Result.Success -> full.data
-                            is Result.Error -> null
-                        }
-                    }
-                    GetTransactionsResult.Success(fullTransactions)
-                }
-                is Result.Error -> GetTransactionsResult.Error("Failed to get transactions: ${result.exception.message}")
+        return combine(
+            userRepository.observeUserProfile(userId),
+            transactionRepository.observeTransactionsForUser(userId),
+            walletRepository.observeWallets(userId),
+            categoryRepository.observeCategories(userId),
+            labelRepository.observeAllLabels(userId)
+        ) { user, transactions, wallets, categories, labels ->
+
+            if (user == null) {
+                return@combine GetTransactionsResult.Error("User not found")
             }
-        } catch (e: Exception) {
-            GetTransactionsResult.Error("Failed to get transactions: ${e.message}")
-        }
+
+            val domainUser = user.toDomain()
+
+            val walletMap = wallets.associateBy { it.id }
+            val categoryMap = categories.associateBy { it.id }
+            val labelMap = labels.associateBy { it.id }
+
+            val fullTransactions = transactions.mapNotNull { dto ->
+                try {
+                    dto.toDomain(
+                        user = domainUser,
+                        wallet = walletMap[dto.walletId]?.toDomain(domainUser),
+                        category = categoryMap[dto.categoryId]?.toDomain(domainUser),
+                        labels = dto.labelIds.mapNotNull { labelId ->
+                            labelMap[labelId]?.toDomain(domainUser)
+                        }
+                    )
+                } catch (e: Exception) {
+                    null
+                }
+            }
+
+            GetTransactionsResult.Success(fullTransactions)
+        }.flowOn(Dispatchers.IO) // Optional for heavy mapping
     }
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-    // Executes the operation to fetch transactions for the specified user within a date range
-    suspend fun executeWithDateRange(userId: String, startDate: Long, endDate: Long): GetTransactionsResult {
+    fun executeWithDateRange(userId: String, startDate: Long, endDate: Long): Flow<GetTransactionsResult> {
         if (userId.isEmpty()) {
-            return GetTransactionsResult.Error("Invalid user ID")
+            return kotlinx.coroutines.flow.flow { 
+                emit(GetTransactionsResult.Error("Invalid user ID")) 
+            }
         }
         if (startDate > endDate) {
-            return GetTransactionsResult.Error("Invalid date range")
+            return kotlinx.coroutines.flow.flow { 
+                emit(GetTransactionsResult.Error("Invalid date range")) 
+            }
         }
 
-        return try {
-            when (val result = transactionRepository.getTransactionsForUserInDateRange(userId, startDate, endDate)) {
-                is Result.Success -> {
-                    val fullTransactions = result.data.mapNotNull { dto ->
-                        when (val full = getTransactionData(dto)) {
-                            is Result.Success -> full.data
-                            is Result.Error -> null
+        return combine(
+            userRepository.observeUserProfile(userId),
+            transactionRepository.observeTransactionsInDateRange(userId, startDate, endDate)
+        ) { user, transactions ->
+            when (user) {
+                null -> GetTransactionsResult.Error("User not found")
+                else -> {
+                    val domainUser = user.toDomain()
+                    val fullTransactions = transactions.mapNotNull { dto ->
+                        try {
+                            dto.toDomain(
+                                user = domainUser,
+                                wallet = walletRepository.observeWallet(dto.userId, dto.walletId).first()!!.toDomain(domainUser),
+                                category = categoryRepository.observeCategory(dto.userId, dto.categoryId).first()!!.toDomain(domainUser),
+                                labels = labelRepository.observeLabels(dto.userId, dto.labelIds).first()
+                                    .map { it.toDomain(domainUser) }
+                            )
+                        } catch (e: Exception) {
+                            null
                         }
                     }
                     GetTransactionsResult.Success(fullTransactions)
                 }
-                is Result.Error -> GetTransactionsResult.Error("Failed to get transactions: ${result.exception.message}")
             }
-        } catch (e: Exception) {
-            GetTransactionsResult.Error("Failed to get transactions: ${e.message}")
         }
     }
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-    // Helper function to get full transaction data including user, wallet, category, and labels
-    private suspend fun getTransactionData(transaction: TransactionDTO): Result<Transaction> {
-        val user = when (val result = userRepository.getUserProfile(transaction.userId)) {
-            is Result.Success -> result.data?.toDomain()
-            is Result.Error -> return Result.Error(result.exception)
-        } ?: return Result.Error(Exception("User not found"))
-
-        val wallet = when (val result = walletRepository.getWalletById(transaction.walletId)) {
-            is Result.Success -> result.data?.toDomain(user)
-            is Result.Error -> return Result.Error(result.exception)
-        } ?: return Result.Error(Exception("Wallet not found"))
-
-        val category = when (val result = categoryRepository.getCategoryById(transaction.categoryId)) {
-            is Result.Success -> result.data?.toDomain(user)
-            is Result.Error -> return Result.Error(result.exception)
-        } ?: return Result.Error(Exception("Category not found"))
-
-        val labels = when (val result = labelRepository.getLabelsByIds(transaction.labelIds)) {
-            is Result.Success -> result.data.map { it.toDomain(user) }
-            is Result.Error -> return Result.Error(result.exception)
-        }
-
-        return Result.Success(transaction.toDomain(user, wallet, category, labels))
+    fun observeTotalAmountInDateRange(userId: String, startDate: Long, endDate: Long): Flow<Double> {
+        return transactionRepository.observeTotalAmountInDateRange(userId, startDate, endDate)
     }
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~EOF~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\

@@ -5,6 +5,7 @@ import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FirebaseFirestore
 import com.synaptix.budgetbuddy.core.model.Result
 import com.synaptix.budgetbuddy.data.firebase.model.UserDTO
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -13,9 +14,12 @@ import javax.inject.Singleton
 class FirestoreUserRepository @Inject constructor(
     private val auth: FirebaseAuth,
     private val firestore: FirebaseFirestore
-) {
+) : BaseFirestoreRepository<UserDTO>(firestore) {
 
-    private val usersCollection = firestore.collection("users")
+    override val collection = firestore.collection("users")
+    override val subCollectionName = null // Users are at the root level
+
+    override fun getType(): Class<UserDTO> = UserDTO::class.java
 
     // Get current Firebase authenticated user
     fun getCurrentUser(): FirebaseUser? = auth.currentUser
@@ -36,7 +40,7 @@ class FirestoreUserRepository @Inject constructor(
                 updatedAt = System.currentTimeMillis()
             )
 
-            usersCollection.document(firebaseUser.uid).set(newUser).await()
+            create(newUser, firebaseUser.uid, firebaseUser.uid)
             Result.Success(newUser)
         } catch (e: Exception) {
             Result.Error(e)
@@ -50,10 +54,7 @@ class FirestoreUserRepository @Inject constructor(
             val firebaseUser = authResult.user ?: throw Exception("Failed to login user")
 
             // Update login time
-            usersCollection.document(firebaseUser.uid)
-                .update("lastLoginAt", System.currentTimeMillis())
-                .await()
-
+            update(firebaseUser.uid, firebaseUser.uid, mapOf("lastLoginAt" to System.currentTimeMillis()))
             Result.Success(firebaseUser)
         } catch (e: Exception) {
             Result.Error(e)
@@ -72,12 +73,7 @@ class FirestoreUserRepository @Inject constructor(
 
     // Get user profile
     suspend fun getUserProfile(userId: String): Result<UserDTO?> {
-        return try {
-            val snapshot = usersCollection.document(userId).get().await()
-            Result.Success(snapshot.toObject(UserDTO::class.java))
-        } catch (e: Exception) {
-            Result.Error(e)
-        }
+        return getById(userId, userId)
     }
 
     // Get current user profile
@@ -86,11 +82,16 @@ class FirestoreUserRepository @Inject constructor(
         return getUserProfile(userId)
     }
 
+    // Observe user profile changes in real-time
+    fun observeUserProfile(userId: String): Flow<UserDTO?> {
+        return observeDocument(userId, userId)
+    }
+
     // Update user profile with provided fields
     suspend fun updateUserProfile(userId: String, updates: Map<String, Any>): Result<Unit> {
         return try {
             val dataWithTimestamp = updates + mapOf("updatedAt" to System.currentTimeMillis())
-            usersCollection.document(userId).update(dataWithTimestamp).await()
+            update(userId, userId, dataWithTimestamp)
             Result.Success(Unit)
         } catch (e: Exception) {
             Result.Error(e)
@@ -103,7 +104,7 @@ class FirestoreUserRepository @Inject constructor(
             val user = auth.currentUser ?: throw Exception("No user logged in")
 
             // Delete Firestore document
-            usersCollection.document(user.uid).delete().await()
+            delete(user.uid, user.uid)
 
             // Delete from Firebase Auth
             user.delete().await()
