@@ -48,6 +48,7 @@ class BudgetAddFragment : Fragment() {
 
     private val viewModel: BudgetAddViewModel by activityViewModels()
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     // --- Fragment Lifecycle Methods ---
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -74,6 +75,7 @@ class BudgetAddFragment : Fragment() {
         _binding = null
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     // --- Setup Methods ---
     private fun setupUI() {
         setupCurrencySpinner()
@@ -94,13 +96,14 @@ class BudgetAddFragment : Fragment() {
         binding.rowSelectWallet.setOnClickListener { showWalletSelector() }
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     // --- Save Logic ---
     private fun saveBudget() {
         viewModel.budgetName.value = binding.budgetName.text.toString()
         viewModel.budgetAmount.value = binding.amount.text.toString().toDoubleOrNull() ?: 0.0
 
         if (viewModel.selectedCategories.value.isNullOrEmpty() ||
-            viewModel.wallet.value == null ||
+//            viewModel.wallet.value == null ||
             viewModel.budgetName.value.isNullOrBlank() ||
             viewModel.budgetAmount.value!! <= 0.0
         ) {
@@ -132,6 +135,7 @@ class BudgetAddFragment : Fragment() {
         }
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     // --- Popup Navigation ---
     private fun showWalletSelector() {
         findNavController().navigate(R.id.action_budgetAddFragment_to_budgetSelectWalletFragment)
@@ -141,6 +145,7 @@ class BudgetAddFragment : Fragment() {
         findNavController().navigate(R.id.action_budgetAddFragment_to_budgetSelectCategoryFragment)
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     // --- Update Methods ---
     private fun updateSelectedWallet(walletName: String) {
         if (walletName.isBlank()) {
@@ -160,6 +165,7 @@ class BudgetAddFragment : Fragment() {
         binding.textSelectedCategoryName.text = categoryNames
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     // --- Observers ---
     private fun observeViewModel() {
         viewModel.selectedCategories.observe(viewLifecycleOwner) { categories ->
@@ -180,3 +186,4 @@ class BudgetAddFragment : Fragment() {
         }
     }
 }
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~EOF~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\

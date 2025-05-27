@@ -3,9 +3,6 @@ package com.synaptix.budgetbuddy.data.firebase.repository
 import com.google.firebase.firestore.FirebaseFirestore
 import com.synaptix.budgetbuddy.core.model.Result
 import com.synaptix.budgetbuddy.data.firebase.model.WalletDTO
-import kotlinx.coroutines.channels.awaitClose
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -14,8 +11,10 @@ import javax.inject.Singleton
 class FirestoreWalletRepository @Inject constructor(
     firestore: FirebaseFirestore
 ) : BaseFirestoreRepository<WalletDTO>(firestore) {
-    
+
     override val collection = firestore.collection("wallets")
+
+    override fun getType(): Class<WalletDTO> = WalletDTO::class.java
 
     // Create a new wallet
     suspend fun createWallet(wallet: WalletDTO): Result<String> {
@@ -36,34 +35,25 @@ class FirestoreWalletRepository @Inject constructor(
     suspend fun deleteWallet(walletId: String): Result<Unit> = delete(walletId)
 
     // Get a single wallet by ID
-    fun getWalletById(walletId: String): Flow<Result<WalletDTO?>> = getById(walletId) { docRef ->
-        callbackFlow {
-            val listener = docRef.addSnapshotListener { snapshot, error ->
-                if (error != null) {
-                    trySend(Result.Error(error))
-                    return@addSnapshotListener
-                }
-                val wallet = snapshot?.toObject(WalletDTO::class.java)
-                trySend(Result.Success(wallet))
-            }
-            awaitClose { listener.remove() }
+    suspend fun getWalletById(walletId: String): Result<WalletDTO?> {
+        return try {
+            val snapshot = collection.document(walletId).get().await()
+            Result.Success(snapshot.toObject(WalletDTO::class.java))
+        } catch (e: Exception) {
+            Result.Error(e)
         }
     }
 
     // Get all wallets for a user
-    fun getWalletsForUser(userId: String): Flow<Result<List<WalletDTO>>> = getAll(createBaseQueryWithUserId(userId)) { query ->
-        callbackFlow {
-            val listener = query.addSnapshotListener { snapshot, error ->
-                if (error != null) {
-                    trySend(Result.Error(error))
-                    return@addSnapshotListener
-                }
-                val wallets = snapshot?.documents?.mapNotNull { 
-                    it.toObject(WalletDTO::class.java)
-                } ?: emptyList()
-                trySend(Result.Success(wallets))
+    suspend fun getWalletsForUser(userId: String): Result<List<WalletDTO>> {
+        return try {
+            val snapshot = createBaseQueryWithUserId(userId).get().await()
+            val wallets = snapshot.documents.mapNotNull {
+                it.toObject(WalletDTO::class.java)
             }
-            awaitClose { listener.remove() }
+            Result.Success(wallets)
+        } catch (e: Exception) {
+            Result.Error(e)
         }
     }
 
@@ -100,7 +90,7 @@ class FirestoreWalletRepository @Inject constructor(
     }
 
     // Check if a wallet name already exists for a user
-    suspend fun walletNameExists(userId: String, name: String): Result<Boolean> = 
+    suspend fun walletNameExists(userId: String, name: String): Result<Boolean> =
         checkNameExists(userId, name)
 
     // Create default wallet for a new user

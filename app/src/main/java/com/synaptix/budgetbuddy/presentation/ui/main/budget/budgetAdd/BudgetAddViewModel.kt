@@ -27,6 +27,7 @@ import androidx.lifecycle.viewModelScope
 import com.synaptix.budgetbuddy.core.model.Category
 import com.synaptix.budgetbuddy.core.model.Wallet
 import com.synaptix.budgetbuddy.core.usecase.auth.GetUserIdUseCase
+import com.synaptix.budgetbuddy.core.usecase.auth.ValidateUserTotalsUseCase
 import com.synaptix.budgetbuddy.data.firebase.model.BudgetDTO
 import com.synaptix.budgetbuddy.data.firebase.repository.FirestoreBudgetRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -37,9 +38,11 @@ import javax.inject.Inject
 @HiltViewModel
 class BudgetAddViewModel @Inject constructor(
     private val firestoreBudgetRepository: FirestoreBudgetRepository,
-    private val getUserIdUseCase: GetUserIdUseCase
+    private val getUserIdUseCase: GetUserIdUseCase,
+    private val validateUserTotalsUseCase: ValidateUserTotalsUseCase
 ) : ViewModel() {
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     // LiveData for budget input fields
     val budgetName = MutableLiveData<String?>()
     val wallet = MutableLiveData<Wallet?>()
@@ -49,34 +52,35 @@ class BudgetAddViewModel @Inject constructor(
     private val _error = MutableLiveData<String?>()
     val error: MutableLiveData<String?> = _error
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     // Function to Add Budget
     suspend fun addBudget() {
-        viewModelScope.launch {
-            try {
-                val userId = getUserIdUseCase.execute()
-                val budget = BudgetDTO(
-                    userId = userId,
-                    name = budgetName.value ?: "",
-                    amount = budgetAmount.value ?: 0.0,
-                    spent = 0.0,
-                    categoryIds = selectedCategories.value?.map { it.id } ?: emptyList(),
-                    startDate = System.currentTimeMillis()
-                )
+        try {
+            val userId = getUserIdUseCase.execute()
+            val budget = BudgetDTO(
+                userId = userId,
+                name = budgetName.value ?: "",
+                amount = budgetAmount.value ?: 0.0,
+                spent = 0.0,
+                categoryIds = selectedCategories.value?.map { it.id } ?: emptyList(),
+                startDate = System.currentTimeMillis()
+            )
 
-                when (val result = firestoreBudgetRepository.createBudget(budget)) {
-                    is com.synaptix.budgetbuddy.core.model.Result.Success -> {
-                        reset()
-                    }
-                    is com.synaptix.budgetbuddy.core.model.Result.Error -> {
-                        _error.value = result.exception.message
-                    }
+            when (val result = firestoreBudgetRepository.createBudget(budget)) {
+                is com.synaptix.budgetbuddy.core.model.Result.Success -> {
+                    // OK
+//                    validateUserTotalsUseCase.execute(userId)
                 }
-            } catch (e: Exception) {
-                _error.value = e.message
+                is com.synaptix.budgetbuddy.core.model.Result.Error -> {
+                    _error.value = result.exception.message
+                }
             }
+        } catch (e: Exception) {
+            _error.value = e.message
         }
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     // Function to Reset Input Fields
     fun reset() {
         budgetName.value = null
@@ -86,3 +90,4 @@ class BudgetAddViewModel @Inject constructor(
         _error.value = null
     }
 }
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~EOF~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\

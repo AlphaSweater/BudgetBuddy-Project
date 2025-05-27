@@ -10,6 +10,8 @@ import java.net.URL
 
 class GetImageUseCase {
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // Executes the operation to fetch an image from a URL
     suspend fun execute(imageUrl: String): Result<Bitmap> {
         return withContext(Dispatchers.IO){
             try{
@@ -34,3 +36,4 @@ class GetImageUseCase {
         }
     }
 }
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~EOF~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\

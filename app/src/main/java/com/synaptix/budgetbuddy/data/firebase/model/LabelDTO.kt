@@ -9,6 +9,7 @@ data class LabelDTO(
     val id: String = "", // Firestore document ID
     val userId: String? = null, // Nullable to allow for default labels
     val name: String = "",
+    val isDefault: Boolean = false, // Whether this is a default label
     val createdAt: Long = System.currentTimeMillis(),
     val updatedAt: Long = System.currentTimeMillis()
 )

@@ -33,6 +33,7 @@
         <item name="bb_expense">@color/expense_red</item>
         <item name="bb_profit">@color/profit_green</item>
         <item name="bb_button">@color/button</item>
+        <item name="bb_buttonText">@android:color/white</item>
         <item name="bb_buttonSelected">@color/light_button_selected</item>
 
         <!-- Material theme compatibility (fallback) -->

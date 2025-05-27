@@ -25,7 +25,6 @@ import java.util.Locale
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.provider.MediaStore
-import android.text.Editable
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.core.widget.doAfterTextChanged
@@ -37,6 +36,7 @@ import com.synaptix.budgetbuddy.core.model.RecurrenceData
 import com.synaptix.budgetbuddy.core.model.Wallet
 import com.synaptix.budgetbuddy.extentions.getThemeColor
 import kotlin.toString
+import com.synaptix.budgetbuddy.core.model.Label
 
 @AndroidEntryPoint
 class TransactionAddFragment : Fragment() {
@@ -50,6 +50,7 @@ class TransactionAddFragment : Fragment() {
     private lateinit var pickImageLauncher: ActivityResultLauncher<String>
     private var tempImageUri: Uri? = null
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     // --- Lifecycle ---
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -60,6 +61,8 @@ class TransactionAddFragment : Fragment() {
         return binding.root
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // --- Fragment Lifecycle ---
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupViews()
@@ -67,16 +70,19 @@ class TransactionAddFragment : Fragment() {
         observeViewModel()
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     override fun onResume() {
         super.onResume()
         restoreState()
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     // --- Setup Methods ---
     private fun setupViews() {
         setupCurrencySpinner()
@@ -84,8 +90,10 @@ class TransactionAddFragment : Fragment() {
         setupTextWatchers()
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private fun restoreState() {
         if (!viewModel.saveState.value!!) {
+            reset()
             return
         }
 
@@ -96,6 +104,7 @@ class TransactionAddFragment : Fragment() {
         }
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     //Handles the setup of the currency spinner.
     private fun setupCurrencySpinner() {
         val adapter = ArrayAdapter(
@@ -108,6 +117,8 @@ class TransactionAddFragment : Fragment() {
         binding.spinnerCurrency.adapter = adapter
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    //Handles the setup of click listeners for various UI elements.
     private fun setupClickListeners() {
         with(binding) {
             btnGoBack.setOnClickListener {
@@ -124,6 +135,10 @@ class TransactionAddFragment : Fragment() {
 
             rowSelectWallet.setOnClickListener {
                 showWalletSelector()
+            }
+
+            rowSelectLabels.setOnClickListener {
+                showLabelsSelector()
             }
 
             rowSelectDate.setOnClickListener {
@@ -144,9 +159,11 @@ class TransactionAddFragment : Fragment() {
         }
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    //Handles the setup of text watchers for input fields.
     private fun setupTextWatchers() {
         binding.edtTextAmount.doAfterTextChanged { text ->
-            viewModel.setAmount(text.toString())
+            viewModel.setAmount(text.toString().toDoubleOrNull())
         }
 
         binding.edtTextNote.doAfterTextChanged { text ->
@@ -154,6 +171,8 @@ class TransactionAddFragment : Fragment() {
         }
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    //Handles the setup of image pickers for taking or selecting photos.
     private fun setupImagePickers() {
         takePictureLauncher = registerForActivityResult(ActivityResultContracts.TakePicture()) { success ->
             if (success && tempImageUri != null) {
@@ -175,6 +194,8 @@ class TransactionAddFragment : Fragment() {
         }
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // --- Image Handling ---
     private fun handleImageResult(uri: Uri) {
         try {
             requireContext().contentResolver.openInputStream(uri)?.use { inputStream ->
@@ -187,6 +208,8 @@ class TransactionAddFragment : Fragment() {
         }
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    //Handles showing the date picker dialog for selecting a date.
     private fun showDatePicker() {
         val picker = MaterialDatePicker.Builder.datePicker()
             .setTitleText("Select Date")
@@ -202,6 +225,8 @@ class TransactionAddFragment : Fragment() {
         picker.show(parentFragmentManager, "DATE_PICKER")
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    //Handles showing the image preview in a dialog.
     private fun showImagePreview(bytes: ByteArray?) {
         if (bytes == null) {
             binding.imagePreviewContainer.visibility = View.GONE
@@ -213,11 +238,16 @@ class TransactionAddFragment : Fragment() {
         binding.imagePreview.setImageBitmap(bitmap)
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    //Handles removing the selected photo from the transaction.
     private fun removePhoto() {
         viewModel.setImageBytes(null)
         binding.imagePreviewContainer.visibility = View.GONE
         binding.imagePreview.setImageBitmap(null)
     }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    //Handles showing the full-screen image in a dialog.
     private fun showFullScreenImage() {
         viewModel.imageBytes.value?.let { bytes ->
             val dialog = AlertDialog.Builder(requireContext(), R.style.FullScreenDialog)
@@ -241,6 +271,8 @@ class TransactionAddFragment : Fragment() {
         }
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    //Handles showing the dialog for selecting image source (camera or gallery).
     private fun showImageSourceDialog() {
         val options = arrayOf("Take Photo", "Choose from Gallery", "Cancel")
         AlertDialog.Builder(requireContext())
@@ -255,6 +287,8 @@ class TransactionAddFragment : Fragment() {
             .show()
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    //Handles launching the camera to take a photo.
     private fun launchCamera() {
         val contentValues = ContentValues().apply {
             put(MediaStore.Images.Media.DISPLAY_NAME, "transaction_${System.currentTimeMillis()}.jpg")
@@ -274,19 +308,33 @@ class TransactionAddFragment : Fragment() {
         }
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     // --- Update Methods ---
+    private fun updateSelectedLabels(labels: List<Label>) {
+        binding.chipGroupLabels.removeAllViews()
+        
+        if (labels.isEmpty()) {
+            binding.textSelectedLabels.visibility = View.VISIBLE
+            return
+        }
 
-//    private fun updateSelectedLabels(labels: List<String>) {
-//        if (labels.isEmpty()) {
-//            binding.textSelectedLabelName.text = "No labels selected"
-//            return
-//        }
-//        binding.textSelectedLabelName.text = labels.joinToString(", ")
-//    }
+        binding.textSelectedLabels.visibility = View.GONE
+        
+        labels.forEach { label ->
+            val chip = com.google.android.material.chip.Chip(requireContext()).apply {
+                text = label.name
+                isCloseIconVisible = true
+                setOnCloseIconClickListener {
+                    viewModel.removeLabel(label)
+                }
+            }
+            binding.chipGroupLabels.addView(chip)
+        }
+    }
 
     private fun updateSelectedCategory(category: Category?) {
         if (category == null) {
-            binding.textSelectedCategoryName.text = "Select Category"
+            binding.textSelectedCategoryName.text = "Select category"
             binding.imgSelectedCategoryIcon.setImageResource(R.drawable.ic_ui_categories)
             binding.imgSelectedCategoryIcon.setColorFilter(requireContext().getThemeColor(R.attr.bb_accent))
             return
@@ -299,7 +347,7 @@ class TransactionAddFragment : Fragment() {
 
     private fun updateSelectedWallet(wallet: Wallet?) {
         if (wallet == null) {
-            binding.textSelectedWalletName.text = "Select Wallet"
+            binding.textSelectedWalletName.text = "Select wallet"
             return
         }
         binding.textSelectedWalletName.text = wallet.name
@@ -309,22 +357,23 @@ class TransactionAddFragment : Fragment() {
         if (date == null) {
             val currentDate = LocalDate.now()
             val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
-            binding.edtTextDate.text = currentDate.format(formatter)
+            binding.textSelectedDate.text = currentDate.format(formatter)
             return
         }
-        binding.edtTextDate.text = date
+        binding.textSelectedDate.text = date
     }
 
     private fun updateSelectedRecurrence(recurrence: RecurrenceData) {
         binding.textSelectedRecurrenceRate.text = recurrence.toDisplayString()
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     // --- Save Logic ---
     private fun saveTransaction() {
-        val amount = binding.edtTextAmount.text.toString()
+        val amount = binding.edtTextAmount.text.toString().toDoubleOrNull()
         viewModel.setAmount(amount)
 
-        val date = binding.edtTextDate.text.toString()
+        val date = binding.textSelectedDate.text.toString()
         viewModel.setDate(date)
 
         val note = binding.edtTextNote.text.toString()
@@ -350,8 +399,9 @@ class TransactionAddFragment : Fragment() {
         }
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     // --- Popup Navigation ---
-    private fun showLabelSelector() {
+    private fun showLabelsSelector() {
         findNavController().navigate(R.id.action_transactionAddFragment_to_transactionSelectLabelFragment)
     }
 
@@ -367,6 +417,7 @@ class TransactionAddFragment : Fragment() {
         findNavController().navigate(R.id.action_transactionAddFragment_to_transactionSelectRecurrenceFragment)
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     // --- Observers ---
     private fun observeViewModel() {
         viewLifecycleOwner.lifecycleScope.launch {
@@ -397,6 +448,10 @@ class TransactionAddFragment : Fragment() {
             updateSelectedRecurrence(rate)
         }
 
+        viewModel.selectedLabels.observe(viewLifecycleOwner) { labels ->
+            updateSelectedLabels(labels)
+        }
+
         viewModel.imageBytes.observe(viewLifecycleOwner) { bytes ->
             if (bytes != null) {
                 val bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
@@ -410,25 +465,33 @@ class TransactionAddFragment : Fragment() {
         }
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // --- UI State Handlers ---
     private fun handleUiState(state: TransactionAddViewModel.UiState) {
         when (state) {
             is TransactionAddViewModel.UiState.Loading -> {
                 binding.btnSave.isEnabled = false
+                binding.loadingOverlay.visibility = View.VISIBLE
             }
             is TransactionAddViewModel.UiState.Success -> {
+                binding.loadingOverlay.visibility = View.GONE
                 showSuccess("Transaction added successfully")
                 findNavController().popBackStack()
             }
             is TransactionAddViewModel.UiState.Error -> {
-                binding.btnSave.isEnabled = false
+                binding.btnSave.isEnabled = true
+                binding.loadingOverlay.visibility = View.GONE
                 showError(state.message)
             }
             else -> {
                 binding.btnSave.isEnabled = true
+                binding.loadingOverlay.visibility = View.GONE
             }
         }
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    //Handles the validation state and shows/hides error messages for each field.
     private fun handleValidationState(state: TransactionAddViewModel.ValidationState) {
         with(binding) {
             // Show/hide error messages for each field
@@ -459,18 +522,22 @@ class TransactionAddFragment : Fragment() {
         }
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private fun showError(message: String) {
         Snackbar.make(binding.root, message, Snackbar.LENGTH_SHORT)
             .setBackgroundTint(resources.getColor(R.color.error, null))
             .show()
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private fun showSuccess(message: String) {
         Snackbar.make(binding.root, message, Snackbar.LENGTH_SHORT)
             .setBackgroundTint(resources.getColor(R.color.success, null))
             .show()
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // Resets the form to its initial state
     private fun reset() {
         viewModel.reset()
         binding.apply {
@@ -479,3 +546,4 @@ class TransactionAddFragment : Fragment() {
         }
     }
 }
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~EOF~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\

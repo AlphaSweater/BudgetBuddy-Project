@@ -4,13 +4,16 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.github.mikephil.charting.data.PieEntry
 import com.synaptix.budgetbuddy.core.model.Category
 import com.synaptix.budgetbuddy.core.model.Transaction
 import com.synaptix.budgetbuddy.core.model.Wallet
 import com.synaptix.budgetbuddy.core.usecase.auth.GetUserIdUseCase
 import com.synaptix.budgetbuddy.core.usecase.main.category.GetCategoriesUseCase
+import com.synaptix.budgetbuddy.core.usecase.main.display.TotalWalletUseCase
 import com.synaptix.budgetbuddy.core.usecase.main.transaction.GetTransactionsUseCase
 import com.synaptix.budgetbuddy.core.usecase.main.wallet.GetWalletUseCase
+import com.synaptix.budgetbuddy.data.firebase.model.TransactionDTO
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -26,8 +29,12 @@ class HomeMainViewModel @Inject constructor(
     private val getWalletUseCase: GetWalletUseCase,
     private val getTransactionsUseCase: GetTransactionsUseCase,
     private val getCategoriesUseCase: GetCategoriesUseCase,
-    private val getUserIdUseCase: GetUserIdUseCase
+    private val getUserIdUseCase: GetUserIdUseCase,
+    private val getTotalWalletUseCase: TotalWalletUseCase
 ) : ViewModel() {
+
+    private val _pieEntries = MutableLiveData<List<PieEntry>>()
+    val pieEntries: LiveData<List<PieEntry>> = _pieEntries
 
     sealed class WalletState {
         object Loading : WalletState()
@@ -47,17 +54,29 @@ class HomeMainViewModel @Inject constructor(
         data class Error(val message: String) : CategoryState()
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // StateFlow for UI states
     private val _walletsState = MutableStateFlow<WalletState>(WalletState.Loading)
     val walletsState: StateFlow<WalletState> = _walletsState
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private val _transactionsState = MutableStateFlow<TransactionState>(TransactionState.Loading)
     val transactionsState: StateFlow<TransactionState> = _transactionsState
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private val _categoriesState = MutableStateFlow<CategoryState>(CategoryState.Loading)
     val categoriesState: StateFlow<CategoryState> = _categoriesState
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    //for total wallet balance
+    private val _totalWalletBalance = MutableStateFlow<Double?>(null)
+    val totalWalletBalance: StateFlow<Double?> get() = _totalWalletBalance
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // LiveData for selected start and end dates, and selected transaction
     private var _selectedStartDate = ""
     var selectedStartDate: String
         get() = _selectedStartDate
@@ -66,6 +85,7 @@ class HomeMainViewModel @Inject constructor(
             loadTransactions()
         }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private var _selectedEndDate = ""
     var selectedEndDate: String
         get() = _selectedEndDate
@@ -74,9 +94,11 @@ class HomeMainViewModel @Inject constructor(
             loadTransactions()
         }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private val _selectedTransaction = MutableLiveData<Transaction>()
     val selectedTransaction: LiveData<Transaction> = _selectedTransaction
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private var currentFilter: TransactionFilter = TransactionFilter.ALL
         set(value) {
             field = value
@@ -87,12 +109,16 @@ class HomeMainViewModel @Inject constructor(
         refreshData()
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     fun refreshData() {
         loadWallets()
         loadTransactions()
         loadCategories()
+        loadTotalWalletBalance()
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // Load data methods
     private fun loadWallets() {
         viewModelScope.launch {
             _walletsState.value = WalletState.Loading
@@ -112,15 +138,30 @@ class HomeMainViewModel @Inject constructor(
         }
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // Load transactions with optional date filtering
     private fun loadTransactions() {
         viewModelScope.launch {
             _transactionsState.value = TransactionState.Loading
             try {
                 val userId = getUserIdUseCase.execute()
-                when (val result = getTransactionsUseCase.execute(userId)) {
+                if (userId.isEmpty()) {
+                    _transactionsState.value = TransactionState.Error("User ID is empty")
+                    return@launch
+                }
+
+                val result = if (_selectedStartDate.isNotEmpty() && _selectedEndDate.isNotEmpty()) {
+                    val startDate = dateFormat.parse(_selectedStartDate)?.time ?: 0L
+                    val endDate = dateFormat.parse(_selectedEndDate)?.time ?: 0L
+                    getTransactionsUseCase.executeWithDateRange(userId, startDate, endDate)
+                } else {
+                    getTransactionsUseCase.execute(userId)
+                }
+
+                when (result) {
                     is GetTransactionsUseCase.GetTransactionsResult.Success -> {
-                        val filteredTransactions = filterTransactions(result.transactions)
-                        _transactionsState.value = TransactionState.Success(filteredTransactions)
+                        val filtered = filterTransactions(result.transactions)
+                        _transactionsState.value = TransactionState.Success(filtered)
                     }
                     is GetTransactionsUseCase.GetTransactionsResult.Error -> {
                         _transactionsState.value = TransactionState.Error(result.message)
@@ -132,15 +173,10 @@ class HomeMainViewModel @Inject constructor(
         }
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // Filter transactions based on the current filter
     private fun filterTransactions(transactions: List<Transaction>): List<Transaction> {
         var filtered = transactions
-
-        // Apply date range filter if dates are selected
-        if (_selectedStartDate.isNotEmpty() && _selectedEndDate.isNotEmpty()) {
-            filtered = filtered.filter { transaction ->
-                isTransactionInDateRange(transaction.date, _selectedStartDate, _selectedEndDate)
-            }
-        }
 
         // Apply current filter
         filtered = when (currentFilter) {
@@ -153,18 +189,7 @@ class HomeMainViewModel @Inject constructor(
         return filtered.sortedByDescending { it.date }
     }
 
-    private fun isTransactionInDateRange(transactionDate: Long, startDate: String, endDate: String): Boolean {
-        return try {
-            val start = dateFormat.parse(startDate)?.time ?: return false
-            val end = dateFormat.parse(endDate)?.time ?: return false
-
-            transactionDate in start..end
-        } catch (e: Exception) {
-            println("Date parsing error: ${e.message}")
-            false
-        }
-    }
-
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private fun isToday(date: Long): Boolean {
         return try {
             val dateDate = dateFormat.format(Date(date))
@@ -178,6 +203,7 @@ class HomeMainViewModel @Inject constructor(
         }
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private fun isThisWeek(date: Long): Boolean {
         return try {
             val dateDate = dateFormat.format(Date(date))
@@ -191,6 +217,7 @@ class HomeMainViewModel @Inject constructor(
         }
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private fun isThisMonth(date: Long): Boolean {
         return try {
             val dateDate = dateFormat.format(Date(date))
@@ -204,6 +231,8 @@ class HomeMainViewModel @Inject constructor(
         }
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // Load categories
     private fun loadCategories() {
         viewModelScope.launch {
             _categoriesState.value = CategoryState.Loading
@@ -223,24 +252,54 @@ class HomeMainViewModel @Inject constructor(
         }
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // Load total wallet balance for display in textview
+    fun loadTotalWalletBalance() {
+        viewModelScope.launch {
+            try {
+                val userId = getUserIdUseCase.execute()
+                val total = getTotalWalletUseCase.execute(userId)
+                _totalWalletBalance.value = total
+            } catch (e: Exception) {
+                _totalWalletBalance.value = 0.0
+            }
+        }
+    }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     fun setTransaction(transaction: Transaction) {
         _selectedTransaction.value = transaction
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     fun setTransactionFilter(filter: TransactionFilter) {
         currentFilter = filter
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     fun clearDateFilter() {
         _selectedStartDate = ""
         _selectedEndDate = ""
         loadTransactions()
     }
+
+    fun updatePieChartWithTransactions(transactions: List<TransactionDTO>, categoriesMap: Map<String, Category>) {
+        val transactionsGroupedByCategory = transactions.groupingBy { it.categoryId }.eachCount()
+
+        val pieEntries = transactionsGroupedByCategory.mapNotNull { (categoryId, count) ->
+            val categoryName = categoriesMap[categoryId]?.name ?: return@mapNotNull null
+            PieEntry(count.toFloat(), categoryName)
+        }
+
+        _pieEntries.value = pieEntries
+    }
 }
 
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
 enum class TransactionFilter {
     ALL,
     TODAY,
     THIS_WEEK,
     THIS_MONTH
 }
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~EOF~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\

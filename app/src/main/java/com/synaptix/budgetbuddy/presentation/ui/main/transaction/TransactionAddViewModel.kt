@@ -52,87 +52,116 @@ class TransactionAddViewModel @Inject constructor(
         val shouldShowErrors: Boolean = false
     )
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // UI State
     private val _uiState = MutableStateFlow<UiState>(UiState.Initial)
     val uiState: StateFlow<UiState> = _uiState
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // Validation State
     private val _validationState = MutableLiveData(ValidationState())
     val validationState: LiveData<ValidationState> = _validationState
 
-    // Form fields
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // Form Fields
     private val _category = MutableLiveData<Category?>()
-    val category: LiveData<Category?>
-        get() = _category
+    val category: LiveData<Category?> = _category
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private val _wallet = MutableLiveData<Wallet?>()
-    val wallet: LiveData<Wallet?>
-        get() = _wallet
+    val wallet: LiveData<Wallet?> = _wallet
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private val _currency = MutableLiveData("ZAR")
-    val currency: LiveData<String>
-        get() = _currency
+    val currency: LiveData<String> = _currency
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private val _amount = MutableLiveData<Double?>()
-    val amount: LiveData<Double?>
-        get() = _amount
+    val amount: LiveData<Double?> = _amount
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private val _date = MutableLiveData(getCurrentDate())
-    val date: LiveData<String>
-        get() = _date
+    val date: LiveData<String> = _date
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private val _note = MutableLiveData<String?>()
-    val note: LiveData<String?>
-        get() = _note
+    val note: LiveData<String?> = _note
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private val _imageBytes = MutableLiveData<ByteArray?>()
-    val imageBytes: LiveData<ByteArray?>
-        get() = _imageBytes
+    val imageBytes: LiveData<ByteArray?> = _imageBytes
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private val _recurrenceData = MutableLiveData<RecurrenceData>()
-    val recurrenceData: LiveData<RecurrenceData>
-        get() = _recurrenceData
+    val recurrenceData: LiveData<RecurrenceData> = _recurrenceData
 
-    var selectedLabels = MutableLiveData<List<Label>>(emptyList())
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    private val _selectedLabels = MutableLiveData<List<Label>>(emptyList())
+    val selectedLabels: LiveData<List<Label>> = _selectedLabels
 
-    var saveState = MutableLiveData<Boolean>(false)
+    val saveState = MutableLiveData<Boolean>(false)
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     fun setCategory(category: Category?) {
-        _category.value = category
+        _category.postValue(category)
         validateForm()
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    fun setLabels(labels: List<Label>) {
+        _selectedLabels.postValue(labels)
+    }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     fun setWallet(wallet: Wallet?) {
-        _wallet.value = wallet
+        _wallet.postValue(wallet)
         validateForm()
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     fun setCurrency(currency: String) {
-        _currency.value = currency
+        _currency.postValue(currency)
         validateForm()
     }
 
-    fun setAmount(amount: String) {
-        _amount.value = amount.toDoubleOrNull() ?: 0.0
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    fun setAmount(amount: Double?) {
+        _amount.postValue(amount)
         validateForm()
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     fun setDate(date: String) {
-        _date.value = date
+        _date.postValue(date)
         validateForm()
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     fun setNote(note: String) {
-        _note.value = note
+        _note.postValue(note)
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     fun setRecurrenceData(data: RecurrenceData) {
-        _recurrenceData.value = data
+        _recurrenceData.postValue(data)
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     fun setImageBytes(bytes: ByteArray?) {
-        _imageBytes.value = bytes
+        _imageBytes.postValue(bytes)
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    fun removeLabel(label: Label) {
+        val currentLabels = _selectedLabels.value?.toMutableList() ?: mutableListOf()
+        currentLabels.remove(label)
+        _selectedLabels.postValue(currentLabels)
+    }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // Function to validate the form inputs
     fun validateForm(): Boolean {
+        val currentState = _validationState.value ?: ValidationState()
         val isAmountValid = (_amount.value ?: 0.0) > 0.0
         val isCurrencyValid = !_currency.value.isNullOrBlank()
         val isCategoryValid = _category.value != null
@@ -140,7 +169,6 @@ class TransactionAddViewModel @Inject constructor(
         val isDateValid = !_date.value.isNullOrBlank()
 
         saveState.value = true
-        val currentState = _validationState.value ?: ValidationState()
         _validationState.value = currentState.copy(
             isAmountValid = isAmountValid,
             isCurrencyValid = isCurrencyValid,
@@ -157,53 +185,81 @@ class TransactionAddViewModel @Inject constructor(
         return isAmountValid && isCurrencyValid && isCategoryValid && isWalletValid && isDateValid
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     fun showValidationErrors() {
-        val currentState = _validationState.value ?: ValidationState()
-        _validationState.value = currentState.copy(shouldShowErrors = true)
+        _validationState.value = _validationState.value?.copy(shouldShowErrors = true)
         validateForm()
     }
 
-    fun addTransaction() {
-        if (!validateForm()) {
-            return
-        }
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // Function to add a new transaction
+    suspend fun addTransaction() {
+        if (!validateForm()) return
 
-        viewModelScope.launch {
-            _uiState.value = UiState.Loading
-            try {
-                val userId = getUserIdUseCase.execute()
-                val tempUser = User(userId, "", "", "")
-                val newTransaction = Transaction.new(
-                    user = tempUser,
-                    wallet = _wallet.value!!,
-                    category = _category.value!!,
-                    labels = selectedLabels.value!!,
-                    amount = _amount.value ?: 0.0,
-                    currency = _currency.value ?: "ZAR",
-                    date = parseDate((_date.value ?: System.currentTimeMillis()).toString()),
-                    note = _note.value ?: "",
-                    photoUrl = null, // TODO: Upload image to Firebase Storage
-                    recurrenceData = _recurrenceData.value ?: RecurrenceData.DEFAULT
-                )
+        _uiState.value = UiState.Loading
 
-                when (val result = addTransactionUseCase.execute(newTransaction)) {
-                    is AddTransactionResult.Success -> {
-                        Log.d("TransactionAddViewModel", "Transaction added successfully: ${result.transactionId}")
-                        _uiState.value = UiState.Success
+        try {
+            val userId = getUserIdUseCase.execute()
+
+            // Create transaction object first without image
+            val tempUser = User(userId, "", "", "")
+            val newTransaction = Transaction.new(
+                user = tempUser,
+                wallet = _wallet.value!!,
+                category = _category.value!!,
+                labels = selectedLabels.value!!,
+                amount = _amount.value ?: 0.0,
+                currency = _currency.value ?: "ZAR",
+                date = parseDate((_date.value ?: System.currentTimeMillis()).toString()),
+                note = _note.value ?: "",
+                photoUrl = null, // Will be updated after upload
+                recurrenceData = _recurrenceData.value ?: RecurrenceData.DEFAULT
+            )
+
+            // Upload image in parallel if exists
+            val imageUrl = _imageBytes.value?.let { bytes ->
+                try {
+                    when (val result = uploadImageUseCase.execute(bytes)) {
+                        is UploadImageUseCase.UploadImageResult.Success -> result.imageUrl
+                        is UploadImageUseCase.UploadImageResult.Error -> {
+                            Log.e("TransactionAddViewModel", "Error uploading image: ${result.message}")
+                            null
+                        }
                     }
-                    is AddTransactionResult.Error -> {
-                        Log.e("TransactionAddViewModel", "Error adding transaction: ${result.message}")
-                        _uiState.value = UiState.Error(result.message)
-                    }
+                } catch (e: Exception) {
+                    Log.e("TransactionAddViewModel", "Exception uploading image: ${e.message}")
+                    null
                 }
-            } catch (e: Exception) {
-                Log.e("TransactionAddViewModel", "Exception adding transaction: ${e.message}")
-                _uiState.value = UiState.Error(e.message ?: "Failed to add transaction")
             }
+
+            // Update transaction with image URL if upload was successful
+            val finalTransaction = if (imageUrl != null) {
+                newTransaction.copy(photoUrl = imageUrl)
+            } else {
+                newTransaction
+            }
+
+            // Save transaction
+            when (val result = addTransactionUseCase.execute(finalTransaction)) {
+                is AddTransactionResult.Success -> {
+                    Log.d("TransactionAddViewModel", "Transaction added successfully: ${result.transactionId}")
+                    reset()
+                    _uiState.value = UiState.Success
+                }
+                is AddTransactionResult.Error -> {
+                    Log.e("TransactionAddViewModel", "Error adding transaction: ${result.message}")
+                    _uiState.value = UiState.Error(result.message)
+                }
+            }
+        } catch (e: Exception) {
+            Log.e("TransactionAddViewModel", "Exception adding transaction: ${e.message}")
+            _uiState.value = UiState.Error(e.message ?: "Failed to add transaction")
         }
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     fun reset() {
+        saveState.value = false
         _amount.value = null
         _date.value = getCurrentDate()
         _note.value = null
@@ -211,21 +267,22 @@ class TransactionAddViewModel @Inject constructor(
         _wallet.value = null
         _imageBytes.value = null
         _recurrenceData.value = RecurrenceData.DEFAULT
+        _selectedLabels.value = emptyList()
         _validationState.value = ValidationState(shouldShowErrors = false)
         _uiState.value = UiState.Initial
         saveState.value = false
     }
 
-    private fun getCurrentDate(): String {
-        return SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date())
-    }
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    private fun getCurrentDate(): String =
+        SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date())
 
-    private fun parseDate(dateStr: String): Long {
-        return try {
-            val format = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-            format.parse(dateStr)?.time ?: System.currentTimeMillis()
-        } catch (e: Exception) {
-            System.currentTimeMillis()
-        }
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    private fun parseDate(dateStr: String): Long = try {
+        SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+            .parse(dateStr)?.time ?: System.currentTimeMillis()
+    } catch (e: Exception) {
+        System.currentTimeMillis()
     }
 }
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~EOF~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
