@@ -13,6 +13,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
@@ -37,9 +38,9 @@ class GetTransactionsUseCase @Inject constructor(
         return combine(
             userRepository.observeUserProfile(userId),
             transactionRepository.observeTransactionsForUser(userId),
-            walletRepository.observeWallets(userId),
-            categoryRepository.observeCategories(userId),
-            labelRepository.observeAllLabels(userId)
+            walletRepository.observeWalletsForUser(userId),
+            categoryRepository.observeCategoriesForUser(userId),
+            labelRepository.observeLabelsForUser(userId)
         ) { user, transactions, wallets, categories, labels ->
 
             if (user == null) {
@@ -56,8 +57,8 @@ class GetTransactionsUseCase @Inject constructor(
                 try {
                     dto.toDomain(
                         user = domainUser,
-                        wallet = walletMap[dto.walletId]?.toDomain(domainUser),
-                        category = categoryMap[dto.categoryId]?.toDomain(domainUser),
+                        wallet = walletMap[dto.walletId]!!.toDomain(domainUser),
+                        category = categoryMap[dto.categoryId]!!.toDomain(domainUser),
                         labels = dto.labelIds.mapNotNull { labelId ->
                             labelMap[labelId]?.toDomain(domainUser)
                         }

@@ -43,12 +43,5 @@ class GetCategoriesUseCase @Inject constructor(
             }
         }
     }
-
-    fun observeDefaultCategories(): Flow<List<Category>> {
-        return categoryRepository.observeDefaultCategories()
-            .map { categories ->
-                categories.map { it.toDomain(null) }
-            }
-    }
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~EOF~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
