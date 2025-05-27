@@ -250,7 +250,7 @@ class HomeMainViewModel @Inject constructor(
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-    // Load total wallet balance
+    // Load total wallet balance for display in textview
     fun loadTotalWalletBalance() {
         viewModelScope.launch {
             try {

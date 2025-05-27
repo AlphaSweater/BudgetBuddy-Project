@@ -52,91 +52,114 @@ class TransactionAddViewModel @Inject constructor(
         val shouldShowErrors: Boolean = false
     )
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     // UI State
     private val _uiState = MutableStateFlow<UiState>(UiState.Initial)
     val uiState: StateFlow<UiState> = _uiState
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     // Validation State
     private val _validationState = MutableLiveData(ValidationState())
     val validationState: LiveData<ValidationState> = _validationState
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     // Form Fields
     private val _category = MutableLiveData<Category?>()
     val category: LiveData<Category?> = _category
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private val _wallet = MutableLiveData<Wallet?>()
     val wallet: LiveData<Wallet?> = _wallet
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private val _currency = MutableLiveData("ZAR")
     val currency: LiveData<String> = _currency
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private val _amount = MutableLiveData<Double?>()
     val amount: LiveData<Double?> = _amount
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private val _date = MutableLiveData(getCurrentDate())
     val date: LiveData<String> = _date
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private val _note = MutableLiveData<String?>()
     val note: LiveData<String?> = _note
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private val _imageBytes = MutableLiveData<ByteArray?>()
     val imageBytes: LiveData<ByteArray?> = _imageBytes
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private val _recurrenceData = MutableLiveData<RecurrenceData>()
     val recurrenceData: LiveData<RecurrenceData> = _recurrenceData
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private val _selectedLabels = MutableLiveData<List<Label>>(emptyList())
     val selectedLabels: LiveData<List<Label>> = _selectedLabels
 
     val saveState = MutableLiveData<Boolean>(false)
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     fun setCategory(category: Category?) {
         _category.postValue(category)
         validateForm()
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     fun setLabels(labels: List<Label>) {
         _selectedLabels.postValue(labels)
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     fun setWallet(wallet: Wallet?) {
         _wallet.postValue(wallet)
         validateForm()
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     fun setCurrency(currency: String) {
         _currency.postValue(currency)
         validateForm()
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     fun setAmount(amount: Double?) {
         _amount.postValue(amount)
         validateForm()
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     fun setDate(date: String) {
         _date.postValue(date)
         validateForm()
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     fun setNote(note: String) {
         _note.postValue(note)
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     fun setRecurrenceData(data: RecurrenceData) {
         _recurrenceData.postValue(data)
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     fun setImageBytes(bytes: ByteArray?) {
         _imageBytes.postValue(bytes)
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     fun removeLabel(label: Label) {
         val currentLabels = _selectedLabels.value?.toMutableList() ?: mutableListOf()
         currentLabels.remove(label)
         _selectedLabels.postValue(currentLabels)
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // Function to validate the form inputs
     fun validateForm(): Boolean {
         val currentState = _validationState.value ?: ValidationState()
         val isAmountValid = (_amount.value ?: 0.0) > 0.0
@@ -162,11 +185,14 @@ class TransactionAddViewModel @Inject constructor(
         return isAmountValid && isCurrencyValid && isCategoryValid && isWalletValid && isDateValid
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     fun showValidationErrors() {
         _validationState.value = _validationState.value?.copy(shouldShowErrors = true)
         validateForm()
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // Function to add a new transaction
     suspend fun addTransaction() {
         if (!validateForm()) return
 
@@ -231,6 +257,7 @@ class TransactionAddViewModel @Inject constructor(
         }
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     fun reset() {
         saveState.value = false
         _amount.value = null
@@ -246,9 +273,11 @@ class TransactionAddViewModel @Inject constructor(
         saveState.value = false
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private fun getCurrentDate(): String =
         SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date())
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private fun parseDate(dateStr: String): Long = try {
         SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
             .parse(dateStr)?.time ?: System.currentTimeMillis()
