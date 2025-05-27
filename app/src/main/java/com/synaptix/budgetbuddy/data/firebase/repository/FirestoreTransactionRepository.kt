@@ -13,7 +13,7 @@ import javax.inject.Singleton
 
 @Singleton
 class FirestoreTransactionRepository @Inject constructor(
-    private val firestoreInstance: FirebaseFirestore
+    firestoreInstance: FirebaseFirestore
 ) : BaseFirestoreRepository<TransactionDTO>(firestoreInstance) {
     
     override val collection = firestoreInstance.collection("users")

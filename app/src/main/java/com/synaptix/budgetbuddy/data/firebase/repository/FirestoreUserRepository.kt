@@ -1,5 +1,6 @@
 package com.synaptix.budgetbuddy.data.firebase.repository
 
+import com.google.android.play.integrity.internal.u
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FirebaseFirestore
@@ -9,14 +10,15 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlin.collections.mapOf
 
 @Singleton
 class FirestoreUserRepository @Inject constructor(
     private val auth: FirebaseAuth,
-    private val firestore: FirebaseFirestore
-) : BaseFirestoreRepository<UserDTO>(firestore) {
+    firestoreInstance: FirebaseFirestore
+) : BaseFirestoreRepository<UserDTO>(firestoreInstance) {
 
-    override val collection = firestore.collection("users")
+    override val collection = firestoreInstance.collection("users")
     override val subCollectionName = null // Users are at the root level
 
     override fun getType(): Class<UserDTO> = UserDTO::class.java
@@ -53,8 +55,6 @@ class FirestoreUserRepository @Inject constructor(
             val authResult = auth.signInWithEmailAndPassword(email, password).await()
             val firebaseUser = authResult.user ?: throw Exception("Failed to login user")
 
-            // Update login time
-            update(firebaseUser.uid, firebaseUser.uid, mapOf("lastLoginAt" to System.currentTimeMillis()))
             Result.Success(firebaseUser)
         } catch (e: Exception) {
             Result.Error(e)
@@ -88,10 +88,9 @@ class FirestoreUserRepository @Inject constructor(
     }
 
     // Update user profile with provided fields
-    suspend fun updateUserProfile(userId: String, updates: Map<String, Any>): Result<Unit> {
+    suspend fun updateUserProfile(userId: String, user: UserDTO): Result<Unit> {
         return try {
-            val dataWithTimestamp = updates + mapOf("updatedAt" to System.currentTimeMillis())
-            update(userId, userId, dataWithTimestamp)
+            update(userId, userId, user)
             Result.Success(Unit)
         } catch (e: Exception) {
             Result.Error(e)

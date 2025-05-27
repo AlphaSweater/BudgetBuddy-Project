@@ -73,7 +73,7 @@ class FirestoreCategoryRepository @Inject constructor(
 
             val defaultSnapshot = collection
                 .document("default")
-                .collection(subCollectionName!!)
+                .collection(subCollectionName)
                 .whereEqualTo("type", type)
                 .whereEqualTo("isDefault", true)
                 .get()

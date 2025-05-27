@@ -55,7 +55,7 @@ class FirestoreLabelRepository @Inject constructor(
 
             val defaultSnapshot = collection
                 .document("default")
-                .collection(subCollectionName!!)
+                .collection(subCollectionName)
                 .whereEqualTo("isDefault", true)
                 .get()
                 .await()

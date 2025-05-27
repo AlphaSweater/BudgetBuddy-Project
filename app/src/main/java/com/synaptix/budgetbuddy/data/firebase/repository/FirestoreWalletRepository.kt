@@ -58,10 +58,12 @@ class FirestoreWalletRepository @Inject constructor(
     // Update wallet balance
     suspend fun updateWalletBalance(userId: String, walletId: String, amount: Double): Result<Unit> {
         return try {
-            val wallet = getById(userId, walletId).getOrNull()
-                ?: return Result.Error(Exception("Wallet not found"))
+            val wallet = when (val result = getWalletById(userId, walletId)) {
+                is Result.Success -> result.data
+                is Result.Error -> return Result.Error(result.exception)
+            }
 
-            val updatedWallet = wallet.updateBalance(amount)
+            val updatedWallet = wallet!!.updateBalance(amount)
             update(userId, walletId, updatedWallet)
         } catch (e: Exception) {
             Result.Error(e)
