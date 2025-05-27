@@ -26,20 +26,22 @@ import com.synaptix.budgetbuddy.core.model.Transaction
 import com.synaptix.budgetbuddy.core.model.Result
 import com.synaptix.budgetbuddy.data.firebase.mapper.FirebaseMapper.toDTO
 import com.synaptix.budgetbuddy.data.firebase.repository.FirestoreTransactionRepository
+import com.synaptix.budgetbuddy.data.firebase.repository.FirestoreWalletRepository
 import javax.inject.Inject
 
 // UseCase class for adding a new transaction
 class AddTransactionUseCase @Inject constructor(
     // Injecting the FirestoreTransactionRepository to handle transaction-related operations
-    private val repository: FirestoreTransactionRepository
+    private val repository: FirestoreTransactionRepository,
+    private val walletRepository: FirestoreWalletRepository
 ) {
     sealed class AddTransactionResult {
         data class Success(val transactionId: String) : AddTransactionResult()
         data class Error(val message: String) : AddTransactionResult()
     }
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-    // Executes the operation to add a new transaction
+//    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+//     Executes the operation to add a new transaction
     suspend fun execute(newTransaction: Transaction): AddTransactionResult {
 
         // Convert domain model to DTO using mapper
@@ -63,4 +65,6 @@ class AddTransactionUseCase @Inject constructor(
         }
     }
 }
+
+
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~EOF~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\

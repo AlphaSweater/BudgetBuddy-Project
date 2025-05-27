@@ -143,8 +143,8 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideAddTransactionUseCase(repository: FirestoreTransactionRepository): AddTransactionUseCase {
-        return AddTransactionUseCase(repository)
+    fun provideAddTransactionUseCase(repository: FirestoreTransactionRepository, walletRepository: FirestoreWalletRepository): AddTransactionUseCase {
+        return AddTransactionUseCase(repository, walletRepository)
     }
 
     @Provides

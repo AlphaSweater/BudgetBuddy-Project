@@ -22,6 +22,8 @@ class BudgetMainViewModel @Inject constructor(
     private val totalBudgetUseCase: TotalBudgetUseCase
 ) : ViewModel() {
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // LiveData for budget summary and budgets
     private val _budgetSummary = MutableLiveData<BudgetSummary>()
     val budgetSummary: LiveData<BudgetSummary> = _budgetSummary
 
@@ -31,6 +33,8 @@ class BudgetMainViewModel @Inject constructor(
     private val _error = MutableLiveData<String?>()
     val error: LiveData<String?> = _error
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // Function to fetch budgets and budget summary
     fun fetchBudgets() {
         viewModelScope.launch {
             try {
@@ -58,6 +62,8 @@ class BudgetMainViewModel @Inject constructor(
     }
 
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // Function to fetch budget summary
     fun fetchBudgetSummary() {
         viewModelScope.launch {
             try {
@@ -74,3 +80,4 @@ class BudgetMainViewModel @Inject constructor(
         }
     }
 }
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~EOF~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\

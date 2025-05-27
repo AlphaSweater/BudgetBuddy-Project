@@ -88,6 +88,16 @@
                 android:textSize="16sp"/>
         </LinearLayout>
 
+        <com.github.mikephil.charting.charts.BarChart
+            android:id="@+id/barChart"
+            android:layout_width="match_parent"
+            android:layout_height="300dp"
+            android:layout_margin="16dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/cardTotalBalance"
+            />
+
+
         <!-- Wallets Section -->
         <TextView
             android:id="@+id/textView3"
@@ -100,7 +110,7 @@
             android:textSize="18sp"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/cardTotalBalance" />
+            app:layout_constraintTop_toBottomOf="@+id/barChart" />
 
         <TextView
             android:id="@+id/txtViewAllWallets"
@@ -153,6 +163,15 @@
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
+        <com.github.mikephil.charting.charts.PieChart
+            android:id="@+id/pieChart"
+            android:layout_width="match_parent"
+            android:layout_height="300dp"
+            android:layout_marginTop="16dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/materialCardView"/>
+
+
         <!-- Categories Section -->
         <TextView
             android:id="@+id/txtCategoriesOverView"
@@ -165,7 +184,7 @@
             android:textSize="18sp"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/materialCardView" />
+            app:layout_constraintTop_toBottomOf="@+id/pieChart" />
 
         <TextView
             android:id="@+id/txtViewAllCategories"

@@ -1,5 +1,6 @@
 package com.synaptix.budgetbuddy.presentation.ui.main.wallet
 
+import android.graphics.Color
 import androidx.fragment.app.viewModels
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -9,6 +10,19 @@ import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.github.mikephil.charting.animation.Easing
+import com.github.mikephil.charting.charts.LineChart
+import com.github.mikephil.charting.charts.PieChart
+import com.github.mikephil.charting.components.XAxis
+import com.github.mikephil.charting.data.Entry
+import com.github.mikephil.charting.data.LineData
+import com.github.mikephil.charting.data.LineDataSet
+import com.github.mikephil.charting.data.PieData
+import com.github.mikephil.charting.data.PieDataSet
+import com.github.mikephil.charting.data.PieEntry
+import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
+import com.github.mikephil.charting.formatter.PercentFormatter
+import com.github.mikephil.charting.utils.ColorTemplate
 import com.synaptix.budgetbuddy.databinding.FragmentWalletMainBinding
 import com.synaptix.budgetbuddy.R
 import com.synaptix.budgetbuddy.core.model.BudgetListItems
@@ -77,9 +91,46 @@ class WalletMainFragment : Fragment() {
         }
     }
 
+    private fun setupPieChart(wallets: List<Wallet>) {
+        val pieChart: PieChart = binding.pieChart
+        val context = pieChart.context
+
+        // Convert wallet balances into PieEntries
+        val entries = wallets.map { PieEntry(it.balance.toFloat(), it.name) }
+
+        val dataSet = PieDataSet(entries, "").apply {
+            colors = ColorTemplate.MATERIAL_COLORS.toList()
+            valueTextColor = Color.WHITE
+            valueTextSize = 14f
+        }
+
+        val data = PieData(dataSet)
+
+        // Format values to show percentages
+        data.setValueFormatter(PercentFormatter(pieChart))
+
+        pieChart.apply {
+            this.data = data
+            isDrawHoleEnabled = true
+            holeRadius = 50f
+            setUsePercentValues(true)
+            setDrawEntryLabels(true) // Shows labels like wallet name
+            setEntryLabelColor(Color.BLACK)
+            setEntryLabelTextSize(12f)
+            description.isEnabled = false // Hides the description label
+            legend.isEnabled = false      // Hides the legend at the bottom
+            animateY(1000, Easing.EaseInOutQuad)
+            invalidate()
+        }
+    }
+
+
+
+
     private fun observeViewModel() {
         viewModel.wallets.observe(viewLifecycleOwner) { wallets ->
             updateWalletsList(wallets)
+            setupPieChart(wallets)
         }
 
         viewModel.totalBalance.observe(viewLifecycleOwner) { total ->
