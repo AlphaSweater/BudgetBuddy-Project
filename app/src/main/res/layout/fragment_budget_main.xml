@@ -45,16 +45,16 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <!-- Summary Container -->
     <LinearLayout
         android:id="@+id/budget_container"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:padding="16dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintTop_toBottomOf="@id/current_budgets_title"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/current_budgets_title">
+        app:layout_constraintEnd_toEndOf="parent">
 
         <!-- Total Budget -->
         <LinearLayout
@@ -68,7 +68,6 @@
                 android:id="@+id/totalBudgetedTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:gravity="center"
                 android:text="ZAR 0.00"
                 android:textColor="?attr/bb_primaryText"
                 android:textSize="18sp" />
@@ -76,7 +75,6 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:gravity="center"
                 android:text="@string/total_budget"
                 android:textColor="?attr/bb_secondaryText"
                 android:textSize="14sp" />
@@ -94,7 +92,6 @@
                 android:id="@+id/totalSpentTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:gravity="center"
                 android:text="ZAR 0.00"
                 android:textColor="?attr/bb_primaryText"
                 android:textSize="18sp" />
@@ -102,7 +99,6 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:gravity="center"
                 android:text="@string/total_spent"
                 android:textColor="?attr/bb_secondaryText"
                 android:textSize="14sp" />
@@ -119,7 +115,6 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:gravity="center"
                 android:text="26 days"
                 android:textColor="?attr/bb_primaryText"
                 android:textSize="18sp" />
@@ -127,217 +122,67 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:gravity="center"
                 android:text="@string/end_of_month"
                 android:textColor="?attr/bb_secondaryText"
                 android:textSize="14sp" />
         </LinearLayout>
     </LinearLayout>
 
-<!--    <com.google.android.material.card.MaterialCardView-->
-<!--        android:id="@+id/monthlySpendingGoalCard"-->
-<!--        android:layout_width="380dp"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:layout_marginTop="20dp"-->
-<!--        android:backgroundTint="?attr/bb_surface"-->
-<!--        app:cardCornerRadius="16dp"-->
-<!--        app:cardElevation="4dp"-->
-<!--        app:layout_constraintEnd_toEndOf="parent"-->
-<!--        app:layout_constraintStart_toStartOf="parent"-->
-<!--        app:layout_constraintTop_toBottomOf="@+id/budget_container">-->
-
-<!--        &lt;!&ndash; Monthly Goal Row &ndash;&gt;-->
-<!--        <LinearLayout-->
-<!--            android:id="@+id/rowMonthlyGoal"-->
-<!--            style="@style/RowStyle"-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:layout_margin="16dp"-->
-<!--            android:layout_marginTop="20dp"-->
-<!--            android:background="?attr/bb_surface"-->
-<!--            android:orientation="vertical"-->
-<!--            android:padding="16dp"-->
-<!--            app:layout_constraintTop_toBottomOf="@+id/current_budgets_container"-->
-<!--            tools:layout_editor_absoluteX="21dp">-->
-
-<!--            &lt;!&ndash; Title Row &ndash;&gt;-->
-<!--            <LinearLayout-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:gravity="center_vertical"-->
-<!--                android:orientation="horizontal">-->
-
-<!--                <TextView-->
-<!--                    android:id="@+id/monthlyGoalTitle"-->
-<!--                    android:layout_width="0dp"-->
-<!--                    android:layout_height="wrap_content"-->
-<!--                    android:layout_marginBottom="5dp"-->
-<!--                    android:layout_weight="1"-->
-<!--                    android:gravity="center"-->
-<!--                    android:text="Monthly Spending Goal"-->
-<!--                    android:textColor="?attr/bb_primaryText"-->
-<!--                    android:textSize="16sp"-->
-<!--                    android:textStyle="bold" />-->
-
-<!--                &lt;!&ndash; Save Button &ndash;&gt;-->
-<!--                <Button-->
-<!--                    android:id="@+id/saveButton"-->
-<!--                    android:layout_width="wrap_content"-->
-<!--                    android:layout_height="wrap_content"-->
-<!--                    android:textColor="@android:color/white"-->
-<!--                    app:backgroundTint="?attr/bb_button"-->
-<!--                    app:cornerRadius="24dp"-->
-<!--                    android:text="Save"-->
-<!--                    app:layout_constraintStart_toStartOf="parent" />-->
-
-
-<!--            </LinearLayout>-->
-
-<!--            &lt;!&ndash; Min - Max Range Row &ndash;&gt;-->
-<!--            <LinearLayout-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:layout_marginTop="8dp"-->
-<!--                android:gravity="center"-->
-<!--                android:orientation="horizontal">-->
-
-<!--                <TextView-->
-<!--                    android:layout_width="wrap_content"-->
-<!--                    android:layout_height="wrap_content"-->
-<!--                    android:text="(Minimum)"-->
-<!--                    android:textColor="?attr/bb_primaryText"-->
-<!--                    android:textSize="14sp" />-->
-
-<!--                &lt;!&ndash; Min Goal Input &ndash;&gt;-->
-
-<!--                <EditText-->
-<!--                    android:id="@+id/inputMinGoal"-->
-<!--                    android:layout_width="wrap_content"-->
-<!--                    android:layout_height="wrap_content"-->
-<!--                    android:layout_marginStart="4dp"-->
-<!--                    android:layout_marginEnd="4dp"-->
-<!--                    android:hint="R          "-->
-<!--                    android:backgroundTint="?attr/bb_primaryText"-->
-<!--                    android:inputType="numberDecimal|numberSigned"-->
-<!--                    android:textColorHint="?attr/bb_primaryText"-->
-<!--                    android:textSize="14sp" />-->
-
-<!--                <TextView-->
-<!--                    android:layout_width="wrap_content"-->
-<!--                    android:layout_height="wrap_content"-->
-<!--                    android:text="&#45;&#45;&#45;&#45;"-->
-<!--                    android:textColor="?attr/bb_primaryText"-->
-<!--                    android:textSize="14sp" />-->
-
-<!--                &lt;!&ndash; Max Goal Input &ndash;&gt;-->
-<!--                <EditText-->
-<!--                    android:id="@+id/inputMaxGoal"-->
-<!--                    android:layout_width="wrap_content"-->
-<!--                    android:layout_height="wrap_content"-->
-<!--                    android:layout_marginStart="4dp"-->
-<!--                    android:layout_marginEnd="4dp"-->
-<!--                    android:hint="R          "-->
-<!--                    android:textColorHint="?attr/bb_primaryText"-->
-<!--                    android:backgroundTint="?attr/bb_primaryText"-->
-<!--                    android:inputType="numberDecimal|numberSigned"-->
-<!--                    android:textColor="?attr/bb_primaryText"-->
-<!--                    android:textSize="14sp" />-->
-
-<!--                <TextView-->
-<!--                    android:layout_width="wrap_content"-->
-<!--                    android:layout_height="wrap_content"-->
-<!--                    android:text="(Maximum)"-->
-<!--                    android:textColor="?attr/bb_primaryText"-->
-<!--                    android:textSize="14sp" />-->
-<!--            </LinearLayout>-->
-
-<!--            &lt;!&ndash; Progress Bar &ndash;&gt;-->
-<!--            <ProgressBar-->
-<!--                android:id="@+id/goalProgressBar"-->
-<!--                style="?android:attr/progressBarStyleHorizontal"-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="12dp"-->
-<!--                android:layout_marginTop="16dp"-->
-<!--                android:layout_marginBottom="16dp"-->
-<!--                android:clipToOutline="true"-->
-<!--                android:max="100"-->
-<!--                android:progress="10"-->
-<!--                android:progressTint="?attr/bb_button" />-->
-
-<!--            &lt;!&ndash; Spent Text Row &ndash;&gt;-->
-<!--            <LinearLayout-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:gravity="center"-->
-<!--                android:orientation="horizontal">-->
-
-<!--                <TextView-->
-<!--                    android:layout_width="wrap_content"-->
-<!--                    android:layout_height="wrap_content"-->
-<!--                    android:text="You have currently spent"-->
-<!--                    android:textColor="?attr/bb_primaryText"-->
-<!--                    android:textSize="14sp" />-->
-
-<!--                <TextView-->
-<!--                    android:id="@+id/minValueSpent"-->
-<!--                    android:layout_width="wrap_content"-->
-<!--                    android:layout_height="wrap_content"-->
-<!--                    android:layout_marginStart="2dp"-->
-<!--                    android:layout_marginEnd="2dp"-->
-<!--                    android:text=" R 500 "-->
-<!--                    android:textColor="?attr/bb_profit"-->
-<!--                    android:textSize="14sp" />-->
-
-<!--                <TextView-->
-<!--                    android:layout_width="wrap_content"-->
-<!--                    android:layout_height="wrap_content"-->
-<!--                    android:text="out of"-->
-<!--                    android:textColor="?attr/bb_primaryText"-->
-<!--                    android:textSize="14sp" />-->
-
-<!--                <TextView-->
-<!--                    android:id="@+id/minValueTotal"-->
-<!--                    android:layout_width="wrap_content"-->
-<!--                    android:layout_height="wrap_content"-->
-<!--                    android:layout_marginStart="2dp"-->
-<!--                    android:text=" R 5,000 "-->
-<!--                    android:textColor="?attr/bb_primaryText"-->
-<!--                    android:textSize="14sp" />-->
-
-<!--                <TextView-->
-<!--                    android:layout_width="wrap_content"-->
-<!--                    android:layout_height="wrap_content"-->
-<!--                    android:text="!"-->
-<!--                    android:textColor="?attr/bb_primaryText"-->
-<!--                    android:textSize="14sp" />-->
-<!--            </LinearLayout>-->
-<!--        </LinearLayout>-->
-<!--    </com.google.android.material.card.MaterialCardView>-->
-
     <!-- Create Budget Button -->
     <Button
         android:id="@+id/createBudgetButton"
         android:layout_width="wrap_content"
         android:layout_height="48dp"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="16dp"
         android:text="Create Budget"
         android:textColor="@android:color/white"
         app:backgroundTint="?attr/bb_button"
         app:cornerRadius="24dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.497"
+        app:layout_constraintTop_toBottomOf="@id/budget_container"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/budget_container" />
+        app:layout_constraintEnd_toEndOf="parent" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerViewBudgetMain"
-        android:layout_width="match_parent"
+    <!-- Budget Card with RecyclerView -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/cardBudgets"
+        android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginTop="10dp"
-        android:visibility="visible"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_margin="16dp"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="4dp"
+        app:layout_constraintTop_toBottomOf="@id/createBudgetButton"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/createBudgetButton" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:backgroundTint="?attr/bb_surface">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerViewBudgetMain"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clipToPadding="false"
+                android:padding="8dp"
+                android:visibility="visible"
+                android:nestedScrollingEnabled="false"
+                tools:visibility="visible"
+                tools:itemCount="3"
+                tools:listitem="@layout/item_budget_main" />
+
+            <TextView
+                android:id="@+id/txtEmptyBudgets"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:padding="32dp"
+                android:text="No budgets added yet"
+                android:textColor="?attr/bb_secondaryText"
+                android:visibility="gone" />
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
