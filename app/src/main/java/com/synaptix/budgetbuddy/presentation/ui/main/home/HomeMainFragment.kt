@@ -204,59 +204,6 @@ class HomeMainFragment : Fragment() {
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     // Handle different states for wallets, transactions, and categories
-    private fun setupBarChart() {
-        val context = binding.root.context
-        val barChart: BarChart = binding.barChart
-
-        // Get theme-based colors
-        val primaryTextColor = context.getThemeColor(R.attr.bb_primaryText)
-        val expenseColor = context.getThemeColor(R.attr.bb_expense)
-        val profitColor = context.getThemeColor(R.attr.bb_profit)
-
-        // Sample data
-        val income = BarEntry(0f, 5000f)
-        val expense = BarEntry(1f, 3200f)
-
-        val incomeSet = BarDataSet(listOf(income), "Income").apply {
-            color = profitColor
-            valueTextColor = primaryTextColor
-        }
-
-        val expenseSet = BarDataSet(listOf(expense), "Expense").apply {
-            color = expenseColor
-            valueTextColor = primaryTextColor
-        }
-
-        val data = BarData(incomeSet, expenseSet)
-        data.barWidth = 0.25f
-
-        barChart.data = data
-        barChart.xAxis.axisMinimum = -0.5f
-        barChart.xAxis.axisMaximum = 2f
-        barChart.groupBars(0f, 0.4f, 0.05f)
-
-        barChart.xAxis.apply {
-            granularity = 1f
-            isGranularityEnabled = true
-            setDrawGridLines(false)
-            setCenterAxisLabels(true)
-            position = XAxis.XAxisPosition.BOTTOM
-            valueFormatter = IndexAxisValueFormatter(listOf("March"))
-            textColor = primaryTextColor
-        }
-
-        barChart.axisLeft.textColor = primaryTextColor
-        barChart.axisRight.isEnabled = false
-        barChart.legend.textColor = primaryTextColor
-
-        barChart.description = Description().apply {
-            text = "Monthly Budget"
-            textColor = primaryTextColor
-        }
-
-        barChart.animateY(1000)
-        barChart.invalidate()
-    }
 
     private fun setupPieChart() {
         val context = binding.root.context
