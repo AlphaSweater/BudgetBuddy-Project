@@ -2,23 +2,38 @@ package com.synaptix.budgetbuddy.presentation.ui.main.general.generalReports
 
 import android.graphics.Color
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import java.time.LocalDate
+import java.time.format.TextStyle
+import java.util.Locale
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import com.github.mikephil.charting.animation.Easing
 import com.github.mikephil.charting.charts.LineChart
+import com.github.mikephil.charting.charts.PieChart
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
+import com.github.mikephil.charting.data.PieData
+import com.github.mikephil.charting.data.PieDataSet
+import com.github.mikephil.charting.data.PieEntry
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
+import com.github.mikephil.charting.formatter.PercentFormatter
 import com.synaptix.budgetbuddy.R
+import com.synaptix.budgetbuddy.core.model.Transaction
 import com.synaptix.budgetbuddy.databinding.FragmentGeneralReportsBinding
+import com.synaptix.budgetbuddy.extentions.getThemeColor
 import dagger.hilt.android.AndroidEntryPoint
+import java.time.Instant
+import java.time.ZoneId
+import java.util.Calendar
 
 @AndroidEntryPoint
 class GeneralReportsFragment : Fragment() {
@@ -41,6 +56,15 @@ class GeneralReportsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setupRecyclers()
         setupOnClickListeners()
+        viewModel.transactions.observe(viewLifecycleOwner) { transactionList ->
+            if (!transactionList.isNullOrEmpty()) {
+                setupLineChart(transactionList)
+            }
+        }
+
+        viewModel.loadTransactions()
+
+        setupPieChart(isExpense = true)
 //        viewModel.reportBudgetCategoryItem.observe(viewLifecycleOwner) { items ->
 //            binding.recyclerViewExpenseCategory.adapter = GeneralReportAdapter(items)
 //        }
@@ -112,12 +136,18 @@ class GeneralReportsFragment : Fragment() {
     private fun showCategoryExpenseToggle() {
         binding.recyclerViewExpenseCategory.visibility = View.VISIBLE
         binding.recyclerViewIncomeCategory.visibility = View.GONE
+
+        setupPieChart(isExpense = true)
+
         highlightToggle(binding.btnCategoryExpenseToggle, binding.btnCategoryIncomeToggle)
     }
 
     private fun showCategoryIncomeToggle() {
         binding.recyclerViewExpenseCategory.visibility = View.GONE
         binding.recyclerViewIncomeCategory.visibility = View.VISIBLE
+
+        setupPieChart(isExpense = false)
+
         highlightToggle(binding.btnCategoryIncomeToggle, binding.btnCategoryExpenseToggle)
     }
 
@@ -138,63 +168,135 @@ class GeneralReportsFragment : Fragment() {
         unselected.setBackgroundResource(android.R.color.transparent)
     }
 
-    private fun setupLineChart() {
+    private fun setupLineChart(transactions: List<Transaction>) {
         val lineChart: LineChart = binding.lineChart
         val context = lineChart.context
 
         val months = listOf("Jan", "Feb", "Mar", "Apr", "May", "Jun")
-        val incomeValues = listOf(3000f, 3200f, 3100f, 4000f, 4200f, 4100f)
-        val expenseValues = listOf(1500f, 1800f, 1600f, 2000f, 2300f, 2200f)
+        val incomeValues = MutableList(6) { 0f }
+        val expenseValues = MutableList(6) { 0f }
 
-        val incomeEntries = incomeValues.mapIndexed { index, value ->
-            Entry(index.toFloat(), value)
+        for (transaction in transactions) {
+            val calendar = Calendar.getInstance().apply {
+                timeInMillis = transaction.date
+            }
+            val monthIndex = calendar.get(Calendar.MONTH)
+            val amount = transaction.amount.toFloat()
+            val categoryType = transaction.category.type.lowercase(Locale.getDefault())
+
+            if (monthIndex in 0..5) {
+                when (categoryType) {
+                    "income" -> incomeValues[monthIndex] += amount
+                    "expense" -> expenseValues[monthIndex] += amount
+                }
+            }
         }
-        val expenseEntries = expenseValues.mapIndexed { index, value ->
-            Entry(index.toFloat(), value)
-        }
+
+        val incomeEntries = incomeValues.mapIndexed { index, value -> Entry(index.toFloat(), value) }
+        val expenseEntries = expenseValues.mapIndexed { index, value -> Entry(index.toFloat(), value) }
 
         val incomeDataSet = LineDataSet(incomeEntries, "Income").apply {
             color = ContextCompat.getColor(context, R.color.profit_green)
-            valueTextColor = R.attr.bb_primaryText
             lineWidth = 2f
             setCircleColor(ContextCompat.getColor(context, R.color.profit_green))
             circleRadius = 4f
             mode = LineDataSet.Mode.CUBIC_BEZIER
-
-            // Gradient fill
             setDrawFilled(true)
             fillDrawable = ContextCompat.getDrawable(context, R.drawable.gradient_income)
+            setDrawValues(false)
         }
 
         val expenseDataSet = LineDataSet(expenseEntries, "Expense").apply {
             color = ContextCompat.getColor(context, R.color.expense_red)
-            valueTextColor = R.attr.bb_primaryText
             lineWidth = 2f
             setCircleColor(ContextCompat.getColor(context, R.color.expense_red))
             circleRadius = 4f
             mode = LineDataSet.Mode.CUBIC_BEZIER
-
-            // Gradient fill
             setDrawFilled(true)
             fillDrawable = ContextCompat.getDrawable(context, R.drawable.gradient_expense)
+            setDrawValues(false)
         }
 
         val lineData = LineData(incomeDataSet, expenseDataSet)
-        lineChart.data = lineData
 
-        // X-axis
-        lineChart.xAxis.apply {
-            valueFormatter = IndexAxisValueFormatter(months)
-            granularity = 1f
-            position = XAxis.XAxisPosition.BOTTOM
-            setDrawGridLines(false)
-            labelRotationAngle = -45f
+        lineChart.apply {
+            clear()
+            data = lineData
+
+            xAxis.apply {
+                valueFormatter = IndexAxisValueFormatter(months)
+                granularity = 1f
+                position = XAxis.XAxisPosition.BOTTOM
+                setDrawGridLines(false)
+                labelRotationAngle = -45f
+            }
+
+            axisRight.isEnabled = false
+            description.text = "Income vs Expense (6 Months)"
+
+            animateXY(1000, 1200, Easing.EaseInOutCubic)
+            setTouchEnabled(true)
+            isDragEnabled = true
+            setScaleEnabled(false)
+            setPinchZoom(false)
+            invalidate()
+        }
+    }
+
+
+    private fun setupPieChart(isExpense: Boolean) {
+        val context = binding.root.context
+        val pieChart: PieChart = binding.pieChart
+
+        val categories: List<String>
+        val amounts: List<Float>
+        val label: String
+
+        if (isExpense) {
+            categories = listOf("Food", "Transport", "Entertainment", "Bills", "Shopping")
+            amounts = listOf(800f, 400f, 300f, 500f, 600f)
+            label = "Expenses"
+        } else {
+            categories = listOf("Salary", "Freelance", "Investments", "Gift")
+            amounts = listOf(1500f, 500f, 300f, 200f)
+            label = "Income"
         }
 
-        lineChart.axisRight.isEnabled = false
-        lineChart.description.text = "Income vs Expense (6 Months)"
-        lineChart.animateX(1000)
-        lineChart.invalidate()
+        val pieEntries = categories.mapIndexed { index, category ->
+            PieEntry(amounts[index], category)
+        }
+
+        val pieDataSet = PieDataSet(pieEntries, label).apply {
+            colors = listOf(
+                ContextCompat.getColor(context, R.color.cat_dark_green),
+                ContextCompat.getColor(context, R.color.cat_light_pink),
+                ContextCompat.getColor(context, R.color.cat_dark_blue),
+                ContextCompat.getColor(context, R.color.cat_yellow),
+                ContextCompat.getColor(context, R.color.cat_orange)
+            )
+            valueTextSize = 14f
+            valueTextColor = ContextCompat.getColor(context, R.color.light_text)
+        }
+
+        val pieData = PieData(pieDataSet).apply {
+            setValueFormatter(PercentFormatter(pieChart))
+        }
+
+        pieChart.apply {
+            data = pieData
+            isDrawHoleEnabled = true
+            holeRadius = 50f
+            setHoleColor(Color.TRANSPARENT)
+            centerText = label
+            setUsePercentValues(true)
+            setDrawEntryLabels(true)
+            setEntryLabelColor(ContextCompat.getColor(context, R.color.light_text))
+            setEntryLabelTextSize(12f)
+            description.isEnabled = false
+            legend.isEnabled = false
+            animateY(1000, Easing.EaseInOutQuad)
+            invalidate()
+        }
     }
 
 
