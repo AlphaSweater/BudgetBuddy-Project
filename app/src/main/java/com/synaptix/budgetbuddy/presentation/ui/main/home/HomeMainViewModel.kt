@@ -30,18 +30,21 @@ class HomeMainViewModel @Inject constructor(
         object Loading : WalletState()
         data class Success(val wallets: List<Wallet>) : WalletState()
         data class Error(val message: String) : WalletState()
+        object Empty : WalletState()
     }
 
     sealed class TransactionState {
         object Loading : TransactionState()
         data class Success(val transactions: List<Transaction>) : TransactionState()
         data class Error(val message: String) : TransactionState()
+        object Empty : TransactionState()
     }
 
     sealed class CategoryState {
         object Loading : CategoryState()
         data class Success(val categories: List<Category>) : CategoryState()
         data class Error(val message: String) : CategoryState()
+        object Empty : CategoryState()
     }
 
     private val _walletsState = MutableStateFlow<WalletState>(WalletState.Loading)
@@ -86,60 +89,74 @@ class HomeMainViewModel @Inject constructor(
         viewModelScope.launch {
             val userId = getUserIdUseCase.execute()
             if (userId.isEmpty()) {
-                _walletsState.value = WalletState.Error("User ID is empty")
-                _transactionsState.value = TransactionState.Error("User ID is empty")
-                _categoriesState.value = CategoryState.Error("User ID is empty")
+                _walletsState.value = WalletState.Empty
+                _transactionsState.value = TransactionState.Empty
+                _categoriesState.value = CategoryState.Empty
                 return@launch
             }
 
-            // Collect wallets
-            getWalletUseCase.execute(userId)
-                .catch { e -> 
-                    _walletsState.value = WalletState.Error(e.message ?: "Failed to load wallets")
-                }
-                .collect { result ->
-                    _walletsState.value = when (result) {
-                        is GetWalletUseCase.GetWalletResult.Success -> WalletState.Success(result.wallets)
-                        is GetWalletUseCase.GetWalletResult.Error -> WalletState.Error(result.message)
-                    }
+            launch {
+                // Collect transactions
+                val transactionsFlow = if (_selectedStartDate.isNotEmpty() && _selectedEndDate.isNotEmpty()) {
+                    val startDate = dateFormat.parse(_selectedStartDate)?.time ?: 0L
+                    val endDate = dateFormat.parse(_selectedEndDate)?.time ?: 0L
+                    getTransactionsUseCase.executeWithDateRange(userId, startDate, endDate)
+                } else {
+                    getTransactionsUseCase.execute(userId)
                 }
 
-            // Collect transactions
-            val transactionsFlow = if (_selectedStartDate.isNotEmpty() && _selectedEndDate.isNotEmpty()) {
-                val startDate = dateFormat.parse(_selectedStartDate)?.time ?: 0L
-                val endDate = dateFormat.parse(_selectedEndDate)?.time ?: 0L
-                getTransactionsUseCase.executeWithDateRange(userId, startDate, endDate)
-            } else {
-                getTransactionsUseCase.execute(userId)
+                transactionsFlow
+                    .catch { e ->
+                        _transactionsState.value = TransactionState.Empty
+                    }
+                    .collect { result ->
+                        when (result) {
+                            is GetTransactionsUseCase.GetTransactionsResult.Success -> {
+                                val filtered = filterTransactions(result.transactions)
+                                _transactionsState.value = if (filtered.isEmpty()) TransactionState.Empty
+                                else TransactionState.Success(filtered)
+                            }
+                            is GetTransactionsUseCase.GetTransactionsResult.Error -> {
+                                _transactionsState.value = TransactionState.Empty
+                            }
+                        }
+                    }
             }
 
-            transactionsFlow
-                .catch { e ->
-                    _transactionsState.value = TransactionState.Error(e.message ?: "Failed to load transactions")
-                }
-                .collect { result ->
-                    when (result) {
-                        is GetTransactionsUseCase.GetTransactionsResult.Success -> {
-                            val filtered = filterTransactions(result.transactions)
-                            _transactionsState.value = TransactionState.Success(filtered)
-                        }
-                        is GetTransactionsUseCase.GetTransactionsResult.Error -> {
-                            _transactionsState.value = TransactionState.Error(result.message)
+            // Launch parallel coroutines for each collection
+            launch {
+                // Collect wallets
+                getWalletUseCase.execute(userId)
+                    .catch { e -> 
+                        _walletsState.value = WalletState.Empty
+                    }
+                    .collect { result ->
+                        _walletsState.value = when (result) {
+                            is GetWalletUseCase.GetWalletResult.Success -> {
+                                if (result.wallets.isEmpty()) WalletState.Empty
+                                else WalletState.Success(result.wallets)
+                            }
+                            is GetWalletUseCase.GetWalletResult.Error -> WalletState.Empty
                         }
                     }
-                }
+            }
 
-            // Collect categories
-            getCategoriesUseCase.execute(userId)
-                .catch { e ->
-                    _categoriesState.value = CategoryState.Error(e.message ?: "Failed to load categories")
-                }
-                .collect { result ->
-                    _categoriesState.value = when (result) {
-                        is GetCategoriesUseCase.GetCategoriesResult.Success -> CategoryState.Success(result.categories)
-                        is GetCategoriesUseCase.GetCategoriesResult.Error -> CategoryState.Error(result.message)
+            launch {
+                // Collect categories
+                getCategoriesUseCase.execute(userId)
+                    .catch { e ->
+                        _categoriesState.value = CategoryState.Empty
                     }
-                }
+                    .collect { result ->
+                        _categoriesState.value = when (result) {
+                            is GetCategoriesUseCase.GetCategoriesResult.Success -> {
+                                if (result.categories.isEmpty()) CategoryState.Empty
+                                else CategoryState.Success(result.categories)
+                            }
+                            is GetCategoriesUseCase.GetCategoriesResult.Error -> CategoryState.Empty
+                        }
+                    }
+            }
         }
     }
 

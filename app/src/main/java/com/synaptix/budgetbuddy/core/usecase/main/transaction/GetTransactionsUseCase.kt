@@ -108,7 +108,7 @@ class GetTransactionsUseCase @Inject constructor(
                     GetTransactionsResult.Success(fullTransactions)
                 }
             }
-        }
+        }.flowOn(Dispatchers.IO) // Optional for heavy mapping
     }
 
     fun observeTotalAmountInDateRange(userId: String, startDate: Long, endDate: Long): Flow<Double> {

@@ -7,11 +7,17 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.snackbar.Snackbar
+import com.synaptix.budgetbuddy.R
 import com.synaptix.budgetbuddy.databinding.FragmentTransactionSelectWalletBinding
 import com.synaptix.budgetbuddy.presentation.ui.main.transaction.TransactionAddViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class TransactionSelectWalletFragment : Fragment() {
@@ -42,7 +48,8 @@ class TransactionSelectWalletFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setupRecyclerView()
         setupClickListeners()
-        observeWallets()
+        observeViewModel()
+        walletViewModel.loadWallets()
     }
 
     private fun setupRecyclerView() {
@@ -58,11 +65,57 @@ class TransactionSelectWalletFragment : Fragment() {
         }
     }
 
-    private fun observeWallets() {
-        walletViewModel.loadWallets()
-        walletViewModel.wallets.observe(viewLifecycleOwner) { wallets ->
-            walletAdapter.submitList(wallets)
+    private fun observeViewModel() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                // Collect UI state
+                launch {
+                    walletViewModel.uiState.collect { state ->
+                        handleUiState(state)
+                    }
+                }
+
+                // Collect wallets
+                launch {
+                    walletViewModel.wallets.collect { wallets ->
+                        walletAdapter.submitList(wallets)
+                        updateEmptyState(wallets.isEmpty())
+                    }
+                }
+            }
         }
+    }
+
+    private fun handleUiState(state: TransactionSelectWalletViewModel.UiState) {
+        when (state) {
+            is TransactionSelectWalletViewModel.UiState.Loading -> {
+                binding.progressBar.visibility = View.VISIBLE
+                binding.contentContainer.visibility = View.GONE
+            }
+            is TransactionSelectWalletViewModel.UiState.Success -> {
+                binding.progressBar.visibility = View.GONE
+                binding.contentContainer.visibility = View.VISIBLE
+            }
+            is TransactionSelectWalletViewModel.UiState.Error -> {
+                binding.progressBar.visibility = View.GONE
+                binding.contentContainer.visibility = View.VISIBLE
+                showError(state.message)
+            }
+            else -> {
+                binding.progressBar.visibility = View.GONE
+                binding.contentContainer.visibility = View.VISIBLE
+            }
+        }
+    }
+
+    private fun updateEmptyState(isEmpty: Boolean) {
+        binding.emptyState.visibility = if (isEmpty) View.VISIBLE else View.GONE
+    }
+
+    private fun showError(message: String) {
+        Snackbar.make(binding.root, message, Snackbar.LENGTH_SHORT)
+            .setBackgroundTint(resources.getColor(R.color.error, null))
+            .show()
     }
 
     override fun onDestroyView() {

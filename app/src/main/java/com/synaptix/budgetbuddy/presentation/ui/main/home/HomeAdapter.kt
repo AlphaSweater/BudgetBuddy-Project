@@ -126,9 +126,7 @@ class HomeAdapter(
         override fun bind(item: HomeListItems) {
             if (item !is HomeListItems.HomeTransactionItem) return
 
-            val resolvedColor =
-                ContextCompat.getColor(itemView.context, item.transaction.category.color)
-//            (iconContainer.background.mutate() as GradientDrawable).setColor(resolvedColor)
+            val resolvedColor = ContextCompat.getColor(itemView.context, item.transaction.category.color)
 
             iconView.setImageResource(item.transaction.category.icon)
             iconView.setColorFilter(resolvedColor)

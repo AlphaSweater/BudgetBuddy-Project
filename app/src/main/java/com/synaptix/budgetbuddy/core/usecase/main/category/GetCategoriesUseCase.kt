@@ -5,8 +5,10 @@ import com.synaptix.budgetbuddy.core.model.Result
 import com.synaptix.budgetbuddy.data.firebase.mapper.FirebaseMapper.toDomain
 import com.synaptix.budgetbuddy.data.firebase.repository.FirestoreCategoryRepository
 import com.synaptix.budgetbuddy.data.firebase.repository.FirestoreUserRepository
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
@@ -34,14 +36,17 @@ class GetCategoriesUseCase @Inject constructor(
             userRepository.observeUserProfile(userId),
             categoryRepository.observeCategoriesForUser(userId)
         ) { user, categories ->
-            when (user) {
-                null -> GetCategoriesResult.Error("User not found")
-                else -> {
-                    val domainUser = user.toDomain()
-                    GetCategoriesResult.Success(categories.map { it.toDomain(domainUser) })
-                }
+            if (user == null) {
+                return@combine GetCategoriesResult.Error("User not found")
             }
-        }
+
+            val domainUser = user.toDomain()
+
+            val fullCategories = categories.map { it.toDomain(domainUser) }
+
+            GetCategoriesResult.Success(fullCategories)
+
+        }.flowOn(Dispatchers.IO) // Optional for heavy mapping
     }
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~EOF~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\

@@ -23,7 +23,6 @@ package com.synaptix.budgetbuddy.presentation.ui.main.budget.budgetAdd
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.synaptix.budgetbuddy.core.model.Category
 import com.synaptix.budgetbuddy.core.model.Wallet
 import com.synaptix.budgetbuddy.core.usecase.auth.GetUserIdUseCase
@@ -31,7 +30,6 @@ import com.synaptix.budgetbuddy.core.usecase.auth.ValidateUserTotalsUseCase
 import com.synaptix.budgetbuddy.data.firebase.model.BudgetDTO
 import com.synaptix.budgetbuddy.data.firebase.repository.FirestoreBudgetRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 // --- ViewModel for Adding Budget ---
@@ -55,7 +53,7 @@ class BudgetAddViewModel @Inject constructor(
     suspend fun addBudget() {
         try {
             val userId = getUserIdUseCase.execute()
-            val budget = BudgetDTO(
+            val newBudgetDTO = BudgetDTO(
                 userId = userId,
                 name = budgetName.value ?: "",
                 amount = budgetAmount.value ?: 0.0,
@@ -64,7 +62,7 @@ class BudgetAddViewModel @Inject constructor(
                 startDate = System.currentTimeMillis()
             )
 
-            when (val result = firestoreBudgetRepository.createBudget(budget)) {
+            when (val result = firestoreBudgetRepository.createBudget(newBudgetDTO.userId, newBudgetDTO)) {
                 is com.synaptix.budgetbuddy.core.model.Result.Success -> {
                     // OK
 //                    validateUserTotalsUseCase.execute(userId)

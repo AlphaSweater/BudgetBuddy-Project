@@ -1,8 +1,6 @@
 package com.synaptix.budgetbuddy.presentation.ui.main.transaction
 
 import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.synaptix.budgetbuddy.core.model.Category
@@ -11,8 +9,7 @@ import com.synaptix.budgetbuddy.core.model.RecurrenceData
 import com.synaptix.budgetbuddy.core.model.Wallet
 import com.synaptix.budgetbuddy.core.usecase.auth.GetUserIdUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -57,95 +54,96 @@ class TransactionAddViewModel @Inject constructor(
     val uiState: StateFlow<UiState> = _uiState
 
     // Validation State
-    private val _validationState = MutableLiveData(ValidationState())
-    val validationState: LiveData<ValidationState> = _validationState
+    private val _validationState = MutableStateFlow(ValidationState())
+    val validationState: StateFlow<ValidationState> = _validationState
 
     // Form Fields
-    private val _category = MutableLiveData<Category?>()
-    val category: LiveData<Category?> = _category
+    private val _category = MutableStateFlow<Category?>(null)
+    val category: StateFlow<Category?> = _category
 
-    private val _wallet = MutableLiveData<Wallet?>()
-    val wallet: LiveData<Wallet?> = _wallet
+    private val _wallet = MutableStateFlow<Wallet?>(null)
+    val wallet: StateFlow<Wallet?> = _wallet
 
-    private val _currency = MutableLiveData("ZAR")
-    val currency: LiveData<String> = _currency
+    private val _currency = MutableStateFlow("ZAR")
+    val currency: StateFlow<String> = _currency
 
-    private val _amount = MutableLiveData<Double?>()
-    val amount: LiveData<Double?> = _amount
+    private val _amount = MutableStateFlow<Double?>(null)
+    val amount: StateFlow<Double?> = _amount
 
-    private val _date = MutableLiveData(getCurrentDate())
-    val date: LiveData<String> = _date
+    private val _date = MutableStateFlow(getCurrentDate())
+    val date: StateFlow<String> = _date
 
-    private val _note = MutableLiveData<String?>()
-    val note: LiveData<String?> = _note
+    private val _note = MutableStateFlow<String?>(null)
+    val note: StateFlow<String?> = _note
 
-    private val _imageBytes = MutableLiveData<ByteArray?>()
-    val imageBytes: LiveData<ByteArray?> = _imageBytes
+    private val _imageBytes = MutableStateFlow<ByteArray?>(null)
+    val imageBytes: StateFlow<ByteArray?> = _imageBytes
 
-    private val _recurrenceData = MutableLiveData<RecurrenceData>()
-    val recurrenceData: LiveData<RecurrenceData> = _recurrenceData
+    private val _recurrenceData = MutableStateFlow(RecurrenceData.DEFAULT)
+    val recurrenceData: StateFlow<RecurrenceData> = _recurrenceData
 
-    private val _selectedLabels = MutableLiveData<List<Label>>(emptyList())
-    val selectedLabels: LiveData<List<Label>> = _selectedLabels
+    private val _selectedLabels = MutableStateFlow<List<Label>>(emptyList())
+    val selectedLabels: StateFlow<List<Label>> = _selectedLabels
 
-    val saveState = MutableLiveData<Boolean>(false)
+    private val _saveState = MutableStateFlow(false)
+    val saveState: StateFlow<Boolean> = _saveState
 
     fun setCategory(category: Category?) {
-        _category.postValue(category)
+        _category.value = category
         validateForm()
     }
 
     fun setLabels(labels: List<Label>) {
-        _selectedLabels.postValue(labels)
+        _selectedLabels.value = labels
     }
 
     fun setWallet(wallet: Wallet?) {
-        _wallet.postValue(wallet)
+        _wallet.value = wallet
         validateForm()
     }
 
     fun setCurrency(currency: String) {
-        _currency.postValue(currency)
+        _currency.value = currency
         validateForm()
     }
 
     fun setAmount(amount: Double?) {
-        _amount.postValue(amount)
+        _amount.value = amount
         validateForm()
     }
 
     fun setDate(date: String) {
-        _date.postValue(date)
+        _date.value = date
         validateForm()
     }
 
     fun setNote(note: String) {
-        _note.postValue(note)
+        _note.value = note
     }
 
     fun setRecurrenceData(data: RecurrenceData) {
-        _recurrenceData.postValue(data)
+        _recurrenceData.value = data
     }
 
     fun setImageBytes(bytes: ByteArray?) {
-        _imageBytes.postValue(bytes)
+        _imageBytes.value = bytes
     }
 
     fun removeLabel(label: Label) {
-        val currentLabels = _selectedLabels.value?.toMutableList() ?: mutableListOf()
+        val currentLabels = _selectedLabels.value.toMutableList()
         currentLabels.remove(label)
-        _selectedLabels.postValue(currentLabels)
+        _selectedLabels.value = currentLabels
     }
 
     fun validateForm(): Boolean {
-        val currentState = _validationState.value ?: ValidationState()
+        val currentState = _validationState.value
         val isAmountValid = (_amount.value ?: 0.0) > 0.0
         val isCurrencyValid = !_currency.value.isNullOrBlank()
         val isCategoryValid = _category.value != null
         val isWalletValid = _wallet.value != null
         val isDateValid = !_date.value.isNullOrBlank()
 
-        saveState.value = true
+        _saveState.value = true
         _validationState.value = currentState.copy(
             isAmountValid = isAmountValid,
             isCurrencyValid = isCurrencyValid,
@@ -163,76 +161,89 @@ class TransactionAddViewModel @Inject constructor(
     }
 
     fun showValidationErrors() {
-        _validationState.value = _validationState.value?.copy(shouldShowErrors = true)
+        _validationState.value = _validationState.value.copy(shouldShowErrors = true)
         validateForm()
     }
 
-    suspend fun addTransaction() {
+    fun addTransaction() {
         if (!validateForm()) return
 
-        _uiState.value = UiState.Loading
+        viewModelScope.launch {
+            _uiState.value = UiState.Loading
 
-        try {
-            val userId = getUserIdUseCase.execute()
+            try {
+                val userId = getUserIdUseCase.execute()
+                if (userId.isEmpty()) {
+                    _uiState.value = UiState.Error("User ID is empty")
+                    return@launch
+                }
 
-            // Create transaction object first without image
-            val tempUser = User(userId, "", "", "")
-            val newTransaction = Transaction.new(
-                user = tempUser,
-                wallet = _wallet.value!!,
-                category = _category.value!!,
-                labels = selectedLabels.value!!,
-                amount = _amount.value ?: 0.0,
-                currency = _currency.value ?: "ZAR",
-                date = parseDate((_date.value ?: System.currentTimeMillis()).toString()),
-                note = _note.value ?: "",
-                photoUrl = null, // Will be updated after upload
-                recurrenceData = _recurrenceData.value ?: RecurrenceData.DEFAULT
-            )
+                // Create transaction object first without image
+                val tempUser = User(userId, "", "", "")
+                val newTransaction = Transaction.new(
+                    user = tempUser,
+                    wallet = _wallet.value!!,
+                    category = _category.value!!,
+                    labels = _selectedLabels.value,
+                    amount = _amount.value ?: 0.0,
+                    currency = _currency.value,
+                    date = parseDate(_date.value),
+                    note = _note.value ?: "",
+                    photoUrl = null, // Will be updated after upload
+                    recurrenceData = _recurrenceData.value
+                )
 
-            // Upload image in parallel if exists
-            val imageUrl = _imageBytes.value?.let { bytes ->
-                try {
-                    when (val result = uploadImageUseCase.execute(bytes)) {
-                        is UploadImageUseCase.UploadImageResult.Success -> result.imageUrl
-                        is UploadImageUseCase.UploadImageResult.Error -> {
-                            Log.e("TransactionAddViewModel", "Error uploading image: ${result.message}")
-                            null
+                // Upload image in parallel if exists
+                val imageUrl = _imageBytes.value?.let { bytes ->
+                    try {
+                        when (val result = uploadImageUseCase.execute(bytes)) {
+                            is UploadImageUseCase.UploadImageResult.Success -> result.imageUrl
+                            is UploadImageUseCase.UploadImageResult.Error -> {
+                                Log.e("TransactionAddViewModel", "Error uploading image: ${result.message}")
+                                null
+                            }
+                        }
+                    } catch (e: Exception) {
+                        Log.e("TransactionAddViewModel", "Exception uploading image: ${e.message}")
+                        null
+                    }
+                }
+
+                // Update transaction with image URL if upload was successful
+                val finalTransaction = if (imageUrl != null) {
+                    newTransaction.copy(photoUrl = imageUrl)
+                } else {
+                    newTransaction
+                }
+
+                // Save transaction
+                addTransactionUseCase.execute(finalTransaction)
+                    .catch { e ->
+                        Log.e("TransactionAddViewModel", "Error in transaction flow: ${e.message}")
+                        _uiState.value = UiState.Error(e.message ?: "Failed to add transaction")
+                    }
+                    .collect { result ->
+                        when (result) {
+                            is AddTransactionResult.Success -> {
+                                Log.d("TransactionAddViewModel", "Transaction added successfully: ${result.transactionId}")
+                                reset()
+                                _uiState.value = UiState.Success
+                            }
+                            is AddTransactionResult.Error -> {
+                                Log.e("TransactionAddViewModel", "Error adding transaction: ${result.message}")
+                                _uiState.value = UiState.Error(result.message)
+                            }
                         }
                     }
-                } catch (e: Exception) {
-                    Log.e("TransactionAddViewModel", "Exception uploading image: ${e.message}")
-                    null
-                }
+            } catch (e: Exception) {
+                Log.e("TransactionAddViewModel", "Exception adding transaction: ${e.message}")
+                _uiState.value = UiState.Error(e.message ?: "Failed to add transaction")
             }
-
-            // Update transaction with image URL if upload was successful
-            val finalTransaction = if (imageUrl != null) {
-                newTransaction.copy(photoUrl = imageUrl)
-            } else {
-                newTransaction
-            }
-
-            // Save transaction
-            when (val result = addTransactionUseCase.execute(finalTransaction)) {
-                is AddTransactionResult.Success -> {
-                    Log.d("TransactionAddViewModel", "Transaction added successfully: ${result.transactionId}")
-                    reset()
-                    _uiState.value = UiState.Success
-                }
-                is AddTransactionResult.Error -> {
-                    Log.e("TransactionAddViewModel", "Error adding transaction: ${result.message}")
-                    _uiState.value = UiState.Error(result.message)
-                }
-            }
-        } catch (e: Exception) {
-            Log.e("TransactionAddViewModel", "Exception adding transaction: ${e.message}")
-            _uiState.value = UiState.Error(e.message ?: "Failed to add transaction")
         }
     }
 
     fun reset() {
-        saveState.value = false
+        _saveState.value = false
         _amount.value = null
         _date.value = getCurrentDate()
         _note.value = null
@@ -243,7 +254,7 @@ class TransactionAddViewModel @Inject constructor(
         _selectedLabels.value = emptyList()
         _validationState.value = ValidationState(shouldShowErrors = false)
         _uiState.value = UiState.Initial
-        saveState.value = false
+        _saveState.value = false
     }
 
     private fun getCurrentDate(): String =

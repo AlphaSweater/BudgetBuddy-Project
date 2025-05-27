@@ -9,14 +9,20 @@ import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.snackbar.Snackbar
 import com.synaptix.budgetbuddy.R
 import com.synaptix.budgetbuddy.core.model.Category
 import com.synaptix.budgetbuddy.databinding.FragmentTransactionSelectCategoryBinding
 import com.synaptix.budgetbuddy.presentation.ui.main.transaction.TransactionAddViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
+import androidx.core.view.isVisible
 
 @AndroidEntryPoint
 class TransactionSelectCategoryFragment : Fragment() {
@@ -54,7 +60,8 @@ class TransactionSelectCategoryFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setupViews()
         setupSearch()
-        observeCategories()
+        observeViewModel()
+        categoryViewModel.loadCategories()
     }
 
     private fun setupViews() {
@@ -95,13 +102,48 @@ class TransactionSelectCategoryFragment : Fragment() {
         }
     }
 
-    private fun observeCategories() {
-        categoryViewModel.loadCategories()
-        categoryViewModel.filteredCategories.observe(viewLifecycleOwner) { categories ->
-            val (expenseCategories, incomeCategories) = categories.partition { it.type == "expense" }
-            expenseAdapter.submitList(expenseCategories)
-            incomeAdapter.submitList(incomeCategories)
-            updateEmptyState()
+    private fun observeViewModel() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                // Collect UI state
+                launch {
+                    categoryViewModel.uiState.collect { state ->
+                        handleUiState(state)
+                    }
+                }
+
+                // Collect filtered categories
+                launch {
+                    categoryViewModel.filteredCategories.collect { categories ->
+                        val (expenseCategories, incomeCategories) = categories.partition { it.type == "expense" }
+                        expenseAdapter.submitList(expenseCategories)
+                        incomeAdapter.submitList(incomeCategories)
+                        updateEmptyState()
+                    }
+                }
+            }
+        }
+    }
+
+    private fun handleUiState(state: TransactionSelectCategoryViewModel.UiState) {
+        when (state) {
+            is TransactionSelectCategoryViewModel.UiState.Loading -> {
+                binding.progressBar.visibility = View.VISIBLE
+                binding.contentContainer.visibility = View.GONE
+            }
+            is TransactionSelectCategoryViewModel.UiState.Success -> {
+                binding.progressBar.visibility = View.GONE
+                binding.contentContainer.visibility = View.VISIBLE
+            }
+            is TransactionSelectCategoryViewModel.UiState.Error -> {
+                binding.progressBar.visibility = View.GONE
+                binding.contentContainer.visibility = View.VISIBLE
+                showError(state.message)
+            }
+            else -> {
+                binding.progressBar.visibility = View.GONE
+                binding.contentContainer.visibility = View.VISIBLE
+            }
         }
     }
 
@@ -127,7 +169,7 @@ class TransactionSelectCategoryFragment : Fragment() {
 
     private fun updateEmptyState() {
         with(binding) {
-            val isExpenseVisible = recyclerViewExpenseCategory.visibility == View.VISIBLE
+            val isExpenseVisible = recyclerViewExpenseCategory.isVisible
             val currentAdapter = if (isExpenseVisible) expenseAdapter else incomeAdapter
             emptyState.visibility = if (currentAdapter.itemCount == 0) View.VISIBLE else View.GONE
         }
@@ -135,6 +177,12 @@ class TransactionSelectCategoryFragment : Fragment() {
 
     private fun showAddCategory() {
         findNavController().navigate(R.id.navigation_category_add_new)
+    }
+
+    private fun showError(message: String) {
+        Snackbar.make(binding.root, message, Snackbar.LENGTH_SHORT)
+            .setBackgroundTint(resources.getColor(R.color.error, null))
+            .show()
     }
 
     override fun onDestroyView() {
