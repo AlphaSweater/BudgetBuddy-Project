@@ -83,14 +83,89 @@ class HomeMainViewModel @Inject constructor(
             loadTransactions()
         }
 
+    private var cachedTransactions: List<Transaction> = emptyList()
+    private var lastTransactionFetchTime: Long = 0
+    private val CACHE_DURATION = 30000L // 30 seconds cache
+    private var isInitialLoad = true
+
+    fun getCachedTransactions(): List<Transaction> = cachedTransactions
+
     init {
         refreshData()
     }
 
-    fun refreshData() {
+    fun refreshData(forceRefresh: Boolean = false) {
+        // Clear cache only if forced refresh or initial load
+        if (forceRefresh || isInitialLoad) {
+            cachedTransactions = emptyList()
+            lastTransactionFetchTime = 0
+            isInitialLoad = false
+        }
         loadWallets()
         loadTransactions()
         loadCategories()
+    }
+
+    private suspend fun getTransactions(userId: String): List<Transaction> {
+        val currentTime = System.currentTimeMillis()
+        
+        // Return cached data if it's still valid
+        if (currentTime - lastTransactionFetchTime < CACHE_DURATION && cachedTransactions.isNotEmpty()) {
+            return cachedTransactions
+        }
+
+        // If cache is expired but we have data, return it while refreshing in background
+        if (cachedTransactions.isNotEmpty()) {
+            viewModelScope.launch {
+                refreshTransactionsInBackground(userId)
+            }
+            return cachedTransactions
+        }
+
+        // If no cache exists, fetch synchronously
+        return fetchTransactions(userId)
+    }
+
+    private suspend fun refreshTransactionsInBackground(userId: String) {
+        try {
+            val newTransactions = fetchTransactions(userId)
+            if (newTransactions.isNotEmpty()) {
+                cachedTransactions = newTransactions
+                lastTransactionFetchTime = System.currentTimeMillis()
+            }
+        } catch (e: Exception) {
+            // Log error but don't update UI since we're in background
+            e.printStackTrace()
+        }
+    }
+
+    private suspend fun fetchTransactions(userId: String): List<Transaction> {
+        val result = if (_selectedStartDate.isNotEmpty() && _selectedEndDate.isNotEmpty()) {
+            val startDate = dateFormat.parse(_selectedStartDate)?.time ?: 0L
+            val endDate = dateFormat.parse(_selectedEndDate)?.time ?: 0L
+            getTransactionsUseCase.executeWithDateRange(userId, startDate, endDate)
+        } else {
+            getTransactionsUseCase.execute(userId)
+        }
+
+        return when (result) {
+            is GetTransactionsUseCase.GetTransactionsResult.Success -> {
+                cachedTransactions = result.transactions
+                lastTransactionFetchTime = System.currentTimeMillis()
+                result.transactions
+            }
+            else -> emptyList()
+        }
+    }
+
+    // Add method to check if cache is stale
+    fun isCacheStale(): Boolean {
+        return System.currentTimeMillis() - lastTransactionFetchTime > CACHE_DURATION
+    }
+
+    // Add method to get cache age
+    fun getCacheAge(): Long {
+        return System.currentTimeMillis() - lastTransactionFetchTime
     }
 
     private fun loadWallets() {
@@ -100,7 +175,16 @@ class HomeMainViewModel @Inject constructor(
                 val userId = getUserIdUseCase.execute()
                 when (val result = getWalletUseCase.execute(userId)) {
                     is GetWalletUseCase.GetWalletResult.Success -> {
-                        _walletsState.value = WalletState.Success(result.wallets)
+                        // Get transactions once and reuse
+                        val transactions = getTransactions(userId)
+                        
+                        // Sort wallets by most recent transaction date
+                        val sortedWallets = result.wallets.sortedByDescending { wallet ->
+                            transactions
+                                .filter { it.wallet.id == wallet.id }
+                                .maxOfOrNull { it.date } ?: 0L
+                        }
+                        _walletsState.value = WalletState.Success(sortedWallets)
                     }
                     is GetWalletUseCase.GetWalletResult.Error -> {
                         _walletsState.value = WalletState.Error(result.message)
@@ -122,23 +206,10 @@ class HomeMainViewModel @Inject constructor(
                     return@launch
                 }
 
-                val result = if (_selectedStartDate.isNotEmpty() && _selectedEndDate.isNotEmpty()) {
-                    val startDate = dateFormat.parse(_selectedStartDate)?.time ?: 0L
-                    val endDate = dateFormat.parse(_selectedEndDate)?.time ?: 0L
-                    getTransactionsUseCase.executeWithDateRange(userId, startDate, endDate)
-                } else {
-                    getTransactionsUseCase.execute(userId)
-                }
-
-                when (result) {
-                    is GetTransactionsUseCase.GetTransactionsResult.Success -> {
-                        val filtered = filterTransactions(result.transactions)
-                        _transactionsState.value = TransactionState.Success(filtered)
-                    }
-                    is GetTransactionsUseCase.GetTransactionsResult.Error -> {
-                        _transactionsState.value = TransactionState.Error(result.message)
-                    }
-                }
+                val transactions = getTransactions(userId)
+                val filtered = filterTransactions(transactions)
+                    .sortedByDescending { it.date }
+                _transactionsState.value = TransactionState.Success(filtered)
             } catch (e: Exception) {
                 _transactionsState.value = TransactionState.Error(e.message ?: "Failed to load transactions")
             }
@@ -205,7 +276,21 @@ class HomeMainViewModel @Inject constructor(
                 val userId = getUserIdUseCase.execute()
                 when (val result = getCategoriesUseCase.execute(userId)) {
                     is GetCategoriesUseCase.GetCategoriesResult.Success -> {
-                        _categoriesState.value = CategoryState.Success(result.categories)
+                        // Get transactions once and reuse
+                        val transactions = getTransactions(userId)
+                        
+                        // Calculate total amount for each category
+                        val categoryAmounts = result.categories.associateWith { category ->
+                            transactions
+                                .filter { it.category.id == category.id }
+                                .sumOf { it.amount }
+                        }
+
+                        // Sort categories by total amount (highest to lowest)
+                        val sortedCategories = result.categories.sortedByDescending { category ->
+                            categoryAmounts[category] ?: 0.0
+                        }
+                        _categoriesState.value = CategoryState.Success(sortedCategories)
                     }
                     is GetCategoriesUseCase.GetCategoriesResult.Error -> {
                         _categoriesState.value = CategoryState.Error(result.message)

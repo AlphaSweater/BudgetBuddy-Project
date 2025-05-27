@@ -101,7 +101,6 @@ class HomeAdapter(
 
             dateText.text = "• ${item.relativeDate}"
 
-
             itemView.setOnClickListener { onClick?.invoke(item.wallet) }
         }
     }

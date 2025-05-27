@@ -21,9 +21,7 @@
 
 package com.synaptix.budgetbuddy.di
 
-import android.app.Application
 import com.google.firebase.Firebase
-import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -45,7 +43,6 @@ import com.synaptix.budgetbuddy.data.firebase.repository.FirestoreWalletReposito
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -143,8 +140,8 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideAddTransactionUseCase(repository: FirestoreTransactionRepository): AddTransactionUseCase {
-        return AddTransactionUseCase(repository)
+    fun provideAddTransactionUseCase(transactionRepository: FirestoreTransactionRepository, walletRepository: FirestoreWalletRepository): AddTransactionUseCase {
+        return AddTransactionUseCase(transactionRepository, walletRepository)
     }
 
     @Provides
