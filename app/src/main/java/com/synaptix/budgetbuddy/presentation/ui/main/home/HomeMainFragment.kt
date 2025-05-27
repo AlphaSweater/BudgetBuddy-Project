@@ -1,11 +1,14 @@
 package com.synaptix.budgetbuddy.presentation.ui.main.home
 
+import android.content.Context
 import android.graphics.Color
 import android.os.Bundle
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.annotation.AttrRes
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -26,6 +29,7 @@ import com.github.mikephil.charting.data.PieData
 import com.github.mikephil.charting.data.PieDataSet
 import com.github.mikephil.charting.data.PieEntry
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
+import com.github.mikephil.charting.formatter.PercentFormatter
 import com.synaptix.budgetbuddy.R
 import com.synaptix.budgetbuddy.core.model.HomeListItems
 import com.synaptix.budgetbuddy.databinding.FragmentHomeBinding
@@ -85,6 +89,13 @@ class HomeMainFragment : Fragment() {
             }
         )
     }
+
+    fun Context.getThemeColor(@AttrRes attrRes: Int): Int {
+        val typedValue = TypedValue()
+        theme.resolveAttribute(attrRes, typedValue, true)
+        return typedValue.data
+    }
+
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -161,57 +172,63 @@ class HomeMainFragment : Fragment() {
     }
 
     private fun setupBarChart() {
+        val context = binding.root.context
         val barChart: BarChart = binding.barChart
 
-        // Sample data: one month's income and expense
-        val income = BarEntry(0f, 5000f) // X = 0
-        val expense = BarEntry(1f, 3200f) // X = 1
+        // Get theme-based colors
+        val primaryTextColor = context.getThemeColor(R.attr.bb_primaryText)
+        val expenseColor = context.getThemeColor(R.attr.bb_expense)
+        val profitColor = context.getThemeColor(R.attr.bb_profit)
+
+        // Sample data
+        val income = BarEntry(0f, 5000f)
+        val expense = BarEntry(1f, 3200f)
 
         val incomeSet = BarDataSet(listOf(income), "Income").apply {
-            color = resources.getColor(R.color.expense_red, null)
+            color = profitColor
+            valueTextColor = primaryTextColor
         }
 
         val expenseSet = BarDataSet(listOf(expense), "Expense").apply {
-            color = resources.getColor(R.color.profit_green, null)
+            color = expenseColor
+            valueTextColor = primaryTextColor
         }
 
         val data = BarData(incomeSet, expenseSet)
+        data.barWidth = 0.25f
 
-        // Adjust bar width and spacing
-        val groupSpace = 0.4f
-        val barSpace = 0.05f
-        val barWidth = 0.25f
-
-        data.barWidth = barWidth
         barChart.data = data
-
-        // Set X-axis range so both bars fit
         barChart.xAxis.axisMinimum = -0.5f
         barChart.xAxis.axisMaximum = 2f
+        barChart.groupBars(0f, 0.4f, 0.05f)
 
-        // Group the bars
-        barChart.groupBars(0f, groupSpace, barSpace)
-
-        // Setup labels
         barChart.xAxis.apply {
             granularity = 1f
             isGranularityEnabled = true
             setDrawGridLines(false)
             setCenterAxisLabels(true)
             position = XAxis.XAxisPosition.BOTTOM
-            valueFormatter = IndexAxisValueFormatter(listOf("March")) // <-- or dynamically set month
+            valueFormatter = IndexAxisValueFormatter(listOf("March"))
+            textColor = primaryTextColor
         }
 
-        barChart.description = Description().apply { text = "Monthly Budget" }
+        barChart.axisLeft.textColor = primaryTextColor
         barChart.axisRight.isEnabled = false
+        barChart.legend.textColor = primaryTextColor
+
+        barChart.description = Description().apply {
+            text = "Monthly Budget"
+            textColor = primaryTextColor
+        }
+
         barChart.animateY(1000)
         barChart.invalidate()
     }
 
     private fun setupPieChart() {
+        val context = binding.root.context
         val pieChart: PieChart = binding.pieChart
 
-        // Sample expense categories and values
         val expenseCategories = listOf("Food", "Transport", "Entertainment", "Bills", "Shopping")
         val expenseAmounts = listOf(800f, 400f, 300f, 500f, 600f)
 
@@ -221,30 +238,37 @@ class HomeMainFragment : Fragment() {
 
         val pieDataSet = PieDataSet(pieEntries, "Expense Categories").apply {
             colors = listOf(
-                ContextCompat.getColor(requireContext(), R.color.cat_dark_green),
-                ContextCompat.getColor(requireContext(), R.color.cat_light_pink),
-                ContextCompat.getColor(requireContext(), R.color.cat_dark_blue),
-                ContextCompat.getColor(requireContext(), R.color.cat_yellow),
-                ContextCompat.getColor(requireContext(), R.color.cat_orange)
+                ContextCompat.getColor(context, R.color.cat_dark_green),
+                ContextCompat.getColor(context, R.color.cat_light_pink),
+                ContextCompat.getColor(context, R.color.cat_dark_blue),
+                ContextCompat.getColor(context, R.color.cat_yellow),
+                ContextCompat.getColor(context, R.color.cat_orange)
             )
             valueTextSize = 14f
-            valueTextColor = Color.WHITE
-            sliceSpace = 2f
+            valueTextColor = context.getThemeColor(R.attr.bb_primaryText)
         }
 
-        val pieData = PieData(pieDataSet)
+        val pieData = PieData(pieDataSet).apply {
+            setValueFormatter(PercentFormatter(pieChart))
+        }
 
-        pieChart.data = pieData
-        pieChart.description.isEnabled = false
-        pieChart.centerText = "Expenses"
-        pieChart.setUsePercentValues(true)
-        pieChart.setEntryLabelColor(Color.BLACK)
-
-        // ✅ Correct easing import from MPAndroidChart
-        pieChart.animateY(1000, Easing.EaseInOutQuad)
-        pieChart.invalidate()
+        pieChart.apply {
+            data = pieData
+            isDrawHoleEnabled = true
+            holeRadius = 50f
+            setHoleColor(Color.TRANSPARENT)
+            centerText = "Expenses"
+            setCenterTextColor(context.getThemeColor(R.attr.bb_primaryText))
+            setUsePercentValues(true)
+            setDrawEntryLabels(true)
+            setEntryLabelColor(context.getThemeColor(R.attr.bb_primaryText))
+            setEntryLabelTextSize(12f)
+            description.isEnabled = false
+            legend.isEnabled = false
+            animateY(1000, Easing.EaseInOutQuad)
+            invalidate()
+        }
     }
-
 
     private fun handleWalletsState(state: HomeMainViewModel.WalletState) {
         binding.apply {
