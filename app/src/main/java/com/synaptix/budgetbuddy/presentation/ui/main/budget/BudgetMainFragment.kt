@@ -62,24 +62,24 @@ class BudgetMainFragment : Fragment() {
             findNavController().navigate(R.id.action_budgetMainFragment_to_budgetAddFragment)
         }
         
-        binding.saveButton.setOnClickListener {
-            val minGoalText = binding.inputMinGoal.text.toString()
-            val maxGoalText = binding.inputMaxGoal.text.toString()
-
-            val minGoal = minGoalText.toDoubleOrNull()
-            val maxGoal = maxGoalText.toDoubleOrNull()
-
-            if (minGoal == null || maxGoal == null) {
-                Toast.makeText(
-                    requireContext(),
-                    "Please enter valid goal values.",
-                    Toast.LENGTH_SHORT
-                ).show()
-                return@setOnClickListener
-            }
-            // TODO: Save the min and max goals to the ViewModel or database
-//            viewModel.saveMinMaxGoals(minGoal, maxGoal)
-        }
+//        binding.saveButton.setOnClickListener {
+////            val minGoalText = binding.inputMinGoal.text.toString()
+////            val maxGoalText = binding.inputMaxGoal.text.toString()
+//
+////            val minGoal = minGoalText.toDoubleOrNull()
+////            val maxGoal = maxGoalText.toDoubleOrNull()
+//
+//            if (minGoal == null || maxGoal == null) {
+//                Toast.makeText(
+//                    requireContext(),
+//                    "Please enter valid goal values.",
+//                    Toast.LENGTH_SHORT
+//                ).show()
+//                return@setOnClickListener
+//            }
+//            // TODO: Save the min and max goals to the ViewModel or database
+////            viewModel.saveMinMaxGoals(minGoal, maxGoal)
+//        }
     }
 
     private fun observeViewModel() {
