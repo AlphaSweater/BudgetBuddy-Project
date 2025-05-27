@@ -1,5 +1,7 @@
 package com.synaptix.budgetbuddy.presentation.ui.main.home
 
+import android.R.attr.shadowColor
+import android.R.attr.shadowRadius
 import android.content.Context
 import android.graphics.Color
 import android.graphics.Typeface
@@ -324,17 +326,12 @@ class HomeMainFragment : Fragment() {
         context: Context
     ): PieDataSet {
         return PieDataSet(entries, "Expense Categories").apply {
-            colors = entries.mapIndexed { index, entry ->
+            // Use exact category colors
+            colors = entries.map { entry ->
                 val category = categories.find { it.name == entry.label }
-                category?.color ?: when (index % 6) {
-                    0 -> ContextCompat.getColor(context, R.color.cat_dark_green)
-                    1 -> ContextCompat.getColor(context, R.color.cat_light_pink)
-                    2 -> ContextCompat.getColor(context, R.color.cat_dark_blue)
-                    3 -> ContextCompat.getColor(context, R.color.cat_yellow)
-                    4 -> ContextCompat.getColor(context, R.color.cat_orange)
-                    else -> ContextCompat.getColor(context, R.color.cat_dark_brown)
-                }
+                category?.color ?: ContextCompat.getColor(context, R.color.cat_dark_green)
             }
+
             valueTextColor = context.getThemeColor(R.attr.bb_primaryText)
             valueTextSize = 16f
             valueLineColor = context.getThemeColor(R.attr.bb_secondaryText)
@@ -376,13 +373,18 @@ class HomeMainFragment : Fragment() {
         setHoleColor(Color.TRANSPARENT)
         setTransparentCircleColor(context.getThemeColor(R.attr.bb_surface))
         setTransparentCircleAlpha(110)
+
         centerText = "Expenses"
         setCenterTextColor(context.getThemeColor(R.attr.bb_primaryText))
         setCenterTextTypeface(Typeface.DEFAULT_BOLD)
         setCenterTextSize(20f)
+
         setUsePercentValues(true)
         setDrawEntryLabels(false)
         description.isEnabled = false
+
+        // Add padding
+        setExtraOffsets(10f, 10f, 10f, 10f)
     }
 
     private fun PieChart.configurePieChartLegend(context: Context) {
@@ -397,6 +399,8 @@ class HomeMainFragment : Fragment() {
             form = Legend.LegendForm.CIRCLE
             formSize = 14f
             formToTextSpace = 10f
+            xEntrySpace = 15f
+            yEntrySpace = 5f
         }
     }
 
@@ -429,6 +433,10 @@ class HomeMainFragment : Fragment() {
                     updateTransactionTotals(state.transactions)
                     setupBarChart()
                     handleTransactionsState(state)
+                    homeViewModel.categoriesState.collect { state ->
+                        handleCategoriesState(state)
+                        setupPieChart()
+                    }
                 }
                 is HomeMainViewModel.TransactionState.Empty -> {
                     handleTransactionsState(state)
