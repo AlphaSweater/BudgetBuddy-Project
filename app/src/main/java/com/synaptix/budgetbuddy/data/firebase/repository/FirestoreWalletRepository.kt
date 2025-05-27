@@ -11,7 +11,7 @@ import javax.inject.Singleton
 class FirestoreWalletRepository @Inject constructor(
     firestore: FirebaseFirestore
 ) : BaseFirestoreRepository<WalletDTO>(firestore) {
-    
+
     override val collection = firestore.collection("wallets")
 
     override fun getType(): Class<WalletDTO> = WalletDTO::class.java
@@ -48,7 +48,7 @@ class FirestoreWalletRepository @Inject constructor(
     suspend fun getWalletsForUser(userId: String): Result<List<WalletDTO>> {
         return try {
             val snapshot = createBaseQueryWithUserId(userId).get().await()
-            val wallets = snapshot.documents.mapNotNull { 
+            val wallets = snapshot.documents.mapNotNull {
                 it.toObject(WalletDTO::class.java)
             }
             Result.Success(wallets)
@@ -65,6 +65,22 @@ class FirestoreWalletRepository @Inject constructor(
                 ?: return Result.Error(Exception("Wallet not found"))
 
             val updatedWallet = wallet.updateBalance(amount)
+            update(walletId, updatedWallet)
+        } catch (e: Exception) {
+            Result.Error(e)
+        }
+    }
+
+    //updates wallet balance with income or expense
+    suspend fun updateWalletBalanceTrans(walletId: String, amount: Double, isIncome: Boolean): Result<Unit> {
+        return try {
+            val wallet = collection.document(walletId).get().await()
+                .toObject(WalletDTO::class.java)
+                ?: return Result.Error(Exception("Wallet not found"))
+
+            val finalAmount = if (isIncome) wallet.balance + amount else wallet.balance - amount
+            val updatedWallet = wallet.copy(balance = finalAmount, updatedAt = System.currentTimeMillis())
+
             update(walletId, updatedWallet)
         } catch (e: Exception) {
             Result.Error(e)
@@ -90,7 +106,7 @@ class FirestoreWalletRepository @Inject constructor(
     }
 
     // Check if a wallet name already exists for a user
-    suspend fun walletNameExists(userId: String, name: String): Result<Boolean> = 
+    suspend fun walletNameExists(userId: String, name: String): Result<Boolean> =
         checkNameExists(userId, name)
 
     // Create default wallet for a new user
