@@ -158,7 +158,8 @@
                     android:padding="32dp"
                     android:text="No wallets added yet"
                     android:textColor="?attr/bb_secondaryText"
-                    android:visibility="visible"/>
+                    android:visibility="gone"
+                    tools:visibility="visible"/>
 
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
