@@ -38,6 +38,10 @@ import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class HomeMainFragment : Fragment() {
+
+    private var totalIncome: Double = 0.0
+    private var totalExpense: Double = 0.0
+
     companion object {
         private const val MAX_ITEMS = 3
     }
@@ -160,6 +164,19 @@ class HomeMainFragment : Fragment() {
                 launch {
                     viewModel.transactionsState.collect { state ->
                         handleTransactionsState(state)
+
+                        if (state is HomeMainViewModel.TransactionState.Success) {
+                            totalIncome = state.transactions
+                                .filter { it.category.type == "income" }
+                                .sumOf { it.amount.toDouble() }  // ✅ Use toDouble()
+
+                            totalExpense = state.transactions
+                                .filter { it.category.type == "expense" }
+                                .sumOf { it.amount.toDouble() }  // ✅ Use toDouble()
+
+                            setupBarChart()
+                        }
+
                     }
                 }
                 launch {
@@ -175,54 +192,55 @@ class HomeMainFragment : Fragment() {
         val context = binding.root.context
         val barChart: BarChart = binding.barChart
 
-        // Get theme-based colors
         val primaryTextColor = context.getThemeColor(R.attr.bb_primaryText)
         val expenseColor = context.getThemeColor(R.attr.bb_expense)
         val profitColor = context.getThemeColor(R.attr.bb_profit)
 
-        // Sample data
-        val income = BarEntry(0f, 5000f)
-        val expense = BarEntry(1f, 3200f)
+        val incomeEntry = BarEntry(0f, totalIncome.toFloat())
+        val expenseEntry = BarEntry(1f, totalExpense.toFloat())
 
-        val incomeSet = BarDataSet(listOf(income), "Income").apply {
+        val incomeSet = BarDataSet(listOf(incomeEntry), "Income").apply {
             color = profitColor
             valueTextColor = primaryTextColor
         }
 
-        val expenseSet = BarDataSet(listOf(expense), "Expense").apply {
+        val expenseSet = BarDataSet(listOf(expenseEntry), "Expense").apply {
             color = expenseColor
             valueTextColor = primaryTextColor
         }
 
-        val data = BarData(incomeSet, expenseSet)
-        data.barWidth = 0.25f
-
-        barChart.data = data
-        barChart.xAxis.axisMinimum = -0.5f
-        barChart.xAxis.axisMaximum = 2f
-        barChart.groupBars(0f, 0.4f, 0.05f)
-
-        barChart.xAxis.apply {
-            granularity = 1f
-            isGranularityEnabled = true
-            setDrawGridLines(false)
-            setCenterAxisLabels(true)
-            position = XAxis.XAxisPosition.BOTTOM
-            valueFormatter = IndexAxisValueFormatter(listOf("March"))
-            textColor = primaryTextColor
+        val data = BarData(incomeSet, expenseSet).apply {
+            barWidth = 0.25f
         }
 
-        barChart.axisLeft.textColor = primaryTextColor
-        barChart.axisRight.isEnabled = false
-        barChart.legend.textColor = primaryTextColor
+        barChart.apply {
+            this.data = data
+            xAxis.axisMinimum = -0.5f
+            xAxis.axisMaximum = 2f
+            groupBars(0f, 0.4f, 0.05f)
 
-        barChart.description = Description().apply {
-            text = "Monthly Budget"
-            textColor = primaryTextColor
+            xAxis.apply {
+                granularity = 1f
+                isGranularityEnabled = true
+                setDrawGridLines(false)
+                setCenterAxisLabels(true)
+                position = XAxis.XAxisPosition.BOTTOM
+                valueFormatter = IndexAxisValueFormatter(listOf("March"))
+                textColor = primaryTextColor
+            }
+
+            axisLeft.textColor = primaryTextColor
+            axisRight.isEnabled = false
+            legend.textColor = primaryTextColor
+
+            description = Description().apply {
+                text = "Monthly Budget"
+                textColor = primaryTextColor
+            }
+
+            animateY(1000)
+            invalidate()
         }
-
-        barChart.animateY(1000)
-        barChart.invalidate()
     }
 
     private fun setupPieChart() {
