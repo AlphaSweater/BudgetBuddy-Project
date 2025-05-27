@@ -16,6 +16,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.github.mikephil.charting.charts.BarChart
 import com.github.mikephil.charting.charts.PieChart
@@ -153,7 +154,7 @@ class HomeMainFragment : Fragment() {
             }
 
             txtViewAllTransactions.setOnClickListener {
-                // TODO: Navigate to all transactions
+                findNavController().navigate(R.id.action_homeFragment_to_generalReportsFragment)
             }
         }
     }
