@@ -109,7 +109,7 @@ class HomeMainFragment : Fragment() {
         setupViews()
         observeStates()
         setupBarChart()
-        viewModel.pieEntries.observe(viewLifecycleOwner) { pieEntries ->
+        homeViewModel.pieEntries.observe(viewLifecycleOwner) { pieEntries ->
             setupPieChart(pieEntries)
         }
     }
@@ -610,7 +610,7 @@ class HomeMainFragment : Fragment() {
     }
 
     private fun navigateToAllTransactions() {
-        // TODO: Implement navigation to all transactions
+        findNavController().navigate(R.id.action_homeFragment_to_generalTransactionsFragment)
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
