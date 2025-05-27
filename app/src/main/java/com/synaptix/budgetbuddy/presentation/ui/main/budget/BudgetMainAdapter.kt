@@ -28,6 +28,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import com.google.android.material.progressindicator.LinearProgressIndicator
 import com.synaptix.budgetbuddy.R
 import com.synaptix.budgetbuddy.core.model.Budget
 import com.synaptix.budgetbuddy.core.model.BudgetListItems
@@ -73,6 +74,7 @@ class BudgetMainAdapter(
         private val budgetIcon: ImageView = itemView.findViewById(R.id.budgetIcon)
         private val budgetTitle: TextView = itemView.findViewById(R.id.budgetTitle)
         private val budgetStatus: TextView = itemView.findViewById(R.id.budgetStatus)
+        private val budgetProgress: LinearProgressIndicator = itemView.findViewById(R.id.budgetProgress)
 
         /**
          * Binds budget data to the view.
@@ -83,14 +85,13 @@ class BudgetMainAdapter(
             budgetIcon.setImageResource(R.drawable.ic_ui_budget)
             budgetTitle.text = item.budget.name
 
-            // Format the budget status with spent and amount
             val context = itemView.context
             val spent = item.budget.spent
             val amount = item.budget.amount
 
+            // --- Setup status text with color ---
             val statusText = SpannableStringBuilder()
 
-            // "R {spent}" in expense red
             val spentStr = "R %.2f".format(spent)
             val spentStart = statusText.length
             statusText.append(spentStr)
@@ -101,10 +102,8 @@ class BudgetMainAdapter(
                 Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
             )
 
-            // " spent of "
             statusText.append(" spent of ")
 
-            // "R {amount}" in profit green
             val amountStr = "R %.2f".format(amount)
             val amountStart = statusText.length
             statusText.append(amountStr)
@@ -116,7 +115,15 @@ class BudgetMainAdapter(
             )
 
             budgetStatus.setText(statusText, TextView.BufferType.SPANNABLE)
-            
+
+            // --- Set progress ---
+            val progress = if (amount > 0) {
+                ((spent / amount) * 100).coerceIn(0.0, 100.0)
+            } else {
+                0.0
+            }
+            budgetProgress.progress = progress.toInt()
+
             itemView.setOnClickListener { onBudgetClick(item.budget) }
         }
     }

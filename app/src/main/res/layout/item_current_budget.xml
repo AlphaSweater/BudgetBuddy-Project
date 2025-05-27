@@ -90,6 +90,21 @@
                 android:textColor="?attr/bb_secondaryText"
                 android:textSize="11sp"
                 android:includeFontPadding="false" />
+
+            <!-- Budget Progress Bar -->
+            <com.google.android.material.progressindicator.LinearProgressIndicator
+                android:id="@+id/budgetProgress"
+                android:layout_width="match_parent"
+                android:layout_height="6dp"
+                android:layout_marginTop="6dp"
+                android:layout_marginEnd="4dp"
+                android:layout_marginBottom="2dp"
+                android:max="100"
+                android:progress="40"
+                app:trackThickness="6dp"
+                app:indicatorColor="?attr/bb_button"
+                app:trackColor="?attr/bb_surfaceAlt"
+                style="@style/Widget.Material3.LinearProgressIndicator" />
         </LinearLayout>
 
         <!-- Navigation Arrow -->
