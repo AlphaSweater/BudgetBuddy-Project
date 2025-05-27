@@ -72,689 +72,729 @@
         </androidx.appcompat.widget.Toolbar>
     </com.google.android.material.appbar.AppBarLayout>
 
-    <!-- Main Layout Using ConstraintLayout -->
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/mainLayout"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="?attr/bb_background"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+    <ScrollView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
 
-        <!-- Cards Section -->
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/cardDaysLeft"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:layout_marginTop="80dp"
-            android:layout_marginEnd="10dp"
-            app:cardCornerRadius="50dp"
-            app:cardElevation="4dp"
-            app:layout_constraintEnd_toStartOf="@+id/cardSavingGoal"
-            app:layout_constraintHorizontal_chainStyle="packed"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="?attr/bb_primaryText"
-                android:gravity="center"
-                android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/textSelectedDaysLeft"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:text="Days Left"
-                    android:textColor="?attr/bb_background"
-                    android:textSize="13sp" />
-
-                <TextView
-                    android:id="@+id/textSelectedDaysLeftAmount"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:text="15"
-                    android:textColor="?attr/bb_background"
-                    android:textSize="20sp" />
-            </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
-
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/cardSavingGoal"
-            android:layout_width="120dp"
-            android:layout_height="120dp"
-            android:layout_marginHorizontal="8dp"
-            android:layout_marginTop="50dp"
-            app:cardCornerRadius="80dp"
-            app:cardElevation="4dp"
-            app:layout_constraintEnd_toStartOf="@+id/cardDaysPassed"
-            app:layout_constraintStart_toEndOf="@+id/cardDaysLeft"
-            app:layout_constraintTop_toTopOf="parent">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="?attr/bb_primaryText"
-                android:gravity="center"
-                android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/textSelectedSavingGoal"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:text="Saving Goal"
-                    android:textColor="?attr/bb_background"
-                    android:textSize="13sp" />
-
-                <!-- Horizontal Layout for Currency + Amount -->
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:gravity="center"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:id="@+id/textSelectedSavingGoalCurrency"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="2dp"
-                        android:text="R"
-                        android:textColor="?attr/bb_background"
-                        android:textSize="18sp" />
-
-                    <TextView
-                        android:id="@+id/textSavingGoalLeftAmount"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="10 000"
-                        android:textColor="?attr/bb_background"
-                        android:textSize="18sp" />
-                </LinearLayout>
-            </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
-
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/cardDaysPassed"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:layout_marginStart="10dp"
-            android:layout_marginTop="80dp"
-            app:cardCornerRadius="50dp"
-            app:cardElevation="4dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/cardSavingGoal"
-            app:layout_constraintTop_toTopOf="parent">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="?attr/bb_primaryText"
-                android:gravity="center"
-                android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/textSavingDaysPassed"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:text="Days Passed"
-                    android:textColor="?attr/bb_background"
-                    android:textSize="13sp" />
-
-                <TextView
-                    android:id="@+id/textSavingDaysPassedAmount"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:text="15"
-                    android:textColor="?attr/bb_background"
-                    android:textSize="20sp" />
-
-            </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
-
-        <!-- Horizontal LinearLayout containing 3 CardViews -->
-        <LinearLayout
-            android:id="@+id/cardsContainer"
+        <!-- Main Layout Using ConstraintLayout -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/mainLayout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="80dp"
-            android:orientation="horizontal"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/cardSavingGoal">
+            android:layout_height="match_parent"
+            android:background="?attr/bb_background"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-            <!-- First CardView -->
+            <!-- Cards Section -->
             <com.google.android.material.card.MaterialCardView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_margin="4dp"
-                android:layout_weight="1"
-                android:background="?attr/bb_background"
-                app:cardCornerRadius="16dp">
+                android:id="@+id/cardDaysLeft"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:layout_marginTop="80dp"
+                android:layout_marginEnd="10dp"
+                app:cardCornerRadius="50dp"
+                app:cardElevation="4dp"
+                app:layout_constraintEnd_toStartOf="@+id/cardSavingGoal"
+                app:layout_constraintHorizontal_chainStyle="packed"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
 
                 <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="?attr/bb_background"
-                    android:layout_gravity="center_horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="?attr/bb_primaryText"
+                    android:gravity="center"
                     android:orientation="vertical">
 
-                    <!-- Row 1 -->
-                    <androidx.constraintlayout.widget.ConstraintLayout
+                    <TextView
+                        android:id="@+id/textSelectedDaysLeft"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content">
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:text="Days Left"
+                        android:textColor="?attr/bb_background"
+                        android:textSize="13sp" />
 
-                        <LinearLayout
-                            style="@style/RowStyle"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="20dp"
-                            android:background="?attr/bb_background"
-                            android:orientation="horizontal"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent">
-
-                            <LinearLayout
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:orientation="vertical">
-
-                                <TextView
-                                    android:layout_width="110dp"
-                                    android:layout_height="wrap_content"
-                                    android:text="Savings Legend"
-                                    android:textColor="?attr/bb_secondaryText"
-                                    android:textSize="15sp" />
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="R 10 000"
-                                    android:textColor="?attr/bb_primaryText"
-                                    android:textSize="18sp" />
-                            </LinearLayout>
-
-                            <FrameLayout
-                                android:layout_width="40dp"
-                                android:layout_height="40dp">
-
-                                <ImageView
-                                    android:layout_width="match_parent"
-                                    android:layout_height="match_parent"
-                                    android:scaleType="centerCrop"
-                                    android:src="@drawable/ic_ui_achievement_trophy"
-                                    app:tint="@color/cat_gold" />
-                            </FrameLayout>
-                        </LinearLayout>
-                    </androidx.constraintlayout.widget.ConstraintLayout>
-
-                    <!-- Row 2 -->
-                    <androidx.constraintlayout.widget.ConstraintLayout
+                    <TextView
+                        android:id="@+id/textSelectedDaysLeftAmount"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content">
-
-                        <LinearLayout
-                            style="@style/RowStyle"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="20dp"
-                            android:background="?attr/bb_background"
-                            android:orientation="horizontal"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent">
-
-                            <LinearLayout
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:orientation="vertical">
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="Savings Legend"
-                                    android:textColor="?attr/bb_secondaryText"
-                                    android:textSize="15sp" />
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="R 7 000"
-                                    android:textColor="?attr/bb_primaryText"
-                                    android:textSize="18sp" />
-                            </LinearLayout>
-
-                            <FrameLayout
-                                android:layout_width="40dp"
-                                android:layout_height="40dp">
-
-                                <ImageView
-                                    android:layout_width="match_parent"
-                                    android:layout_height="match_parent"
-                                    android:scaleType="centerCrop"
-                                    android:src="@drawable/ic_ui_achievement_medal"
-                                    app:tint="@color/cat_dark_pink" />
-                            </FrameLayout>
-                        </LinearLayout>
-                    </androidx.constraintlayout.widget.ConstraintLayout>
-
-                    <!-- Row 3 -->
-                    <androidx.constraintlayout.widget.ConstraintLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content">
-
-                        <LinearLayout
-                            style="@style/RowStyle"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="48dp"
-                            android:background="?attr/bb_background"
-                            android:orientation="horizontal"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent">
-
-                            <LinearLayout
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:orientation="vertical">
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="Savings Legend"
-                                    android:textColor="?attr/bb_secondaryText"
-                                    android:textSize="15sp" />
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="R 3 500"
-                                    android:textColor="?attr/bb_primaryText"
-                                    android:textSize="18sp" />
-                            </LinearLayout>
-                        </LinearLayout>
-                    </androidx.constraintlayout.widget.ConstraintLayout>
-
-                    <!-- Row 4 -->
-                    <androidx.constraintlayout.widget.ConstraintLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content">
-
-                        <LinearLayout
-                            style="@style/RowStyle"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:layout_marginStart="48dp"
-                            android:background="?attr/bb_background"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent">
-
-                            <LinearLayout
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:orientation="vertical">
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="Savings Legend"
-                                    android:textColor="?attr/bb_secondaryText"
-                                    android:textSize="15sp" />
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="R 1 000"
-                                    android:textColor="?attr/bb_primaryText"
-                                    android:textSize="18sp" />
-                            </LinearLayout>
-                        </LinearLayout>
-                    </androidx.constraintlayout.widget.ConstraintLayout>
-
-                    <!-- Row 5 -->
-                    <androidx.constraintlayout.widget.ConstraintLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content">
-
-                        <LinearLayout
-                            style="@style/RowStyle"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:layout_marginStart="48dp"
-                            android:background="?attr/bb_background"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent">
-
-                            <LinearLayout
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:orientation="vertical">
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="Savings Legend"
-                                    android:textColor="?attr/bb_secondaryText"
-                                    android:textSize="15sp" />
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="R 250"
-                                    android:textColor="?attr/bb_primaryText"
-                                    android:textSize="18sp" />
-                            </LinearLayout>
-                        </LinearLayout>
-                    </androidx.constraintlayout.widget.ConstraintLayout>
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:text="15"
+                        android:textColor="?attr/bb_background"
+                        android:textSize="20sp" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Second CardView: Vertical ProgressBar -->
             <com.google.android.material.card.MaterialCardView
-                android:layout_width="wrap_content"
+                android:id="@+id/cardSavingGoal"
+                android:layout_width="120dp"
+                android:layout_height="120dp"
+                android:layout_marginHorizontal="8dp"
+                android:layout_marginTop="50dp"
+                app:cardCornerRadius="80dp"
+                app:cardElevation="4dp"
+                app:layout_constraintEnd_toStartOf="@+id/cardDaysPassed"
+                app:layout_constraintStart_toEndOf="@+id/cardDaysLeft"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="?attr/bb_primaryText"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/textSelectedSavingGoal"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:text="Saving Goal"
+                        android:textColor="?attr/bb_background"
+                        android:textSize="13sp" />
+
+                    <!-- Horizontal Layout for Currency + Amount -->
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:gravity="center"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:id="@+id/textSelectedSavingGoalCurrency"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="2dp"
+                            android:text="R"
+                            android:textColor="?attr/bb_background"
+                            android:textSize="18sp" />
+
+                        <TextView
+                            android:id="@+id/textSavingGoalLeftAmount"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="10 000"
+                            android:textColor="?attr/bb_background"
+                            android:textSize="18sp" />
+                    </LinearLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardDaysPassed"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="80dp"
+                app:cardCornerRadius="50dp"
+                app:cardElevation="4dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/cardSavingGoal"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="?attr/bb_primaryText"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/textSavingDaysPassed"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:text="Days Passed"
+                        android:textColor="?attr/bb_background"
+                        android:textSize="13sp" />
+
+                    <TextView
+                        android:id="@+id/textSavingDaysPassedAmount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:text="15"
+                        android:textColor="?attr/bb_background"
+                        android:textSize="20sp" />
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Horizontal LinearLayout containing 3 CardViews -->
+            <LinearLayout
+                android:id="@+id/cardsContainer"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="4dp"
+                android:layout_marginTop="80dp"
+                android:orientation="horizontal"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/cardSavingGoal">
+
+                <!-- First CardView -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="4dp"
+                    android:layout_weight="1"
+                    android:background="?attr/bb_background"
+                    app:cardCornerRadius="16dp">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="?attr/bb_background"
+                        android:layout_gravity="center_horizontal"
+                        android:orientation="vertical">
+
+                        <!-- Row 1 -->
+                        <androidx.constraintlayout.widget.ConstraintLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content">
+
+                            <LinearLayout
+                                style="@style/RowStyle"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="20dp"
+                                android:layout_marginTop="-20dp"
+                                android:background="?attr/bb_background"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toTopOf="parent">
+
+                                <LinearLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:gravity="center"
+                                    android:orientation="vertical">
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="Savings Legend"
+                                        android:textAlignment="center"
+                                        android:textColor="?attr/bb_secondaryText"
+                                        android:textSize="16sp" />
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="R 10 000"
+                                        android:textAlignment="center"
+                                        android:textColor="?attr/bb_primaryText"
+                                        android:textSize="18sp" />
+                                </LinearLayout>
+
+                                <FrameLayout
+                                    android:layout_width="40dp"
+                                    android:layout_height="40dp">
+
+                                    <ImageView
+                                        android:layout_width="match_parent"
+                                        android:layout_height="match_parent"
+                                        android:scaleType="centerCrop"
+                                        android:src="@drawable/ic_ui_achievement_trophy"
+                                        app:tint="@color/cat_gold" />
+                                </FrameLayout>
+                            </LinearLayout>
+                        </androidx.constraintlayout.widget.ConstraintLayout>
+
+                        <!-- Row 2 -->
+                        <androidx.constraintlayout.widget.ConstraintLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content">
+
+                            <LinearLayout
+                                style="@style/RowStyle"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="20dp"
+                                android:layout_marginTop="50dp"
+                                android:background="?attr/bb_background"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toTopOf="parent">
+
+                                <LinearLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:gravity="center"
+                                    android:orientation="vertical">
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="Wealth Warrior"
+                                        android:textAlignment="center"
+                                        android:textColor="?attr/bb_secondaryText"
+                                        android:textSize="16sp" />
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="R 7 000"
+                                        android:textAlignment="center"
+                                        android:textColor="?attr/bb_primaryText"
+                                        android:textSize="18sp" />
+                                </LinearLayout>
+
+                                <FrameLayout
+                                    android:layout_width="40dp"
+                                    android:layout_height="40dp">
+
+                                    <ImageView
+                                        android:layout_width="match_parent"
+                                        android:layout_height="match_parent"
+                                        android:scaleType="centerCrop"
+                                        android:src="@drawable/ic_ui_achievement_medal"
+                                        app:tint="@color/cat_gold" />
+                                </FrameLayout>
+                            </LinearLayout>
+                        </androidx.constraintlayout.widget.ConstraintLayout>
+
+                        <!-- Row 3 -->
+                        <androidx.constraintlayout.widget.ConstraintLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content">
+
+                            <LinearLayout
+                                style="@style/RowStyle"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="48dp"
+                                android:layout_marginTop="50dp"
+                                android:background="?attr/bb_background"
+                                android:orientation="horizontal"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toTopOf="parent">
+
+                                <LinearLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:gravity="center"
+                                    android:orientation="vertical">
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="Financial Wizard"
+                                        android:textColor="?attr/bb_secondaryText"
+                                        android:textSize="16sp" />
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="R 3 500"
+                                        android:textColor="?attr/bb_primaryText"
+                                        android:textSize="18sp" />
+                                </LinearLayout>
+                            </LinearLayout>
+                        </androidx.constraintlayout.widget.ConstraintLayout>
+
+                        <!-- Row 4 -->
+                        <androidx.constraintlayout.widget.ConstraintLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content">
+
+                            <LinearLayout
+                                style="@style/RowStyle"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="48dp"
+                                android:layout_marginTop="50dp"
+                                android:background="?attr/bb_background"
+                                android:orientation="horizontal"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toTopOf="parent">
+
+                                <LinearLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:gravity="center"
+                                    android:orientation="vertical">
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="Strategic Saver"
+                                        android:textColor="?attr/bb_secondaryText"
+                                        android:textSize="16sp" />
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="R 1 000"
+                                        android:textColor="?attr/bb_primaryText"
+                                        android:textSize="18sp" />
+                                </LinearLayout>
+                            </LinearLayout>
+                        </androidx.constraintlayout.widget.ConstraintLayout>
+
+                        <!-- Row 5 -->
+                        <androidx.constraintlayout.widget.ConstraintLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content">
+
+                            <LinearLayout
+                                style="@style/RowStyle"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="48dp"
+                                android:layout_marginTop="50dp"
+                                android:background="?attr/bb_background"
+                                android:orientation="horizontal"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toTopOf="parent">
+
+                                <LinearLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:gravity="center"
+                                    android:orientation="vertical">
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="Budget Beginner"
+                                        android:textColor="?attr/bb_secondaryText"
+                                        android:textSize="16sp" />
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="R 250"
+                                        android:textColor="?attr/bb_primaryText"
+                                        android:textSize="18sp" />
+                                </LinearLayout>
+                            </LinearLayout>
+                        </androidx.constraintlayout.widget.ConstraintLayout>
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- Second CardView: Vertical ProgressBar -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="4dp"
+                    app:cardCornerRadius="25dp">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:gravity="center_horizontal">
+
+                        <FrameLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content">
+
+                            <ProgressBar
+                                android:id="@+id/verticalProgressBar"
+                                android:layout_width="50dp"
+                                android:layout_height="650dp"
+                                android:max="100"
+                                android:progress="50" />
+
+                        </FrameLayout>
+
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- Third CardView (similar to first) -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="4dp"
+                    android:layout_weight="1"
+                    android:background="?attr/bb_background"
+                    app:cardCornerRadius="16dp">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="?attr/bb_background"
+                        android:layout_gravity="center_horizontal"
+                        android:orientation="vertical">
+
+                        <!-- Row 1 -->
+                        <androidx.constraintlayout.widget.ConstraintLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content">
+
+                            <LinearLayout
+                                style="@style/RowStyle"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="70dp"
+                                android:layout_marginEnd="20dp"
+                                android:background="?attr/bb_background"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toTopOf="parent">
+
+                                <FrameLayout
+                                    android:layout_width="40dp"
+                                    android:layout_height="40dp">
+
+                                    <ImageView
+                                        android:layout_width="match_parent"
+                                        android:layout_height="match_parent"
+                                        android:scaleType="centerCrop"
+                                        android:src="@drawable/ic_ui_achievement_medal"
+                                        app:tint="@color/cat_gold" />
+                                </FrameLayout>
+
+                                <LinearLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:gravity="center"
+                                    android:orientation="vertical">
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="Money Master"
+                                        android:textAlignment="center"
+                                        android:textColor="?attr/bb_secondaryText"
+                                        android:textSize="16sp" />
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="R 8 500"
+                                        android:textAlignment="center"
+                                        android:textColor="?attr/bb_primaryText"
+                                        android:textSize="18sp" />
+                                </LinearLayout>
+                            </LinearLayout>
+                        </androidx.constraintlayout.widget.ConstraintLayout>
+
+                        <!-- Row 2 -->
+                        <androidx.constraintlayout.widget.ConstraintLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content">
+
+                            <LinearLayout
+                                style="@style/RowStyle"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="50dp"
+                                android:layout_marginEnd="20dp"
+                                android:background="?attr/bb_background"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toTopOf="parent">
+
+                                <FrameLayout
+                                    android:layout_width="40dp"
+                                    android:layout_height="40dp">
+
+                                    <ImageView
+                                        android:layout_width="match_parent"
+                                        android:layout_height="match_parent"
+                                        android:scaleType="centerCrop"
+                                        android:src="@drawable/ic_ui_achievement_medal"
+                                        app:tint="@color/cat_gold" />
+                                </FrameLayout>
+
+                                <LinearLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:gravity="center"
+                                    android:orientation="vertical">
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="Savings Sage"
+                                        android:textAlignment="center"
+                                        android:textColor="?attr/bb_secondaryText"
+                                        android:textSize="16sp" />
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="R 5 000"
+                                        android:textAlignment="center"
+                                        android:textColor="?attr/bb_primaryText"
+                                        android:textSize="18sp" />
+                                </LinearLayout>
+                            </LinearLayout>
+                        </androidx.constraintlayout.widget.ConstraintLayout>
+
+                        <!-- Row 3 -->
+                        <androidx.constraintlayout.widget.ConstraintLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content">
+
+                            <LinearLayout
+                                style="@style/RowStyle"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="50dp"
+                                android:layout_marginEnd="48dp"
+                                android:background="?attr/bb_background"
+                                android:orientation="horizontal"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toTopOf="parent">
+
+                                <LinearLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:gravity="center"
+                                    android:orientation="vertical">
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="Money Maker"
+                                        android:textColor="?attr/bb_secondaryText"
+                                        android:textSize="16sp" />
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="R 2 000"
+                                        android:textColor="?attr/bb_primaryText"
+                                        android:textSize="18sp" />
+                                </LinearLayout>
+                            </LinearLayout>
+                        </androidx.constraintlayout.widget.ConstraintLayout>
+
+                        <!-- Row 4 -->
+                        <androidx.constraintlayout.widget.ConstraintLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content">
+
+                            <LinearLayout
+                                style="@style/RowStyle"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="50dp"
+                                android:layout_marginEnd="48dp"
+                                android:background="?attr/bb_background"
+                                android:orientation="horizontal"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toTopOf="parent">
+
+                                <LinearLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:gravity="center"
+                                    android:orientation="vertical">
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="Cash Collector"
+                                        android:textColor="?attr/bb_secondaryText"
+                                        android:textSize="16sp" />
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="R 500"
+                                        android:textColor="?attr/bb_primaryText"
+                                        android:textSize="18sp" />
+                                </LinearLayout>
+                            </LinearLayout>
+                        </androidx.constraintlayout.widget.ConstraintLayout>
+
+                        <!-- Row 5 -->
+                        <androidx.constraintlayout.widget.ConstraintLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content">
+
+                            <LinearLayout
+                                style="@style/RowStyle"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="50dp"
+                                android:layout_marginEnd="48dp"
+                                android:background="?attr/bb_background"
+                                android:orientation="horizontal"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toTopOf="parent">
+
+                                <LinearLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:gravity="center"
+                                    android:orientation="vertical">
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="Rookie saver"
+                                        android:textColor="?attr/bb_secondaryText"
+                                        android:textSize="16sp" />
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="R 100"
+                                        android:textColor="?attr/bb_primaryText"
+                                        android:textSize="18sp" />
+                                </LinearLayout>
+                            </LinearLayout>
+                        </androidx.constraintlayout.widget.ConstraintLayout>
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+            </LinearLayout>
+
+            <!-- Single CardView under the 3 cards with 4 rows -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 app:cardCornerRadius="16dp"
                 app:cardElevation="4dp"
+                app:strokeWidth="1dp"
                 app:strokeColor="@color/gray"
-                app:strokeWidth="1dp">
+                android:layout_margin="8dp"
+                app:layout_constraintTop_toBottomOf="@id/cardsContainer"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
 
-                <!-- Instead of wrap_content, use match_parent with padding in LinearLayout -->
                 <LinearLayout
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:gravity="center_horizontal">
-
-                    <FrameLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content">
-
-                        <ProgressBar
-                            android:id="@+id/verticalProgressBar"
-                            android:layout_width="50dp"
-                            android:layout_height="500dp"
-                            android:max="100"
-                            android:progress="50" />
-
-                    </FrameLayout>
-
+                    android:padding="8dp">
+                    <!-- 4 Rows -->
+                    <TextView android:text="Row 1" />
+                    <TextView android:text="Row 2" />
+                    <TextView android:text="Row 3" />
+                    <TextView android:text="Row 4" />
                 </LinearLayout>
+
             </com.google.android.material.card.MaterialCardView>
-
-            <!-- Third CardView (similar to first) -->
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_margin="4dp"
-                android:layout_weight="1"
-                android:background="?attr/bb_background"
-                app:cardCornerRadius="16dp">
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="?attr/bb_background"
-                    android:layout_gravity="center_horizontal"
-                    android:orientation="vertical">
-
-                    <!-- Row 1 -->
-                    <androidx.constraintlayout.widget.ConstraintLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content">
-
-                        <LinearLayout
-                            style="@style/RowStyle"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:background="?attr/bb_background"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent">
-
-                            <FrameLayout
-                                android:layout_width="40dp"
-                                android:layout_height="40dp">
-
-                                <ImageView
-                                    android:layout_width="match_parent"
-                                    android:layout_height="match_parent"
-                                    android:scaleType="centerCrop"
-                                    android:src="@drawable/ic_ui_achievement_trophy"
-                                    app:tint="@color/cat_gold" />
-                            </FrameLayout>
-
-                            <LinearLayout
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:orientation="vertical">
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="Savings Legend"
-                                    android:textColor="?attr/bb_secondaryText"
-                                    android:textSize="15sp" />
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="R 10 000"
-                                    android:textColor="?attr/bb_primaryText"
-                                    android:textSize="18sp" />
-                            </LinearLayout>
-                        </LinearLayout>
-                    </androidx.constraintlayout.widget.ConstraintLayout>
-
-                    <!-- Row 2 -->
-                    <androidx.constraintlayout.widget.ConstraintLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content">
-
-                        <LinearLayout
-                            style="@style/RowStyle"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:background="?attr/bb_background"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent">
-
-                            <FrameLayout
-                                android:layout_width="40dp"
-                                android:layout_height="40dp">
-
-                                <ImageView
-                                    android:layout_width="match_parent"
-                                    android:layout_height="match_parent"
-                                    android:scaleType="centerCrop"
-                                    android:src="@drawable/ic_ui_achievement_medal"
-                                    app:tint="@color/cat_dark_pink" />
-                            </FrameLayout>
-
-                            <LinearLayout
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:orientation="vertical">
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="Savings Legend"
-                                    android:textColor="?attr/bb_secondaryText"
-                                    android:textSize="15sp" />
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="R 7 000"
-                                    android:textColor="?attr/bb_primaryText"
-                                    android:textSize="18sp" />
-                            </LinearLayout>
-                        </LinearLayout>
-                    </androidx.constraintlayout.widget.ConstraintLayout>
-
-                    <!-- Row 3 -->
-                    <androidx.constraintlayout.widget.ConstraintLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content">
-
-                        <LinearLayout
-                            style="@style/RowStyle"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:background="?attr/bb_background"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent">
-
-                            <LinearLayout
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:orientation="vertical">
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="Savings Legend"
-                                    android:textColor="?attr/bb_secondaryText"
-                                    android:textSize="15sp" />
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="R 3 500"
-                                    android:textColor="?attr/bb_primaryText"
-                                    android:textSize="18sp" />
-                            </LinearLayout>
-                        </LinearLayout>
-                    </androidx.constraintlayout.widget.ConstraintLayout>
-
-                    <!-- Row 4 -->
-                    <androidx.constraintlayout.widget.ConstraintLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content">
-
-                        <LinearLayout
-                            style="@style/RowStyle"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:background="?attr/bb_background"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent">
-
-                            <LinearLayout
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:orientation="vertical">
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="Savings Legend"
-                                    android:textColor="?attr/bb_secondaryText"
-                                    android:textSize="15sp" />
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="R 1 000"
-                                    android:textColor="?attr/bb_primaryText"
-                                    android:textSize="18sp" />
-                            </LinearLayout>
-                        </LinearLayout>
-                    </androidx.constraintlayout.widget.ConstraintLayout>
-
-                    <!-- Row 5 -->
-                    <androidx.constraintlayout.widget.ConstraintLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content">
-
-                        <LinearLayout
-                            style="@style/RowStyle"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:background="?attr/bb_background"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent">
-
-                            <LinearLayout
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:orientation="vertical">
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="Savings Legend"
-                                    android:textColor="?attr/bb_secondaryText"
-                                    android:textSize="15sp" />
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="R 250"
-                                    android:textColor="?attr/bb_primaryText"
-                                    android:textSize="18sp" />
-                            </LinearLayout>
-                        </LinearLayout>
-                    </androidx.constraintlayout.widget.ConstraintLayout>
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
-
-        </LinearLayout>
-
-        <!-- Single CardView under the 3 cards with 4 rows -->
-        <com.google.android.material.card.MaterialCardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:cardCornerRadius="16dp"
-            app:cardElevation="4dp"
-            app:strokeWidth="1dp"
-            app:strokeColor="@color/gray"
-            android:layout_margin="8dp"
-            app:layout_constraintTop_toBottomOf="@id/cardsContainer"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="8dp">
-                <!-- 4 Rows -->
-                <TextView android:text="Row 1" />
-                <TextView android:text="Row 2" />
-                <TextView android:text="Row 3" />
-                <TextView android:text="Row 4" />
-            </LinearLayout>
-
-        </com.google.android.material.card.MaterialCardView>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
