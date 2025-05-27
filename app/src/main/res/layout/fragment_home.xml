@@ -138,7 +138,7 @@
                     android:visibility="gone"
                     tools:visibility="visible"
                     tools:itemCount="2"
-                    tools:listitem="@layout/item_home_wallet"/>
+                    tools:listitem="@layout/item_wallet_main"/>
 
                 <TextView
                     android:id="@+id/txtEmptyWallets"

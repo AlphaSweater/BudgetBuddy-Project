@@ -21,91 +21,100 @@
 <!--    * https://www.youtube.com/watch?v=A_tPafV23DM&list=PLPgs125_L-X9H6J7x4beRU-AxJ4mXe5vX-->
 <!--    ======================================================================================-->
 
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@android:color/transparent"
-    android:padding="12dp">
+    android:layout_marginHorizontal="4dp"
+    android:layout_marginVertical="4dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="0dp"
+    app:strokeWidth="0dp"
+    android:clickable="true"
+    android:focusable="true"
+    app:rippleColor="?attr/bb_surfaceAlt"
+    android:backgroundTint="?attr/bb_surface">
 
-    <!-- Icon Container -->
-    <LinearLayout
-        android:id="@+id/iconCategoryContainer"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
-        android:layout_margin="4dp"
-        android:background="@drawable/bg_circle_shape"
-        android:gravity="center"
-        android:orientation="vertical"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="12dp">
 
+        <!-- Category Icon -->
         <ImageView
-            android:id="@+id/iconCategory"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:scaleType="fitCenter"
-            app:tint="?attr/bb_primaryText" />
-    </LinearLayout>
+            android:id="@+id/categoryIcon"
+            style="@style/IconButton"
+            android:contentDescription="Category Icon"
+            android:src="@drawable/ic_ui_categories"
+            app:tint="?attr/bb_button"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
 
-    <!-- Category Name and Transactions -->
-    <LinearLayout
-        android:id="@+id/categoryTextContainer"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"
-        android:orientation="vertical"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/amountContainer"
-        app:layout_constraintStart_toEndOf="@id/iconCategoryContainer"
-        app:layout_constraintTop_toTopOf="parent">
+        <!-- Category Name and Transactions -->
+        <LinearLayout
+            android:id="@+id/categoryTextContainer"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginStart="12dp"
+            android:layout_marginEnd="12dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@id/categoryIcon"
+            app:layout_constraintEnd_toStartOf="@id/amountContainer">
 
-        <TextView
-            android:id="@+id/txtCategoryName"
+            <TextView
+                android:id="@+id/categoryName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="?attr/bb_primaryText"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:maxLines="1"
+                android:ellipsize="end"
+                tools:text="Category name"/>
+
+            <TextView
+                android:id="@+id/categoryTransactions"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:textColor="?attr/bb_secondaryText"
+                android:textSize="11sp"
+                tools:text="4 transactions"/>
+        </LinearLayout>
+
+        <!-- Amount and Date Container -->
+        <LinearLayout
+            android:id="@+id/amountContainer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Name"
-            android:textColor="?attr/bb_primaryText"
-            android:textSize="18sp"
-            android:textStyle="bold" />
+            android:orientation="vertical"
+            android:gravity="end"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent">
 
-        <TextView
-            android:id="@+id/txtTransactions"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Transactions"
-            android:textColor="?attr/bb_primaryText"
-            android:textSize="12sp" />
-    </LinearLayout>
+            <TextView
+                android:id="@+id/categoryAmount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/amount"
+                android:textColor="?attr/bb_expense"
+                android:textSize="14sp"
+                android:textStyle="bold" />
 
-    <!-- Amount and Date -->
-    <LinearLayout
-        android:id="@+id/amountContainer"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+            <TextView
+                android:id="@+id/categoryDate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="?attr/bb_secondaryText"
+                android:textSize="11sp"
+                tools:text="• Today"/>
+        </LinearLayout>
 
-        <TextView
-            android:id="@+id/txtAmount"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="end"
-            android:text="@string/amount"
-            android:textColor="?attr/bb_expense"
-            android:textSize="14sp"
-            android:textStyle="bold" />
-
-        <TextView
-            android:id="@+id/txtDate"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="end"
-            android:text="Last Activity"
-            android:textColor="?attr/bb_primaryText"
-            android:textSize="10sp" />
-    </LinearLayout>
-</androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</com.google.android.material.card.MaterialCardView>
