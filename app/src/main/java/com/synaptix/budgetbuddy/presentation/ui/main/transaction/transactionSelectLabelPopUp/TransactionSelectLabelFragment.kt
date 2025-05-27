@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
@@ -27,7 +28,7 @@ class TransactionSelectLabelFragment : Fragment() {
 
     private val labelAdapter by lazy {
         TransactionSelectLabelAdapter { selectedLabels ->
-            viewModel.selectedLabels.value = selectedLabels
+            labelViewModel.updateSelectedLabels(selectedLabels)
         }
     }
 
@@ -44,6 +45,7 @@ class TransactionSelectLabelFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setupRecyclerView()
         setupClickListeners()
+        setupSearch()
         observeLabels()
     }
 
@@ -62,12 +64,23 @@ class TransactionSelectLabelFragment : Fragment() {
         binding.btnGoBack.setOnClickListener {
             findNavController().popBackStack()
         }
+
+        binding.btnSave.setOnClickListener {
+            viewModel.setLabels(labelAdapter.getSelectedLabels())
+            findNavController().popBackStack()
+        }
+    }
+
+    private fun setupSearch() {
+        binding.searchEditText.doAfterTextChanged { text ->
+            labelViewModel.filterLabels(text?.toString() ?: "")
+        }
     }
 
     private fun observeLabels() {
         viewLifecycleOwner.lifecycleScope.launch {
             labelViewModel.loadLabelsForUser()
-            labelViewModel.labels.collectLatest { labels ->
+            labelViewModel.filteredLabels.collectLatest { labels ->
                 val selectedLabels = viewModel.selectedLabels.value ?: emptyList()
                 labelAdapter.submitList(labels, selectedLabels)
             }

@@ -56,6 +56,21 @@ class TransactionSelectRecurrenceFragment : Fragment() {
         binding.btnOnceOff.isChecked = true
         binding.recurrenceDetailsCard.isVisible = false
         binding.endDateCard.isVisible = false
+        
+        // Set all week day chips to checked by default
+        listOf(
+            binding.chipMon,
+            binding.chipTue,
+            binding.chipWed,
+            binding.chipThu,
+            binding.chipFri,
+            binding.chipSat,
+            binding.chipSun
+        ).forEach { chip ->
+            chip.isChecked = true
+            val color = requireContext().getThemeColor(R.attr.bb_buttonSelected)
+            chip.chipBackgroundColor = ColorStateList.valueOf(color)
+        }
     }
 
     private fun setupClickListeners() {
@@ -108,8 +123,26 @@ class TransactionSelectRecurrenceFragment : Fragment() {
 
         // End type radio group
         binding.endDateGroup.setOnCheckedChangeListener { _, checkedId ->
-            binding.occurrencesLayout.isVisible = checkedId == binding.radioEndAfter.id
-            binding.endDateLayout.isVisible = checkedId == binding.radioEndOn.id
+            when (checkedId) {
+                binding.radioEndAfter.id -> {
+                    binding.occurrencesLayout.isVisible = true
+                    binding.occurrencesError.visibility = View.GONE
+                    binding.endDateLayout.isVisible = false
+                    binding.endDateError.visibility = View.GONE
+                }
+                binding.radioEndOn.id -> {
+                    binding.occurrencesLayout.isVisible = false
+                    binding.occurrencesError.visibility = View.GONE
+                    binding.endDateLayout.isVisible = true
+                    binding.endDateError.visibility = View.GONE
+                }
+                else -> {
+                    binding.occurrencesLayout.isVisible = false
+                    binding.occurrencesError.visibility = View.GONE
+                    binding.endDateLayout.isVisible = false
+                    binding.endDateError.visibility = View.GONE
+                }
+            }
         }
 
         // Date picker
@@ -160,16 +193,26 @@ class TransactionSelectRecurrenceFragment : Fragment() {
     }
 
     private fun showDatePicker() {
+        val currentDate = calendar.time
         DatePickerDialog(
             requireContext(),
             { _, year, month, day ->
                 calendar.set(year, month, day)
+                // Ensure the time is set to the end of the day
+                calendar.set(Calendar.HOUR_OF_DAY, 23)
+                calendar.set(Calendar.MINUTE, 59)
+                calendar.set(Calendar.SECOND, 59)
                 binding.endDateInput.setText(dateFormatter.format(calendar.time))
+                // Update the ViewModel with the new date
+                recurrenceViewModel.setEndDate(calendar.time)
             },
             calendar.get(Calendar.YEAR),
             calendar.get(Calendar.MONTH),
             calendar.get(Calendar.DAY_OF_MONTH)
-        ).show()
+        ).apply {
+            // Set minimum date to today
+            datePicker.minDate = currentDate.time
+        }.show()
     }
 
     private fun getSelectedWeekDays(): List<String> {
@@ -206,18 +249,80 @@ class TransactionSelectRecurrenceFragment : Fragment() {
 
         recurrenceViewModel.validationState.observe(viewLifecycleOwner) { validationState ->
             if (validationState.shouldShowErrors) {
-//                binding.dailyIntervalSlider.error = if (!validationState.isIntervalValid) "Invalid interval" else null
-//                binding.weeklyIntervalSlider.error = if (!validationState.isIntervalValid) "Invalid interval" else null
-//                binding.monthlyIntervalSlider.error = if (!validationState.isIntervalValid) "Invalid interval" else null
-//                binding.yearlyIntervalSlider.error = if (!validationState.isIntervalValid) "Invalid interval" else null
-                binding.occurrencesInput.error = if (!validationState.isOccurrencesValid) "Invalid occurrences" else null
-                binding.endDateInput.error = if (!validationState.isEndDateValid) "Invalid end date" else null
+                // Handle occurrences validation
+                if (!validationState.isOccurrencesValid) {
+                    binding.occurrencesError.apply {
+                        text = validationState.occurrencesError
+                        visibility = View.VISIBLE
+                    }
+                    binding.occurrencesInput.error = null
+                    scrollToView(binding.occurrencesLayout)
+                } else {
+                    binding.occurrencesError.visibility = View.GONE
+                }
+
+                // Handle end date validation
+                if (!validationState.isEndDateValid) {
+                    binding.endDateError.apply {
+                        text = validationState.endDateError
+                        visibility = View.VISIBLE
+                    }
+                    binding.endDateInput.error = null
+                    scrollToView(binding.endDateLayout)
+                } else {
+                    binding.endDateError.visibility = View.GONE
+                }
+
+                // Handle week days validation
+                if (!validationState.isWeekDaysValid) {
+                    binding.weekDaysError.apply {
+                        text = validationState.weekDaysError
+                        visibility = View.VISIBLE
+                    }
+                    scrollToView(binding.weekDaysChipGroup)
+                } else {
+                    binding.weekDaysError.visibility = View.GONE
+                }
+
+                // Handle interval validation
+                if (!validationState.isIntervalValid) {
+                    val errorMessage = validationState.intervalError ?: "Please select a valid interval"
+                    when (recurrenceViewModel.recurrenceType) {
+                        TransactionSelectRecurrenceViewModel.RecurrenceType.DAILY -> {
+                            scrollToView(binding.dailyOptions)
+                        }
+                        TransactionSelectRecurrenceViewModel.RecurrenceType.WEEKLY -> {
+                            scrollToView(binding.weeklyOptions)
+                        }
+                        TransactionSelectRecurrenceViewModel.RecurrenceType.MONTHLY -> {
+                            scrollToView(binding.monthlyOptions)
+                        }
+                        TransactionSelectRecurrenceViewModel.RecurrenceType.YEARLY -> {
+                            scrollToView(binding.yearlyOptions)
+                        }
+                        else -> {}
+                    }
+                    Snackbar.make(binding.root, errorMessage, Snackbar.LENGTH_LONG).show()
+                }
+            } else {
+                // Clear all error states when validation is successful
+                binding.occurrencesError.visibility = View.GONE
+                binding.endDateError.visibility = View.GONE
+                binding.weekDaysError.visibility = View.GONE
+                binding.occurrencesInput.error = null
+                binding.endDateInput.error = null
             }
         }
 
         recurrenceViewModel.eventSave.observe(viewLifecycleOwner) { recurrenceData ->
             viewModel.setRecurrenceData(recurrenceData)
             findNavController().popBackStack()
+        }
+    }
+
+    private fun scrollToView(view: View) {
+        binding.contentScrollView.post {
+            binding.contentScrollView.smoothScrollTo(0, view.top)
         }
     }
 

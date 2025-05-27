@@ -12,7 +12,7 @@ import com.synaptix.budgetbuddy.R
 import com.synaptix.budgetbuddy.core.model.BudgetListItems
 import com.synaptix.budgetbuddy.databinding.FragmentWalletReportBinding
 
-//class WalletReportFragment : Fragment() {
+class WalletReportFragment : Fragment() {
 //
 //    private var _binding: FragmentWalletReportBinding? = null
 //    private val binding get() = _binding!!
@@ -63,4 +63,4 @@ import com.synaptix.budgetbuddy.databinding.FragmentWalletReportBinding
 //        super.onDestroyView()
 //        _binding = null
 //    }
-//}
+}

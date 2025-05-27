@@ -22,19 +22,21 @@ class GetBudgetsUseCase @Inject constructor(
         data class Error(val message: String) : GetBudgetsResult()
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // Executes the operation to fetch budgets for the specified user
     suspend fun execute(userId: String): GetBudgetsResult {
         if (userId.isEmpty()) {
             return Error("Invalid user ID")
         }
 
         return try {
-            val userResult = userRepository.getUserProfile(userId).first()
+            val userResult = userRepository.getUserProfile(userId)
             val user = when (userResult) {
                 is Result.Success -> userResult.data?.toDomain()
                 is Result.Error -> return Error("Failed to get user data: ${userResult.exception.message}")
             }
 
-            val budgetResult = budgetRepository.getBudgetsForUser(userId).first()
+            val budgetResult = budgetRepository.getBudgetsForUser(userId)
             val budgetDTOs = when (budgetResult) {
                 is Result.Success -> budgetResult.data
                 is Result.Error -> return Error("Failed to get budgets: ${budgetResult.exception.message}")
@@ -58,13 +60,15 @@ class GetBudgetsUseCase @Inject constructor(
         }
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // Helper function to get full budget data including user and categories
     private suspend fun getBudgetData(budgetDTO: BudgetDTO): Result<Budget> {
-        val user = when (val result = userRepository.getUserProfile(budgetDTO.userId).first()) {
+        val user = when (val result = userRepository.getUserProfile(budgetDTO.userId)) {
             is Result.Success -> result.data?.toDomain()
             is Result.Error -> return Result.Error(result.exception)
         } ?: return Result.Error(Exception("User not found"))
 
-        val categories = when (val result = categoryRepository.getCategoriesByIds(budgetDTO.categoryIds).first()) {
+        val categories = when (val result = categoryRepository.getCategoriesByIds(budgetDTO.categoryIds)) {
             is Result.Success -> result.data.map { it.toDomain(user) }
             is Result.Error -> return Result.Error(result.exception)
         }
@@ -72,3 +76,4 @@ class GetBudgetsUseCase @Inject constructor(
         return Result.Success(budgetDTO.toDomain(user, categories))
     }
 }
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~EOF~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\

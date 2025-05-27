@@ -9,13 +9,6 @@ import com.synaptix.budgetbuddy.data.firebase.repository.FirestoreCategoryReposi
 import com.synaptix.budgetbuddy.data.firebase.repository.FirestoreLabelRepository
 import com.synaptix.budgetbuddy.data.firebase.repository.FirestoreUserRepository
 import com.synaptix.budgetbuddy.data.firebase.repository.FirestoreWalletRepository
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOf
 import javax.inject.Inject
 
 class GetTransactionsUseCase @Inject constructor(
@@ -30,80 +23,78 @@ class GetTransactionsUseCase @Inject constructor(
         data class Error(val message: String) : GetTransactionsResult()
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    fun execute(userId: String): Flow<GetTransactionsResult> {
-        if (userId.isEmpty()) return flowOf(GetTransactionsResult.Error("Invalid user ID"))
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // Executes the operation to fetch transactions for the specified user
+    suspend fun execute(userId: String): GetTransactionsResult {
+        if (userId.isEmpty()) {
+            return GetTransactionsResult.Error("Invalid user ID")
+        }
 
-        return transactionRepository.getTransactionsForUser(userId)
-            .flatMapLatest { result ->
-                flow {
-                    when (result) {
-                        is Result.Success -> {
-                            val transactions = mutableListOf<Transaction>()
-                            for (dto in result.data) {
-                                when (val full = getTransactionData(dto)) {
-                                    is Result.Success -> transactions.add(full.data)
-                                    is Result.Error -> {} // Optionally log or handle
-                                }
-                            }
-                            emit(GetTransactionsResult.Success(transactions))
-                        }
-                        is Result.Error -> {
-                            emit(GetTransactionsResult.Error("Failed to get transactions: ${result.exception.message}"))
+        return try {
+            when (val result = transactionRepository.getTransactionsForUser(userId)) {
+                is Result.Success -> {
+                    val fullTransactions = result.data.mapNotNull { dto ->
+                        when (val full = getTransactionData(dto)) {
+                            is Result.Success -> full.data
+                            is Result.Error -> null
                         }
                     }
+                    GetTransactionsResult.Success(fullTransactions)
                 }
-            }.catch { e ->
-                emit(GetTransactionsResult.Error("Failed to get transactions: ${e.message}"))
+                is Result.Error -> GetTransactionsResult.Error("Failed to get transactions: ${result.exception.message}")
             }
+        } catch (e: Exception) {
+            GetTransactionsResult.Error("Failed to get transactions: ${e.message}")
+        }
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    fun executeWithDateRange(userId: String, startDate: Long, endDate: Long): Flow<GetTransactionsResult> {
-        if (userId.isEmpty()) return flowOf(GetTransactionsResult.Error("Invalid user ID"))
-        if (startDate > endDate) return flowOf(GetTransactionsResult.Error("Invalid date range"))
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // Executes the operation to fetch transactions for the specified user within a date range
+    suspend fun executeWithDateRange(userId: String, startDate: Long, endDate: Long): GetTransactionsResult {
+        if (userId.isEmpty()) {
+            return GetTransactionsResult.Error("Invalid user ID")
+        }
+        if (startDate > endDate) {
+            return GetTransactionsResult.Error("Invalid date range")
+        }
 
-        return transactionRepository.getTransactionsForUserInDateRange(userId, startDate, endDate)
-            .flatMapLatest { result ->
-                flow {
-                    when (result) {
-                        is Result.Success -> {
-                            val transactions = mutableListOf<Transaction>()
-                            for (dto in result.data) {
-                                when (val full = getTransactionData(dto)) {
-                                    is Result.Success -> transactions.add(full.data)
-                                    is Result.Error -> {} // Optionally log
-                                }
-                            }
-                            emit(GetTransactionsResult.Success(transactions))
-                        }
-                        is Result.Error -> {
-                            emit(GetTransactionsResult.Error("Failed to get transactions: ${result.exception.message}"))
+        return try {
+            when (val result = transactionRepository.getTransactionsForUserInDateRange(userId, startDate, endDate)) {
+                is Result.Success -> {
+                    val fullTransactions = result.data.mapNotNull { dto ->
+                        when (val full = getTransactionData(dto)) {
+                            is Result.Success -> full.data
+                            is Result.Error -> null
                         }
                     }
+                    GetTransactionsResult.Success(fullTransactions)
                 }
-            }.catch { e ->
-                emit(GetTransactionsResult.Error("Failed to get transactions: ${e.message}"))
+                is Result.Error -> GetTransactionsResult.Error("Failed to get transactions: ${result.exception.message}")
             }
+        } catch (e: Exception) {
+            GetTransactionsResult.Error("Failed to get transactions: ${e.message}")
+        }
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // Helper function to get full transaction data including user, wallet, category, and labels
     private suspend fun getTransactionData(transaction: TransactionDTO): Result<Transaction> {
-        val user = when (val result = userRepository.getUserProfile(transaction.userId).first()) {
+        val user = when (val result = userRepository.getUserProfile(transaction.userId)) {
             is Result.Success -> result.data?.toDomain()
             is Result.Error -> return Result.Error(result.exception)
         } ?: return Result.Error(Exception("User not found"))
 
-        val wallet = when (val result = walletRepository.getWalletById(transaction.walletId).first()) {
+        val wallet = when (val result = walletRepository.getWalletById(transaction.walletId)) {
             is Result.Success -> result.data?.toDomain(user)
             is Result.Error -> return Result.Error(result.exception)
         } ?: return Result.Error(Exception("Wallet not found"))
 
-        val category = when (val result = categoryRepository.getCategoryById(transaction.categoryId).first()) {
+        val category = when (val result = categoryRepository.getCategoryById(transaction.categoryId)) {
             is Result.Success -> result.data?.toDomain(user)
             is Result.Error -> return Result.Error(result.exception)
         } ?: return Result.Error(Exception("Category not found"))
 
-        val labels = when (val result = labelRepository.getLabelsByIds(transaction.labelIds).first()) {
+        val labels = when (val result = labelRepository.getLabelsByIds(transaction.labelIds)) {
             is Result.Success -> result.data.map { it.toDomain(user) }
             is Result.Error -> return Result.Error(result.exception)
         }
@@ -111,3 +102,4 @@ class GetTransactionsUseCase @Inject constructor(
         return Result.Success(transaction.toDomain(user, wallet, category, labels))
     }
 }
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~EOF~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\

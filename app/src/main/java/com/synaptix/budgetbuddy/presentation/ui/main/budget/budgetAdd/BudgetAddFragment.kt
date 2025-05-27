@@ -100,7 +100,7 @@ class BudgetAddFragment : Fragment() {
         viewModel.budgetAmount.value = binding.amount.text.toString().toDoubleOrNull() ?: 0.0
 
         if (viewModel.selectedCategories.value.isNullOrEmpty() ||
-            viewModel.wallet.value == null ||
+//            viewModel.wallet.value == null ||
             viewModel.budgetName.value.isNullOrBlank() ||
             viewModel.budgetAmount.value!! <= 0.0
         ) {
