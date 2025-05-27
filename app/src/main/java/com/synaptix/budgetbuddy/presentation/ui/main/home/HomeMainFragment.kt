@@ -30,8 +30,11 @@ import com.github.mikephil.charting.data.PieDataSet
 import com.github.mikephil.charting.data.PieEntry
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
 import com.github.mikephil.charting.formatter.PercentFormatter
+import com.github.mikephil.charting.utils.ColorTemplate
 import com.synaptix.budgetbuddy.R
+import com.synaptix.budgetbuddy.core.model.Category
 import com.synaptix.budgetbuddy.core.model.HomeListItems
+import com.synaptix.budgetbuddy.data.firebase.model.TransactionDTO
 import com.synaptix.budgetbuddy.databinding.FragmentHomeBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -115,7 +118,9 @@ class HomeMainFragment : Fragment() {
         setupViews()
         observeStates()
         setupBarChart()
-        setupPieChart()
+        viewModel.pieEntries.observe(viewLifecycleOwner) { pieEntries ->
+            setupPieChart(pieEntries)
+        }
     }
 
     private fun setupViews() {
@@ -127,12 +132,12 @@ class HomeMainFragment : Fragment() {
                 layoutManager = LinearLayoutManager(requireContext())
                 adapter = walletAdapter
             }
-            
+
             recyclerViewHomeTransactionOverview.apply {
                 layoutManager = LinearLayoutManager(requireContext())
                 adapter = transactionAdapter
             }
-            
+
             recyclerViewHomeCategoryOverview.apply {
                 layoutManager = LinearLayoutManager(requireContext())
                 adapter = categoryAdapter
@@ -142,11 +147,11 @@ class HomeMainFragment : Fragment() {
             txtViewAllWallets.setOnClickListener {
                 // TODO: Navigate to all wallets
             }
-            
+
             txtViewAllCategories.setOnClickListener {
                 // TODO: Navigate to all categories
             }
-            
+
             txtViewAllTransactions.setOnClickListener {
                 // TODO: Navigate to all transactions
             }
@@ -168,11 +173,11 @@ class HomeMainFragment : Fragment() {
                         if (state is HomeMainViewModel.TransactionState.Success) {
                             totalIncome = state.transactions
                                 .filter { it.category.type == "income" }
-                                .sumOf { it.amount.toDouble() }  // ✅ Use toDouble()
+                                .sumOf { it.amount.toDouble() }
 
                             totalExpense = state.transactions
                                 .filter { it.category.type == "expense" }
-                                .sumOf { it.amount.toDouble() }  // ✅ Use toDouble()
+                                .sumOf { it.amount.toDouble() }
 
                             setupBarChart()
                         }
@@ -243,27 +248,14 @@ class HomeMainFragment : Fragment() {
         }
     }
 
-    private fun setupPieChart() {
+    private fun setupPieChart(pieEntries: List<PieEntry>) {
         val context = binding.root.context
         val pieChart: PieChart = binding.pieChart
 
-        val expenseCategories = listOf("Food", "Transport", "Entertainment", "Bills", "Shopping")
-        val expenseAmounts = listOf(800f, 400f, 300f, 500f, 600f)
-
-        val pieEntries = expenseCategories.mapIndexed { index, category ->
-            PieEntry(expenseAmounts[index], category)
-        }
-
-        val pieDataSet = PieDataSet(pieEntries, "Expense Categories").apply {
-            colors = listOf(
-                ContextCompat.getColor(context, R.color.cat_dark_green),
-                ContextCompat.getColor(context, R.color.cat_light_pink),
-                ContextCompat.getColor(context, R.color.cat_dark_blue),
-                ContextCompat.getColor(context, R.color.cat_yellow),
-                ContextCompat.getColor(context, R.color.cat_orange)
-            )
+        val pieDataSet = PieDataSet(pieEntries, "Transactions per Category").apply {
+            colors = ColorTemplate.MATERIAL_COLORS.toList()
+            valueTextColor = ContextCompat.getColor(context, R.color.light_text)
             valueTextSize = 14f
-            valueTextColor = context.getThemeColor(R.attr.bb_primaryText)
         }
 
         val pieData = PieData(pieDataSet).apply {
@@ -275,11 +267,11 @@ class HomeMainFragment : Fragment() {
             isDrawHoleEnabled = true
             holeRadius = 50f
             setHoleColor(Color.TRANSPARENT)
-            centerText = "Expenses"
+            centerText = "Transactions"
             setCenterTextColor(context.getThemeColor(R.attr.bb_primaryText))
             setUsePercentValues(true)
             setDrawEntryLabels(true)
-            setEntryLabelColor(context.getThemeColor(R.attr.bb_primaryText))
+            setEntryLabelColor(ContextCompat.getColor(context, R.color.light_text))
             setEntryLabelTextSize(12f)
             description.isEnabled = false
             legend.isEnabled = false
@@ -287,6 +279,7 @@ class HomeMainFragment : Fragment() {
             invalidate()
         }
     }
+
 
     private fun handleWalletsState(state: HomeMainViewModel.WalletState) {
         binding.apply {
@@ -296,6 +289,7 @@ class HomeMainFragment : Fragment() {
                     txtEmptyWallets.isVisible = false
                     // TODO: Show loading indicator
                 }
+
                 is HomeMainViewModel.WalletState.Success -> {
                     val wallets = state.wallets
                     if (wallets.isEmpty()) {
@@ -306,7 +300,7 @@ class HomeMainFragment : Fragment() {
 
                     recyclerViewHomeWalletOverview.isVisible = true
                     txtEmptyWallets.isVisible = false
-                    
+
                     val walletItems = wallets.take(MAX_ITEMS).map { wallet ->
                         HomeListItems.HomeWalletItem(
                             wallet = wallet,
@@ -316,6 +310,7 @@ class HomeMainFragment : Fragment() {
                     }
                     walletAdapter.submitList(walletItems)
                 }
+
                 is HomeMainViewModel.WalletState.Error -> {
                     recyclerViewHomeWalletOverview.isVisible = false
                     txtEmptyWallets.isVisible = true
@@ -334,6 +329,7 @@ class HomeMainFragment : Fragment() {
                     txtEmptyTransactions.isVisible = false
                     // TODO: Show loading indicator
                 }
+
                 is HomeMainViewModel.TransactionState.Success -> {
                     val transactions = state.transactions
                     if (transactions.isEmpty()) {
@@ -344,7 +340,7 @@ class HomeMainFragment : Fragment() {
 
                     recyclerViewHomeTransactionOverview.isVisible = true
                     txtEmptyTransactions.isVisible = false
-                    
+
                     val transactionItems = transactions.take(MAX_ITEMS).map { transaction ->
                         HomeListItems.HomeTransactionItem(
                             transaction = transaction,
@@ -353,6 +349,7 @@ class HomeMainFragment : Fragment() {
                     }
                     transactionAdapter.submitList(transactionItems)
                 }
+
                 is HomeMainViewModel.TransactionState.Error -> {
                     recyclerViewHomeTransactionOverview.isVisible = false
                     txtEmptyTransactions.isVisible = true
@@ -371,6 +368,7 @@ class HomeMainFragment : Fragment() {
                     txtEmptyCategories.isVisible = false
                     // TODO: Show loading indicator
                 }
+
                 is HomeMainViewModel.CategoryState.Success -> {
                     val categories = state.categories
                     if (categories.isEmpty()) {
@@ -381,7 +379,7 @@ class HomeMainFragment : Fragment() {
 
                     recyclerViewHomeCategoryOverview.isVisible = true
                     txtEmptyCategories.isVisible = false
-                    
+
                     val categoryItems = categories.take(MAX_ITEMS).map { category ->
                         HomeListItems.HomeCategoryItem(
                             category = category,
@@ -392,6 +390,7 @@ class HomeMainFragment : Fragment() {
                     }
                     categoryAdapter.submitList(categoryItems)
                 }
+
                 is HomeMainViewModel.CategoryState.Error -> {
                     recyclerViewHomeCategoryOverview.isVisible = false
                     txtEmptyCategories.isVisible = true

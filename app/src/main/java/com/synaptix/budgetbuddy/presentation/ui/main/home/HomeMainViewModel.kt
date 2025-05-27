@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.github.mikephil.charting.data.PieEntry
 import com.synaptix.budgetbuddy.core.model.Category
 import com.synaptix.budgetbuddy.core.model.Transaction
 import com.synaptix.budgetbuddy.core.model.Wallet
@@ -11,6 +12,7 @@ import com.synaptix.budgetbuddy.core.usecase.auth.GetUserIdUseCase
 import com.synaptix.budgetbuddy.core.usecase.main.category.GetCategoriesUseCase
 import com.synaptix.budgetbuddy.core.usecase.main.transaction.GetTransactionsUseCase
 import com.synaptix.budgetbuddy.core.usecase.main.wallet.GetWalletUseCase
+import com.synaptix.budgetbuddy.data.firebase.model.TransactionDTO
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -27,7 +29,12 @@ class HomeMainViewModel @Inject constructor(
     private val getTransactionsUseCase: GetTransactionsUseCase,
     private val getCategoriesUseCase: GetCategoriesUseCase,
     private val getUserIdUseCase: GetUserIdUseCase
+
+
 ) : ViewModel() {
+
+    private val _pieEntries = MutableLiveData<List<PieEntry>>()
+    val pieEntries: LiveData<List<PieEntry>> = _pieEntries
 
     sealed class WalletState {
         object Loading : WalletState()
@@ -229,6 +236,17 @@ class HomeMainViewModel @Inject constructor(
         _selectedStartDate = ""
         _selectedEndDate = ""
         loadTransactions()
+    }
+
+    fun updatePieChartWithTransactions(transactions: List<TransactionDTO>, categoriesMap: Map<String, Category>) {
+        val transactionsGroupedByCategory = transactions.groupingBy { it.categoryId }.eachCount()
+
+        val pieEntries = transactionsGroupedByCategory.mapNotNull { (categoryId, count) ->
+            val categoryName = categoriesMap[categoryId]?.name ?: return@mapNotNull null
+            PieEntry(count.toFloat(), categoryName)
+        }
+
+        _pieEntries.value = pieEntries
     }
 }
 
