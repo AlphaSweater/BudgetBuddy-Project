@@ -29,6 +29,7 @@ class HomeMainFragment : Fragment() {
 
     private val viewModel: HomeMainViewModel by activityViewModels()
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     // Initialize adapters once and reuse them
     private val walletAdapter by lazy {
         HomeAdapter(
@@ -43,6 +44,7 @@ class HomeMainFragment : Fragment() {
         )
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private val transactionAdapter by lazy {
         HomeAdapter(
             onTransactionClick = { transaction ->
@@ -58,6 +60,7 @@ class HomeMainFragment : Fragment() {
         )
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private val categoryAdapter by lazy {
         HomeAdapter(
             onCategoryClick = { category ->
@@ -72,6 +75,7 @@ class HomeMainFragment : Fragment() {
         )
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -81,12 +85,14 @@ class HomeMainFragment : Fragment() {
         return binding.root
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupViews()
         observeStates()
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private fun setupViews() {
         binding.apply {
             //editTextDate2.setOnClickListener { openDateRangePicker() }
@@ -122,6 +128,7 @@ class HomeMainFragment : Fragment() {
         }
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private fun observeStates() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -150,6 +157,8 @@ class HomeMainFragment : Fragment() {
         }
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // Handle different states for wallets, transactions, and categories
     private fun handleWalletsState(state: HomeMainViewModel.WalletState) {
         binding.apply {
             when (state) {
@@ -188,6 +197,8 @@ class HomeMainFragment : Fragment() {
         }
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // Handle different states for transactions
     private fun handleTransactionsState(state: HomeMainViewModel.TransactionState) {
         binding.apply {
             when (state) {
@@ -225,6 +236,8 @@ class HomeMainFragment : Fragment() {
         }
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // Handle different states for categories
     private fun handleCategoriesState(state: HomeMainViewModel.CategoryState) {
         binding.apply {
             when (state) {
@@ -264,17 +277,21 @@ class HomeMainFragment : Fragment() {
         }
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private fun showError(message: String) {
         Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     override fun onResume() {
         super.onResume()
         viewModel.refreshData()
     }
 }
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~EOF~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\

@@ -31,6 +31,8 @@ class HomeMainViewModel @Inject constructor(
     private val getTotalWalletUseCase: TotalWalletUseCase
 ) : ViewModel() {
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // State Classes
     sealed class WalletState {
         object Loading : WalletState()
         data class Success(val wallets: List<Wallet>) : WalletState()
@@ -49,21 +51,29 @@ class HomeMainViewModel @Inject constructor(
         data class Error(val message: String) : CategoryState()
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // StateFlow for UI states
     private val _walletsState = MutableStateFlow<WalletState>(WalletState.Loading)
     val walletsState: StateFlow<WalletState> = _walletsState
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private val _transactionsState = MutableStateFlow<TransactionState>(TransactionState.Loading)
     val transactionsState: StateFlow<TransactionState> = _transactionsState
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private val _categoriesState = MutableStateFlow<CategoryState>(CategoryState.Loading)
     val categoriesState: StateFlow<CategoryState> = _categoriesState
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     //for total wallet balance
     private val _totalWalletBalance = MutableStateFlow<Double?>(null)
     val totalWalletBalance: StateFlow<Double?> get() = _totalWalletBalance
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // LiveData for selected start and end dates, and selected transaction
     private var _selectedStartDate = ""
     var selectedStartDate: String
         get() = _selectedStartDate
@@ -72,6 +82,7 @@ class HomeMainViewModel @Inject constructor(
             loadTransactions()
         }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private var _selectedEndDate = ""
     var selectedEndDate: String
         get() = _selectedEndDate
@@ -80,9 +91,11 @@ class HomeMainViewModel @Inject constructor(
             loadTransactions()
         }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private val _selectedTransaction = MutableLiveData<Transaction>()
     val selectedTransaction: LiveData<Transaction> = _selectedTransaction
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private var currentFilter: TransactionFilter = TransactionFilter.ALL
         set(value) {
             field = value
@@ -93,6 +106,7 @@ class HomeMainViewModel @Inject constructor(
         refreshData()
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     fun refreshData() {
         loadWallets()
         loadTransactions()
@@ -100,6 +114,8 @@ class HomeMainViewModel @Inject constructor(
         loadTotalWalletBalance()
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // Load data methods
     private fun loadWallets() {
         viewModelScope.launch {
             _walletsState.value = WalletState.Loading
@@ -119,6 +135,8 @@ class HomeMainViewModel @Inject constructor(
         }
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // Load transactions with optional date filtering
     private fun loadTransactions() {
         viewModelScope.launch {
             _transactionsState.value = TransactionState.Loading
@@ -152,6 +170,8 @@ class HomeMainViewModel @Inject constructor(
         }
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // Filter transactions based on the current filter
     private fun filterTransactions(transactions: List<Transaction>): List<Transaction> {
         var filtered = transactions
 
@@ -166,6 +186,7 @@ class HomeMainViewModel @Inject constructor(
         return filtered.sortedByDescending { it.date }
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private fun isToday(date: Long): Boolean {
         return try {
             val dateDate = dateFormat.format(Date(date))
@@ -179,6 +200,7 @@ class HomeMainViewModel @Inject constructor(
         }
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private fun isThisWeek(date: Long): Boolean {
         return try {
             val dateDate = dateFormat.format(Date(date))
@@ -192,6 +214,7 @@ class HomeMainViewModel @Inject constructor(
         }
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private fun isThisMonth(date: Long): Boolean {
         return try {
             val dateDate = dateFormat.format(Date(date))
@@ -205,6 +228,8 @@ class HomeMainViewModel @Inject constructor(
         }
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // Load categories
     private fun loadCategories() {
         viewModelScope.launch {
             _categoriesState.value = CategoryState.Loading
@@ -224,6 +249,8 @@ class HomeMainViewModel @Inject constructor(
         }
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // Load total wallet balance
     fun loadTotalWalletBalance() {
         viewModelScope.launch {
             try {
@@ -236,14 +263,17 @@ class HomeMainViewModel @Inject constructor(
         }
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     fun setTransaction(transaction: Transaction) {
         _selectedTransaction.value = transaction
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     fun setTransactionFilter(filter: TransactionFilter) {
         currentFilter = filter
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     fun clearDateFilter() {
         _selectedStartDate = ""
         _selectedEndDate = ""
@@ -251,9 +281,11 @@ class HomeMainViewModel @Inject constructor(
     }
 }
 
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
 enum class TransactionFilter {
     ALL,
     TODAY,
     THIS_WEEK,
     THIS_MONTH
 }
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~EOF~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
