@@ -223,20 +223,29 @@ class GeneralReportsFragment : Fragment() {
             clear()
             data = lineData
 
+
             xAxis.apply {
                 valueFormatter = IndexAxisValueFormatter(months)
                 granularity = 1f
+                textColor = context.getThemeColor(R.attr.bb_primaryText)
                 position = XAxis.XAxisPosition.BOTTOM
                 setDrawGridLines(false)
                 labelRotationAngle = -45f
             }
 
+            axisLeft.apply {
+                textColor = context.getThemeColor(R.attr.bb_primaryText)
+                setDrawGridLines(false)
+            }
+
+            setExtraOffsets(0f, 0f, 0f, 30f)
             axisRight.isEnabled = false
             description.text = "Income vs Expense (6 Months)"
-
             animateXY(1000, 1200, Easing.EaseInOutCubic)
             setTouchEnabled(true)
             isDragEnabled = true
+            description.isEnabled = false
+            legend.isEnabled = false
             setScaleEnabled(false)
             setPinchZoom(false)
             invalidate()
