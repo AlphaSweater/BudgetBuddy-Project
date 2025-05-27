@@ -40,6 +40,7 @@ class BudgetAddViewModel @Inject constructor(
     private val validateUserTotalsUseCase: ValidateUserTotalsUseCase
 ) : ViewModel() {
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     // LiveData for budget input fields
     val budgetName = MutableLiveData<String?>()
     val wallet = MutableLiveData<Wallet?>()
@@ -49,6 +50,7 @@ class BudgetAddViewModel @Inject constructor(
     private val _error = MutableLiveData<String?>()
     val error: MutableLiveData<String?> = _error
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     // Function to Add Budget
     suspend fun addBudget() {
         try {
@@ -76,6 +78,7 @@ class BudgetAddViewModel @Inject constructor(
         }
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     // Function to Reset Input Fields
     fun reset() {
         budgetName.value = null
@@ -85,3 +88,4 @@ class BudgetAddViewModel @Inject constructor(
         _error.value = null
     }
 }
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~EOF~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\

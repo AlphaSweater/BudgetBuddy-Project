@@ -230,7 +230,8 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:layout_marginTop="16dp"
-            android:visibility="visible"/>
+            android:visibility="visible"
+            tools:listitem="@layout/item_home_transaction"/>
 
     </ScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>

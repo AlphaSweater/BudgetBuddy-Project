@@ -49,92 +49,116 @@ class TransactionAddViewModel @Inject constructor(
         val shouldShowErrors: Boolean = false
     )
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     // UI State
     private val _uiState = MutableStateFlow<UiState>(UiState.Initial)
     val uiState: StateFlow<UiState> = _uiState
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     // Validation State
     private val _validationState = MutableStateFlow(ValidationState())
     val validationState: StateFlow<ValidationState> = _validationState
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     // Form Fields
     private val _category = MutableStateFlow<Category?>(null)
     val category: StateFlow<Category?> = _category
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private val _wallet = MutableStateFlow<Wallet?>(null)
     val wallet: StateFlow<Wallet?> = _wallet
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private val _currency = MutableStateFlow("ZAR")
     val currency: StateFlow<String> = _currency
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private val _amount = MutableStateFlow<Double?>(null)
     val amount: StateFlow<Double?> = _amount
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private val _date = MutableStateFlow(getCurrentDate())
     val date: StateFlow<String> = _date
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private val _note = MutableStateFlow<String?>(null)
     val note: StateFlow<String?> = _note
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private val _imageBytes = MutableStateFlow<ByteArray?>(null)
     val imageBytes: StateFlow<ByteArray?> = _imageBytes
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private val _recurrenceData = MutableStateFlow(RecurrenceData.DEFAULT)
     val recurrenceData: StateFlow<RecurrenceData> = _recurrenceData
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private val _selectedLabels = MutableStateFlow<List<Label>>(emptyList())
     val selectedLabels: StateFlow<List<Label>> = _selectedLabels
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private val _saveState = MutableStateFlow(false)
     val saveState: StateFlow<Boolean> = _saveState
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     fun setCategory(category: Category?) {
         _category.value = category
         validateForm()
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     fun setLabels(labels: List<Label>) {
         _selectedLabels.value = labels
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     fun setWallet(wallet: Wallet?) {
         _wallet.value = wallet
         validateForm()
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     fun setCurrency(currency: String) {
         _currency.value = currency
         validateForm()
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     fun setAmount(amount: Double?) {
         _amount.value = amount
         validateForm()
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     fun setDate(date: String) {
         _date.value = date
         validateForm()
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     fun setNote(note: String) {
         _note.value = note
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     fun setRecurrenceData(data: RecurrenceData) {
         _recurrenceData.value = data
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     fun setImageBytes(bytes: ByteArray?) {
         _imageBytes.value = bytes
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     fun removeLabel(label: Label) {
         val currentLabels = _selectedLabels.value.toMutableList()
         currentLabels.remove(label)
         _selectedLabels.value = currentLabels
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // Function to validate the form inputs
     fun validateForm(): Boolean {
         val currentState = _validationState.value
         val isAmountValid = (_amount.value ?: 0.0) > 0.0
@@ -160,11 +184,14 @@ class TransactionAddViewModel @Inject constructor(
         return isAmountValid && isCurrencyValid && isCategoryValid && isWalletValid && isDateValid
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     fun showValidationErrors() {
         _validationState.value = _validationState.value.copy(shouldShowErrors = true)
         validateForm()
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // Function to add a new transaction
     fun addTransaction() {
         if (!validateForm()) return
 
@@ -242,6 +269,7 @@ class TransactionAddViewModel @Inject constructor(
         }
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     fun reset() {
         _saveState.value = false
         _amount.value = null
@@ -254,12 +282,13 @@ class TransactionAddViewModel @Inject constructor(
         _selectedLabels.value = emptyList()
         _validationState.value = ValidationState(shouldShowErrors = false)
         _uiState.value = UiState.Initial
-        _saveState.value = false
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private fun getCurrentDate(): String =
         SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date())
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private fun parseDate(dateStr: String): Long = try {
         SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
             .parse(dateStr)?.time ?: System.currentTimeMillis()
@@ -267,3 +296,4 @@ class TransactionAddViewModel @Inject constructor(
         System.currentTimeMillis()
     }
 }
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~EOF~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\

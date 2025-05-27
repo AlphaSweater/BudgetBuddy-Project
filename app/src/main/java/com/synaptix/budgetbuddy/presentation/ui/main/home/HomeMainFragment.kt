@@ -1,18 +1,38 @@
 package com.synaptix.budgetbuddy.presentation.ui.main.home
 
+import android.content.Context
+import android.graphics.Color
 import android.os.Bundle
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
+import androidx.annotation.AttrRes
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.github.mikephil.charting.charts.BarChart
+import com.github.mikephil.charting.charts.PieChart
+import com.github.mikephil.charting.components.Description
+import com.github.mikephil.charting.components.XAxis
+import com.github.mikephil.charting.data.BarData
+import com.github.mikephil.charting.data.BarDataSet
+import com.github.mikephil.charting.data.BarEntry
+import com.github.mikephil.charting.animation.Easing
+import com.github.mikephil.charting.data.PieData
+import com.github.mikephil.charting.data.PieDataSet
+import com.github.mikephil.charting.data.PieEntry
+import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
+import com.github.mikephil.charting.formatter.PercentFormatter
+import com.github.mikephil.charting.utils.ColorTemplate
 import com.synaptix.budgetbuddy.R
 import com.synaptix.budgetbuddy.core.model.Category
 import com.synaptix.budgetbuddy.core.model.HomeListItems
@@ -25,6 +45,10 @@ import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class HomeMainFragment : Fragment() {
+
+    private var totalIncome: Double = 0.0
+    private var totalExpense: Double = 0.0
+
     companion object {
         private const val MAX_ITEMS = 3
     }
@@ -44,6 +68,7 @@ class HomeMainFragment : Fragment() {
         )
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private val transactionAdapter by lazy {
         HomeAdapter(
             onTransactionClick = { transaction ->
@@ -53,6 +78,7 @@ class HomeMainFragment : Fragment() {
         )
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private val categoryAdapter by lazy {
         HomeAdapter(
             onCategoryClick = { category ->
@@ -61,6 +87,13 @@ class HomeMainFragment : Fragment() {
             }
         )
     }
+
+    fun Context.getThemeColor(@AttrRes attrRes: Int): Int {
+        val typedValue = TypedValue()
+        theme.resolveAttribute(attrRes, typedValue, true)
+        return typedValue.data
+    }
+
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -75,6 +108,10 @@ class HomeMainFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setupViews()
         observeStates()
+        setupBarChart()
+        viewModel.pieEntries.observe(viewLifecycleOwner) { pieEntries ->
+            setupPieChart(pieEntries)
+        }
     }
 
     private fun setupViews() {
@@ -84,12 +121,12 @@ class HomeMainFragment : Fragment() {
                 layoutManager = LinearLayoutManager(requireContext())
                 adapter = walletAdapter
             }
-            
+
             recyclerViewHomeTransactionOverview.apply {
                 layoutManager = LinearLayoutManager(requireContext())
                 adapter = transactionAdapter
             }
-            
+
             recyclerViewHomeCategoryOverview.apply {
                 layoutManager = LinearLayoutManager(requireContext())
                 adapter = categoryAdapter
@@ -99,11 +136,11 @@ class HomeMainFragment : Fragment() {
             txtViewAllWallets.setOnClickListener {
                 navigateToAllWallets()
             }
-            
+
             txtViewAllCategories.setOnClickListener {
                 navigateToAllCategories()
             }
-            
+
             txtViewAllTransactions.setOnClickListener {
                 navigateToAllTransactions()
             }
@@ -124,6 +161,17 @@ class HomeMainFragment : Fragment() {
                         when (state) {
                             is HomeMainViewModel.TransactionState.Success -> {
                                 transactionsLoaded = true
+
+                                totalIncome = state.transactions
+                                    .filter { it.category.type == "income" }
+                                    .sumOf { it.amount.toDouble() }
+
+                                totalExpense = state.transactions
+                                    .filter { it.category.type == "expense" }
+                                    .sumOf { it.amount.toDouble() }
+
+                                setupBarChart()
+
                                 handleTransactionsState(state)
                                 // If categories are already loaded, refresh them with new transaction data
                                 if (categoriesLoaded) {
@@ -198,6 +246,141 @@ class HomeMainFragment : Fragment() {
         }
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // Handle different states for wallets, transactions, and categories
+
+    private fun setupPieChart() {
+        val context = binding.root.context
+        val pieChart: PieChart = binding.pieChart
+
+        val expenseCategories = listOf("Food", "Transport", "Entertainment", "Bills", "Shopping")
+        val expenseAmounts = listOf(800f, 400f, 300f, 500f, 600f)
+
+        val pieEntries = expenseCategories.mapIndexed { index, category ->
+            PieEntry(expenseAmounts[index], category)
+        }
+
+        val pieDataSet = PieDataSet(pieEntries, "Expense Categories").apply {
+            colors = listOf(
+                ContextCompat.getColor(context, R.color.cat_dark_green),
+                ContextCompat.getColor(context, R.color.cat_light_pink),
+                ContextCompat.getColor(context, R.color.cat_dark_blue),
+                ContextCompat.getColor(context, R.color.cat_yellow),
+                ContextCompat.getColor(context, R.color.cat_orange)
+            )
+            valueTextSize = 14f
+            valueTextColor = context.getThemeColor(R.attr.bb_primaryText)
+        }
+
+        val pieData = PieData(pieDataSet).apply {
+            setValueFormatter(PercentFormatter(pieChart))
+        }
+
+        pieChart.apply {
+            data = pieData
+            isDrawHoleEnabled = true
+            holeRadius = 50f
+            setHoleColor(Color.TRANSPARENT)
+            centerText = "Expenses"
+            setCenterTextColor(context.getThemeColor(R.attr.bb_primaryText))
+            setUsePercentValues(true)
+            setDrawEntryLabels(true)
+            setEntryLabelColor(context.getThemeColor(R.attr.bb_primaryText))
+            setEntryLabelTextSize(12f)
+            description.isEnabled = false
+            legend.isEnabled = false
+            animateY(1000, Easing.EaseInOutQuad)
+            invalidate()
+        }
+    }
+
+    private fun setupBarChart() {
+        val context = binding.root.context
+        val barChart: BarChart = binding.barChart
+
+        val primaryTextColor = context.getThemeColor(R.attr.bb_primaryText)
+        val expenseColor = context.getThemeColor(R.attr.bb_expense)
+        val profitColor = context.getThemeColor(R.attr.bb_profit)
+
+        val incomeEntry = BarEntry(0f, totalIncome.toFloat())
+        val expenseEntry = BarEntry(1f, totalExpense.toFloat())
+
+        val incomeSet = BarDataSet(listOf(incomeEntry), "Income").apply {
+            color = profitColor
+            valueTextColor = primaryTextColor
+        }
+
+        val expenseSet = BarDataSet(listOf(expenseEntry), "Expense").apply {
+            color = expenseColor
+            valueTextColor = primaryTextColor
+        }
+
+        val data = BarData(incomeSet, expenseSet).apply {
+            barWidth = 0.25f
+        }
+
+        barChart.apply {
+            this.data = data
+            xAxis.axisMinimum = -0.5f
+            xAxis.axisMaximum = 2f
+            groupBars(0f, 0.4f, 0.05f)
+
+            xAxis.apply {
+                granularity = 1f
+                isGranularityEnabled = true
+                setDrawGridLines(false)
+                setCenterAxisLabels(true)
+                position = XAxis.XAxisPosition.BOTTOM
+                valueFormatter = IndexAxisValueFormatter(listOf("March"))
+                textColor = primaryTextColor
+            }
+
+            axisLeft.textColor = primaryTextColor
+            axisRight.isEnabled = false
+            legend.textColor = primaryTextColor
+
+            description = Description().apply {
+                text = "Monthly Budget"
+                textColor = primaryTextColor
+            }
+
+            animateY(1000)
+            invalidate()
+        }
+    }
+
+    private fun setupPieChart(pieEntries: List<PieEntry>) {
+        val context = binding.root.context
+        val pieChart: PieChart = binding.pieChart
+
+        val pieDataSet = PieDataSet(pieEntries, "Transactions per Category").apply {
+            colors = ColorTemplate.MATERIAL_COLORS.toList()
+            valueTextColor = ContextCompat.getColor(context, R.color.light_text)
+            valueTextSize = 14f
+        }
+
+        val pieData = PieData(pieDataSet).apply {
+            setValueFormatter(PercentFormatter(pieChart))
+        }
+
+        pieChart.apply {
+            data = pieData
+            isDrawHoleEnabled = true
+            holeRadius = 50f
+            setHoleColor(Color.TRANSPARENT)
+            centerText = "Transactions"
+            setCenterTextColor(context.getThemeColor(R.attr.bb_primaryText))
+            setUsePercentValues(true)
+            setDrawEntryLabels(true)
+            setEntryLabelColor(ContextCompat.getColor(context, R.color.light_text))
+            setEntryLabelTextSize(12f)
+            description.isEnabled = false
+            legend.isEnabled = false
+            animateY(1000, Easing.EaseInOutQuad)
+            invalidate()
+        }
+    }
+
     private fun handleWalletsState(state: HomeMainViewModel.WalletState) {
         binding.apply {
             when (state) {
@@ -208,6 +391,7 @@ class HomeMainFragment : Fragment() {
                         emptyText = txtEmptyWallets
                     )
                 }
+
                 is HomeMainViewModel.WalletState.Success -> {
                     hideLoadingState(progressBarWallets)
                     showContentState(
@@ -244,6 +428,8 @@ class HomeMainFragment : Fragment() {
         }
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // Handle different states for transactions
     private fun handleTransactionsState(state: HomeMainViewModel.TransactionState) {
         binding.apply {
             when (state) {
@@ -254,13 +440,14 @@ class HomeMainFragment : Fragment() {
                         emptyText = txtEmptyTransactions
                     )
                 }
+
                 is HomeMainViewModel.TransactionState.Success -> {
                     hideLoadingState(progressBarTransactions)
                     showContentState(
                         recyclerView = recyclerViewHomeTransactionOverview,
                         emptyText = txtEmptyTransactions
                     )
-                    
+
                     val transactionItems = state.transactions.take(MAX_ITEMS).map { transaction ->
                         HomeListItems.HomeTransactionItem(
                             transaction = transaction,
@@ -289,6 +476,8 @@ class HomeMainFragment : Fragment() {
         }
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // Handle different states for categories
     private fun handleCategoriesState(state: HomeMainViewModel.CategoryState) {
         binding.apply {
             when (state) {
@@ -299,13 +488,14 @@ class HomeMainFragment : Fragment() {
                         emptyText = txtEmptyCategories
                     )
                 }
+
                 is HomeMainViewModel.CategoryState.Success -> {
                     hideLoadingState(progressBarCategories)
                     showContentState(
                         recyclerView = recyclerViewHomeCategoryOverview,
                         emptyText = txtEmptyCategories
                     )
-                    
+
                     // Get current transactions from the state flow
                     val currentTransactions = when (val transactionState = homeViewModel.transactionsState.value) {
                         is HomeMainViewModel.TransactionState.Success -> transactionState.transactions
@@ -319,7 +509,7 @@ class HomeMainFragment : Fragment() {
                         val totalAmount = categoryTransactions.sumOf { it.amount }
                         val formattedAmount = String.format("R %.2f", totalAmount)
                         val mostRecentDate = categoryTransactions.maxOfOrNull { it.date } ?: System.currentTimeMillis()
-                        
+
                         HomeListItems.HomeCategoryItem(
                             category = category,
                             transactionCount = transactionCount,
@@ -393,6 +583,7 @@ class HomeMainFragment : Fragment() {
         showError(message)
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private fun showError(message: String) {
         Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
     }
@@ -422,8 +613,10 @@ class HomeMainFragment : Fragment() {
         // TODO: Implement navigation to all transactions
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }
 }
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~EOF~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
