@@ -141,7 +141,7 @@ class WalletMainFragment : Fragment() {
             BudgetListItems.BudgetWalletItem(
                 wallet = wallet,
                 walletName = wallet.name,
-                walletIcon = R.drawable.baseline_shopping_bag_24,
+                walletIcon = R.drawable.ic_ui_wallet,
                 walletBalance = wallet.balance,
                 relativeDate = wallet.formatDate(wallet.lastTransactionAt)
             )
