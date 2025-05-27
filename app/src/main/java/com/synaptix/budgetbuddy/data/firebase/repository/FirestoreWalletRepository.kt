@@ -11,7 +11,7 @@ import javax.inject.Singleton
 class FirestoreWalletRepository @Inject constructor(
     firestore: FirebaseFirestore
 ) : BaseFirestoreRepository<WalletDTO>(firestore) {
-    
+
     override val collection = firestore.collection("wallets")
 
     override fun getType(): Class<WalletDTO> = WalletDTO::class.java
@@ -48,7 +48,7 @@ class FirestoreWalletRepository @Inject constructor(
     suspend fun getWalletsForUser(userId: String): Result<List<WalletDTO>> {
         return try {
             val snapshot = createBaseQueryWithUserId(userId).get().await()
-            val wallets = snapshot.documents.mapNotNull { 
+            val wallets = snapshot.documents.mapNotNull {
                 it.toObject(WalletDTO::class.java)
             }
             Result.Success(wallets)
@@ -90,7 +90,7 @@ class FirestoreWalletRepository @Inject constructor(
     }
 
     // Check if a wallet name already exists for a user
-    suspend fun walletNameExists(userId: String, name: String): Result<Boolean> = 
+    suspend fun walletNameExists(userId: String, name: String): Result<Boolean> =
         checkNameExists(userId, name)
 
     // Create default wallet for a new user

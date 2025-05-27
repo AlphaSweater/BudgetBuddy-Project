@@ -69,6 +69,7 @@ class HomeMainFragment : Fragment() {
         )
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private val transactionAdapter by lazy {
         HomeAdapter(
             onTransactionClick = { transaction ->
@@ -84,6 +85,7 @@ class HomeMainFragment : Fragment() {
         )
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private val categoryAdapter by lazy {
         HomeAdapter(
             onCategoryClick = { category ->
@@ -190,7 +192,114 @@ class HomeMainFragment : Fragment() {
                         handleCategoriesState(state)
                     }
                 }
+                launch {
+                    viewModel.totalWalletBalance.collect { total ->
+                        val formatted = String.format("R %.2f", total)
+                        binding.textViewCurrencyTotal.text = formatted
+                    }
+                }
             }
+        }
+    }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // Handle different states for wallets, transactions, and categories
+    private fun setupBarChart() {
+        val context = binding.root.context
+        val barChart: BarChart = binding.barChart
+
+        // Get theme-based colors
+        val primaryTextColor = context.getThemeColor(R.attr.bb_primaryText)
+        val expenseColor = context.getThemeColor(R.attr.bb_expense)
+        val profitColor = context.getThemeColor(R.attr.bb_profit)
+
+        // Sample data
+        val income = BarEntry(0f, 5000f)
+        val expense = BarEntry(1f, 3200f)
+
+        val incomeSet = BarDataSet(listOf(income), "Income").apply {
+            color = profitColor
+            valueTextColor = primaryTextColor
+        }
+
+        val expenseSet = BarDataSet(listOf(expense), "Expense").apply {
+            color = expenseColor
+            valueTextColor = primaryTextColor
+        }
+
+        val data = BarData(incomeSet, expenseSet)
+        data.barWidth = 0.25f
+
+        barChart.data = data
+        barChart.xAxis.axisMinimum = -0.5f
+        barChart.xAxis.axisMaximum = 2f
+        barChart.groupBars(0f, 0.4f, 0.05f)
+
+        barChart.xAxis.apply {
+            granularity = 1f
+            isGranularityEnabled = true
+            setDrawGridLines(false)
+            setCenterAxisLabels(true)
+            position = XAxis.XAxisPosition.BOTTOM
+            valueFormatter = IndexAxisValueFormatter(listOf("March"))
+            textColor = primaryTextColor
+        }
+
+        barChart.axisLeft.textColor = primaryTextColor
+        barChart.axisRight.isEnabled = false
+        barChart.legend.textColor = primaryTextColor
+
+        barChart.description = Description().apply {
+            text = "Monthly Budget"
+            textColor = primaryTextColor
+        }
+
+        barChart.animateY(1000)
+        barChart.invalidate()
+    }
+
+    private fun setupPieChart() {
+        val context = binding.root.context
+        val pieChart: PieChart = binding.pieChart
+
+        val expenseCategories = listOf("Food", "Transport", "Entertainment", "Bills", "Shopping")
+        val expenseAmounts = listOf(800f, 400f, 300f, 500f, 600f)
+
+        val pieEntries = expenseCategories.mapIndexed { index, category ->
+            PieEntry(expenseAmounts[index], category)
+        }
+
+        val pieDataSet = PieDataSet(pieEntries, "Expense Categories").apply {
+            colors = listOf(
+                ContextCompat.getColor(context, R.color.cat_dark_green),
+                ContextCompat.getColor(context, R.color.cat_light_pink),
+                ContextCompat.getColor(context, R.color.cat_dark_blue),
+                ContextCompat.getColor(context, R.color.cat_yellow),
+                ContextCompat.getColor(context, R.color.cat_orange)
+            )
+            valueTextSize = 14f
+            valueTextColor = context.getThemeColor(R.attr.bb_primaryText)
+        }
+
+        val pieData = PieData(pieDataSet).apply {
+            setValueFormatter(PercentFormatter(pieChart))
+        }
+
+        pieChart.apply {
+            data = pieData
+            isDrawHoleEnabled = true
+            holeRadius = 50f
+            setHoleColor(Color.TRANSPARENT)
+            centerText = "Expenses"
+            setCenterTextColor(context.getThemeColor(R.attr.bb_primaryText))
+            setUsePercentValues(true)
+            setDrawEntryLabels(true)
+            setEntryLabelColor(context.getThemeColor(R.attr.bb_primaryText))
+            setEntryLabelTextSize(12f)
+            description.isEnabled = false
+            legend.isEnabled = false
+            animateY(1000, Easing.EaseInOutQuad)
+            invalidate()
         }
     }
 
@@ -322,6 +431,8 @@ class HomeMainFragment : Fragment() {
         }
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // Handle different states for transactions
     private fun handleTransactionsState(state: HomeMainViewModel.TransactionState) {
         binding.apply {
             when (state) {
@@ -361,6 +472,8 @@ class HomeMainFragment : Fragment() {
         }
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // Handle different states for categories
     private fun handleCategoriesState(state: HomeMainViewModel.CategoryState) {
         binding.apply {
             when (state) {
@@ -402,17 +515,21 @@ class HomeMainFragment : Fragment() {
         }
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private fun showError(message: String) {
         Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     override fun onResume() {
         super.onResume()
         viewModel.refreshData()
     }
 }
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~EOF~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
