@@ -74,7 +74,8 @@
 
     <ScrollView
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_marginTop="50dp">
 
         <!-- Main Layout Using ConstraintLayout -->
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -238,6 +239,7 @@
                     android:layout_height="wrap_content"
                     android:layout_margin="4dp"
                     android:layout_weight="1"
+                    app:cardElevation="0dp"
                     android:background="?attr/bb_background"
                     app:cardCornerRadius="16dp">
 
@@ -355,7 +357,7 @@
                                         android:layout_height="match_parent"
                                         android:scaleType="centerCrop"
                                         android:src="@drawable/ic_ui_achievement_medal"
-                                        app:tint="@color/cat_gold" />
+                                        app:tint="@color/cat_light_bronze" />
                                 </FrameLayout>
                             </LinearLayout>
                         </androidx.constraintlayout.widget.ConstraintLayout>
@@ -520,6 +522,7 @@
                     android:layout_height="wrap_content"
                     android:layout_margin="4dp"
                     android:layout_weight="1"
+                    app:cardElevation="0dp"
                     android:background="?attr/bb_background"
                     app:cardCornerRadius="16dp">
 
@@ -557,7 +560,7 @@
                                         android:layout_height="match_parent"
                                         android:scaleType="centerCrop"
                                         android:src="@drawable/ic_ui_achievement_medal"
-                                        app:tint="@color/cat_gold" />
+                                        app:tint="@color/cat_silver" />
                                 </FrameLayout>
 
                                 <LinearLayout
@@ -613,7 +616,7 @@
                                         android:layout_height="match_parent"
                                         android:scaleType="centerCrop"
                                         android:src="@drawable/ic_ui_achievement_medal"
-                                        app:tint="@color/cat_gold" />
+                                        app:tint="@color/cat_dark_bronze" />
                                 </FrameLayout>
 
                                 <LinearLayout
@@ -770,31 +773,31 @@
             </LinearLayout>
 
             <!-- Single CardView under the 3 cards with 4 rows -->
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="4dp"
-                app:strokeWidth="1dp"
-                app:strokeColor="@color/gray"
-                android:layout_margin="8dp"
-                app:layout_constraintTop_toBottomOf="@id/cardsContainer"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent">
+<!--            <com.google.android.material.card.MaterialCardView-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                app:cardCornerRadius="16dp"-->
+<!--                app:cardElevation="4dp"-->
+<!--                app:strokeWidth="1dp"-->
+<!--                app:strokeColor="@color/gray"-->
+<!--                android:layout_margin="8dp"-->
+<!--                app:layout_constraintTop_toBottomOf="@id/cardsContainer"-->
+<!--                app:layout_constraintStart_toStartOf="parent"-->
+<!--                app:layout_constraintEnd_toEndOf="parent">-->
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="8dp">
-                    <!-- 4 Rows -->
-                    <TextView android:text="Row 1" />
-                    <TextView android:text="Row 2" />
-                    <TextView android:text="Row 3" />
-                    <TextView android:text="Row 4" />
-                </LinearLayout>
+<!--                <LinearLayout-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:orientation="vertical"-->
+<!--                    android:padding="8dp">-->
+<!--                    &lt;!&ndash; 4 Rows &ndash;&gt;-->
+<!--                    <TextView android:text="Row 1" />-->
+<!--                    <TextView android:text="Row 2" />-->
+<!--                    <TextView android:text="Row 3" />-->
+<!--                    <TextView android:text="Row 4" />-->
+<!--                </LinearLayout>-->
 
-            </com.google.android.material.card.MaterialCardView>
+<!--            </com.google.android.material.card.MaterialCardView>-->
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
