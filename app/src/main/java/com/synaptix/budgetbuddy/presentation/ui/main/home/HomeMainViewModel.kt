@@ -57,6 +57,7 @@ class HomeMainViewModel @Inject constructor(
     val categoriesState: StateFlow<CategoryState> = _categoriesState
 
     private val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+    private val calendar = Calendar.getInstance()
 
     private var _selectedStartDate = ""
     var selectedStartDate: String
@@ -74,19 +75,16 @@ class HomeMainViewModel @Inject constructor(
             loadTransactions()
         }
 
-    private val _selectedTransaction = MutableLiveData<Transaction>()
-    val selectedTransaction: LiveData<Transaction> = _selectedTransaction
-
     private var currentFilter: TransactionFilter = TransactionFilter.ALL
         set(value) {
             field = value
             loadTransactions()
         }
 
+    // Simplified caching
     private var cachedTransactions: List<Transaction> = emptyList()
     private var lastTransactionFetchTime: Long = 0
     private val CACHE_DURATION = 30000L // 30 seconds cache
-    private var isInitialLoad = true
 
     fun getCachedTransactions(): List<Transaction> = cachedTransactions
 
@@ -95,11 +93,9 @@ class HomeMainViewModel @Inject constructor(
     }
 
     fun refreshData(forceRefresh: Boolean = false) {
-        // Clear cache only if forced refresh or initial load
-        if (forceRefresh || isInitialLoad) {
+        if (forceRefresh || isCacheStale()) {
             cachedTransactions = emptyList()
             lastTransactionFetchTime = 0
-            isInitialLoad = false
         }
         loadWallets()
         loadTransactions()
@@ -109,33 +105,13 @@ class HomeMainViewModel @Inject constructor(
     private suspend fun getTransactions(userId: String): List<Transaction> {
         val currentTime = System.currentTimeMillis()
         
-        // Return cached data if it's still valid
-        if (currentTime - lastTransactionFetchTime < CACHE_DURATION && cachedTransactions.isNotEmpty()) {
+        if (!isCacheStale() && cachedTransactions.isNotEmpty()) {
             return cachedTransactions
         }
 
-        // If cache is expired but we have data, return it while refreshing in background
-        if (cachedTransactions.isNotEmpty()) {
-            viewModelScope.launch {
-                refreshTransactionsInBackground(userId)
-            }
-            return cachedTransactions
-        }
-
-        // If no cache exists, fetch synchronously
-        return fetchTransactions(userId)
-    }
-
-    private suspend fun refreshTransactionsInBackground(userId: String) {
-        try {
-            val newTransactions = fetchTransactions(userId)
-            if (newTransactions.isNotEmpty()) {
-                cachedTransactions = newTransactions
-                lastTransactionFetchTime = System.currentTimeMillis()
-            }
-        } catch (e: Exception) {
-            // Log error but don't update UI since we're in background
-            e.printStackTrace()
+        return fetchTransactions(userId).also {
+            cachedTransactions = it
+            lastTransactionFetchTime = currentTime
         }
     }
 
@@ -149,24 +125,12 @@ class HomeMainViewModel @Inject constructor(
         }
 
         return when (result) {
-            is GetTransactionsUseCase.GetTransactionsResult.Success -> {
-                cachedTransactions = result.transactions
-                lastTransactionFetchTime = System.currentTimeMillis()
-                result.transactions
-            }
+            is GetTransactionsUseCase.GetTransactionsResult.Success -> result.transactions
             else -> emptyList()
         }
     }
 
-    // Add method to check if cache is stale
-    fun isCacheStale(): Boolean {
-        return System.currentTimeMillis() - lastTransactionFetchTime > CACHE_DURATION
-    }
-
-    // Add method to get cache age
-    fun getCacheAge(): Long {
-        return System.currentTimeMillis() - lastTransactionFetchTime
-    }
+    fun isCacheStale(): Boolean = System.currentTimeMillis() - lastTransactionFetchTime > CACHE_DURATION
 
     private fun loadWallets() {
         viewModelScope.launch {
@@ -175,10 +139,7 @@ class HomeMainViewModel @Inject constructor(
                 val userId = getUserIdUseCase.execute()
                 when (val result = getWalletUseCase.execute(userId)) {
                     is GetWalletUseCase.GetWalletResult.Success -> {
-                        // Get transactions once and reuse
                         val transactions = getTransactions(userId)
-                        
-                        // Sort wallets by most recent transaction date
                         val sortedWallets = result.wallets.sortedByDescending { wallet ->
                             transactions
                                 .filter { it.wallet.id == wallet.id }
@@ -208,7 +169,6 @@ class HomeMainViewModel @Inject constructor(
 
                 val transactions = getTransactions(userId)
                 val filtered = filterTransactions(transactions)
-                    .sortedByDescending { it.date }
                 _transactionsState.value = TransactionState.Success(filtered)
             } catch (e: Exception) {
                 _transactionsState.value = TransactionState.Error(e.message ?: "Failed to load transactions")
@@ -217,56 +177,23 @@ class HomeMainViewModel @Inject constructor(
     }
 
     private fun filterTransactions(transactions: List<Transaction>): List<Transaction> {
-        var filtered = transactions
-
-        // Apply current filter
-        filtered = when (currentFilter) {
-            TransactionFilter.ALL -> filtered
-            TransactionFilter.TODAY -> filtered.filter { isToday(it.date) }
-            TransactionFilter.THIS_WEEK -> filtered.filter { isThisWeek(it.date) }
-            TransactionFilter.THIS_MONTH -> filtered.filter { isThisMonth(it.date) }
+        val filtered = when (currentFilter) {
+            TransactionFilter.ALL -> transactions
+            TransactionFilter.TODAY -> transactions.filter { isDateInRange(it.date, Calendar.DAY_OF_YEAR) }
+            TransactionFilter.THIS_WEEK -> transactions.filter { isDateInRange(it.date, Calendar.WEEK_OF_YEAR) }
+            TransactionFilter.THIS_MONTH -> transactions.filter { isDateInRange(it.date, Calendar.MONTH) }
         }
-
         return filtered.sortedByDescending { it.date }
     }
 
-    private fun isToday(date: Long): Boolean {
-        return try {
-            val dateDate = dateFormat.format(Date(date))
-            val today = Calendar.getInstance()
-            val transactionCal = Calendar.getInstance().apply { time = dateFormat.parse(dateDate) ?: Date() }
-
-            today.get(Calendar.YEAR) == transactionCal.get(Calendar.YEAR) &&
-                    today.get(Calendar.DAY_OF_YEAR) == transactionCal.get(Calendar.DAY_OF_YEAR)
-        } catch (e: Exception) {
-            false
+    private fun isDateInRange(date: Long, calendarField: Int): Boolean {
+        val transactionDate = Calendar.getInstance().apply { 
+            time = Date(date)
         }
-    }
-
-    private fun isThisWeek(date: Long): Boolean {
-        return try {
-            val dateDate = dateFormat.format(Date(date))
-            val today = Calendar.getInstance()
-            val transactionCal = Calendar.getInstance().apply { time = dateFormat.parse(dateDate) ?: Date() }
-
-            today.get(Calendar.YEAR) == transactionCal.get(Calendar.YEAR) &&
-                    today.get(Calendar.WEEK_OF_YEAR) == transactionCal.get(Calendar.WEEK_OF_YEAR)
-        } catch (e: Exception) {
-            false
-        }
-    }
-
-    private fun isThisMonth(date: Long): Boolean {
-        return try {
-            val dateDate = dateFormat.format(Date(date))
-            val today = Calendar.getInstance()
-            val transactionCal = Calendar.getInstance().apply { time = dateFormat.parse(dateDate) ?: Date() }
-
-            today.get(Calendar.YEAR) == transactionCal.get(Calendar.YEAR) &&
-                    today.get(Calendar.MONTH) == transactionCal.get(Calendar.MONTH)
-        } catch (e: Exception) {
-            false
-        }
+        val today = Calendar.getInstance()
+        
+        return today.get(Calendar.YEAR) == transactionDate.get(Calendar.YEAR) &&
+               today.get(calendarField) == transactionDate.get(calendarField)
     }
 
     private fun loadCategories() {
@@ -276,17 +203,12 @@ class HomeMainViewModel @Inject constructor(
                 val userId = getUserIdUseCase.execute()
                 when (val result = getCategoriesUseCase.execute(userId)) {
                     is GetCategoriesUseCase.GetCategoriesResult.Success -> {
-                        // Get transactions once and reuse
                         val transactions = getTransactions(userId)
-                        
-                        // Calculate total amount for each category
                         val categoryAmounts = result.categories.associateWith { category ->
                             transactions
                                 .filter { it.category.id == category.id }
                                 .sumOf { it.amount }
                         }
-
-                        // Sort categories by total amount (highest to lowest)
                         val sortedCategories = result.categories.sortedByDescending { category ->
                             categoryAmounts[category] ?: 0.0
                         }
@@ -300,10 +222,6 @@ class HomeMainViewModel @Inject constructor(
                 _categoriesState.value = CategoryState.Error(e.message ?: "Failed to load categories")
             }
         }
-    }
-
-    fun setTransaction(transaction: Transaction) {
-        _selectedTransaction.value = transaction
     }
 
     fun setTransactionFilter(filter: TransactionFilter) {

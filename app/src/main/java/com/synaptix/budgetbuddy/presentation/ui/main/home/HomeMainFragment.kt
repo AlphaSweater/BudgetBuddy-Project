@@ -165,17 +165,12 @@ class HomeMainFragment : Fragment() {
 
                     recyclerViewHomeWalletOverview.isVisible = true
                     txtEmptyWallets.isVisible = false
-                    
-                    val transactions = viewModel.getCachedTransactions()
+
                     val walletItems = wallets.take(MAX_ITEMS).map { wallet ->
-                        // Get the most recent transaction for this wallet
-                        val walletTransactions = transactions.filter { it.wallet.id == wallet.id }
-                        val mostRecentDate = walletTransactions.minOfOrNull { it.date } ?: System.currentTimeMillis()
-                        
                         HomeListItems.HomeWalletItem(
                             wallet = wallet,
                             walletIcon = R.drawable.ic_ui_wallet,
-                            relativeDate = getRelativeDate(mostRecentDate)
+                            relativeDate = wallet.formatDate(wallet.lastTransactionAt)
                         )
                     }
                     walletAdapter.submitList(walletItems)
@@ -213,7 +208,7 @@ class HomeMainFragment : Fragment() {
                     val transactionItems = transactions.take(MAX_ITEMS).map { transaction ->
                         HomeListItems.HomeTransactionItem(
                             transaction = transaction,
-                            relativeDate = getRelativeDate(transaction.date)
+                            relativeDate = transaction.formatDate(transaction.date)
                         )
                     }
                     transactionAdapter.submitList(transactionItems)
@@ -265,7 +260,7 @@ class HomeMainFragment : Fragment() {
                             category = category,
                             transactionCount = transactionCount,
                             amount = formattedAmount,
-                            relativeDate = getRelativeDate(mostRecentDate)
+                            relativeDate = category.formatDate(mostRecentDate)
                         )
                     }
                     categoryAdapter.submitList(categoryItems)
@@ -276,23 +271,6 @@ class HomeMainFragment : Fragment() {
                     txtEmptyCategories.text = state.message
                     showError(state.message)
                 }
-            }
-        }
-    }
-
-    private fun getRelativeDate(timestamp: Long): String {
-        val now = System.currentTimeMillis()
-        val diff = now - timestamp
-        
-        return when {
-            diff < 60 * 1000 -> "Just now"
-            diff < 60 * 60 * 1000 -> "${diff / (60 * 1000)}m ago"
-            diff < 24 * 60 * 60 * 1000 -> "${diff / (60 * 60 * 1000)}h ago"
-            diff < 7 * 24 * 60 * 60 * 1000 -> "${diff / (24 * 60 * 60 * 1000)}d ago"
-            else -> {
-                val date = Date(timestamp)
-                val format = SimpleDateFormat("MMM dd", Locale.getDefault())
-                format.format(date)
             }
         }
     }
