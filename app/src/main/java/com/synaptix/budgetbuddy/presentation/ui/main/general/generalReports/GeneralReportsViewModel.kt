@@ -1,66 +1,108 @@
 package com.synaptix.budgetbuddy.presentation.ui.main.general.generalReports
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.synaptix.budgetbuddy.core.model.BudgetListItems
+import com.synaptix.budgetbuddy.core.model.Category
 import com.synaptix.budgetbuddy.core.model.Transaction
 import com.synaptix.budgetbuddy.core.usecase.auth.GetUserIdUseCase
+import com.synaptix.budgetbuddy.core.usecase.main.category.GetCategoriesUseCase
 import com.synaptix.budgetbuddy.core.usecase.main.transaction.GetTransactionsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class GeneralReportsViewModel @Inject constructor(
     private val getTransactionsUseCase: GetTransactionsUseCase,
+    private val getCategoriesUseCase: GetCategoriesUseCase,
     private val getUserIdUseCase: GetUserIdUseCase
 ) : ViewModel() {
 
-    private val _transactions = MutableLiveData<List<Transaction>>()
-    val reportBudgetCategoryItem = MutableLiveData<List<BudgetListItems.BudgetCategoryItem>>()
+    sealed class TransactionState {
+        object Loading : TransactionState()
+        data class Success(val transactions: List<Transaction>) : TransactionState()
+        data class Error(val message: String) : TransactionState()
+        object Empty : TransactionState()
+    }
 
-    val transactions: LiveData<List<Transaction>> = _transactions
+    sealed class CategoryState {
+        object Loading : CategoryState()
+        data class Success(val categories: List<Category>) : CategoryState()
+        data class Error(val message: String) : CategoryState()
+        object Empty : CategoryState()
+    }
 
-    fun loadTransactions() {
+    private val _transactionsState = MutableStateFlow<TransactionState>(TransactionState.Loading)
+    val transactionsState: StateFlow<TransactionState> = _transactionsState
+
+    private val _categoriesState = MutableStateFlow<CategoryState>(CategoryState.Loading)
+    val categoriesState: StateFlow<CategoryState> = _categoriesState
+
+    init {
+        loadData()
+    }
+
+    fun loadData() {
         viewModelScope.launch {
             val userId = getUserIdUseCase.execute()
-            val result = getTransactionsUseCase.execute(userId)
+            if (userId.isEmpty()) {
+                _transactionsState.value = TransactionState.Empty
+                _categoriesState.value = CategoryState.Empty
+                return@launch
+            }
 
-            when (result) {
-                is GetTransactionsUseCase.GetTransactionsResult.Success -> {
-                    val transactionList = result.transactions
-                    _transactions.postValue(transactionList)
-                }
-                is GetTransactionsUseCase.GetTransactionsResult.Error -> {
-                    // Handle error here, e.g., show message or log
-                    // You could clear the list or keep previous value
-                    _transactions.postValue(emptyList()) // or keep old list
-                }
+            // Load transactions
+            launch {
+                getTransactionsUseCase.execute(userId)
+                    .catch { e ->
+                        _transactionsState.value = TransactionState.Error(e.message ?: "Unknown error")
+                    }
+                    .collect { result ->
+                        _transactionsState.value = when (result) {
+                            is GetTransactionsUseCase.GetTransactionsResult.Success -> {
+                                if (result.transactions.isEmpty()) TransactionState.Empty
+                                else TransactionState.Success(result.transactions)
+                            }
+                            is GetTransactionsUseCase.GetTransactionsResult.Error -> 
+                                TransactionState.Error("Failed to load transactions")
+                        }
+                    }
+            }
+
+            // Load categories
+            launch {
+                getCategoriesUseCase.execute(userId)
+                    .catch { e ->
+                        _categoriesState.value = CategoryState.Error(e.message ?: "Unknown error")
+                    }
+                    .collect { result ->
+                        _categoriesState.value = when (result) {
+                            is GetCategoriesUseCase.GetCategoriesResult.Success -> {
+                                if (result.categories.isEmpty()) CategoryState.Empty
+                                else CategoryState.Success(result.categories)
+                            }
+                            is GetCategoriesUseCase.GetCategoriesResult.Error -> 
+                                CategoryState.Error("Failed to load categories")
+                        }
+                    }
             }
         }
+    }
 
-//
-//
-//            val categoryGroups = result.groupBy { it.category?.categoryName ?: "Uncategorized" }
-//
-//            val items = categoryGroups.map { (name, transactions) ->
-//                val icon = transactions.firstOrNull()?.category?.categoryIcon ?: R.drawable.ic_car_24
-//                val colour = transactions.firstOrNull()?.category?.categoryColor ?: R.color.cat_orange
-//                val amount = "R ${transactions.sumOf { it.amount }.toInt()}"
-//                val relativeDate = "This Month" // You can implement actual logic here
-//
-//                BudgetReportListItems.CategoryItems(
-//                    categoryName = name,
-//                    categoryIcon = icon,
-//                    categoryColour = colour,
-//                    transactionCount = transactions.size,
-//                    amount = amount,
-//                    relativeDate = relativeDate
-//                )
-//            }
-
-//            reportCategoryItems.postValue(items)
+    fun getTransactionsByType(type: String): List<Transaction> {
+        return when (val state = transactionsState.value) {
+            is TransactionState.Success -> state.transactions.filter { it.category.type.equals(type, ignoreCase = true) }
+            else -> emptyList()
         }
     }
+
+    fun getCategoriesByType(type: String): List<Category> {
+        return when (val state = categoriesState.value) {
+            is CategoryState.Success -> state.categories.filter { it.type.equals(type, ignoreCase = true) }
+            else -> emptyList()
+        }
+    }
+}

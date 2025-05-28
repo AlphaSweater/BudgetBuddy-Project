@@ -2,18 +2,19 @@ package com.synaptix.budgetbuddy.presentation.ui.main.general.generalReports
 
 import android.graphics.Color
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import java.time.LocalDate
-import java.time.format.TextStyle
-import java.util.Locale
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.github.mikephil.charting.animation.Easing
 import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.charts.PieChart
@@ -27,13 +28,15 @@ import com.github.mikephil.charting.data.PieEntry
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
 import com.github.mikephil.charting.formatter.PercentFormatter
 import com.synaptix.budgetbuddy.R
+import com.synaptix.budgetbuddy.core.model.Category
 import com.synaptix.budgetbuddy.core.model.Transaction
 import com.synaptix.budgetbuddy.databinding.FragmentGeneralReportsBinding
 import com.synaptix.budgetbuddy.extentions.getThemeColor
 import dagger.hilt.android.AndroidEntryPoint
-import java.time.Instant
-import java.time.ZoneId
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import java.util.Calendar
+import java.util.Locale
 
 @AndroidEntryPoint
 class GeneralReportsFragment : Fragment() {
@@ -42,10 +45,24 @@ class GeneralReportsFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val viewModel: GeneralReportsViewModel by viewModels()
-//    private lateinit var generalReportsAdapter: GeneralReportAdapter
+
+    private val expenseAdapter by lazy {
+        GeneralReportAdapter(
+            onTransactionClick = { transaction -> navigateToTransactionDetails(transaction) },
+            onCategoryClick = { category -> navigateToCategoryDetails(category) }
+        )
+    }
+
+    private val incomeAdapter by lazy {
+        GeneralReportAdapter(
+            onTransactionClick = { transaction -> navigateToTransactionDetails(transaction) },
+            onCategoryClick = { category -> navigateToCategoryDetails(category) }
+        )
+    }
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentGeneralReportsBinding.inflate(inflater, container, false)
@@ -54,113 +71,162 @@ class GeneralReportsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setupRecyclers()
+        setupRecyclerViews()
         setupOnClickListeners()
-        viewModel.transactions.observe(viewLifecycleOwner) { transactionList ->
-            if (!transactionList.isNullOrEmpty()) {
-                setupLineChart(transactionList)
+        observeStates()
+    }
+
+    private fun setupRecyclerViews() {
+        binding.apply {
+            recyclerViewExpenseCategory.apply {
+                layoutManager = LinearLayoutManager(requireContext())
+                adapter = expenseAdapter
+            }
+
+            recyclerViewIncomeCategory.apply {
+                layoutManager = LinearLayoutManager(requireContext())
+                adapter = incomeAdapter
             }
         }
-
-        viewModel.loadTransactions()
-
-        setupPieChart(isExpense = true)
-//        viewModel.reportBudgetCategoryItem.observe(viewLifecycleOwner) { items ->
-//            binding.recyclerViewExpenseCategory.adapter = GeneralReportAdapter(items)
-//        }
     }
-
-    private fun setupRecyclers() {
-//        labelRecycler()
-//        categoryRecycler()
-    }
-
-//    private fun labelRecycler() {
-////        val labelItems = listOf(
-////            BudgetReportListItems.LabelItems(
-////                labelName = "Food",
-////                labelIcon = R.drawable.baseline_fastfood_24,
-////                labelColour = R.color.cat_light_blue,
-////                transactionCount = 5,
-////                amount = "R 1,000",
-////                relativeDate = "This Week"
-////            )
-////        )
-//
-//        binding.recyclerViewExpenseLabel.apply {
-//            layoutManager = LinearLayoutManager(requireContext())
-//            adapter = GeneralReportAdapter(labelItems)
-//        }
-//    }
-
-//    private fun categoryRecycler() {
-////        val categoryItems = listOf(
-////            BudgetReportListItems.CategoryItems(
-////                categoryName = "Food",
-////                categoryIcon = R.drawable.baseline_fastfood_24,
-////                categoryColour = R.color.cat_light_blue,
-////                transactionCount = 5,
-////                amount = "R 1,000",
-////                relativeDate = "This Week"
-////            )
-////        )
-//
-//        binding.recyclerViewExpenseCategory.apply {
-//            layoutManager = LinearLayoutManager(requireContext())
-//            adapter = GeneralReportAdapter(categoryItems)
-//        }
-//    }
 
     private fun setupOnClickListeners() {
-        binding.btnGoBack.setOnClickListener {
-            findNavController().popBackStack()
+        binding.apply {
+            btnGoBack.setOnClickListener {
+                findNavController().popBackStack()
+            }
+
+            btnCategoryExpenseToggle.setOnClickListener {
+                showCategoryExpenseToggle()
+            }
+
+            btnCategoryIncomeToggle.setOnClickListener {
+                showCategoryIncomeToggle()
+            }
+        }
+    }
+
+    private fun observeStates() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                // Launch a single coroutine to handle both states
+                launch {
+                    var transactionsLoaded = false
+                    var categoriesLoaded = false
+
+                    // Observe transactions
+                    launch {
+                        viewModel.transactionsState.collectLatest { state ->
+                            when (state) {
+                                is GeneralReportsViewModel.TransactionState.Success -> {
+                                    setupLineChart(state.transactions)
+                                    updateTransactionLists(state.transactions)
+                                    transactionsLoaded = true
+                                    if (categoriesLoaded) {
+                                        // Both data sets are loaded, update pie chart
+                                        setupPieChart(binding.btnCategoryExpenseToggle.background != null)
+                                    }
+                                }
+                                else -> {
+                                    // Handle other states if needed
+                                }
+                            }
+                        }
+                    }
+
+                    // Observe categories
+                    launch {
+                        viewModel.categoriesState.collectLatest { state ->
+                            when (state) {
+                                is GeneralReportsViewModel.CategoryState.Success -> {
+                                    updateCategoryLists(state.categories)
+                                    categoriesLoaded = true
+                                    if (transactionsLoaded) {
+                                        // Both data sets are loaded, update pie chart
+                                        setupPieChart(binding.btnCategoryExpenseToggle.background != null)
+                                    }
+                                }
+                                else -> {
+                                    // Handle other states if needed
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun updateTransactionLists(transactions: List<Transaction>) {
+        val expenseTransactions = transactions.filter { it.category.type.equals("expense", ignoreCase = true) }
+        val incomeTransactions = transactions.filter { it.category.type.equals("income", ignoreCase = true) }
+
+        val expenseItems = expenseTransactions.map { transaction ->
+            ReportListItems.ReportTransactionItem(
+                transaction = transaction,
+                relativeDate = formatDate(transaction.date)
+            )
         }
 
-        binding.btnCategoryExpenseToggle.setOnClickListener {
-            showCategoryExpenseToggle()
+        val incomeItems = incomeTransactions.map { transaction ->
+            ReportListItems.ReportTransactionItem(
+                transaction = transaction,
+                relativeDate = formatDate(transaction.date)
+            )
         }
 
-        binding.btnCategoryIncomeToggle.setOnClickListener {
-            showCategoryIncomeToggle()
+        expenseAdapter.submitList(expenseItems)
+        incomeAdapter.submitList(incomeItems)
+    }
+
+    private fun updateCategoryLists(categories: List<Category>) {
+        val expenseCategories = categories.filter { it.type.equals("expense", ignoreCase = true) }
+        val incomeCategories = categories.filter { it.type.equals("income", ignoreCase = true) }
+
+        val expenseItems = expenseCategories.map { category ->
+            val transactions = viewModel.getTransactionsByType("expense")
+                .filter { it.category.id == category.id }
+            
+            ReportListItems.ReportCategoryItem(
+                category = category,
+                transactionCount = transactions.size,
+                amount = String.format("R %.2f", transactions.sumOf { it.amount }),
+                relativeDate = "This Month" // You can implement actual logic here
+            )
         }
 
-        binding.btnLabelIncomeToggle.setOnClickListener {
-            showLabelIncomeToggle()
+        val incomeItems = incomeCategories.map { category ->
+            val transactions = viewModel.getTransactionsByType("income")
+                .filter { it.category.id == category.id }
+            
+            ReportListItems.ReportCategoryItem(
+                category = category,
+                transactionCount = transactions.size,
+                amount = String.format("R %.2f", transactions.sumOf { it.amount }),
+                relativeDate = "This Month" // You can implement actual logic here
+            )
         }
 
-        binding.btnLabelExpenseToggle.setOnClickListener {
-            showLabelExpenseToggle()
-        }
+        expenseAdapter.submitList(expenseItems)
+        incomeAdapter.submitList(incomeItems)
     }
 
     private fun showCategoryExpenseToggle() {
-        binding.recyclerViewExpenseCategory.visibility = View.VISIBLE
-        binding.recyclerViewIncomeCategory.visibility = View.GONE
-
-        setupPieChart(isExpense = true)
-
-        highlightToggle(binding.btnCategoryExpenseToggle, binding.btnCategoryIncomeToggle)
+        binding.apply {
+            recyclerViewExpenseCategory.visibility = View.VISIBLE
+            recyclerViewIncomeCategory.visibility = View.GONE
+            setupPieChart(isExpense = true)
+            highlightToggle(btnCategoryExpenseToggle, btnCategoryIncomeToggle)
+        }
     }
 
     private fun showCategoryIncomeToggle() {
-        binding.recyclerViewExpenseCategory.visibility = View.GONE
-        binding.recyclerViewIncomeCategory.visibility = View.VISIBLE
-
-        setupPieChart(isExpense = false)
-
-        highlightToggle(binding.btnCategoryIncomeToggle, binding.btnCategoryExpenseToggle)
-    }
-
-    private fun showLabelExpenseToggle() {
-        binding.recyclerViewExpenseLabel.visibility = View.VISIBLE
-        binding.recyclerViewIncomeLabel.visibility = View.GONE
-        highlightToggle(binding.btnLabelExpenseToggle, binding.btnLabelIncomeToggle)
-    }
-
-    private fun showLabelIncomeToggle() {
-        binding.recyclerViewExpenseLabel.visibility = View.GONE
-        binding.recyclerViewIncomeLabel.visibility = View.VISIBLE
-        highlightToggle(binding.btnLabelIncomeToggle, binding.btnLabelExpenseToggle)
+        binding.apply {
+            recyclerViewExpenseCategory.visibility = View.GONE
+            recyclerViewIncomeCategory.visibility = View.VISIBLE
+            setupPieChart(isExpense = false)
+            highlightToggle(btnCategoryIncomeToggle, btnCategoryExpenseToggle)
+        }
     }
 
     private fun highlightToggle(selected: LinearLayout, unselected: LinearLayout) {
@@ -223,7 +289,6 @@ class GeneralReportsFragment : Fragment() {
             clear()
             data = lineData
 
-
             xAxis.apply {
                 valueFormatter = IndexAxisValueFormatter(months)
                 granularity = 1f
@@ -240,66 +305,72 @@ class GeneralReportsFragment : Fragment() {
 
             setExtraOffsets(0f, 0f, 0f, 30f)
             axisRight.isEnabled = false
-            description.text = "Income vs Expense (6 Months)"
-            animateXY(1000, 1200, Easing.EaseInOutCubic)
-            setTouchEnabled(true)
-            isDragEnabled = true
             description.isEnabled = false
             legend.isEnabled = false
             setScaleEnabled(false)
             setPinchZoom(false)
+            animateXY(1000, 1200, Easing.EaseInOutCubic)
             invalidate()
         }
     }
-
 
     private fun setupPieChart(isExpense: Boolean) {
         val context = binding.root.context
         val pieChart: PieChart = binding.pieChart
 
-        val categories: List<String>
-        val amounts: List<Float>
-        val label: String
-
-        if (isExpense) {
-            categories = listOf("Food", "Transport", "Entertainment", "Bills", "Shopping")
-            amounts = listOf(800f, 400f, 300f, 500f, 600f)
-            label = "Expenses"
+        val categories = if (isExpense) {
+            viewModel.getCategoriesByType("expense")
         } else {
-            categories = listOf("Salary", "Freelance", "Investments", "Gift")
-            amounts = listOf(1500f, 500f, 300f, 200f)
-            label = "Income"
+            viewModel.getCategoriesByType("income")
         }
 
-        val pieEntries = categories.mapIndexed { index, category ->
-            PieEntry(amounts[index], category)
+        val transactions = if (isExpense) {
+            viewModel.getTransactionsByType("expense")
+        } else {
+            viewModel.getTransactionsByType("income")
         }
 
-        val pieDataSet = PieDataSet(pieEntries, label).apply {
-            colors = listOf(
-                ContextCompat.getColor(context, R.color.cat_dark_green),
-                ContextCompat.getColor(context, R.color.cat_light_pink),
-                ContextCompat.getColor(context, R.color.cat_dark_blue),
-                ContextCompat.getColor(context, R.color.cat_yellow),
-                ContextCompat.getColor(context, R.color.cat_orange)
-            )
+        val categoryAmounts = transactions
+            .groupBy { it.category.id }
+            .mapValues { (_, transactions) -> transactions.sumOf { it.amount.toDouble() } }
+
+        val pieEntries = categories.mapNotNull { category ->
+            val amount = categoryAmounts[category.id] ?: 0.0
+            if (amount > 0) {
+                PieEntry(amount.toFloat(), category.name)
+            } else {
+                null
+            }
+        }
+
+        if (pieEntries.isEmpty()) {
+            pieChart.clear()
+            pieChart.setNoDataText("No data available")
+            pieChart.setNoDataTextColor(context.getThemeColor(R.attr.bb_primaryText))
+            pieChart.invalidate()
+            return
+        }
+
+        val pieDataSet = PieDataSet(pieEntries, if (isExpense) "Expenses" else "Income").apply {
+            colors = categories.map { category ->
+                ContextCompat.getColor(context, category.color)
+            }
             valueTextSize = 14f
-            valueTextColor = ContextCompat.getColor(context, R.color.light_text)
+            valueTextColor = context.getThemeColor(R.attr.bb_primaryText)
+            valueFormatter = PercentFormatter(pieChart)
         }
 
-        val pieData = PieData(pieDataSet).apply {
-            setValueFormatter(PercentFormatter(pieChart))
-        }
+        val pieData = PieData(pieDataSet)
 
         pieChart.apply {
             data = pieData
             isDrawHoleEnabled = true
             holeRadius = 50f
             setHoleColor(Color.TRANSPARENT)
-            centerText = label
+            centerText = if (isExpense) "Expenses" else "Income"
             setUsePercentValues(true)
             setDrawEntryLabels(true)
-            setEntryLabelColor(ContextCompat.getColor(context, R.color.light_text))
+            setEntryLabelColor(context.getThemeColor(R.attr.bb_primaryText))
             setEntryLabelTextSize(12f)
             description.isEnabled = false
             legend.isEnabled = false
@@ -308,10 +379,36 @@ class GeneralReportsFragment : Fragment() {
         }
     }
 
+    private fun navigateToTransactionDetails(transaction: Transaction) {
+        // TODO: Implement navigation to transaction details
+    }
+
+    private fun navigateToCategoryDetails(category: Category) {
+        // TODO: Implement navigation to category details
+    }
+
+    private fun formatDate(timestamp: Long): String {
+        val calendar = Calendar.getInstance()
+        val now = Calendar.getInstance()
+        calendar.timeInMillis = timestamp
+
+        return when {
+            calendar.get(Calendar.YEAR) == now.get(Calendar.YEAR) &&
+            calendar.get(Calendar.MONTH) == now.get(Calendar.MONTH) &&
+            calendar.get(Calendar.DAY_OF_MONTH) == now.get(Calendar.DAY_OF_MONTH) -> "Today"
+            calendar.get(Calendar.YEAR) == now.get(Calendar.YEAR) &&
+            calendar.get(Calendar.MONTH) == now.get(Calendar.MONTH) &&
+            calendar.get(Calendar.DAY_OF_MONTH) == now.get(Calendar.DAY_OF_MONTH) - 1 -> "Yesterday"
+            else -> {
+                val month = calendar.getDisplayName(Calendar.MONTH, Calendar.SHORT, Locale.getDefault())
+                val day = calendar.get(Calendar.DAY_OF_MONTH)
+                "$month $day"
+            }
+        }
+    }
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }
-
 }

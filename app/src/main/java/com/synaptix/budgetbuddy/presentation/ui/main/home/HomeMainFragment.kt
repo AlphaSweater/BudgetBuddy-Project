@@ -676,7 +676,8 @@ class HomeMainFragment : Fragment() {
     }
 
     private fun navigateToAllTransactions() {
-        findNavController().navigate(R.id.action_homeFragment_to_generalTransactionsFragment)
+//        findNavController().navigate(R.id.action_homeFragment_to_generalTransactionsFragment)
+        findNavController().navigate(R.id.action_homeFragment_to_generalReportsFragment)
     }
 
     //================================================================================
