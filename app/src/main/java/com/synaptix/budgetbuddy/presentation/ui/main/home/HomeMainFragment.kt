@@ -42,12 +42,54 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
+/**
+ * Fragment for the main home screen.
+ * 
+ * This fragment is responsible for:
+ * 1. Displaying wallet overviews
+ * 2. Showing recent transactions
+ * 3. Displaying category summaries
+ * 4. Visualizing data through charts
+ * 5. Handling user navigation
+ * 
+ * The fragment uses:
+ * - ViewBinding for view access
+ * - ViewModel for data management
+ * - Coroutines for asynchronous operations
+ * - MPAndroidChart for data visualization
+ * 
+ * Data Flow and State Management:
+ * 1. ViewModel StateFlow:
+ *    - The ViewModel exposes StateFlow objects for each data type
+ *    - These flows emit updates whenever the data changes
+ *    - The Fragment collects these flows to update the UI
+ * 
+ * 2. Coroutine Lifecycle:
+ *    - viewLifecycleOwner.lifecycleScope: Coroutine scope tied to Fragment lifecycle
+ *    - repeatOnLifecycle: Ensures coroutines are cancelled when Fragment is stopped
+ *    - collectLatest: Collects the latest value from a Flow
+ * 
+ * 3. State Observation:
+ *    - Each data type (wallets, transactions, categories) has its own observer
+ *    - Observers run in parallel using separate coroutines
+ *    - UI is updated based on the current state
+ * 
+ * 4. Error Handling:
+ *    - Each state type (Loading, Success, Error, Empty) is handled appropriately
+ *    - Loading states show progress indicators
+ *    - Error states show empty states with messages
+ *    - Success states update the UI with data
+ */
 @AndroidEntryPoint
 class HomeMainFragment : Fragment() {
 
     //================================================================================
     // Properties
     //================================================================================
+    /**
+     * Running totals for income and expenses.
+     * Used for calculating and displaying financial summaries.
+     */
     private var totalIncome: Double = 0.0
     private var totalExpense: Double = 0.0
 
@@ -55,26 +97,46 @@ class HomeMainFragment : Fragment() {
         private const val MAX_ITEMS = 3
     }
 
+    /**
+     * ViewBinding for safe view access.
+     * Nulled in onDestroyView to prevent memory leaks.
+     */
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
 
+    /**
+     * ViewModel for data management.
+     * Uses activityViewModels to share state across fragments.
+     */
     private val homeViewModel: HomeMainViewModel by activityViewModels()
 
     //================================================================================
     // Adapters
     //================================================================================
+    /**
+     * Adapter for displaying wallet items.
+     * Handles wallet overview cards with balance and recent activity.
+     */
     private val walletAdapter by lazy {
         HomeAdapter(
             onWalletClick = { wallet -> navigateToWalletDetails(wallet) }
         )
     }
 
+    /**
+     * Adapter for displaying transaction items.
+     * Shows transaction details with category and wallet info.
+     */
     private val transactionAdapter by lazy {
         HomeAdapter(
             onTransactionClick = { transaction -> navigateToTransactionDetails(transaction) }
         )
     }
 
+    /**
+     * Adapter for displaying category items.
+     * Shows category summaries with transaction counts and amounts.
+     */
     private val categoryAdapter by lazy {
         HomeAdapter(
             onCategoryClick = { category -> navigateToCategoryDetails(category) }
@@ -108,11 +170,19 @@ class HomeMainFragment : Fragment() {
     //================================================================================
     // Setup Methods
     //================================================================================
+    /**
+     * Sets up all views and click listeners.
+     * Called during fragment initialization.
+     */
     private fun setupViews() {
         setupRecyclerViews()
         setupClickListeners()
     }
 
+    /**
+     * Sets up RecyclerViews with their adapters and layout managers.
+     * Configures the display of wallets, transactions, and categories.
+     */
     private fun setupRecyclerViews() {
         binding.apply {
             recyclerViewHomeWalletOverview.apply {
@@ -132,6 +202,10 @@ class HomeMainFragment : Fragment() {
         }
     }
 
+    /**
+     * Sets up click listeners for navigation and actions.
+     * Handles "View All" buttons and other UI interactions.
+     */
     private fun setupClickListeners() {
         binding.apply {
             txtViewAllWallets.setOnClickListener { navigateToAllWallets() }
@@ -143,6 +217,10 @@ class HomeMainFragment : Fragment() {
     //================================================================================
     // Chart Setup Methods
     //================================================================================
+    /**
+     * Sets up the bar chart showing income vs expense comparison.
+     * Configures appearance, data, and interaction settings.
+     */
     private fun setupBarChart() {
         val context = binding.root.context
         val barChart: BarChart = binding.barChart
@@ -184,6 +262,10 @@ class HomeMainFragment : Fragment() {
         configureBarChart(barChart, data, primaryTextColor)
     }
 
+    /**
+     * Configures the bar chart's appearance and behavior.
+     * Sets up axes, legend, and interaction settings.
+     */
     private fun configureBarChart(barChart: BarChart, data: BarData, primaryTextColor: Int) {
         barChart.apply {
             this.data = data
@@ -198,6 +280,10 @@ class HomeMainFragment : Fragment() {
         }
     }
 
+    /**
+     * Configures the X-axis of the bar chart.
+     * Sets up labels, grid lines, and formatting.
+     */
     private fun BarChart.configureXAxis(primaryTextColor: Int) {
         xAxis.apply {
             granularity = 1f
@@ -211,6 +297,10 @@ class HomeMainFragment : Fragment() {
         }
     }
 
+    /**
+     * Configures the Y-axis of the bar chart.
+     * Sets up grid lines, formatting, and appearance.
+     */
     private fun BarChart.configureYAxis(primaryTextColor: Int) {
         axisLeft.apply {
             textColor = primaryTextColor
@@ -228,6 +318,10 @@ class HomeMainFragment : Fragment() {
         axisRight.isEnabled = false
     }
 
+    /**
+     * Configures the legend of the bar chart.
+     * Sets up position, appearance, and formatting.
+     */
     private fun BarChart.configureLegend(primaryTextColor: Int) {
         legend.apply {
             textColor = primaryTextColor
@@ -239,6 +333,10 @@ class HomeMainFragment : Fragment() {
         }
     }
 
+    /**
+     * Configures the general appearance of the bar chart.
+     * Sets up interaction, animation, and visual settings.
+     */
     private fun BarChart.configureChartAppearance() {
         description.isEnabled = false
         setDrawGridBackground(false)
@@ -252,6 +350,10 @@ class HomeMainFragment : Fragment() {
         invalidate()
     }
 
+    /**
+     * Sets up the pie chart showing category breakdown.
+     * Configures appearance, data, and interaction settings.
+     */
     private fun setupPieChart() {
         val context = binding.root.context
         val pieChart: PieChart = binding.pieChart
@@ -270,6 +372,10 @@ class HomeMainFragment : Fragment() {
         configurePieChart(pieChart, pieData, context)
     }
 
+    /**
+     * Gets the current categories and transactions from the ViewModel.
+     * Used for creating pie chart entries.
+     */
     private fun getCurrentData(): Pair<List<Category>, List<Transaction>> {
         val currentCategories = when (val categoryState = homeViewModel.categoriesState.value) {
             is HomeMainViewModel.CategoryState.Success -> categoryState.categories
@@ -284,6 +390,10 @@ class HomeMainFragment : Fragment() {
         return Pair(currentCategories, currentTransactions)
     }
 
+    /**
+     * Creates pie chart entries from categories and transactions.
+     * Groups transactions by category and calculates amounts.
+     */
     private fun createPieEntries(
         categories: List<Category>,
         transactions: List<Transaction>
@@ -293,7 +403,6 @@ class HomeMainFragment : Fragment() {
             .groupBy { it.category.id }
             .mapValues { (_, transactions) -> transactions.sumOf { it.amount.toDouble() } }
 
-        // Sort the entries by amount in descending order
         val sortedCategories = categories
             .filter { it.type == "expense" }
             .sortedByDescending { categoryAmounts[it.id] ?: 0.0 }
@@ -308,6 +417,10 @@ class HomeMainFragment : Fragment() {
         }
     }
 
+    /**
+     * Shows an empty state for the pie chart.
+     * Displays a message when no data is available.
+     */
     private fun showEmptyPieChart(pieChart: PieChart, context: Context) {
         pieChart.clear()
         pieChart.visibility = View.GONE
@@ -316,13 +429,16 @@ class HomeMainFragment : Fragment() {
         pieChart.invalidate()
     }
 
+    /**
+     * Creates a PieDataSet for the pie chart.
+     * Configures colors, values, and formatting.
+     */
     private fun createPieDataSet(
         entries: List<PieEntry>,
         categories: List<Category>,
         context: Context
     ): PieDataSet {
         return PieDataSet(entries, "Expense Categories").apply {
-            // Use exact category colors
             colors = entries.map { entry ->
                 val category = categories.find { it.name == entry.label }
                 category?.color ?: ContextCompat.getColor(context, R.color.cat_dark_green)
@@ -344,6 +460,10 @@ class HomeMainFragment : Fragment() {
         }
     }
 
+    /**
+     * Creates PieData for the pie chart.
+     * Sets up text size and color.
+     */
     private fun createPieData(pieDataSet: PieDataSet, context: Context): PieData {
         return PieData(pieDataSet).apply {
             setValueTextSize(16f)
@@ -351,6 +471,10 @@ class HomeMainFragment : Fragment() {
         }
     }
 
+    /**
+     * Configures the pie chart's appearance and behavior.
+     * Sets up hole, center text, and interaction settings.
+     */
     private fun configurePieChart(pieChart: PieChart, pieData: PieData, context: Context) {
         pieChart.apply {
             data = pieData
@@ -362,6 +486,10 @@ class HomeMainFragment : Fragment() {
         }
     }
 
+    /**
+     * Configures the general appearance of the pie chart.
+     * Sets up hole, center text, and visual settings.
+     */
     private fun PieChart.configurePieChartAppearance(context: Context) {
         isDrawHoleEnabled = true
         holeRadius = 60f
@@ -379,10 +507,13 @@ class HomeMainFragment : Fragment() {
         setDrawEntryLabels(false)
         description.isEnabled = false
 
-        // Add padding
         setExtraOffsets(10f, 10f, 10f, 10f)
     }
 
+    /**
+     * Configures the legend of the pie chart.
+     * Sets up position, appearance, and formatting.
+     */
     private fun PieChart.configurePieChartLegend(context: Context) {
         legend.apply {
             isEnabled = true
@@ -400,6 +531,10 @@ class HomeMainFragment : Fragment() {
         }
     }
 
+    /**
+     * Configures the interaction settings of the pie chart.
+     * Sets up touch, rotation, and highlight behavior.
+     */
     private fun PieChart.configurePieChartInteraction() {
         setTouchEnabled(false)
         isRotationEnabled = false
@@ -411,10 +546,25 @@ class HomeMainFragment : Fragment() {
     //================================================================================
     // State Observation
     //================================================================================
+    /**
+     * Sets up state observation using coroutines.
+     * 
+     * This method:
+     * 1. Creates a coroutine scope tied to the Fragment's lifecycle
+     * 2. Uses repeatOnLifecycle to handle lifecycle changes
+     * 3. Launches separate coroutines for each data type
+     * 
+     * The coroutines will:
+     * - Start when the Fragment is started
+     * - Be cancelled when the Fragment is stopped
+     * - Restart when the Fragment is started again
+     * 
+     * This ensures efficient resource usage and prevents memory leaks.
+     */
     private fun observeStates() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                // Launch separate coroutines for each observer
+                // Launch parallel coroutines for each data type
                 launch { observeTransactions() }
                 launch { observeWallets() }
                 launch { observeCategories() }
@@ -422,13 +572,33 @@ class HomeMainFragment : Fragment() {
         }
     }
 
+    /**
+     * Observes transaction state changes.
+     * 
+     * Flow Collection Process:
+     * 1. Collects the latest value from transactionsState
+     * 2. Updates UI based on the current state:
+     *    - Success: Updates transaction list and charts
+     *    - Empty: Shows empty state
+     *    - Error: Shows error state
+     *    - Loading: Shows loading indicator
+     * 
+     * When transactions are loaded:
+     * 1. Updates total income and expense
+     * 2. Refreshes the bar chart
+     * 3. Updates the transaction list
+     * 4. Triggers category state collection for pie chart
+     */
     private suspend fun observeTransactions() {
         homeViewModel.transactionsState.collectLatest { state ->
             when (state) {
                 is HomeMainViewModel.TransactionState.Success -> {
+                    // Update totals and charts
                     updateTransactionTotals(state.transactions)
                     setupBarChart()
                     handleTransactionsState(state)
+                    
+                    // Collect category state for pie chart
                     homeViewModel.categoriesState.collect { state ->
                         handleCategoriesState(state)
                         setupPieChart()
@@ -442,22 +612,39 @@ class HomeMainFragment : Fragment() {
         }
     }
 
-    private fun updateTransactionTotals(transactions: List<Transaction>) {
-        totalIncome = transactions
-            .filter { it.category.type == "income" }
-            .sumOf { it.amount.toDouble() }
-
-        totalExpense = transactions
-            .filter { it.category.type == "expense" }
-            .sumOf { it.amount.toDouble() }
-    }
-
+    /**
+     * Observes wallet state changes.
+     * 
+     * Flow Collection Process:
+     * 1. Collects the latest value from walletsState
+     * 2. Updates UI based on the current state
+     * 3. Handles loading, success, error, and empty states
+     * 
+     * The wallet list is updated with:
+     * - Wallet name and balance
+     * - Last transaction date
+     * - Wallet icon
+     */
     private suspend fun observeWallets() {
         homeViewModel.walletsState.collectLatest { state ->
             handleWalletsState(state)
         }
     }
 
+    /**
+     * Observes category state changes.
+     * 
+     * Flow Collection Process:
+     * 1. Collects the latest value from categoriesState
+     * 2. Updates UI based on the current state
+     * 3. Refreshes the pie chart with new data
+     * 
+     * The category list is updated with:
+     * - Category name and icon
+     * - Transaction count
+     * - Total amount
+     * - Most recent transaction date
+     */
     private suspend fun observeCategories() {
         homeViewModel.categoriesState.collectLatest { state ->
             handleCategoriesState(state)
@@ -468,6 +655,10 @@ class HomeMainFragment : Fragment() {
     //================================================================================
     // State Handlers
     //================================================================================
+    /**
+     * Handles wallet state changes.
+     * Updates UI based on the current state.
+     */
     private fun handleWalletsState(state: HomeMainViewModel.WalletState) {
         binding.apply {
             when (state) {
@@ -514,6 +705,10 @@ class HomeMainFragment : Fragment() {
         }
     }
 
+    /**
+     * Handles transaction state changes.
+     * Updates UI based on the current state.
+     */
     private fun handleTransactionsState(state: HomeMainViewModel.TransactionState) {
         binding.apply {
             when (state) {
@@ -559,6 +754,10 @@ class HomeMainFragment : Fragment() {
         }
     }
 
+    /**
+     * Handles category state changes.
+     * Updates UI based on the current state.
+     */
     private fun handleCategoriesState(state: HomeMainViewModel.CategoryState) {
         binding.apply {
             when (state) {
@@ -620,6 +819,10 @@ class HomeMainFragment : Fragment() {
     //================================================================================
     // UI State Helpers
     //================================================================================
+    /**
+     * Shows loading state for a section.
+     * Hides content and shows progress indicator.
+     */
     private fun showLoadingState(
         recyclerView: androidx.recyclerview.widget.RecyclerView,
         progressBar: View,
@@ -630,10 +833,18 @@ class HomeMainFragment : Fragment() {
         progressBar.isVisible = true
     }
 
+    /**
+     * Hides loading state.
+     * Removes progress indicator.
+     */
     private fun hideLoadingState(progressBar: View) {
         progressBar.isVisible = false
     }
 
+    /**
+     * Shows empty state for a section.
+     * Displays a message when no data is available.
+     */
     private fun showEmptyState(
         recyclerView: androidx.recyclerview.widget.RecyclerView,
         emptyText: TextView,
@@ -644,6 +855,10 @@ class HomeMainFragment : Fragment() {
         emptyText.text = message
     }
 
+    /**
+     * Shows content state for a section.
+     * Displays the RecyclerView with data.
+     */
     private fun showContentState(
         recyclerView: androidx.recyclerview.widget.RecyclerView,
         emptyText: TextView
@@ -655,37 +870,74 @@ class HomeMainFragment : Fragment() {
     //================================================================================
     // Navigation
     //================================================================================
+    /**
+     * Navigates to wallet details screen.
+     * To be implemented when the details screen is ready.
+     */
     private fun navigateToWalletDetails(wallet: Wallet) {
         // TODO: Implement navigation to wallet details
     }
 
+    /**
+     * Navigates to transaction details screen.
+     * To be implemented when the details screen is ready.
+     */
     private fun navigateToTransactionDetails(transaction: Transaction) {
         // TODO: Implement navigation to transaction details
     }
 
+    /**
+     * Navigates to category details screen.
+     * To be implemented when the details screen is ready.
+     */
     private fun navigateToCategoryDetails(category: Category) {
         // TODO: Implement navigation to category details
     }
 
+    /**
+     * Navigates to all wallets screen.
+     * To be implemented when the screen is ready.
+     */
     private fun navigateToAllWallets() {
         // TODO: Implement navigation to all wallets
     }
 
+    /**
+     * Navigates to all categories screen.
+     * To be implemented when the screen is ready.
+     */
     private fun navigateToAllCategories() {
         // TODO: Implement navigation to all categories
     }
 
+    /**
+     * Navigates to all transactions screen.
+     * Currently navigates to the reports screen.
+     */
     private fun navigateToAllTransactions() {
-//        findNavController().navigate(R.id.action_homeFragment_to_generalTransactionsFragment)
         findNavController().navigate(R.id.action_homeFragment_to_generalReportsFragment)
     }
 
     //================================================================================
     // Utility Functions
     //================================================================================
+    /**
+     * Gets a color from the current theme.
+     * Used for consistent theming across the app.
+     * 
+     * @param attrRes The attribute resource ID for the color
+     * @return The resolved color value
+     */
     fun Context.getThemeColor(@AttrRes attrRes: Int): Int {
         val typedValue = TypedValue()
         theme.resolveAttribute(attrRes, typedValue, true)
         return typedValue.data
+    }
+
+    private fun HomeMainFragment.updateTransactionTotals(transactions: List<Transaction>) {
+        totalIncome = transactions.filter { it.category.type == "income" }
+            .sumOf { it.amount.toDouble() }
+        totalExpense = transactions.filter { it.category.type == "expense" }
+            .sumOf { it.amount.toDouble() }
     }
 }
