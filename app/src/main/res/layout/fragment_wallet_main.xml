@@ -169,6 +169,16 @@
                         android:textColor="?attr/bb_secondaryText"
                         android:visibility="gone"/>
 
+                    <ProgressBar
+                        android:id="@+id/progressBarWallets"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_margin="32dp"
+                        android:visibility="gone"
+                        android:indeterminateTint="?attr/bb_button"
+                        tools:visibility="visible"/>
+
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 

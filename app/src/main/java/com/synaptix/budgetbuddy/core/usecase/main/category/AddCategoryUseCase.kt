@@ -5,6 +5,8 @@ import com.synaptix.budgetbuddy.core.model.Category
 import com.synaptix.budgetbuddy.core.model.Result
 import com.synaptix.budgetbuddy.data.firebase.mapper.FirebaseMapper.toDTO
 import com.synaptix.budgetbuddy.data.firebase.repository.FirestoreCategoryRepository
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
 class AddCategoryUseCase @Inject constructor(
@@ -17,24 +19,24 @@ class AddCategoryUseCase @Inject constructor(
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     // Executes the operation to add a new category
-    suspend fun execute(newCategory: Category): AddCategoryResult {
-        val newCategoryDTO = newCategory.toDTO()
+    fun execute(newCategory: Category): Flow<AddCategoryResult> = flow {
+        try {
+            val newCategoryDTO = newCategory.toDTO()
 
-        // Attempt to create the category
-        return try {
-            when (val result = categoryRepository.createCategory(newCategoryDTO)) {
+            // Attempt to create the category
+            when (val result = categoryRepository.createCategory(newCategory.user!!.id, newCategoryDTO)) {
                 is Result.Success -> {
                     Log.d("AddCategoryUseCase", "Category added successfully: ${result.data}")
-                    AddCategoryResult.Success(result.data)
+                    emit(AddCategoryResult.Success(result.data))
                 }
                 is Result.Error -> {
                     Log.e("AddCategoryUseCase", "Error adding category: ${result.exception.message}")
-                    AddCategoryResult.Error("Failed to add category: ${result.exception.message}")
+                    emit(AddCategoryResult.Error("Failed to add category: ${result.exception.message}"))
                 }
             }
         } catch (e: Exception) {
             Log.e("AddCategoryUseCase", "Exception while adding category: ${e.message}")
-            AddCategoryResult.Error("Failed to add category: ${e.message}")
+            emit(AddCategoryResult.Error("Failed to add category: ${e.message}"))
         }
     }
 }

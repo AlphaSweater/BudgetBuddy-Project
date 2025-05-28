@@ -3,71 +3,65 @@ package com.synaptix.budgetbuddy.data.firebase.repository
 import com.google.firebase.firestore.FirebaseFirestore
 import com.synaptix.budgetbuddy.core.model.Result
 import com.synaptix.budgetbuddy.data.firebase.model.LabelDTO
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class FirestoreLabelRepository @Inject constructor(
-    private val firestoreInstance: FirebaseFirestore
-) : BaseFirestoreRepository<LabelDTO>(firestoreInstance) {
+    firestore: FirebaseFirestore
+) : BaseFirestoreRepository<LabelDTO>(firestore) {
     
-    override val collection = firestoreInstance.collection("labels")
+    override val collection = firestore.collection("users")
+    override val subCollectionName = "labels"
 
     override fun getType(): Class<LabelDTO> = LabelDTO::class.java
 
     // Create a new label
-    suspend fun createLabel(label: LabelDTO): Result<String> {
+    suspend fun createLabel(userId: String, label: LabelDTO): Result<String> {
         val newLabel = label.copy(
             createdAt = System.currentTimeMillis(),
             updatedAt = System.currentTimeMillis()
         )
-        return create(newLabel)
+        return create(newLabel, userId)
     }
 
     // Update an existing label
-    suspend fun updateLabel(label: LabelDTO): Result<Unit> {
+    suspend fun updateLabel(userId: String, label: LabelDTO): Result<Unit> {
         val updatedLabel = label.copy(updatedAt = System.currentTimeMillis())
-        return update(label.id, updatedLabel)
+        return update(userId, label.id, updatedLabel)
     }
 
     // Delete a label
-    suspend fun deleteLabel(labelId: String): Result<Unit> = delete(labelId)
+    suspend fun deleteLabel(userId: String, labelId: String): Result<Unit> = 
+        delete(userId, labelId)
 
     // Get a single label by ID
-    suspend fun getLabelById(labelId: String): Result<LabelDTO?> {
-        return try {
-            val snapshot = collection.document(labelId).get().await()
-            Result.Success(snapshot.toObject(LabelDTO::class.java))
-        } catch (e: Exception) {
-            Result.Error(e)
-        }
-    }
+    suspend fun getLabelById(userId: String, labelId: String): Result<LabelDTO?> =
+        getById(userId, labelId)
 
     // Get multiple labels by their IDs in a single batch
-    suspend fun getLabelsByIds(labelIds: List<String>): Result<List<LabelDTO>> {
-        return try {
-            val items = mutableListOf<LabelDTO>()
-            labelIds.chunked(10).forEach { chunk ->
-                val snapshots = chunk.map { id ->
-                    collection.document(id).get().await()
-                }
-                items.addAll(snapshots.mapNotNull { it.toObject(LabelDTO::class.java) })
-            }
-            Result.Success(items)
-        } catch (e: Exception) {
-            Result.Error(e)
-        }
-    }
+    suspend fun getLabelsByIds(userId: String, labelIds: List<String>): Result<List<LabelDTO>> =
+        getItemsByIds(userId, labelIds)
 
     // Get all labels for a user
     suspend fun getLabelsForUser(userId: String): Result<List<LabelDTO>> {
         return try {
-            val userSnapshot = collection.whereEqualTo("userId", userId).get().await()
-            val defaultSnapshot = collection.whereEqualTo("isDefault", true).get().await()
+            val userSnapshot = createBaseQuery(userId)
+                .whereEqualTo("isDefault", false)
+                .get()
+                .await()
 
-            val userLabels = userSnapshot.documents.mapNotNull { it.toObject(LabelDTO::class.java) }
-            val defaultLabels = defaultSnapshot.documents.mapNotNull { it.toObject(LabelDTO::class.java) }
+            val defaultSnapshot = collection
+                .document("default")
+                .collection(subCollectionName)
+                .whereEqualTo("isDefault", true)
+                .get()
+                .await()
+
+            val userLabels = userSnapshot.documents.mapNotNull { it.toObject(getType()) }
+            val defaultLabels = defaultSnapshot.documents.mapNotNull { it.toObject(getType()) }
             
             Result.Success(userLabels + defaultLabels)
         } catch (e: Exception) {
@@ -75,12 +69,18 @@ class FirestoreLabelRepository @Inject constructor(
         }
     }
 
-    // Get default labels (where userId is null)
+    // Get default labels
     suspend fun getDefaultLabels(): Result<List<LabelDTO>> {
         return try {
-            val snapshot = collection.whereEqualTo("userId", null).get().await()
+            val snapshot = collection
+                .document("default")
+                .collection(subCollectionName!!)
+                .whereEqualTo("isDefault", true)
+                .get()
+                .await()
+            
             val labels = snapshot.documents.mapNotNull { 
-                it.toObject(LabelDTO::class.java)
+                it.toObject(getType())
             }
             Result.Success(labels)
         } catch (e: Exception) {
@@ -93,6 +93,9 @@ class FirestoreLabelRepository @Inject constructor(
 
     suspend fun createDefaultLabels(): Result<Unit> = try {
         val now = System.currentTimeMillis()
+        val defaultCollection = collection
+            .document("default")
+            .collection(subCollectionName!!)
 
         val defaultLabels = listOf(
             "Needs",
@@ -105,21 +108,45 @@ class FirestoreLabelRepository @Inject constructor(
 
         defaultLabels.forEachIndexed { index, labelName ->
             val labelId = "globalLabel${index + 1}"
-            val labelData = mapOf(
-                "id" to labelId,
-                "userId" to null,
-                "name" to labelName,
-                "isDefault" to true,
-                "createdAt" to now,
-                "updatedAt" to now
+            val label = LabelDTO(
+                id = labelId,
+                userId = null,
+                name = labelName,
+                isDefault = true,
+                createdAt = now,
+                updatedAt = now
             )
 
-            collection.document(labelId)
-                .set(labelData)
+            defaultCollection.document(labelId)
+                .set(label)
                 .await()
         }
         Result.Success(Unit)
     } catch (e: Exception) {
         Result.Error(e)
+    }
+
+    // Real-time listeners
+    fun observeLabelsForUser(userId: String): Flow<List<LabelDTO>> {
+        return observeCollection(userId, createBaseQuery(userId))
+    }
+
+    fun observeLabels(userId: String, labelIds: List<String>): Flow<List<LabelDTO>> {
+        val labelCollection = collection
+            .document(userId)
+            .collection(subCollectionName)
+        return observeCollection(userId, labelCollection.whereIn("id", labelIds))
+
+    }
+
+    fun observeDefaultLabels(): Flow<List<LabelDTO>> {
+        val defaultCollection = collection
+            .document("default")
+            .collection(subCollectionName!!)
+        return observeCollection("default", defaultCollection)
+    }
+
+    fun observeLabel(userId: String, labelId: String): Flow<LabelDTO?> {
+        return observeDocument(userId, labelId)
     }
 } 

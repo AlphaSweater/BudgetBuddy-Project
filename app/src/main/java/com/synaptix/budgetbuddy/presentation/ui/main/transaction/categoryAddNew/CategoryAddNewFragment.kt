@@ -7,9 +7,12 @@ import android.view.ViewGroup
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
+import com.google.android.material.snackbar.Snackbar
 import com.synaptix.budgetbuddy.R
 import com.synaptix.budgetbuddy.databinding.FragmentCategoryAddNewBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -38,7 +41,7 @@ class CategoryAddNewFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setupAdapters()
         setupListeners()
-        setupObservers()
+        observeViewModel()
     }
 
     private fun setupAdapters() {
@@ -61,7 +64,7 @@ class CategoryAddNewFragment : Fragment() {
 
     private fun setupListeners() {
         binding.categoryNameInput.doAfterTextChanged { text ->
-            viewModel.categoryName.value = text?.toString()
+            viewModel.setCategoryName(text?.toString() ?: "")
         }
 
         binding.btnExpenseToggle.setOnClickListener {
@@ -77,53 +80,127 @@ class CategoryAddNewFragment : Fragment() {
         }
 
         binding.btnCreate.setOnClickListener {
-            //TODO: Validate input properly with methods
             viewModel.createCategory()
-            findNavController().popBackStack()
         }
     }
 
-    private fun setupObservers() {
+    private fun observeViewModel() {
         viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.colors.collect { colors ->
-                colorAdapter.submitList(colors)
-            }
-        }
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                // Collect UI state
+                launch {
+                    viewModel.uiState.collect { state ->
+                        handleUiState(state)
+                    }
+                }
+                
+                // Collect validation state
+                launch {
+                    viewModel.validationState.collect { state ->
+                        handleValidationState(state)
+                    }
+                }
 
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.icons.collect { icons ->
-                iconAdapter.submitList(icons)
-            }
-        }
+                // Collect form state
+                launch {
+                    viewModel.categoryName.collect { name ->
+                        binding.categoryNameInput.setText(name)
+                    }
+                }
 
-        viewModel.selectedColor.observe(viewLifecycleOwner) { color ->
-            color?.let {
-                binding.previewIcon.setColorFilter(requireContext().getColor(it.colorResourceId))
-            }
-        }
+                launch {
+                    viewModel.categoryType.collect { type ->
+                        binding.btnExpenseToggle.isSelected = type == "Expense"
+                        binding.btnIncomeToggle.isSelected = type == "Income"
+                    }
+                }
 
-        viewModel.selectedIcon.observe(viewLifecycleOwner) { icon ->
-            icon?.let {
-                binding.previewIcon.setImageResource(it.iconResourceId)
-            }
-        }
+                launch {
+                    viewModel.selectedColor.collect { color ->
+                        color?.let {
+                            binding.previewIcon.setColorFilter(requireContext().getColor(it.colorResourceId))
+                        }
+                    }
+                }
 
-        viewModel.eventCategoryCreated.observe(viewLifecycleOwner) { success ->
-            if (success) {
-                binding.statusMessage.text = getString(R.string.category_created_success)
-                binding.statusMessage.setTextColor(requireContext().getColor(R.color.profit_green))
-                clearForm()
-            } else {
-                binding.statusMessage.text = getString(R.string.category_creation_error)
-                binding.statusMessage.setTextColor(requireContext().getColor(R.color.expense_red))
+                launch {
+                    viewModel.selectedIcon.collect { icon ->
+                        icon?.let {
+                            binding.previewIcon.setImageResource(it.iconResourceId)
+                        }
+                    }
+                }
+
+                // Collect available options
+                launch {
+                    viewModel.colors.collect { colors ->
+                        colorAdapter.submitList(colors)
+                    }
+                }
+
+                launch {
+                    viewModel.icons.collect { icons ->
+                        iconAdapter.submitList(icons)
+                    }
+                }
             }
         }
     }
 
-    private fun clearForm() {
-        binding.categoryNameInput.text?.clear()
-        binding.previewIcon.setImageResource(R.drawable.ic_circle_24)
-        binding.previewIcon.clearColorFilter()
+    private fun handleUiState(state: CategoryAddNewViewModel.UiState) {
+        when (state) {
+            is CategoryAddNewViewModel.UiState.Loading -> {
+                binding.btnCreate.isEnabled = false
+            }
+            is CategoryAddNewViewModel.UiState.Success -> {
+                showSuccess("Category added successfully")
+                findNavController().popBackStack()
+            }
+            is CategoryAddNewViewModel.UiState.Error -> {
+                binding.btnCreate.isEnabled = false
+                showError(state.message)
+            }
+            else -> {
+                binding.btnCreate.isEnabled = true
+            }
+        }
+    }
+
+    private fun handleValidationState(state: CategoryAddNewViewModel.ValidationState) {
+        with(binding) {
+            // Show/hide error messages for each field
+            textNameError.apply {
+                text = state.nameError
+                visibility = if (state.shouldShowErrors && state.nameError != null) View.VISIBLE else View.GONE
+            }
+
+            textTypeError.apply {
+                text = state.typeError
+                visibility = if (state.shouldShowErrors && state.typeError != null) View.VISIBLE else View.GONE
+            }
+
+            textColorError.apply {
+                text = state.colorError
+                visibility = if (state.shouldShowErrors && state.colorError != null) View.VISIBLE else View.GONE
+            }
+
+            textIconError.apply {
+                text = state.iconError
+                visibility = if (state.shouldShowErrors && state.iconError != null) View.VISIBLE else View.GONE
+            }
+        }
+    }
+
+    private fun showError(message: String) {
+        Snackbar.make(binding.root, message, Snackbar.LENGTH_SHORT)
+            .setBackgroundTint(resources.getColor(R.color.error, null))
+            .show()
+    }
+
+    private fun showSuccess(message: String) {
+        Snackbar.make(binding.root, message, Snackbar.LENGTH_SHORT)
+            .setBackgroundTint(resources.getColor(R.color.success, null))
+            .show()
     }
 
     override fun onDestroyView() {

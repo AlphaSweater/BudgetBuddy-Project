@@ -573,20 +573,38 @@
         android:focusable="true"
         android:visibility="gone">
 
-        <ProgressBar
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:indeterminateTint="@android:color/white" />
+            android:gravity="center"
+            android:orientation="vertical">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginTop="48dp"
-            android:text="Saving transaction..."
-            android:textColor="@android:color/white"
-            android:textSize="16sp" />
+            <!-- Loading Progress -->
+            <ProgressBar
+                android:id="@+id/progressBar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:indeterminateTint="@android:color/white" />
+
+            <!-- Success Checkmark -->
+            <ImageView
+                android:id="@+id/successCheckmark"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:src="@drawable/ic_ui_circle_check"
+                android:visibility="gone"
+                app:tint="@color/success" />
+
+            <TextView
+                android:id="@+id/loadingText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="Saving transaction..."
+                android:textColor="@android:color/white"
+                android:textSize="16sp" />
+        </LinearLayout>
     </FrameLayout>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -139,6 +139,14 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
+                <ProgressBar
+                    android:id="@+id/progressBarWallets"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:padding="32dp"
+                    android:visibility="gone"/>
+
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/recyclerViewHomeWalletOverview"
                     android:layout_width="match_parent"
@@ -148,7 +156,7 @@
                     android:visibility="gone"
                     tools:visibility="visible"
                     tools:itemCount="2"
-                    tools:listitem="@layout/item_home_wallet"/>
+                    tools:listitem="@layout/item_wallet_main"/>
 
                 <TextView
                     android:id="@+id/txtEmptyWallets"
@@ -214,6 +222,14 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
+                <ProgressBar
+                    android:id="@+id/progressBarCategories"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:padding="32dp"
+                    android:visibility="gone"/>
+
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/recyclerViewHomeCategoryOverview"
                     android:layout_width="match_parent"
@@ -278,6 +294,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
+
+                <ProgressBar
+                    android:id="@+id/progressBarTransactions"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:padding="32dp"
+                    android:visibility="gone"/>
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/recyclerViewHomeTransactionOverview"

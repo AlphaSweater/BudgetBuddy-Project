@@ -21,21 +21,45 @@
 
 package com.synaptix.budgetbuddy.core.usecase.main.budget
 
+import android.util.Log
 import com.synaptix.budgetbuddy.core.model.Budget
+import com.synaptix.budgetbuddy.core.model.Result
 import com.synaptix.budgetbuddy.data.firebase.mapper.FirebaseMapper.toDTO
+import com.synaptix.budgetbuddy.data.firebase.repository.FirestoreBudgetRepository
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
 //// UseCase class responsible for adding a new budget
-//class AddBudgetUseCase @Inject constructor(
-//    // Injecting the BudgetRepository to handle budget-related operations
-//    private val budgetRepository: BudgetRepository
-//) {
-//    // Executes the operation to add a new budget by converting to entity and inserting into the database
-//    suspend fun execute(budget: Budget) {
-//        // Convert the BudgetIn data model to the entity representation for database insertion
-//        val entity = budget.toDTO()
-//
-//        // Insert the converted budget entity into the repository (database)
-//        budgetRepository.insertBudget(entity)
-//    }
-//}
+class AddBudgetUseCase @Inject constructor(
+    private val budgetRepository: FirestoreBudgetRepository
+) {
+    sealed class AddBudgetResult {
+        data class Success(val budgetId: String) : AddBudgetResult()
+        data class Error(val message: String) : AddBudgetResult()
+    }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // Executes the operation to add a new budget
+    fun execute(newBudget: Budget): Flow<AddBudgetResult> = flow {
+        try {
+            val newBudgetDTO = newBudget.toDTO()
+
+            // Attempt to create the budget
+            when (val result = budgetRepository.createBudget(newBudget.user.id, newBudgetDTO)) {
+                is Result.Success -> {
+                    Log.d("AddBudgetUseCase", "Budget added successfully: ${result.data}")
+                    emit(AddBudgetResult.Success(result.data))
+                }
+                is Result.Error -> {
+                    Log.e("AddBudgetUseCase", "Error adding budget: ${result.exception.message}")
+                    emit(AddBudgetResult.Error("Failed to add budget: ${result.exception.message}"))
+                }
+            }
+        } catch (e: Exception) {
+            Log.e("AddBudgetUseCase", "Exception while adding budget: ${e.message}")
+            emit(AddBudgetResult.Error("Failed to add budget: ${e.message}"))
+        }
+    }
+}
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~EOF~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\

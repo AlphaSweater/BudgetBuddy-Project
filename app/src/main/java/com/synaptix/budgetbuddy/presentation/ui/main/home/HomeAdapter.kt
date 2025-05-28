@@ -55,22 +55,25 @@ class HomeAdapter(
      * Each view type has its own layout resource and ViewHolder implementation.
      */
     override fun onCreateViewHolder(
-        parent: ViewGroup, 
+        parent: ViewGroup,
         viewType: Int
     ): BaseViewHolder<HomeListItems> {
         return when (viewType) {
             VIEW_TYPE_WALLET -> createViewHolder(
                 parent = parent,
-                layoutResId = R.layout.item_home_wallet
+                layoutResId = R.layout.item_wallet_main
             ) { WalletViewHolder(it, onWalletClick) }
+
             VIEW_TYPE_TRANSACTION -> createViewHolder(
                 parent = parent,
                 layoutResId = R.layout.item_home_transaction
             ) { TransactionViewHolder(it, onTransactionClick) }
+
             VIEW_TYPE_CATEGORY -> createViewHolder(
                 parent = parent,
                 layoutResId = R.layout.item_home_category
             ) { CategoryViewHolder(it, onCategoryClick) }
+
             else -> throw IllegalArgumentException("Unknown view type: $viewType")
         }
     }
@@ -83,20 +86,21 @@ class HomeAdapter(
         itemView: View,
         private val onClick: ((Wallet) -> Unit)?
     ) : BaseViewHolder<HomeListItems>(itemView) {
-        private val iconView: ImageView = itemView.findViewById(R.id.imgWalletIcon)
-        private val nameText: TextView = itemView.findViewById(R.id.txtWalletName)
-        private val balanceText: TextView = itemView.findViewById(R.id.txtWalletBalance)
-        private val dateText: TextView = itemView.findViewById(R.id.txtRelativeDay)
+        private val iconView: ImageView = itemView.findViewById(R.id.walletIcon)
+        private val nameText: TextView = itemView.findViewById(R.id.walletName)
+        private val balanceText: TextView = itemView.findViewById(R.id.walletBalance)
+        private val dateText: TextView = itemView.findViewById(R.id.lastActivity)
 
         override fun bind(item: HomeListItems) {
             if (item !is HomeListItems.HomeWalletItem) return
-            
-            iconView.setImageResource(R.drawable.ic_wallet_24)
+
+            iconView.setImageResource(R.drawable.ic_ui_wallet)
             nameText.text = item.wallet.name
             val balanceFormatted = String.format("R %.2f", item.wallet.balance)
             balanceText.text = balanceFormatted
-            dateText.text = item.relativeDate
-            
+
+            dateText.text = "• ${item.relativeDate}"
+
             itemView.setOnClickListener { onClick?.invoke(item.wallet) }
         }
     }
@@ -111,59 +115,80 @@ class HomeAdapter(
         private val onClick: ((Transaction) -> Unit)?
     ) : BaseViewHolder<HomeListItems>(itemView) {
         private val iconView: ImageView = itemView.findViewById(R.id.iconCategory)
-        private val iconContainer: LinearLayout = itemView.findViewById(R.id.iconCategoryContainer)
-        private val nameText: TextView = itemView.findViewById(R.id.textCategoryName)
-        private val amountText: TextView = itemView.findViewById(R.id.text_amount)
-        private val dateText: TextView = itemView.findViewById(R.id.text_date)
-        private val walletText: TextView = itemView.findViewById(R.id.textWalletName)
+        private val categoryName: TextView = itemView.findViewById(R.id.textCategoryName)
+        private val walletIcon: ImageView = itemView.findViewById(R.id.iconWallet)
+        private val walletName: TextView = itemView.findViewById(R.id.textWalletName)
+        private val noteContainer: LinearLayout = itemView.findViewById(R.id.rowNote)
+        private val noteText: TextView = itemView.findViewById(R.id.textNote)
+        private val amountText: TextView = itemView.findViewById(R.id.textAmount)
+        private val dateText: TextView = itemView.findViewById(R.id.textDate)
 
         override fun bind(item: HomeListItems) {
             if (item !is HomeListItems.HomeTransactionItem) return
-            
+
             val resolvedColor = ContextCompat.getColor(itemView.context, item.transaction.category.color)
-            (iconContainer.background.mutate() as GradientDrawable).setColor(resolvedColor)
 
             iconView.setImageResource(item.transaction.category.icon)
-            nameText.text = item.transaction.category.name
+            iconView.setColorFilter(resolvedColor)
+            categoryName.text = item.transaction.category.name
+
+            walletIcon.setImageResource(R.drawable.ic_ui_wallet)
+            walletName.text = item.transaction.wallet.name
+
+            if (item.transaction.note.isNotBlank()) {
+                noteContainer.visibility = View.VISIBLE
+                noteText.text = item.transaction.note
+            } else {
+                noteContainer.visibility = View.GONE
+            }
+
             val amountFormatted = String.format("R %.2f", item.transaction.amount)
             amountText.text = amountFormatted
+
+            val colorRes = if (item.transaction.category.type.equals("INCOME", ignoreCase = true)) {
+                R.color.profit_green
+            } else {
+                R.color.expense_red
+            }
+
+            amountText.setTextColor(ContextCompat.getColor(itemView.context, colorRes))
+
             dateText.text = item.relativeDate
-            walletText.text = item.transaction.wallet.name
-            
+
             itemView.setOnClickListener { onClick?.invoke(item.transaction) }
         }
     }
 
-    /**
-     * ViewHolder for category items in the home screen.
-     * Displays category icon, name, transaction count, amount, and date.
-     * Applies category color to the icon background.
-     */
-    class CategoryViewHolder(
-        itemView: View,
-        private val onClick: ((Category) -> Unit)?
-    ) : BaseViewHolder<HomeListItems>(itemView) {
-        private val iconView: ImageView = itemView.findViewById(R.id.iconCategory)
-        private val iconContainer: LinearLayout = itemView.findViewById(R.id.iconCategoryContainer)
-        private val nameText: TextView = itemView.findViewById(R.id.txtCategoryName)
-        private val transactionsText: TextView = itemView.findViewById(R.id.txtTransactions)
-        private val amountText: TextView = itemView.findViewById(R.id.txtAmount)
-        private val dateText: TextView = itemView.findViewById(R.id.txtDate)
+        /**
+         * ViewHolder for category items in the home screen.
+         * Displays category icon, name, transaction count, amount, and date.
+         * Applies category color to the icon background.
+         */
+        class CategoryViewHolder(
+            itemView: View,
+            private val onClick: ((Category) -> Unit)?
+        ) : BaseViewHolder<HomeListItems>(itemView) {
+            private val iconView: ImageView = itemView.findViewById(R.id.categoryIcon)
+            private val nameText: TextView = itemView.findViewById(R.id.categoryName)
+            private val transactionsText: TextView =
+                itemView.findViewById(R.id.categoryTransactions)
+            private val amountText: TextView = itemView.findViewById(R.id.categoryAmount)
+            private val dateText: TextView = itemView.findViewById(R.id.categoryDate)
 
-        override fun bind(item: HomeListItems) {
-            if (item !is HomeListItems.HomeCategoryItem) return
-            
-            val resolvedColor = ContextCompat.getColor(itemView.context, item.category.color)
-            (iconContainer.background.mutate() as GradientDrawable).setColor(resolvedColor)
+            override fun bind(item: HomeListItems) {
+                if (item !is HomeListItems.HomeCategoryItem) return
 
-            iconView.setImageResource(item.category.icon)
-            nameText.text = item.category.name
-            transactionsText.text = "${item.transactionCount} transactions"
-            amountText.text = item.amount
-            dateText.text = item.relativeDate
-            
-            itemView.setOnClickListener { onClick?.invoke(item.category) }
+                val resolvedColor = ContextCompat.getColor(itemView.context, item.category.color)
+                //(iconView.background.mutate() as GradientDrawable).setColor(resolvedColor)
+
+                iconView.setImageResource(item.category.icon)
+                iconView.setColorFilter(resolvedColor)
+                nameText.text = item.category.name
+                transactionsText.text = "${item.transactionCount} transactions"
+                amountText.text = item.amount
+                dateText.text = item.relativeDate
+
+                itemView.setOnClickListener { onClick?.invoke(item.category) }
+            }
         }
     }
-}
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~EOF~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\

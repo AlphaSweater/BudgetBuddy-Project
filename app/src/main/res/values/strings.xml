@@ -135,5 +135,8 @@
 
     <string name="category_created_success">Category Created Successfully!</string>
     <string name="category_creation_error">Please enter a name and choose an icon and color</string>
+    <string name="no_categories_found">No Categories Found</string>
+    <string name="no_wallets_found">No Wallets Found\n</string>
+    <string name="no_transactions_found">No Transactions Found</string>
 
 </resources>

@@ -150,6 +150,12 @@
         <item name="android:scaleType">fitCenter</item>
     </style>
 
+    <style name="IconButtonExtraSmall">
+        <item name="android:layout_width">12dp</item>
+        <item name="android:layout_height">12dp</item>
+        <item name="android:scaleType">fitCenter</item>
+    </style>
+
     <style name="IconButtonLarge">
         <item name="android:layout_width">48dp</item>
         <item name="android:layout_height">48dp</item>
