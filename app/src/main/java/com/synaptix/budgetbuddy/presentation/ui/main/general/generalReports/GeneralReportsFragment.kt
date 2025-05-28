@@ -38,14 +38,57 @@ import kotlinx.coroutines.launch
 import java.util.Calendar
 import java.util.Locale
 
+/**
+ * Fragment for displaying financial reports and analytics.
+ * 
+ * This fragment is responsible for:
+ * 1. Displaying transaction and category data
+ * 2. Showing visual representations (charts) of the data
+ * 3. Handling user interactions
+ * 4. Managing UI state
+ * 
+ * The fragment uses:
+ * - ViewBinding for view access
+ * - ViewModel for data management
+ * - Coroutines for asynchronous operations
+ * - MPAndroidChart for data visualization
+ * 
+ * Data Flow and State Management:
+ * 1. ViewModel StateFlow:
+ *    - The ViewModel exposes StateFlow objects for each data type
+ *    - These flows emit updates whenever the data changes
+ *    - The Fragment collects these flows to update the UI
+ * 
+ * 2. Coroutine Lifecycle:
+ *    - viewLifecycleOwner.lifecycleScope: Coroutine scope tied to Fragment lifecycle
+ *    - repeatOnLifecycle: Ensures coroutines are cancelled when Fragment is stopped
+ *    - collectLatest: Collects the latest value from a Flow
+ * 
+ * 3. State Observation:
+ *    - Each data type (transactions, categories) has its own observer
+ *    - Observers run in parallel using separate coroutines
+ *    - UI is updated based on the current state
+ * 
+ * 4. Error Handling:
+ *    - Each state type (Loading, Success, Error, Empty) is handled appropriately
+ *    - Loading states show progress indicators
+ *    - Error states show empty states with messages
+ *    - Success states update the UI with data
+ */
 @AndroidEntryPoint
 class GeneralReportsFragment : Fragment() {
 
+    // ViewBinding for safe view access
     private var _binding: FragmentGeneralReportsBinding? = null
     private val binding get() = _binding!!
 
+    // ViewModel for data management
     private val viewModel: GeneralReportsViewModel by viewModels()
 
+    /**
+     * Adapter for displaying expense-related items.
+     * Handles both transactions and categories.
+     */
     private val expenseAdapter by lazy {
         GeneralReportAdapter(
             onTransactionClick = { transaction -> navigateToTransactionDetails(transaction) },
@@ -53,6 +96,10 @@ class GeneralReportsFragment : Fragment() {
         )
     }
 
+    /**
+     * Adapter for displaying income-related items.
+     * Handles both transactions and categories.
+     */
     private val incomeAdapter by lazy {
         GeneralReportAdapter(
             onTransactionClick = { transaction -> navigateToTransactionDetails(transaction) },
@@ -76,6 +123,10 @@ class GeneralReportsFragment : Fragment() {
         observeStates()
     }
 
+    /**
+     * Sets up the RecyclerViews for displaying transactions and categories.
+     * Uses LinearLayoutManager for vertical scrolling.
+     */
     private fun setupRecyclerViews() {
         binding.apply {
             recyclerViewExpenseCategory.apply {
@@ -90,6 +141,10 @@ class GeneralReportsFragment : Fragment() {
         }
     }
 
+    /**
+     * Sets up click listeners for UI elements.
+     * Handles navigation and toggle actions.
+     */
     private fun setupOnClickListeners() {
         binding.apply {
             btnGoBack.setOnClickListener {
@@ -106,6 +161,21 @@ class GeneralReportsFragment : Fragment() {
         }
     }
 
+    /**
+     * Observes ViewModel states using coroutines.
+     * 
+     * This method:
+     * 1. Creates a coroutine scope tied to the Fragment's lifecycle
+     * 2. Uses repeatOnLifecycle to handle lifecycle changes
+     * 3. Launches separate coroutines for each data type
+     * 
+     * The coroutines will:
+     * - Start when the Fragment is started
+     * - Be cancelled when the Fragment is stopped
+     * - Restart when the Fragment is started again
+     * 
+     * This ensures efficient resource usage and prevents memory leaks.
+     */
     private fun observeStates() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -157,9 +227,26 @@ class GeneralReportsFragment : Fragment() {
         }
     }
 
+    /**
+     * Updates the transaction lists based on the loaded data.
+     * 
+     * Data Processing:
+     * 1. Filters transactions by type (income/expense)
+     * 2. Maps transactions to UI items
+     * 3. Updates the appropriate adapter
+     * 
+     * The process ensures:
+     * - Proper separation of income and expense transactions
+     * - Correct formatting of dates and amounts
+     * - Efficient UI updates using adapters
+     */
     private fun updateTransactionLists(transactions: List<Transaction>) {
-        val expenseTransactions = transactions.filter { it.category.type.equals("expense", ignoreCase = true) }
-        val incomeTransactions = transactions.filter { it.category.type.equals("income", ignoreCase = true) }
+        val expenseTransactions = transactions.filter { 
+            it.category.type.equals("expense", ignoreCase = true) 
+        }
+        val incomeTransactions = transactions.filter { 
+            it.category.type.equals("income", ignoreCase = true) 
+        }
 
         val expenseItems = expenseTransactions.map { transaction ->
             ReportListItems.ReportTransactionItem(
@@ -179,9 +266,27 @@ class GeneralReportsFragment : Fragment() {
         incomeAdapter.submitList(incomeItems)
     }
 
+    /**
+     * Updates the category lists based on the loaded data.
+     * 
+     * Data Processing:
+     * 1. Filters categories by type (income/expense)
+     * 2. Calculates transaction counts and amounts
+     * 3. Maps categories to UI items
+     * 4. Updates the appropriate adapter
+     * 
+     * The process ensures:
+     * - Proper separation of income and expense categories
+     * - Accurate calculation of transaction statistics
+     * - Efficient UI updates using adapters
+     */
     private fun updateCategoryLists(categories: List<Category>) {
-        val expenseCategories = categories.filter { it.type.equals("expense", ignoreCase = true) }
-        val incomeCategories = categories.filter { it.type.equals("income", ignoreCase = true) }
+        val expenseCategories = categories.filter { 
+            it.type.equals("expense", ignoreCase = true) 
+        }
+        val incomeCategories = categories.filter { 
+            it.type.equals("income", ignoreCase = true) 
+        }
 
         val expenseItems = expenseCategories.map { category ->
             val transactions = viewModel.getTransactionsByType("expense")
@@ -211,6 +316,10 @@ class GeneralReportsFragment : Fragment() {
         incomeAdapter.submitList(incomeItems)
     }
 
+    /**
+     * Shows expense-related views and updates the pie chart.
+     * Handles visibility of RecyclerViews and toggle states.
+     */
     private fun showCategoryExpenseToggle() {
         binding.apply {
             recyclerViewExpenseCategory.visibility = View.VISIBLE
@@ -220,6 +329,10 @@ class GeneralReportsFragment : Fragment() {
         }
     }
 
+    /**
+     * Shows income-related views and updates the pie chart.
+     * Handles visibility of RecyclerViews and toggle states.
+     */
     private fun showCategoryIncomeToggle() {
         binding.apply {
             recyclerViewExpenseCategory.visibility = View.GONE
@@ -229,11 +342,36 @@ class GeneralReportsFragment : Fragment() {
         }
     }
 
+    /**
+     * Updates the visual state of toggle buttons.
+     * 
+     * @param selected The toggle button that is selected
+     * @param unselected The toggle button that is not selected
+     */
     private fun highlightToggle(selected: LinearLayout, unselected: LinearLayout) {
         selected.setBackgroundResource(R.drawable.toggle_selected)
         unselected.setBackgroundResource(android.R.color.transparent)
     }
 
+    /**
+     * Sets up the line chart showing income vs expense trends.
+     * 
+     * Chart Configuration:
+     * 1. Data Processing:
+     *    - Groups transactions by month
+     *    - Calculates totals for income and expenses
+     *    - Creates data entries for the chart
+     * 
+     * 2. Visual Setup:
+     *    - Configures line styles and colors
+     *    - Sets up axes and labels
+     *    - Adds animations and interactions
+     * 
+     * 3. Performance:
+     *    - Uses efficient data structures
+     *    - Minimizes object creation
+     *    - Optimizes drawing operations
+     */
     private fun setupLineChart(transactions: List<Transaction>) {
         val lineChart: LineChart = binding.lineChart
         val context = lineChart.context
@@ -314,6 +452,25 @@ class GeneralReportsFragment : Fragment() {
         }
     }
 
+    /**
+     * Sets up the pie chart showing category breakdown.
+     * 
+     * Chart Configuration:
+     * 1. Data Processing:
+     *    - Filters transactions by type
+     *    - Groups transactions by category
+     *    - Calculates percentages
+     * 
+     * 2. Visual Setup:
+     *    - Configures slice colors and labels
+     *    - Sets up center text and hole
+     *    - Adds animations and interactions
+     * 
+     * 3. Performance:
+     *    - Uses efficient data structures
+     *    - Minimizes object creation
+     *    - Optimizes drawing operations
+     */
     private fun setupPieChart(isExpense: Boolean) {
         val context = binding.root.context
         val pieChart: PieChart = binding.pieChart
@@ -379,14 +536,13 @@ class GeneralReportsFragment : Fragment() {
         }
     }
 
-    private fun navigateToTransactionDetails(transaction: Transaction) {
-        // TODO: Implement navigation to transaction details
-    }
-
-    private fun navigateToCategoryDetails(category: Category) {
-        // TODO: Implement navigation to category details
-    }
-
+    /**
+     * Formats a timestamp into a human-readable date string.
+     * Shows "Today", "Yesterday", or the date.
+     * 
+     * @param timestamp The timestamp to format
+     * @return Formatted date string
+     */
     private fun formatDate(timestamp: Long): String {
         val calendar = Calendar.getInstance()
         val now = Calendar.getInstance()
@@ -405,6 +561,22 @@ class GeneralReportsFragment : Fragment() {
                 "$month $day"
             }
         }
+    }
+
+    /**
+     * Navigates to transaction details screen.
+     * To be implemented when the details screen is ready.
+     */
+    private fun navigateToTransactionDetails(transaction: Transaction) {
+        // TODO: Implement navigation to transaction details
+    }
+
+    /**
+     * Navigates to category details screen.
+     * To be implemented when the details screen is ready.
+     */
+    private fun navigateToCategoryDetails(category: Category) {
+        // TODO: Implement navigation to category details
     }
 
     override fun onDestroyView() {
