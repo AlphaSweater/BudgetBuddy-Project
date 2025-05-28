@@ -45,13 +45,15 @@
     </declare-styleable>
 
     <declare-styleable name="AnimatedButton">
-        <attr name="originalText" format="string" />
         <attr name="loadingText" format="string" />
         <attr name="successText" format="string" />
-        <attr name="loadingSpinner" format="reference" /> <!-- drawable -->
-        <attr name="successBackground" format="reference" /> <!-- drawable -->
-        <attr name="originalBackground" format="reference" /> <!-- drawable -->
+        <attr name="errorText" format="string" />
+        <attr name="originalText" format="string" />
+        <attr name="originalBackground" format="reference" />
+        <attr name="successBackground" format="reference" />
+        <attr name="errorBackground" format="reference" />
         <attr name="originalTextColor" format="color" />
         <attr name="successTextColor" format="color" />
+        <attr name="errorTextColor" format="color" />
     </declare-styleable>
 </resources>

@@ -13,6 +13,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.view.animation.DecelerateInterpolator
+import android.view.animation.OvershootInterpolator
 import android.widget.FrameLayout
 import android.widget.ProgressBar
 import androidx.appcompat.widget.AppCompatButton
@@ -29,6 +30,7 @@ class AnimatedButton @JvmOverloads constructor(
         isAllCaps = false
         textSize = 16f
         gravity = Gravity.CENTER
+        elevation = 4f
     }
     
     private val progressBar = ProgressBar(context).apply {
@@ -45,16 +47,20 @@ class AnimatedButton @JvmOverloads constructor(
 
     private var loadingText = "Loading..."
     private var successText = "Success"
+    private var errorText = "Error"
     private var originalText = "Login"
 
     private var originalBackgroundDrawable: Drawable? = null
     private var successBackground: Drawable? = null
+    private var errorBackground: Drawable? = null
     private var originalTextColor = Color.WHITE
     private var successTextColor = Color.WHITE
+    private var errorTextColor = Color.WHITE
 
     private val animationDuration = 300L
     private val smallWidthDp = 48
     private val successScale = 1.05f
+    private val errorScale = 0.95f
 
     // Add callback for click events
     private var onButtonClickListener: (() -> Unit)? = null
@@ -64,13 +70,16 @@ class AnimatedButton @JvmOverloads constructor(
         context.withStyledAttributes(attrs, R.styleable.AnimatedButton) {
             loadingText = getString(R.styleable.AnimatedButton_loadingText) ?: loadingText
             successText = getString(R.styleable.AnimatedButton_successText) ?: successText
+            errorText = getString(R.styleable.AnimatedButton_errorText) ?: errorText
             originalText = getString(R.styleable.AnimatedButton_originalText) ?: originalText
 
             originalBackgroundDrawable = getDrawable(R.styleable.AnimatedButton_originalBackground)
             successBackground = getDrawable(R.styleable.AnimatedButton_successBackground)
+            errorBackground = getDrawable(R.styleable.AnimatedButton_errorBackground)
 
             originalTextColor = getColor(R.styleable.AnimatedButton_originalTextColor, Color.WHITE)
             successTextColor = getColor(R.styleable.AnimatedButton_successTextColor, Color.WHITE)
+            errorTextColor = getColor(R.styleable.AnimatedButton_errorTextColor, Color.WHITE)
         }
 
         // Style and configure button
@@ -139,7 +148,7 @@ class AnimatedButton @JvmOverloads constructor(
                     .scaleX(1f)
                     .scaleY(1f)
                     .setDuration(animationDuration)
-                    .setInterpolator(DecelerateInterpolator())
+                    .setInterpolator(OvershootInterpolator())
                     .start()
 
                 button.scaleX = 1f
@@ -176,7 +185,7 @@ class AnimatedButton @JvmOverloads constructor(
                     .scaleX(successScale)
                     .scaleY(successScale)
                     .setDuration(animationDuration)
-                    .setInterpolator(AccelerateDecelerateInterpolator())
+                    .setInterpolator(OvershootInterpolator())
                     .withEndAction {
                         button.animate()
                             .scaleX(1f)
@@ -189,7 +198,42 @@ class AnimatedButton @JvmOverloads constructor(
     }
 
     fun showError() {
-        reset()
+        // Step 1: Restore original width first
+        animateWidth(width, originalWidth)
+
+        // Step 2: Hide progress bar with animation
+        progressBar.animate()
+            .alpha(0f)
+            .setDuration(animationDuration)
+            .withEndAction {
+                progressBar.visibility = GONE
+
+                // Step 3: Apply error state
+                button.apply {
+                    gravity = Gravity.CENTER
+                    setPadding(0, 0, 0, 0)
+                    scaleX = 1f
+                    scaleY = 1f
+                    background = errorBackground ?: originalBackgroundDrawable
+                    setTextColor(errorTextColor)
+                    text = errorText
+                    isEnabled = true
+                }
+
+                // Step 4: Animate error shake
+                button.animate()
+                    .scaleX(errorScale)
+                    .scaleY(errorScale)
+                    .setDuration(animationDuration / 2)
+                    .withEndAction {
+                        button.animate()
+                            .scaleX(1f)
+                            .scaleY(1f)
+                            .setDuration(animationDuration / 2)
+                            .setInterpolator(OvershootInterpolator())
+                            .start()
+                    }.start()
+            }.start()
     }
 
     // Make reset public for error handling

@@ -1,7 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<shape xmlns:android="http://schemas.android.com/apk/res/android"
-    android:shape="rectangle">
-    <solid android:color="#3BB873"/> <!-- Success green -->
-    <stroke android:width="2dp" android:color="@color/success"/>
-    <corners android:radius="25dp"/>
-</shape>
+<ripple xmlns:android="http://schemas.android.com/apk/res/android"
+    android:color="?attr/colorControlHighlight">
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:angle="45"
+                android:endColor="#4BCB8D"
+                android:startColor="#3BB873"
+                android:type="linear" />
+            <corners android:radius="@dimen/button_corner_radius" />
+        </shape>
+    </item>
+</ripple>
