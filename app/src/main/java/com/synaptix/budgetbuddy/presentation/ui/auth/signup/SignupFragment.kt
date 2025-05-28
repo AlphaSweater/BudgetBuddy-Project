@@ -85,16 +85,17 @@ class SignupFragment : Fragment(R.layout.fragment_auth_signup) {
         val email = binding.edtEmailAddress.text.toString()
         val password = binding.edtPassword.text.toString()
 
-        // Animate button press
+        // Animate button press with a smoother animation
         binding.btnSignup.animate()
             .scaleX(0.95f)
             .scaleY(0.95f)
-            .setDuration(100)
+            .setDuration(150)
             .withEndAction {
                 binding.btnSignup.animate()
                     .scaleX(1f)
                     .scaleY(1f)
-                    .setDuration(100)
+                    .setDuration(150)
+                    .setInterpolator(android.view.animation.OvershootInterpolator())
                     .start()
             }
             .start()
@@ -144,48 +145,25 @@ class SignupFragment : Fragment(R.layout.fragment_auth_signup) {
     }
 
     private fun showIdleState() {
-        binding.loadingOverlay.animate()
-            .alpha(0f)
-            .setDuration(200)
-            .withEndAction {
-                binding.loadingOverlay.visibility = View.GONE
-            }
-            .start()
+        (activity as? AuthActivity)?.showLoading(false)
         enableInputs(true)
     }
 
     private fun showLoadingState() {
-        binding.loadingOverlay.visibility = View.VISIBLE
-        binding.loadingOverlay.alpha = 0f
-        binding.loadingOverlay.animate()
-            .alpha(1f)
-            .setDuration(200)
-            .start()
+        (activity as? AuthActivity)?.showLoading(true)
         enableInputs(false)
     }
 
     private fun showSuccessState() {
-        binding.loadingOverlay.animate()
-            .alpha(0f)
-            .setDuration(200)
-            .withEndAction {
-                binding.loadingOverlay.visibility = View.GONE
-                showSuccessMessage("Account created successfully!")
-                (activity as? AuthActivity)?.showLogin()
-            }
-            .start()
+        (activity as? AuthActivity)?.showLoading(false)
+        showSuccessMessage("Account created successfully!")
+        (activity as? AuthActivity)?.showLogin()
     }
 
     private fun showErrorState(message: String) {
-        binding.loadingOverlay.animate()
-            .alpha(0f)
-            .setDuration(200)
-            .withEndAction {
-                binding.loadingOverlay.visibility = View.GONE
-                enableInputs(true)
-                showErrorMessage(message)
-            }
-            .start()
+        (activity as? AuthActivity)?.showLoading(false)
+        enableInputs(true)
+        showErrorMessage(message)
     }
 
     private fun createTextWatcher(onTextChanged: (Editable?) -> Unit): TextWatcher {
@@ -202,6 +180,7 @@ class SignupFragment : Fragment(R.layout.fragment_auth_signup) {
         Snackbar.make(binding.root, message, Snackbar.LENGTH_SHORT)
             .setBackgroundTint(resources.getColor(R.color.success, null))
             .setTextColor(resources.getColor(android.R.color.white, null))
+            .setAnimationMode(Snackbar.ANIMATION_MODE_SLIDE)
             .show()
     }
 
@@ -209,6 +188,7 @@ class SignupFragment : Fragment(R.layout.fragment_auth_signup) {
         Snackbar.make(binding.root, message, Snackbar.LENGTH_LONG)
             .setBackgroundTint(resources.getColor(R.color.error, null))
             .setTextColor(resources.getColor(android.R.color.white, null))
+            .setAnimationMode(Snackbar.ANIMATION_MODE_SLIDE)
             .setAction("Dismiss") { }
             .show()
     }

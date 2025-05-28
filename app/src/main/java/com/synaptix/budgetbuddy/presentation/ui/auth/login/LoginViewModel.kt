@@ -28,6 +28,7 @@ import androidx.lifecycle.viewModelScope
 import com.synaptix.budgetbuddy.core.usecase.auth.LoginUserUseCase
 import com.synaptix.budgetbuddy.core.usecase.auth.LoginResult
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -85,19 +86,25 @@ class LoginViewModel @Inject constructor(
             return
         }
 
-        _loginState.value = LoginUiState.Loading // Set state to Loading before login attempt
+        // Set loading state immediately on the main thread
+        _loginState.value = LoginUiState.Loading
+        android.util.Log.d("LoginViewModel", "Setting loading state")
 
         viewModelScope.launch {
             try {
-                val result = loginUserUseCase(email, password) // Call the use case to perform login
-                // Update the state based on the result of the login attempt
+                // Add a longer delay to ensure loading state is visible
+                delay(300)
+                android.util.Log.d("LoginViewModel", "Starting login process")
+                val result = loginUserUseCase(email, password)
+                android.util.Log.d("LoginViewModel", "Login result: $result")
                 _loginState.value = when (result) {
-                    is LoginResult.Success -> LoginUiState.Success // If successful, show success
-                    is LoginResult.UserNotFound -> LoginUiState.Error("User not found") // User not found error
-                    is LoginResult.IncorrectPassword -> LoginUiState.Error("Incorrect password") // Incorrect password error
-                    is LoginResult.Error -> LoginUiState.Error(result.message) // General error with message
+                    is LoginResult.Success -> LoginUiState.Success
+                    is LoginResult.UserNotFound -> LoginUiState.Error("User not found")
+                    is LoginResult.IncorrectPassword -> LoginUiState.Error("Incorrect password")
+                    is LoginResult.Error -> LoginUiState.Error(result.message)
                 }
             } catch (e: Exception) {
+                android.util.Log.e("LoginViewModel", "Login error", e)
                 _loginState.value = LoginUiState.Error(e.localizedMessage ?: "Unknown error")
             }
         }

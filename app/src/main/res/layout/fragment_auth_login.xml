@@ -135,28 +135,12 @@
         android:textColor="@android:color/white"
         android:textSize="@dimen/button_text_size"
         app:cornerRadius="@dimen/button_corner_radius"
+        app:icon="@drawable/ic_loading"
+        app:iconGravity="textStart"
+        app:iconPadding="8dp"
+        app:iconTint="@android:color/white"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tilPassword" />
-
-    <!-- Loading Overlay -->
-    <FrameLayout
-        android:id="@+id/loadingOverlay"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="#80000000"
-        android:clickable="true"
-        android:focusable="true"
-        android:visibility="gone">
-
-        <com.google.android.material.progressindicator.CircularProgressIndicator
-            android:id="@+id/progressSpinner"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:indeterminate="true"
-            app:indicatorColor="@android:color/white"
-            app:trackColor="#4DFFFFFF" />
-    </FrameLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

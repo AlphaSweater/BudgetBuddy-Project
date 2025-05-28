@@ -28,11 +28,15 @@ import android.text.TextWatcher
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import com.google.android.material.snackbar.Snackbar
 import com.synaptix.budgetbuddy.R
 import com.synaptix.budgetbuddy.databinding.FragmentAuthLoginBinding
+import com.synaptix.budgetbuddy.presentation.ui.auth.AuthActivity
 import com.synaptix.budgetbuddy.presentation.ui.main.MainActivity
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class LoginFragment : Fragment(R.layout.fragment_auth_login) {
@@ -74,6 +78,7 @@ class LoginFragment : Fragment(R.layout.fragment_auth_login) {
 
     private fun observeViewModel() {
         viewModel.loginState.observe(viewLifecycleOwner) { state ->
+            android.util.Log.d("LoginFragment", "State changed to: $state")
             when (state) {
                 is LoginUiState.Idle -> {
                     showIdleState()
@@ -99,70 +104,60 @@ class LoginFragment : Fragment(R.layout.fragment_auth_login) {
         val email = binding.edtEmailAddress.text.toString()
         val password = binding.edtPassword.text.toString()
         
-        // Animate button press
+        android.util.Log.d("LoginFragment", "Performing login")
+        
+        // Show loading state immediately
+        showLoadingState()
+        
+        // Animate button press with a smoother animation
         binding.btnLogin.animate()
             .scaleX(0.95f)
             .scaleY(0.95f)
-            .setDuration(100)
+            .setDuration(150)
             .withEndAction {
                 binding.btnLogin.animate()
                     .scaleX(1f)
                     .scaleY(1f)
-                    .setDuration(100)
+                    .setDuration(150)
+                    .setInterpolator(android.view.animation.OvershootInterpolator())
+                    .withEndAction {
+                        android.util.Log.d("LoginFragment", "Button animation complete, starting login")
+                        viewModel.login(email, password)
+                    }
                     .start()
             }
             .start()
-
-        viewModel.login(email, password)
     }
 
     private fun showIdleState() {
-        binding.loadingOverlay.animate()
-            .alpha(0f)
-            .setDuration(200)
-            .withEndAction {
-                binding.loadingOverlay.visibility = View.GONE
-            }
-            .start()
+        binding.btnLogin.isEnabled = true
+        binding.btnLogin.icon = null
         enableInputs(true)
     }
 
     private fun showLoadingState() {
-        binding.loadingOverlay.visibility = View.VISIBLE
-        binding.loadingOverlay.alpha = 0f
-        binding.loadingOverlay.animate()
-            .alpha(1f)
-            .setDuration(200)
-            .start()
+        android.util.Log.d("LoginFragment", "Showing loading state")
+        binding.btnLogin.isEnabled = false
+        binding.btnLogin.icon = resources.getDrawable(R.drawable.ic_loading, null)
         enableInputs(false)
     }
 
     private fun showSuccessState() {
-        binding.loadingOverlay.animate()
-            .alpha(0f)
-            .setDuration(200)
-            .withEndAction {
-                binding.loadingOverlay.visibility = View.GONE
-                showSuccessMessage("Login successful")
-                // Navigate to main screen after successful login
-                val intent = Intent(requireContext(), MainActivity::class.java)
-                startActivity(intent)
-                requireActivity().finish()
-            }
-            .start()
+        android.util.Log.d("LoginFragment", "Showing success state")
+        viewLifecycleOwner.lifecycleScope.launch {
+            showSuccessMessage("Login successful")
+            delay(1000)
+            val intent = Intent(requireContext(), MainActivity::class.java)
+            startActivity(intent)
+            requireActivity().finish()
+        }
     }
 
     private fun showErrorState(message: String) {
-        binding.loadingOverlay.animate()
-            .alpha(0f)
-            .setDuration(200)
-            .withEndAction {
-                binding.loadingOverlay.visibility = View.GONE
-                enableInputs(true)
-                showErrorMessage(message)
-                viewModel.resetState()
-            }
-            .start()
+        android.util.Log.d("LoginFragment", "Showing error state: $message")
+        showIdleState()
+        showErrorMessage(message)
+        viewModel.resetState()
     }
 
     private fun createTextWatcher(onTextChanged: (Editable?) -> Unit): TextWatcher {
@@ -179,6 +174,7 @@ class LoginFragment : Fragment(R.layout.fragment_auth_login) {
         Snackbar.make(binding.root, message, Snackbar.LENGTH_SHORT)
             .setBackgroundTint(resources.getColor(R.color.success, null))
             .setTextColor(resources.getColor(android.R.color.white, null))
+            .setAnimationMode(Snackbar.ANIMATION_MODE_SLIDE)
             .show()
     }
 
@@ -186,6 +182,7 @@ class LoginFragment : Fragment(R.layout.fragment_auth_login) {
         Snackbar.make(binding.root, message, Snackbar.LENGTH_LONG)
             .setBackgroundTint(resources.getColor(R.color.error, null))
             .setTextColor(resources.getColor(android.R.color.white, null))
+            .setAnimationMode(Snackbar.ANIMATION_MODE_SLIDE)
             .setAction("Dismiss") { }
             .show()
     }
@@ -193,7 +190,6 @@ class LoginFragment : Fragment(R.layout.fragment_auth_login) {
     private fun enableInputs(enabled: Boolean) {
         binding.edtEmailAddress.isEnabled = enabled
         binding.edtPassword.isEnabled = enabled
-        binding.btnLogin.isEnabled = enabled
         binding.btnBackLogin.isEnabled = enabled
     }
 

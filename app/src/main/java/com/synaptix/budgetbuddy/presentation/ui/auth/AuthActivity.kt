@@ -23,6 +23,8 @@ package com.synaptix.budgetbuddy.presentation.ui.auth
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
+import android.widget.FrameLayout
 import androidx.appcompat.app.AppCompatActivity
 import com.synaptix.budgetbuddy.BuildConfig
 import com.synaptix.budgetbuddy.R
@@ -37,13 +39,11 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class AuthActivity : AppCompatActivity() {
 
-    // ViewBinding instance for activity_auth.xml
     private lateinit var binding: ActivityAuthBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Inflate layout using ViewBinding
         binding = ActivityAuthBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -51,10 +51,14 @@ class AuthActivity : AppCompatActivity() {
         val versionText = getString(R.string.version_format, version)
         binding.lblVersion.text = versionText
 
-
-        // Load the LandingFragment when activity starts (only if not restoring state)
         if (savedInstanceState == null) {
             supportFragmentManager.beginTransaction()
+                .setCustomAnimations(
+                    R.anim.slide_in_right,
+                    R.anim.slide_out_left,
+                    R.anim.slide_in_left,
+                    R.anim.slide_out_right
+                )
                 .replace(R.id.auth_fragment_container, LandingFragment())
                 .commit()
         }
@@ -63,14 +67,26 @@ class AuthActivity : AppCompatActivity() {
     // Function to display the LoginFragment when called
     fun showLogin() {
         supportFragmentManager.beginTransaction()
+            .setCustomAnimations(
+                R.anim.slide_in_right,
+                R.anim.slide_out_left,
+                R.anim.slide_in_left,
+                R.anim.slide_out_right
+            )
             .replace(R.id.auth_fragment_container, LoginFragment())
-            .addToBackStack(null) // Adds to backstack so user can press back
+            .addToBackStack(null)
             .commit()
     }
 
     // Function to display the SignupFragment when called
     fun showSignup() {
         supportFragmentManager.beginTransaction()
+            .setCustomAnimations(
+                R.anim.slide_in_right,
+                R.anim.slide_out_left,
+                R.anim.slide_in_left,
+                R.anim.slide_out_right
+            )
             .replace(R.id.auth_fragment_container, SignupFragment())
             .addToBackStack(null)
             .commit()
@@ -79,6 +95,12 @@ class AuthActivity : AppCompatActivity() {
     // Function to display WalletAddFragment for adding new wallet
     fun showAddWallet() {
         supportFragmentManager.beginTransaction()
+            .setCustomAnimations(
+                R.anim.slide_in_right,
+                R.anim.slide_out_left,
+                R.anim.slide_in_left,
+                R.anim.slide_out_right
+            )
             .replace(R.id.auth_fragment_container, WalletAddFragment())
             .addToBackStack(null)
             .commit()
@@ -87,6 +109,6 @@ class AuthActivity : AppCompatActivity() {
     // Function to navigate to MainActivity after successful login or signup
     fun goToMainActivity() {
         startActivity(Intent(this, MainActivity::class.java))
-        finish() // Closes AuthActivity so user can't return to login/signup
+        finish()
     }
 }
