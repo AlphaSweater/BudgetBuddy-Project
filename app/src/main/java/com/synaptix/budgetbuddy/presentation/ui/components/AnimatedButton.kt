@@ -61,7 +61,6 @@ class AnimatedButton @JvmOverloads constructor(
     private var originalTextStyle: Int = 0
 
     private val animationDuration = 300L
-    private val smallWidthDp = 48
     private val successScale = 1.05f
     private val errorScale = 0.95f
 
@@ -136,7 +135,8 @@ class AnimatedButton @JvmOverloads constructor(
         isAnimating = true
         button.isEnabled = false
 
-        val targetWidth = smallWidthDp.dpToPx()
+        // Use the current height as the target width to make it perfectly circular
+        val targetWidth = height
 
         // Animate shrink with easing
         animateWidth(originalWidth, targetWidth)
