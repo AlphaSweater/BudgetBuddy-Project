@@ -123,22 +123,23 @@
     </com.google.android.material.textfield.TextInputLayout>
 
     <!-- Login Button -->
-    <com.google.android.material.button.MaterialButton
+    <com.synaptix.budgetbuddy.presentation.ui.components.AnimatedButton
         android:id="@+id/btnLogin"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/margin_xlarge"
         android:layout_marginTop="32dp"
-        android:backgroundTint="?attr/bb_button"
         android:minHeight="@dimen/button_height"
+        android:textSize="@dimen/button_text_size"
         android:text="@string/login"
         android:textColor="@android:color/white"
-        android:textSize="@dimen/button_text_size"
-        app:cornerRadius="@dimen/button_corner_radius"
-        app:icon="@drawable/ic_loading"
-        app:iconGravity="textStart"
-        app:iconPadding="8dp"
-        app:iconTint="@android:color/white"
+        android:background="@drawable/bg_animated_button_background"
+        app:loadingText="Loading..."
+        app:successText="Done!"
+        app:originalText="LOGIN"
+        app:successBackground="@drawable/bg_animated_button_success_background"
+        app:originalTextColor="#FF5126"
+        app:successTextColor="#FFFFFF"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tilPassword" />

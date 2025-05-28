@@ -85,9 +85,6 @@ class SignupFragment : Fragment(R.layout.fragment_auth_signup) {
         val email = binding.edtEmailAddress.text.toString()
         val password = binding.edtPassword.text.toString()
 
-        // Show loading state
-        showLoadingState()
-
         // Check if email exists and proceed with signup
         lifecycleScope.launch {
             try {
@@ -131,13 +128,11 @@ class SignupFragment : Fragment(R.layout.fragment_auth_signup) {
 
     private fun showIdleState() {
         binding.btnSignup.isEnabled = true
-        binding.btnSignup.icon = null
         enableInputs(true)
     }
 
     private fun showLoadingState() {
         binding.btnSignup.isEnabled = false
-        binding.btnSignup.icon = resources.getDrawable(R.drawable.ic_loading, null)
         enableInputs(false)
     }
 

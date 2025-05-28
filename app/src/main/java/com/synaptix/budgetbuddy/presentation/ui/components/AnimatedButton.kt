@@ -1,109 +1,198 @@
 package com.synaptix.budgetbuddy.presentation.ui.components
 
+import android.animation.ObjectAnimator
+import android.animation.ValueAnimator
 import android.content.Context
+import android.graphics.Color
+import android.graphics.drawable.Drawable
+import android.os.Handler
+import android.os.Looper
 import android.util.AttributeSet
+import android.view.Gravity
+import android.view.View
+import android.view.ViewGroup
+import android.view.animation.AccelerateDecelerateInterpolator
+import android.view.animation.DecelerateInterpolator
+import android.widget.FrameLayout
+import android.widget.ProgressBar
 import androidx.appcompat.widget.AppCompatButton
+import androidx.core.content.ContextCompat.getColorStateList
+import com.synaptix.budgetbuddy.R
+import androidx.core.content.withStyledAttributes
 
 class AnimatedButton @JvmOverloads constructor(
     context: Context,
-    attrs: AttributeSet? = null,
-    defStyleAttr: Int = android.R.attr.buttonStyle
-) : AppCompatButton(context, attrs, defStyleAttr) {
+    attrs: AttributeSet? = null
+) : FrameLayout(context, attrs) {
+
+    private val button = AppCompatButton(context).apply {
+        isAllCaps = false
+        textSize = 16f
+        gravity = Gravity.CENTER
+    }
+    
+    private val progressBar = ProgressBar(context).apply {
+        visibility = GONE
+        isIndeterminate = true
+        indeterminateTintList = getColorStateList(context, android.R.color.white)
+        scaleX = 0.8f
+        scaleY = 0.8f
+    }
 
     private var isAnimating = false
+    private val handler = Handler(Looper.getMainLooper())
+    private var originalWidth = 0
 
-    private var loadingText: String = ""
-    private var successText: String = ""
-    private var loadingSpinner: Drawable? = null
-    private var successBackground: Drawable? = null
+    private var loadingText = "Loading..."
+    private var successText = "Success"
+    private var originalText = "Go"
+
     private var originalBackgroundDrawable: Drawable? = null
-    private var originalTextColorInt: Int = currentTextColor
-    private var successTextColorInt: Int = Color.WHITE
+    private var successBackground: Drawable? = null
+    private var originalTextColor = Color.WHITE
+    private var successTextColor = Color.WHITE
 
-    private val smallWidthDp = 50
     private val animationDuration = 300L
+    private val smallWidthDp = 48
+    private val successScale = 1.05f
 
     init {
-        // Load custom attrs if set
-        attrs?.let {
-            val a = context.obtainStyledAttributes(it, R.styleable.AnimatedButton, 0, 0)
+        // Inflate attributes
+        context.withStyledAttributes(attrs, R.styleable.AnimatedButton) {
+            loadingText = getString(R.styleable.AnimatedButton_loadingText) ?: loadingText
+            successText = getString(R.styleable.AnimatedButton_successText) ?: successText
+            originalText = getString(R.styleable.AnimatedButton_originalText) ?: originalText
 
-            loadingText = a.getString(R.styleable.AnimatedButton_loadingText) ?: ""
-            successText = a.getString(R.styleable.AnimatedButton_successText) ?: "Success"
+            originalBackgroundDrawable = getDrawable(R.styleable.AnimatedButton_originalBackground)
+            successBackground = getDrawable(R.styleable.AnimatedButton_successBackground)
 
-            loadingSpinner = a.getDrawable(R.styleable.AnimatedButton_loadingSpinner)
-            successBackground = a.getDrawable(R.styleable.AnimatedButton_successBackground)
-            originalBackgroundDrawable = a.getDrawable(R.styleable.AnimatedButton_originalBackground)
-
-            originalTextColorInt = a.getColor(R.styleable.AnimatedButton_originalTextColor, currentTextColor)
-            successTextColorInt = a.getColor(R.styleable.AnimatedButton_successTextColor, Color.WHITE)
-
-            a.recycle()
+            originalTextColor = getColor(R.styleable.AnimatedButton_originalTextColor, Color.WHITE)
+            successTextColor = getColor(R.styleable.AnimatedButton_successTextColor, Color.WHITE)
         }
 
-        if (originalBackgroundDrawable != null) {
+        // Style and configure button
+        button.apply {
+            text = originalText
             background = originalBackgroundDrawable
+            setTextColor(originalTextColor)
+            layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT)
+            setOnClickListener { if (!isAnimating) startLoading() }
+        }
+
+        // Center progress bar
+        val progressParams = LayoutParams(
+            LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT
+        ).apply {
+            gravity = Gravity.CENTER
+        }
+
+        addView(button)
+        addView(progressBar, progressParams)
+    }
+
+    override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
+        super.onSizeChanged(w, h, oldw, oldh)
+        if (originalWidth == 0) {
+            originalWidth = w
         }
     }
 
     fun startLoading() {
-        if (isAnimating) return
         isAnimating = true
-        isEnabled = false
+        button.isEnabled = false
 
-        // Save original width to restore later
-        val originalWidth = width.takeIf { it > 0 } ?: 100.dpToPx()
-        val smallWidth = smallWidthDp.dpToPx()
+        val targetWidth = smallWidthDp.dpToPx()
 
-        // Animate width shrink
-        animateWidth(originalWidth, smallWidth)
-        text = loadingText
-        setCompoundDrawablesWithIntrinsicBounds(null, null, loadingSpinner, null)
-        startSpinnerAnimation()
+        // Animate shrink with easing
+        animateWidth(originalWidth, targetWidth)
 
-        // Schedule success and reset
-        postDelayed({ showSuccess() }, 1600)
-        postDelayed({ reset(originalWidth) }, 2900)
+        // Hide text, show spinner with smooth transitions
+        button.animate()
+            .scaleX(0f)
+            .scaleY(0f)
+            .setDuration(animationDuration)
+            .setInterpolator(DecelerateInterpolator())
+            .withEndAction {
+                button.text = ""
+                progressBar.visibility = VISIBLE
+                progressBar.alpha = 0f
+                progressBar.animate()
+                    .alpha(1f)
+                    .scaleX(1f)
+                    .scaleY(1f)
+                    .setDuration(animationDuration)
+                    .setInterpolator(DecelerateInterpolator())
+                    .start()
+
+                handler.postDelayed({ showSuccess() }, 1600)
+                handler.postDelayed({ reset() }, 2900)
+            }.start()
     }
 
     private fun animateWidth(from: Int, to: Int) {
-        val animator = ValueAnimator.ofInt(from, to)
-        animator.addUpdateListener {
-            val value = it.animatedValue as Int
-            layoutParams.width = value
-            requestLayout()
-        }
-        animator.duration = animationDuration
-        animator.start()
-    }
-
-    private fun startSpinnerAnimation() {
-        val drawable = compoundDrawables[2] ?: return
-        ObjectAnimator.ofFloat(drawable, "rotation", 0f, 360f).apply {
-            duration = 300
-            repeatCount = ObjectAnimator.INFINITE
+        ValueAnimator.ofInt(from, to).apply {
+            duration = animationDuration
+            interpolator = DecelerateInterpolator()
+            addUpdateListener {
+                layoutParams.width = it.animatedValue as Int
+                requestLayout()
+            }
             start()
         }
     }
 
     private fun showSuccess() {
-        setCompoundDrawablesWithIntrinsicBounds(null, null, null, null)
-        background = successBackground ?: background
-        setTextColor(successTextColorInt)
-        text = successText
+        // First expand the button back to original width
+        animateWidth(width, originalWidth)
 
-        animate().scaleX(1.1f).scaleY(1.1f).setDuration(300).withEndAction {
-            animate().scaleX(1f).scaleY(1f).duration = 300
-        }.start()
+        // Hide progress bar
+        progressBar.animate()
+            .alpha(0f)
+            .setDuration(animationDuration)
+            .withEndAction {
+                progressBar.visibility = GONE
+            }.start()
+
+        // Transform button to success state
+        button.apply {
+            background = successBackground
+            setTextColor(successTextColor)
+            text = successText
+            isEnabled = false
+        }
+
+        // Animate the button
+        button.animate()
+            .scaleX(successScale)
+            .scaleY(successScale)
+            .setDuration(animationDuration)
+            .setInterpolator(AccelerateDecelerateInterpolator())
+            .withEndAction {
+                button.animate()
+                    .scaleX(1f)
+                    .scaleY(1f)
+                    .setDuration(animationDuration)
+                    .setInterpolator(DecelerateInterpolator())
+                    .start()
+            }.start()
     }
 
-    private fun reset(originalWidth: Int) {
+    internal fun reset() {
         animateWidth(width, originalWidth)
-        background = originalBackgroundDrawable ?: background
-        setTextColor(originalTextColorInt)
-        text = "Go" // or keep as original text if you want, can add another attribute
-        isEnabled = true
+        button.apply {
+            background = originalBackgroundDrawable
+            setTextColor(originalTextColor)
+            text = originalText
+            isEnabled = true
+            scaleX = 1f
+            scaleY = 1f
+        }
         isAnimating = false
+    }
+
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+        handler.removeCallbacksAndMessages(null)
     }
 
     private fun Int.dpToPx(): Int = (this * resources.displayMetrics.density).toInt()
