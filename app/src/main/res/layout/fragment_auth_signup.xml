@@ -169,6 +169,9 @@
         android:textColor="@android:color/white"
         android:textSize="@dimen/button_text_size"
         app:cornerRadius="@dimen/button_corner_radius"
+        app:iconGravity="textStart"
+        app:iconPadding="8dp"
+        app:iconTint="@android:color/white"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tilPasswordConfirm" />

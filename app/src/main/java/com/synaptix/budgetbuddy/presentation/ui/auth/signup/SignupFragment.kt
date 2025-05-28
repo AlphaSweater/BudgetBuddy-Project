@@ -85,21 +85,6 @@ class SignupFragment : Fragment(R.layout.fragment_auth_signup) {
         val email = binding.edtEmailAddress.text.toString()
         val password = binding.edtPassword.text.toString()
 
-        // Animate button press with a smoother animation
-        binding.btnSignup.animate()
-            .scaleX(0.95f)
-            .scaleY(0.95f)
-            .setDuration(150)
-            .withEndAction {
-                binding.btnSignup.animate()
-                    .scaleX(1f)
-                    .scaleY(1f)
-                    .setDuration(150)
-                    .setInterpolator(android.view.animation.OvershootInterpolator())
-                    .start()
-            }
-            .start()
-
         // Show loading state
         showLoadingState()
 
@@ -145,24 +130,24 @@ class SignupFragment : Fragment(R.layout.fragment_auth_signup) {
     }
 
     private fun showIdleState() {
-        (activity as? AuthActivity)?.showLoading(false)
+        binding.btnSignup.isEnabled = true
+        binding.btnSignup.icon = null
         enableInputs(true)
     }
 
     private fun showLoadingState() {
-        (activity as? AuthActivity)?.showLoading(true)
+        binding.btnSignup.isEnabled = false
+        binding.btnSignup.icon = resources.getDrawable(R.drawable.ic_loading, null)
         enableInputs(false)
     }
 
     private fun showSuccessState() {
-        (activity as? AuthActivity)?.showLoading(false)
         showSuccessMessage("Account created successfully!")
         (activity as? AuthActivity)?.showLogin()
     }
 
     private fun showErrorState(message: String) {
-        (activity as? AuthActivity)?.showLoading(false)
-        enableInputs(true)
+        showIdleState()
         showErrorMessage(message)
     }
 
@@ -197,7 +182,6 @@ class SignupFragment : Fragment(R.layout.fragment_auth_signup) {
         binding.edtEmailAddress.isEnabled = enabled
         binding.edtPassword.isEnabled = enabled
         binding.edtTxtPasswordConfirm.isEnabled = enabled
-        binding.btnSignup.isEnabled = enabled
         binding.btnBackSignup.isEnabled = enabled
     }
 

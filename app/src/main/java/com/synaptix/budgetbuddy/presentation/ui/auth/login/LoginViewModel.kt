@@ -92,8 +92,6 @@ class LoginViewModel @Inject constructor(
 
         viewModelScope.launch {
             try {
-                // Add a longer delay to ensure loading state is visible
-                delay(300)
                 android.util.Log.d("LoginViewModel", "Starting login process")
                 val result = loginUserUseCase(email, password)
                 android.util.Log.d("LoginViewModel", "Login result: $result")
