@@ -26,12 +26,17 @@ import com.synaptix.budgetbuddy.core.model.Transaction
 import com.synaptix.budgetbuddy.core.model.Result
 import com.synaptix.budgetbuddy.data.firebase.mapper.FirebaseMapper.toDTO
 import com.synaptix.budgetbuddy.data.firebase.repository.FirestoreTransactionRepository
+import com.synaptix.budgetbuddy.data.firebase.repository.FirestoreWalletRepository
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 // UseCase class for adding a new transaction
 class AddTransactionUseCase @Inject constructor(
     // Injecting the FirestoreTransactionRepository to handle transaction-related operations
-    private val repository: FirestoreTransactionRepository
+    private val transactionRepository: FirestoreTransactionRepository,
+    private val walletRepository: FirestoreWalletRepository
 ) {
     sealed class AddTransactionResult {
         data class Success(val transactionId: String) : AddTransactionResult()
@@ -40,26 +45,51 @@ class AddTransactionUseCase @Inject constructor(
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     // Executes the operation to add a new transaction
-    suspend fun execute(newTransaction: Transaction): AddTransactionResult {
+    fun execute(newTransaction: Transaction): Flow<AddTransactionResult> = flow {
+        try {
+            // Convert domain model to DTO using mapper
+            val newTransactionDTO = newTransaction.toDTO()
 
-        // Convert domain model to DTO using mapper
-        val newTransactionDTO = newTransaction.toDTO()
-
-        // Attempt to create the transaction
-        return try {
-            when (val result = repository.createTransaction(newTransactionDTO)) {
+            // Create the transaction
+            when (val result = transactionRepository.createTransaction(newTransaction.user.id, newTransactionDTO)) {
                 is Result.Success -> {
                     Log.d("AddTransactionUseCase", "Transaction added successfully: ${result.data}")
-                    AddTransactionResult.Success(result.data)
+                    // Update wallet balance
+                    updateWalletBalance(newTransaction)
+                    emit(AddTransactionResult.Success(result.data))
                 }
                 is Result.Error -> {
                     Log.e("AddTransactionUseCase", "Error adding transaction: ${result.exception.message}")
-                    AddTransactionResult.Error("Failed to add transaction: ${result.exception.message}")
+                    emit(AddTransactionResult.Error("Failed to add transaction: ${result.exception.message}"))
                 }
             }
         } catch (e: Exception) {
             Log.e("AddTransactionUseCase", "Exception while adding transaction: ${e.message}")
-            AddTransactionResult.Error("Failed to add transaction: ${e.message}")
+            emit(AddTransactionResult.Error("Failed to add transaction: ${e.message}"))
+        }
+    }
+
+    private suspend fun updateWalletBalance(transaction: Transaction) {
+        val walletDTO = transaction.wallet.toDTO()
+        val currentTime = System.currentTimeMillis()
+
+        val updatedBalance = when (transaction.category.type.uppercase()) {
+            "INCOME" -> walletDTO.balance + transaction.amount
+            else -> walletDTO.balance - transaction.amount
+        }
+
+        val updatedWalletDTO = walletDTO.copy(
+            balance = updatedBalance,
+            lastTransactionAt = currentTime
+        )
+
+        when (val result = walletRepository.updateWallet(transaction.user.id, updatedWalletDTO)) {
+            is Result.Success -> {
+                Log.d("AddTransactionUseCase", "Wallet balance updated successfully: ${result.data}")
+            }
+            is Result.Error -> {
+                Log.e("AddTransactionUseCase", "Error updating wallet balance: ${result.exception.message}")
+            }
         }
     }
 }

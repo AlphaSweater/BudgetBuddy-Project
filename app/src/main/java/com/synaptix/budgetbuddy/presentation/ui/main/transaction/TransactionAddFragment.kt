@@ -37,6 +37,7 @@ import com.synaptix.budgetbuddy.core.model.Wallet
 import com.synaptix.budgetbuddy.extentions.getThemeColor
 import kotlin.toString
 import com.synaptix.budgetbuddy.core.model.Label
+import kotlinx.coroutines.delay
 
 @AndroidEntryPoint
 class TransactionAddFragment : Fragment() {
@@ -50,6 +51,7 @@ class TransactionAddFragment : Fragment() {
     private lateinit var pickImageLauncher: ActivityResultLauncher<String>
     private var tempImageUri: Uri? = null
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     // --- Lifecycle ---
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -60,6 +62,8 @@ class TransactionAddFragment : Fragment() {
         return binding.root
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // --- Fragment Lifecycle ---
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupViews()
@@ -67,16 +71,19 @@ class TransactionAddFragment : Fragment() {
         observeViewModel()
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     override fun onResume() {
         super.onResume()
         restoreState()
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     // --- Setup Methods ---
     private fun setupViews() {
         setupCurrencySpinner()
@@ -84,6 +91,7 @@ class TransactionAddFragment : Fragment() {
         setupTextWatchers()
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private fun restoreState() {
         if (!viewModel.saveState.value!!) {
             reset()
@@ -97,6 +105,7 @@ class TransactionAddFragment : Fragment() {
         }
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     //Handles the setup of the currency spinner.
     private fun setupCurrencySpinner() {
         val adapter = ArrayAdapter(
@@ -109,6 +118,8 @@ class TransactionAddFragment : Fragment() {
         binding.spinnerCurrency.adapter = adapter
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    //Handles the setup of click listeners for various UI elements.
     private fun setupClickListeners() {
         with(binding) {
             btnGoBack.setOnClickListener {
@@ -149,6 +160,8 @@ class TransactionAddFragment : Fragment() {
         }
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    //Handles the setup of text watchers for input fields.
     private fun setupTextWatchers() {
         binding.edtTextAmount.doAfterTextChanged { text ->
             viewModel.setAmount(text.toString().toDoubleOrNull())
@@ -159,6 +172,8 @@ class TransactionAddFragment : Fragment() {
         }
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    //Handles the setup of image pickers for taking or selecting photos.
     private fun setupImagePickers() {
         takePictureLauncher = registerForActivityResult(ActivityResultContracts.TakePicture()) { success ->
             if (success && tempImageUri != null) {
@@ -180,6 +195,8 @@ class TransactionAddFragment : Fragment() {
         }
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // --- Image Handling ---
     private fun handleImageResult(uri: Uri) {
         try {
             requireContext().contentResolver.openInputStream(uri)?.use { inputStream ->
@@ -192,6 +209,8 @@ class TransactionAddFragment : Fragment() {
         }
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    //Handles showing the date picker dialog for selecting a date.
     private fun showDatePicker() {
         val picker = MaterialDatePicker.Builder.datePicker()
             .setTitleText("Select Date")
@@ -207,6 +226,8 @@ class TransactionAddFragment : Fragment() {
         picker.show(parentFragmentManager, "DATE_PICKER")
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    //Handles showing the image preview in a dialog.
     private fun showImagePreview(bytes: ByteArray?) {
         if (bytes == null) {
             binding.imagePreviewContainer.visibility = View.GONE
@@ -218,11 +239,16 @@ class TransactionAddFragment : Fragment() {
         binding.imagePreview.setImageBitmap(bitmap)
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    //Handles removing the selected photo from the transaction.
     private fun removePhoto() {
         viewModel.setImageBytes(null)
         binding.imagePreviewContainer.visibility = View.GONE
         binding.imagePreview.setImageBitmap(null)
     }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    //Handles showing the full-screen image in a dialog.
     private fun showFullScreenImage() {
         viewModel.imageBytes.value?.let { bytes ->
             val dialog = AlertDialog.Builder(requireContext(), R.style.FullScreenDialog)
@@ -246,6 +272,8 @@ class TransactionAddFragment : Fragment() {
         }
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    //Handles showing the dialog for selecting image source (camera or gallery).
     private fun showImageSourceDialog() {
         val options = arrayOf("Take Photo", "Choose from Gallery", "Cancel")
         AlertDialog.Builder(requireContext())
@@ -260,6 +288,8 @@ class TransactionAddFragment : Fragment() {
             .show()
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    //Handles launching the camera to take a photo.
     private fun launchCamera() {
         val contentValues = ContentValues().apply {
             put(MediaStore.Images.Media.DISPLAY_NAME, "transaction_${System.currentTimeMillis()}.jpg")
@@ -279,8 +309,8 @@ class TransactionAddFragment : Fragment() {
         }
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     // --- Update Methods ---
-
     private fun updateSelectedLabels(labels: List<Label>) {
         binding.chipGroupLabels.removeAllViews()
         
@@ -338,6 +368,7 @@ class TransactionAddFragment : Fragment() {
         binding.textSelectedRecurrenceRate.text = recurrence.toDisplayString()
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     // --- Save Logic ---
     private fun saveTransaction() {
         val amount = binding.edtTextAmount.text.toString().toDoubleOrNull()
@@ -358,17 +389,11 @@ class TransactionAddFragment : Fragment() {
         // Check if form is valid before proceeding
         if (!viewModel.validateForm()) return
 
-        // Launch coroutine to call suspend function
-        viewLifecycleOwner.lifecycleScope.launch {
-            try {
-                viewModel.addTransaction()
-                findNavController().popBackStack()
-            } catch (e: Exception) {
-                showError("Failed to save transaction: ${e.message}")
-            }
-        }
+        // Call addTransaction
+        viewModel.addTransaction()
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     // --- Popup Navigation ---
     private fun showLabelsSelector() {
         findNavController().navigate(R.id.action_transactionAddFragment_to_transactionSelectLabelFragment)
@@ -386,63 +411,110 @@ class TransactionAddFragment : Fragment() {
         findNavController().navigate(R.id.action_transactionAddFragment_to_transactionSelectRecurrenceFragment)
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     // --- Observers ---
     private fun observeViewModel() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.uiState.collect { state ->
-                    handleUiState(state)
+                // Collect UI state
+                launch {
+                    viewModel.uiState.collect { state ->
+                        handleUiState(state)
+                    }
                 }
-            }
-        }
 
-        viewModel.validationState.observe(viewLifecycleOwner) { state ->
-            handleValidationState(state)
-        }
-
-        viewModel.category.observe(viewLifecycleOwner) { category ->
-            updateSelectedCategory(category)
-        }
-
-        viewModel.wallet.observe(viewLifecycleOwner) { wallet ->
-            updateSelectedWallet(wallet)
-        }
-
-        viewModel.date.observe(viewLifecycleOwner) { date ->
-            updateSelectedDate(date.toString())
-        }
-
-        viewModel.recurrenceData.observe(viewLifecycleOwner) { rate ->
-            updateSelectedRecurrence(rate)
-        }
-
-        viewModel.selectedLabels.observe(viewLifecycleOwner) { labels ->
-            updateSelectedLabels(labels)
-        }
-
-        viewModel.imageBytes.observe(viewLifecycleOwner) { bytes ->
-            if (bytes != null) {
-                val bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
-                binding.imagePreview.apply {
-                    setImageBitmap(bitmap)
-                    visibility = View.VISIBLE
+                // Collect validation state
+                launch {
+                    viewModel.validationState.collect { state ->
+                        handleValidationState(state)
+                    }
                 }
-            } else {
-                binding.imagePreview.visibility = View.GONE
+
+                // Collect category
+                launch {
+                    viewModel.category.collect { category ->
+                        updateSelectedCategory(category)
+                    }
+                }
+
+                // Collect wallet
+                launch {
+                    viewModel.wallet.collect { wallet ->
+                        updateSelectedWallet(wallet)
+                    }
+                }
+
+                // Collect date
+                launch {
+                    viewModel.date.collect { date ->
+                        updateSelectedDate(date)
+                    }
+                }
+
+                // Collect recurrence data
+                launch {
+                    viewModel.recurrenceData.collect { rate ->
+                        updateSelectedRecurrence(rate)
+                    }
+                }
+
+                // Collect selected labels
+                launch {
+                    viewModel.selectedLabels.collect { labels ->
+                        updateSelectedLabels(labels)
+                    }
+                }
+
+                // Collect image bytes
+                launch {
+                    viewModel.imageBytes.collect { bytes ->
+                        if (bytes != null) {
+                            val bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
+                            binding.imagePreview.apply {
+                                setImageBitmap(bitmap)
+                                visibility = View.VISIBLE
+                            }
+                        } else {
+                            binding.imagePreview.visibility = View.GONE
+                        }
+                    }
+                }
+
+                // Collect save state
+                launch {
+                    viewModel.saveState.collect { shouldSave ->
+                        if (!shouldSave) {
+                            reset()
+                        }
+                    }
+                }
             }
         }
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // --- UI State Handlers ---
     private fun handleUiState(state: TransactionAddViewModel.UiState) {
         when (state) {
             is TransactionAddViewModel.UiState.Loading -> {
                 binding.btnSave.isEnabled = false
                 binding.loadingOverlay.visibility = View.VISIBLE
+                binding.progressBar.visibility = View.VISIBLE
+                binding.successCheckmark.visibility = View.GONE
+                binding.loadingText.text = "Saving transaction..."
             }
             is TransactionAddViewModel.UiState.Success -> {
-                binding.loadingOverlay.visibility = View.GONE
-                showSuccess("Transaction added successfully")
-                findNavController().popBackStack()
+                binding.progressBar.visibility = View.GONE
+                binding.successCheckmark.visibility = View.VISIBLE
+                binding.loadingText.text = "Transaction saved successfully!"
+                
+                // Add a slight delay before closing to show the success state
+                viewLifecycleOwner.lifecycleScope.launch {
+                    delay(1000) // Show success state for 1 second
+                    binding.loadingOverlay.visibility = View.GONE
+                    viewModel.reset()
+                    findNavController().popBackStack()
+                }
             }
             is TransactionAddViewModel.UiState.Error -> {
                 binding.btnSave.isEnabled = true
@@ -456,6 +528,8 @@ class TransactionAddFragment : Fragment() {
         }
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    //Handles the validation state and shows/hides error messages for each field.
     private fun handleValidationState(state: TransactionAddViewModel.ValidationState) {
         with(binding) {
             // Show/hide error messages for each field
@@ -486,18 +560,22 @@ class TransactionAddFragment : Fragment() {
         }
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private fun showError(message: String) {
         Snackbar.make(binding.root, message, Snackbar.LENGTH_SHORT)
             .setBackgroundTint(resources.getColor(R.color.error, null))
             .show()
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private fun showSuccess(message: String) {
         Snackbar.make(binding.root, message, Snackbar.LENGTH_SHORT)
             .setBackgroundTint(resources.getColor(R.color.success, null))
             .show()
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // Resets the form to its initial state
     private fun reset() {
         viewModel.reset()
         binding.apply {
@@ -506,3 +584,4 @@ class TransactionAddFragment : Fragment() {
         }
     }
 }
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~EOF~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\

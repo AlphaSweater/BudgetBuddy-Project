@@ -5,53 +5,51 @@ import com.google.firebase.firestore.ListenerRegistration
 import com.synaptix.budgetbuddy.core.model.Result
 import com.synaptix.budgetbuddy.data.firebase.model.LabelDTO
 import com.synaptix.budgetbuddy.data.firebase.model.TransactionDTO
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class FirestoreTransactionRepository @Inject constructor(
-    private val firestoreInstance: FirebaseFirestore
+    firestoreInstance: FirebaseFirestore
 ) : BaseFirestoreRepository<TransactionDTO>(firestoreInstance) {
     
-    override val collection = firestoreInstance.collection("transactions")
+    override val collection = firestoreInstance.collection("users")
+    override val subCollectionName = "transactions"
 
     override fun getType(): Class<TransactionDTO> = TransactionDTO::class.java
 
     // Create a new transaction
-    suspend fun createTransaction(transaction: TransactionDTO): Result<String> {
+    suspend fun createTransaction(userId: String, transaction: TransactionDTO): Result<String> {
         val newTransaction = transaction.copy(
             createdAt = System.currentTimeMillis(),
             updatedAt = System.currentTimeMillis()
         )
-        return create(newTransaction)
+        return create(newTransaction, userId)
     }
 
     // Update an existing transaction
-    suspend fun updateTransaction(transaction: TransactionDTO): Result<Unit> {
+    suspend fun updateTransaction(userId: String, transaction: TransactionDTO): Result<Unit> {
         val updatedTransaction = transaction.copy(updatedAt = System.currentTimeMillis())
-        return update(transaction.id, updatedTransaction)
+        return update(userId, transaction.id, updatedTransaction)
     }
 
     // Delete a transaction
-    suspend fun deleteTransaction(transactionId: String): Result<Unit> = delete(transactionId)
+    suspend fun deleteTransaction(userId: String, transactionId: String): Result<Unit> = 
+        delete(userId, transactionId)
 
     // Get a single transaction by ID
-    suspend fun getTransactionById(transactionId: String): Result<TransactionDTO?> {
-        return try {
-            val snapshot = collection.document(transactionId).get().await()
-            Result.Success(snapshot.toObject(TransactionDTO::class.java))
-        } catch (e: Exception) {
-            Result.Error(e)
-        }
-    }
+    suspend fun getTransactionById(userId: String, transactionId: String): Result<TransactionDTO?> =
+        getById(userId, transactionId)
 
-    // Get all transactions for a user based on userId
+    // Get all transactions for a user
     suspend fun getTransactionsForUser(userId: String): Result<List<TransactionDTO>> {
         return try {
-            val snapshot = createBaseQueryWithUserId(userId).get().await()
+            val snapshot = createBaseQuery(userId).get().await()
             val transactions = snapshot.documents.mapNotNull { 
-                it.toObject(TransactionDTO::class.java)
+                it.toObject(getType())
             }
             Result.Success(transactions)
         } catch (e: Exception) {
@@ -60,11 +58,14 @@ class FirestoreTransactionRepository @Inject constructor(
     }
 
     // Get transactions for a specific wallet
-    suspend fun getTransactionsForWallet(walletId: String): Result<List<TransactionDTO>> {
+    suspend fun getTransactionsForWallet(userId: String, walletId: String): Result<List<TransactionDTO>> {
         return try {
-            val snapshot = collection.whereEqualTo("walletId", walletId).get().await()
+            val snapshot = createBaseQuery(userId)
+                .whereEqualTo("walletId", walletId)
+                .get()
+                .await()
             val transactions = snapshot.documents.mapNotNull { 
-                it.toObject(TransactionDTO::class.java)
+                it.toObject(getType())
             }
             Result.Success(transactions)
         } catch (e: Exception) {
@@ -73,11 +74,14 @@ class FirestoreTransactionRepository @Inject constructor(
     }
 
     // Get transactions for a specific category
-    suspend fun getTransactionsForCategory(categoryId: String): Result<List<TransactionDTO>> {
+    suspend fun getTransactionsForCategory(userId: String, categoryId: String): Result<List<TransactionDTO>> {
         return try {
-            val snapshot = collection.whereEqualTo("categoryId", categoryId).get().await()
+            val snapshot = createBaseQuery(userId)
+                .whereEqualTo("categoryId", categoryId)
+                .get()
+                .await()
             val transactions = snapshot.documents.mapNotNull { 
-                it.toObject(TransactionDTO::class.java)
+                it.toObject(getType())
             }
             Result.Success(transactions)
         } catch (e: Exception) {
@@ -92,14 +96,14 @@ class FirestoreTransactionRepository @Inject constructor(
         endDate: Long
     ): Result<List<TransactionDTO>> {
         return try {
-            val snapshot = createBaseQueryWithUserId(userId)
+            val snapshot = createBaseQuery(userId)
                 .whereGreaterThanOrEqualTo("date", startDate)
                 .whereLessThanOrEqualTo("date", endDate)
                 .get()
                 .await()
 
             val transactions = snapshot.documents.mapNotNull { 
-                it.toObject(TransactionDTO::class.java)
+                it.toObject(getType())
             }
 
             Result.Success(transactions)
@@ -114,14 +118,14 @@ class FirestoreTransactionRepository @Inject constructor(
         startDate: Long,
         endDate: Long
     ): Result<Double> = try {
-        val snapshot = createBaseQueryWithUserId(userId)
+        val snapshot = createBaseQuery(userId)
             .whereGreaterThanOrEqualTo("date", startDate)
             .whereLessThanOrEqualTo("date", endDate)
             .get()
             .await()
 
         val total = snapshot.documents.sumOf { 
-            it.toObject(TransactionDTO::class.java)?.amount ?: 0.0
+            it.toObject(getType())?.amount ?: 0.0
         }
         Result.Success(total)
     } catch (e: Exception) {
@@ -135,7 +139,7 @@ class FirestoreTransactionRepository @Inject constructor(
         endDate: Long
     ): Result<List<TransactionDTO>> {
         return try {
-            val snapshot = createBaseQueryWithUserId(userId)
+            val snapshot = createBaseQuery(userId)
                 .whereGreaterThanOrEqualTo("date", startDate)
                 .whereLessThanOrEqualTo("date", endDate)
                 .orderBy("date", com.google.firebase.firestore.Query.Direction.DESCENDING)
@@ -143,7 +147,7 @@ class FirestoreTransactionRepository @Inject constructor(
                 .await()
 
             val transactions = snapshot.documents.mapNotNull { 
-                it.toObject(TransactionDTO::class.java)
+                it.toObject(getType())
             }
             Result.Success(transactions)
         } catch (e: Exception) {
@@ -153,12 +157,13 @@ class FirestoreTransactionRepository @Inject constructor(
 
     // Get transactions for a specific wallet within a date range
     suspend fun getTransactionsForWalletInDateRange(
+        userId: String,
         walletId: String,
         startDate: Long,
         endDate: Long
     ): Result<List<TransactionDTO>> {
         return try {
-            val snapshot = collection
+            val snapshot = createBaseQuery(userId)
                 .whereEqualTo("walletId", walletId)
                 .whereGreaterThanOrEqualTo("date", startDate)
                 .whereLessThanOrEqualTo("date", endDate)
@@ -167,7 +172,7 @@ class FirestoreTransactionRepository @Inject constructor(
                 .await()
 
             val transactions = snapshot.documents.mapNotNull { 
-                it.toObject(TransactionDTO::class.java)
+                it.toObject(getType())
             }
             Result.Success(transactions)
         } catch (e: Exception) {
@@ -177,12 +182,13 @@ class FirestoreTransactionRepository @Inject constructor(
 
     // Get transactions for a specific category within a date range
     suspend fun getTransactionsForCategoryInDateRange(
+        userId: String,
         categoryId: String,
         startDate: Long,
         endDate: Long
     ): Result<List<TransactionDTO>> {
         return try {
-            val snapshot = collection
+            val snapshot = createBaseQuery(userId)
                 .whereEqualTo("categoryId", categoryId)
                 .whereGreaterThanOrEqualTo("date", startDate)
                 .whereLessThanOrEqualTo("date", endDate)
@@ -191,7 +197,7 @@ class FirestoreTransactionRepository @Inject constructor(
                 .await()
 
             val transactions = snapshot.documents.mapNotNull { 
-                it.toObject(TransactionDTO::class.java)
+                it.toObject(getType())
             }
             Result.Success(transactions)
         } catch (e: Exception) {
@@ -201,11 +207,12 @@ class FirestoreTransactionRepository @Inject constructor(
 
     // Get total amount for a wallet in a date range
     suspend fun getTotalAmountForWalletInDateRange(
+        userId: String,
         walletId: String,
         startDate: Long,
         endDate: Long
     ): Result<Double> = try {
-        val snapshot = collection
+        val snapshot = createBaseQuery(userId)
             .whereEqualTo("walletId", walletId)
             .whereGreaterThanOrEqualTo("date", startDate)
             .whereLessThanOrEqualTo("date", endDate)
@@ -213,7 +220,7 @@ class FirestoreTransactionRepository @Inject constructor(
             .await()
 
         val total = snapshot.documents.sumOf { 
-            it.toObject(TransactionDTO::class.java)?.amount ?: 0.0
+            it.toObject(getType())?.amount ?: 0.0
         }
         Result.Success(total)
     } catch (e: Exception) {
@@ -222,11 +229,12 @@ class FirestoreTransactionRepository @Inject constructor(
 
     // Get total amount for a category in a date range
     suspend fun getTotalAmountForCategoryInDateRange(
+        userId: String,
         categoryId: String,
         startDate: Long,
         endDate: Long
     ): Result<Double> = try {
-        val snapshot = collection
+        val snapshot = createBaseQuery(userId)
             .whereEqualTo("categoryId", categoryId)
             .whereGreaterThanOrEqualTo("date", startDate)
             .whereLessThanOrEqualTo("date", endDate)
@@ -234,7 +242,7 @@ class FirestoreTransactionRepository @Inject constructor(
             .await()
 
         val total = snapshot.documents.sumOf { 
-            it.toObject(TransactionDTO::class.java)?.amount ?: 0.0
+            it.toObject(getType())?.amount ?: 0.0
         }
         Result.Success(total)
     } catch (e: Exception) {
@@ -242,11 +250,14 @@ class FirestoreTransactionRepository @Inject constructor(
     }
 
     // Get transactions by label IDs
-    suspend fun getTransactionsByLabels(labelIds: List<String>): Result<List<TransactionDTO>> {
+    suspend fun getTransactionsByLabels(userId: String, labelIds: List<String>): Result<List<TransactionDTO>> {
         return try {
-            val snapshot = collection.whereArrayContainsAny("labelIds", labelIds).get().await()
+            val snapshot = createBaseQuery(userId)
+                .whereArrayContainsAny("labelIds", labelIds)
+                .get()
+                .await()
             val transactions = snapshot.documents.mapNotNull { 
-                it.toObject(TransactionDTO::class.java)
+                it.toObject(getType())
             }
             Result.Success(transactions)
         } catch (e: Exception) {
@@ -255,9 +266,9 @@ class FirestoreTransactionRepository @Inject constructor(
     }
 
     // Get transactions by search term (searches in note field)
-    suspend fun searchTransactions(searchTerm: String): Result<List<TransactionDTO>> {
+    suspend fun searchTransactions(userId: String, searchTerm: String): Result<List<TransactionDTO>> {
         return try {
-            val snapshot = collection
+            val snapshot = createBaseQuery(userId)
                 .orderBy("note")
                 .startAt(searchTerm)
                 .endAt(searchTerm + "\uf8ff")
@@ -265,7 +276,7 @@ class FirestoreTransactionRepository @Inject constructor(
                 .await()
 
             val transactions = snapshot.documents.mapNotNull { 
-                it.toObject(TransactionDTO::class.java)
+                it.toObject(getType())
             }
             Result.Success(transactions)
         } catch (e: Exception) {
@@ -274,11 +285,14 @@ class FirestoreTransactionRepository @Inject constructor(
     }
 
     // Get recurring transactions
-    suspend fun getRecurringTransactions(): Result<List<TransactionDTO>> {
+    suspend fun getRecurringTransactions(userId: String): Result<List<TransactionDTO>> {
         return try {
-            val snapshot = collection.whereEqualTo("isRecurring", true).get().await()
+            val snapshot = createBaseQuery(userId)
+                .whereEqualTo("isRecurring", true)
+                .get()
+                .await()
             val transactions = snapshot.documents.mapNotNull { 
-                it.toObject(TransactionDTO::class.java)
+                it.toObject(getType())
             }
             Result.Success(transactions)
         } catch (e: Exception) {
@@ -287,19 +301,69 @@ class FirestoreTransactionRepository @Inject constructor(
     }
 
     // Get transactions that need to be processed (for recurring transactions)
-    suspend fun getTransactionsToProcess(): Result<List<TransactionDTO>> = try {
+    suspend fun getTransactionsToProcess(userId: String): Result<List<TransactionDTO>> = try {
         val currentTime = System.currentTimeMillis()
-        val snapshot = collection
+        val snapshot = createBaseQuery(userId)
             .whereEqualTo("isRecurring", true)
             .whereLessThanOrEqualTo("nextOccurrence", currentTime)
             .get()
             .await()
 
         val transactions = snapshot.documents.mapNotNull { 
-            it.toObject(TransactionDTO::class.java)
+            it.toObject(getType())
         }
         Result.Success(transactions)
     } catch (e: Exception) {
         Result.Error(e)
+    }
+
+    // Real-time listeners
+    fun observeTransactionsForUser(userId: String): Flow<List<TransactionDTO>> {
+        return observeCollection(userId, createBaseQuery(userId))
+    }
+
+    fun observeTransactionsForWallet(userId: String, walletId: String): Flow<List<TransactionDTO>> {
+        val query = createBaseQuery(userId)
+            .whereEqualTo("walletId", walletId)
+        return observeCollection(userId, query)
+    }
+
+    fun observeTransactionsForCategory(userId: String, categoryId: String): Flow<List<TransactionDTO>> {
+        val query = createBaseQuery(userId)
+            .whereEqualTo("categoryId", categoryId)
+        return observeCollection(userId, query)
+    }
+
+    fun observeTransactionsInDateRange(
+        userId: String,
+        startDate: Long,
+        endDate: Long
+    ): Flow<List<TransactionDTO>> {
+        val query = createBaseQuery(userId)
+            .whereGreaterThanOrEqualTo("date", startDate)
+            .whereLessThanOrEqualTo("date", endDate)
+            .orderBy("date", com.google.firebase.firestore.Query.Direction.DESCENDING)
+        return observeCollection(userId, query)
+    }
+
+    fun observeTotalAmountInDateRange(
+        userId: String,
+        startDate: Long,
+        endDate: Long
+    ): Flow<Double> {
+        return observeTransactionsInDateRange(userId, startDate, endDate)
+            .map { transactions ->
+                transactions.sumOf { it.amount }
+            }
+    }
+
+    fun observeRecurringTransactions(userId: String): Flow<List<TransactionDTO>> {
+        val query = createBaseQuery(userId)
+            .whereEqualTo("isRecurring", true)
+        return observeCollection(userId, query)
+    }
+
+    fun observeTransaction(userId: String, transactionId: String): Flow<TransactionDTO?> {
+        return observeDocument(userId, transactionId)
     }
 } 

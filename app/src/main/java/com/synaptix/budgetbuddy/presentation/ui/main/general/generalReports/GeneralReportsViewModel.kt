@@ -23,11 +23,24 @@ class GeneralReportsViewModel @Inject constructor(
 
     val transactions: LiveData<List<Transaction>> = _transactions
 
-    fun loadTransactions(userId: Int) {
+    fun loadTransactions() {
         viewModelScope.launch {
             val userId = getUserIdUseCase.execute()
             val result = getTransactionsUseCase.execute(userId)
-//            _transactions.postValue(result)
+
+            when (result) {
+                is GetTransactionsUseCase.GetTransactionsResult.Success -> {
+                    val transactionList = result.transactions
+                    _transactions.postValue(transactionList)
+                }
+                is GetTransactionsUseCase.GetTransactionsResult.Error -> {
+                    // Handle error here, e.g., show message or log
+                    // You could clear the list or keep previous value
+                    _transactions.postValue(emptyList()) // or keep old list
+                }
+            }
+        }
+
 //
 //
 //            val categoryGroups = result.groupBy { it.category?.categoryName ?: "Uncategorized" }
@@ -51,4 +64,3 @@ class GeneralReportsViewModel @Inject constructor(
 //            reportCategoryItems.postValue(items)
         }
     }
-}

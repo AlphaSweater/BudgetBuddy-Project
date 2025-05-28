@@ -64,6 +64,7 @@
     <!-- Global colour -->
     <color name="profit_green">#25c290</color>
     <color name="expense_red">#fb6569</color>
+    <color name="info_blue">#3BA0FF</color>
     <color name="button">#6b509a</color>
     <color name="error">#ff0000</color>
     <color name="success">#28a745</color>

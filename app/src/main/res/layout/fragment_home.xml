@@ -88,6 +88,16 @@
                 android:textSize="16sp"/>
         </LinearLayout>
 
+        <com.github.mikephil.charting.charts.BarChart
+            android:id="@+id/barChart"
+            android:layout_width="match_parent"
+            android:layout_height="300dp"
+            android:layout_margin="16dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/cardTotalBalance"
+            />
+
+
         <!-- Wallets Section -->
         <TextView
             android:id="@+id/textView3"
@@ -100,7 +110,7 @@
             android:textSize="18sp"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/cardTotalBalance" />
+            app:layout_constraintTop_toBottomOf="@+id/barChart" />
 
         <TextView
             android:id="@+id/txtViewAllWallets"
@@ -129,6 +139,14 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
+                <ProgressBar
+                    android:id="@+id/progressBarWallets"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:padding="32dp"
+                    android:visibility="gone"/>
+
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/recyclerViewHomeWalletOverview"
                     android:layout_width="match_parent"
@@ -138,7 +156,7 @@
                     android:visibility="gone"
                     tools:visibility="visible"
                     tools:itemCount="2"
-                    tools:listitem="@layout/item_home_wallet"/>
+                    tools:listitem="@layout/item_wallet_main"/>
 
                 <TextView
                     android:id="@+id/txtEmptyWallets"
@@ -148,10 +166,20 @@
                     android:padding="32dp"
                     android:text="No wallets added yet"
                     android:textColor="?attr/bb_secondaryText"
-                    android:visibility="visible"/>
+                    android:visibility="gone"
+                    tools:visibility="visible"/>
 
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
+
+        <com.github.mikephil.charting.charts.PieChart
+            android:id="@+id/pieChart"
+            android:layout_width="match_parent"
+            android:layout_height="300dp"
+            android:layout_marginTop="16dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/materialCardView"/>
+
 
         <!-- Categories Section -->
         <TextView
@@ -165,7 +193,7 @@
             android:textSize="18sp"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/materialCardView" />
+            app:layout_constraintTop_toBottomOf="@+id/pieChart" />
 
         <TextView
             android:id="@+id/txtViewAllCategories"
@@ -193,6 +221,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
+
+                <ProgressBar
+                    android:id="@+id/progressBarCategories"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:padding="32dp"
+                    android:visibility="gone"/>
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/recyclerViewHomeCategoryOverview"
@@ -258,6 +294,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
+
+                <ProgressBar
+                    android:id="@+id/progressBarTransactions"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:padding="32dp"
+                    android:visibility="gone"/>
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/recyclerViewHomeTransactionOverview"

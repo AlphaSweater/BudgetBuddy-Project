@@ -88,6 +88,8 @@ dependencies {
     implementation(libs.firebase.storage.ktx)
     implementation(libs.firebase.firestore.ktx)
 
+    //Graphs
+    implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
     // Imgur dependencies
     implementation(libs.okhttp)
     implementation(libs.moshi)

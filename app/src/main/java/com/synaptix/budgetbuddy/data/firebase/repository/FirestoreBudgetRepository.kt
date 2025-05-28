@@ -5,6 +5,8 @@ import com.google.firebase.firestore.Source
 import com.synaptix.budgetbuddy.core.model.Result
 import com.synaptix.budgetbuddy.data.firebase.model.BudgetDTO
 import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -14,44 +16,40 @@ class FirestoreBudgetRepository @Inject constructor(
     private val categoryRepository: FirestoreCategoryRepository
 ) : BaseFirestoreRepository<BudgetDTO>(firestore) {
     
-    override val collection = firestore.collection("budgets")
+    override val collection = firestore.collection("users")
+    override val subCollectionName = "budgets"
 
     override fun getType(): Class<BudgetDTO> = BudgetDTO::class.java
 
     // Create a new budget
-    suspend fun createBudget(budget: BudgetDTO): Result<String> {
+    suspend fun createBudget(userId: String, budget: BudgetDTO): Result<String> {
         val newBudget = budget.copy(
             createdAt = System.currentTimeMillis(),
             updatedAt = System.currentTimeMillis()
         )
-        return create(newBudget)
+        return create(newBudget, userId)
     }
 
     // Update an existing budget
-    suspend fun updateBudget(budget: BudgetDTO): Result<Unit> {
+    suspend fun updateBudget(userId: String, budget: BudgetDTO): Result<Unit> {
         val updatedBudget = budget.copy(updatedAt = System.currentTimeMillis())
-        return update(budget.id, updatedBudget)
+        return update(userId, budget.id, updatedBudget)
     }
 
     // Delete a budget
-    suspend fun deleteBudget(budgetId: String): Result<Unit> = delete(budgetId)
+    suspend fun deleteBudget(userId: String, budgetId: String): Result<Unit> = 
+        delete(userId, budgetId)
 
     // Get a single budget by ID with its categories
-    suspend fun getBudgetById(budgetId: String): Result<BudgetDTO?> {
-        return try {
-            val snapshot = collection.document(budgetId).get().await()
-            Result.Success(snapshot.toObject(BudgetDTO::class.java))
-        } catch (e: Exception) {
-            Result.Error(e)
-        }
-    }
+    suspend fun getBudgetById(userId: String, budgetId: String): Result<BudgetDTO?> =
+        getById(userId, budgetId)
 
     // Get all budgets for a user with their categories
     suspend fun getBudgetsForUser(userId: String): Result<List<BudgetDTO>> {
         return try {
-            val snapshot = collection.whereEqualTo("userId", userId).get().await()
+            val snapshot = createBaseQuery(userId).get().await()
             val budgets = snapshot.documents.mapNotNull { 
-                it.toObject(BudgetDTO::class.java)
+                it.toObject(getType())
             }
             Result.Success(budgets)
         } catch (e: Exception) {
@@ -62,14 +60,13 @@ class FirestoreBudgetRepository @Inject constructor(
     // Get active budgets for a user with their categories
     suspend fun getActiveBudgetsForUser(userId: String): Result<List<BudgetDTO>> {
         return try {
-            val snapshot = collection
-                .whereEqualTo("userId", userId)
+            val snapshot = createBaseQuery(userId)
                 .whereEqualTo("isActive", true)
                 .get()
                 .await()
             
             val budgets = snapshot.documents.mapNotNull { 
-                it.toObject(BudgetDTO::class.java)
+                it.toObject(getType())
             }
             Result.Success(budgets)
         } catch (e: Exception) {
@@ -79,15 +76,14 @@ class FirestoreBudgetRepository @Inject constructor(
 
     suspend fun getBudgetsByPeriod(userId: String, startDate: Long, endDate: Long): Result<List<BudgetDTO>> {
         return try {
-            val snapshot = collection
-                .whereEqualTo("userId", userId)
+            val snapshot = createBaseQuery(userId)
                 .whereGreaterThanOrEqualTo("startDate", startDate)
                 .whereLessThanOrEqualTo("startDate", endDate)
                 .get()
                 .await()
             
             val budgets = snapshot.documents.mapNotNull { 
-                it.toObject(BudgetDTO::class.java)
+                it.toObject(getType())
             }
             Result.Success(budgets)
         } catch (e: Exception) {
@@ -96,17 +92,18 @@ class FirestoreBudgetRepository @Inject constructor(
     }
 
     // Update budget spent amount
-    suspend fun updateBudgetSpent(budgetId: String, amount: Double): Result<Unit> {
+    suspend fun updateBudgetSpent(userId: String, budgetId: String, amount: Double): Result<Unit> {
         return try {
-            val budget = collection.document(budgetId).get().await()
-                .toObject(BudgetDTO::class.java)
-                ?: return Result.Error(Exception("Budget not found"))
+            val budget = when (val result = getBudgetById(userId, budgetId)) {
+                is Result.Success -> result.data
+                is Result.Error -> return Result.Error(result.exception)
+            }
 
-            val updatedBudget = budget.copy(
+            val updatedBudget = budget!!.copy(
                 spent = amount,
                 updatedAt = System.currentTimeMillis()
             )
-            update(budgetId, updatedBudget)
+            update(userId, budgetId, updatedBudget)
         } catch (e: Exception) {
             Result.Error(e)
         }
@@ -119,14 +116,13 @@ class FirestoreBudgetRepository @Inject constructor(
     // Get total budget amount for a user
     suspend fun getTotalBudgetAmountForUser(userId: String): Result<Double> {
         return try {
-            val snapshot = collection
-                .whereEqualTo("userId", userId)
+            val snapshot = createBaseQuery(userId)
+                .whereEqualTo("isActive", true)
                 .get()
                 .await()
 
             val total = snapshot.documents
-                .mapNotNull { it.toObject(BudgetDTO::class.java) }
-                .filter { it.isActive }
+                .mapNotNull { it.toObject(getType()) }
                 .sumOf { it.amount }
 
             Result.Success(total)
@@ -138,19 +134,49 @@ class FirestoreBudgetRepository @Inject constructor(
     // Get total spent amount for a user
     suspend fun getTotalSpentAmountForUser(userId: String): Result<Double> {
         return try {
-            val snapshot = collection
-                .whereEqualTo("userId", userId)
+            val snapshot = createBaseQuery(userId)
+                .whereEqualTo("isActive", true)
                 .get()
                 .await()
 
             val total = snapshot.documents
-                .mapNotNull { it.toObject(BudgetDTO::class.java) }
-                .filter { it.isActive }
+                .mapNotNull { it.toObject(getType()) }
                 .sumOf { it.spent }
 
             Result.Success(total)
         } catch (e: Exception) {
             Result.Error(e)
         }
+    }
+
+    // Real-time listeners
+    fun observeBudgetsForUser(userId: String): Flow<List<BudgetDTO>> {
+        return observeCollection(userId, createBaseQuery(userId))
+    }
+
+    fun observeActiveBudgetsForUser(userId: String): Flow<List<BudgetDTO>> {
+        val query = createBaseQuery(userId)
+            .whereEqualTo("isActive", true)
+        return observeCollection(userId, query)
+    }
+
+    fun observeBudget(userId: String, budgetId: String): Flow<BudgetDTO?> {
+        return observeDocument(userId, budgetId)
+    }
+
+    fun observeTotalBudgetAmount(userId: String): Flow<Double> {
+        return observeCollection(userId, createBaseQuery(userId))
+            .map { budgets ->
+                budgets.filter { it.isActive }
+                    .sumOf { it.amount }
+            }
+    }
+
+    fun observeTotalSpentAmount(userId: String): Flow<Double> {
+        return observeCollection(userId, createBaseQuery(userId))
+            .map { budgets ->
+                budgets.filter { it.isActive }
+                    .sumOf { it.spent }
+            }
     }
 } 
