@@ -5,8 +5,8 @@
         <shape android:shape="rectangle">
             <gradient
                 android:angle="45"
-                android:endColor="?attr/bb_button"
-                android:startColor="?attr/bb_button"
+                android:startColor="#6B509A"
+                android:endColor="#8E62DC"
                 android:type="linear" />
             <corners android:radius="@dimen/button_corner_radius" />
         </shape>

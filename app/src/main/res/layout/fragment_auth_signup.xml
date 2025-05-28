@@ -157,23 +157,28 @@
     </com.google.android.material.textfield.TextInputLayout>
 
     <!-- Sign Up Button -->
-    <com.google.android.material.button.MaterialButton
+    <com.synaptix.budgetbuddy.presentation.ui.components.AnimatedButton
         android:id="@+id/btnSignup"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="@dimen/button_height"
         android:layout_marginHorizontal="@dimen/margin_xlarge"
         android:layout_marginTop="32dp"
-        android:backgroundTint="?attr/bb_button"
-        android:minHeight="@dimen/button_height"
-        android:text="@string/signupText"
-        android:textColor="@android:color/white"
+        android:paddingBottom="0dp"
         android:textSize="@dimen/button_text_size"
-        app:cornerRadius="@dimen/button_corner_radius"
-        app:iconGravity="textStart"
-        app:iconPadding="8dp"
-        app:iconTint="@android:color/white"
+        android:text="@string/signupText"
+        app:loadingText="Loading..."
+        app:successText="Success!"
+        app:errorText="Try Again"
+        app:originalText="SIGN UP"
+        app:originalBackground="@drawable/bg_modern_button_background"
+        app:successBackground="@drawable/bg_animated_button_success_background"
+        app:errorBackground="@drawable/bg_animated_button_error_background"
+        app:originalTextColor="?attr/bb_buttonText"
+        app:successTextColor="?attr/bb_buttonText"
+        app:errorTextColor="?attr/bb_buttonText"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tilPasswordConfirm" />
+        app:layout_constraintTop_toBottomOf="@+id/tilPasswordConfirm"
+        android:clickable="true"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -56,23 +56,42 @@ class LoginFragment : Fragment(R.layout.fragment_auth_login) {
     private fun setupViews() {
         // Add text change listeners for real-time validation
         binding.edtEmailAddress.addTextChangedListener(createTextWatcher { text ->
-            binding.tilEmail.error = viewModel.validateEmail(text.toString())
+            // Clear error when user starts typing
+            binding.tilEmail.error = null
         })
 
         binding.edtPassword.addTextChangedListener(createTextWatcher { text ->
-            binding.tilPassword.error = viewModel.validatePassword(text.toString())
+            // Clear error when user starts typing
+            binding.tilPassword.error = null
         })
+
+        // Add focus change listeners to validate on focus loss
+        binding.edtEmailAddress.setOnFocusChangeListener { _, hasFocus ->
+            if (!hasFocus) {
+                binding.tilEmail.error = viewModel.validateEmail(binding.edtEmailAddress.text.toString())
+            }
+        }
+
+        binding.edtPassword.setOnFocusChangeListener { _, hasFocus ->
+            if (!hasFocus) {
+                binding.tilPassword.error = viewModel.validatePassword(binding.edtPassword.text.toString())
+            }
+        }
 
         // Handle login button click with animation
         binding.btnLogin.setOnClickListener {
             val email = binding.edtEmailAddress.text.toString()
             val password = binding.edtPassword.text.toString()
             
-            if (viewModel.validateInputs(email, password)) {
-                viewModel.login(email, password)
-            } else {
+            // Validate first
+            if (!viewModel.validateInputs(email, password)) {
                 binding.btnLogin.showError()
+                return@setOnClickListener
             }
+            
+            // Only start loading if validation passes
+            binding.btnLogin.startLoading()
+            viewModel.login(email, password)
         }
 
         // Handle back button click
@@ -139,7 +158,7 @@ class LoginFragment : Fragment(R.layout.fragment_auth_login) {
     private fun enableInputs(enabled: Boolean) {
         binding.edtEmailAddress.isEnabled = enabled
         binding.edtPassword.isEnabled = enabled
-        binding.btnBackLogin.isEnabled = enabled
+        binding.btnLogin.isEnabled = enabled
     }
 
     private fun createTextWatcher(onTextChanged: (Editable?) -> Unit): TextWatcher {

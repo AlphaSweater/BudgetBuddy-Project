@@ -4,6 +4,7 @@ import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.Color
+import android.graphics.Typeface
 import android.graphics.drawable.Drawable
 import android.os.Handler
 import android.os.Looper
@@ -28,7 +29,7 @@ class AnimatedButton @JvmOverloads constructor(
 
     private val button = AppCompatButton(context).apply {
         isAllCaps = false
-        textSize = 16f
+        textSize = 18f
         gravity = Gravity.CENTER
         elevation = 4f
     }
@@ -48,7 +49,7 @@ class AnimatedButton @JvmOverloads constructor(
     private var loadingText = "Loading..."
     private var successText = "Success"
     private var errorText = "Error"
-    private var originalText = "Login"
+    private var originalText = "Go"
 
     private var originalBackgroundDrawable: Drawable? = null
     private var successBackground: Drawable? = null
@@ -56,6 +57,8 @@ class AnimatedButton @JvmOverloads constructor(
     private var originalTextColor = Color.WHITE
     private var successTextColor = Color.WHITE
     private var errorTextColor = Color.WHITE
+
+    private var originalTextStyle: Int = 0
 
     private val animationDuration = 300L
     private val smallWidthDp = 48
@@ -80,12 +83,16 @@ class AnimatedButton @JvmOverloads constructor(
             originalTextColor = getColor(R.styleable.AnimatedButton_originalTextColor, Color.WHITE)
             successTextColor = getColor(R.styleable.AnimatedButton_successTextColor, Color.WHITE)
             errorTextColor = getColor(R.styleable.AnimatedButton_errorTextColor, Color.WHITE)
+
+            originalTextStyle = getInt(R.styleable.AnimatedButton_originalTextStyle, Typeface.NORMAL)
         }
 
         // Style and configure button
         button.apply {
             text = originalText
+            typeface = Typeface.defaultFromStyle(originalTextStyle)
             background = originalBackgroundDrawable
+            setTypeface(typeface, Typeface.BOLD)
             setTextColor(originalTextColor)
             layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT)
         }
@@ -117,14 +124,15 @@ class AnimatedButton @JvmOverloads constructor(
     override fun setOnClickListener(l: OnClickListener?) {
         button.setOnClickListener { 
             if (!isAnimating) {
-                startLoading()
                 l?.onClick(this)
             }
         }
     }
 
-    // Make startLoading private since it's now handled internally
-    private fun startLoading() {
+    // Make startLoading public since we need to call it after validation
+    fun startLoading() {
+        if (isAnimating) return // Prevent multiple starts
+        
         isAnimating = true
         button.isEnabled = false
 
@@ -198,42 +206,49 @@ class AnimatedButton @JvmOverloads constructor(
     }
 
     fun showError() {
-        // Step 1: Restore original width first
-        animateWidth(width, originalWidth)
+        // Add a small delay to allow ripple effect to complete
+        handler.postDelayed({
+            // Step 1: Restore original width first
+            animateWidth(width, originalWidth)
 
-        // Step 2: Hide progress bar with animation
-        progressBar.animate()
-            .alpha(0f)
-            .setDuration(animationDuration)
-            .withEndAction {
-                progressBar.visibility = GONE
+            // Step 2: Hide progress bar with animation
+            progressBar.animate()
+                .alpha(0f)
+                .setDuration(animationDuration)
+                .withEndAction {
+                    progressBar.visibility = GONE
 
-                // Step 3: Apply error state
-                button.apply {
-                    gravity = Gravity.CENTER
-                    setPadding(0, 0, 0, 0)
-                    scaleX = 1f
-                    scaleY = 1f
-                    background = errorBackground ?: originalBackgroundDrawable
-                    setTextColor(errorTextColor)
-                    text = errorText
-                    isEnabled = true
-                }
+                    // Step 3: Apply error state
+                    button.apply {
+                        gravity = Gravity.CENTER
+                        setPadding(0, 0, 0, 0)
+                        scaleX = 1f
+                        scaleY = 1f
+                        background = errorBackground ?: originalBackgroundDrawable
+                        setTextColor(errorTextColor)
+                        text = errorText
+                        isEnabled = true
+                    }
 
-                // Step 4: Animate error shake
-                button.animate()
-                    .scaleX(errorScale)
-                    .scaleY(errorScale)
-                    .setDuration(animationDuration / 2)
-                    .withEndAction {
-                        button.animate()
-                            .scaleX(1f)
-                            .scaleY(1f)
-                            .setDuration(animationDuration / 2)
-                            .setInterpolator(OvershootInterpolator())
-                            .start()
-                    }.start()
-            }.start()
+                    // Step 4: Animate error shake
+                    button.animate()
+                        .scaleX(errorScale)
+                        .scaleY(errorScale)
+                        .setDuration(animationDuration / 2)
+                        .withEndAction {
+                            button.animate()
+                                .scaleX(1f)
+                                .scaleY(1f)
+                                .setDuration(animationDuration / 2)
+                                .setInterpolator(OvershootInterpolator())
+                                .withEndAction {
+                                    // Reset animation state after error animation completes
+                                    isAnimating = false
+                                }
+                                .start()
+                        }.start()
+                }.start()
+        }, 130) // 150ms delay to allow ripple to complete
     }
 
     // Make reset public for error handling
