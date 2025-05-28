@@ -91,7 +91,6 @@ class GeneralReportsFragment : Fragment() {
      */
     private val expenseAdapter by lazy {
         GeneralReportAdapter(
-            onTransactionClick = { transaction -> navigateToTransactionDetails(transaction) },
             onCategoryClick = { category -> navigateToCategoryDetails(category) }
         )
     }
@@ -102,7 +101,6 @@ class GeneralReportsFragment : Fragment() {
      */
     private val incomeAdapter by lazy {
         GeneralReportAdapter(
-            onTransactionClick = { transaction -> navigateToTransactionDetails(transaction) },
             onCategoryClick = { category -> navigateToCategoryDetails(category) }
         )
     }
@@ -190,7 +188,7 @@ class GeneralReportsFragment : Fragment() {
                             when (state) {
                                 is GeneralReportsViewModel.TransactionState.Success -> {
                                     setupLineChart(state.transactions)
-                                    updateTransactionLists(state.transactions)
+//                                    updateTransactionLists(state.transactions)
                                     transactionsLoaded = true
                                     if (categoriesLoaded) {
                                         // Both data sets are loaded, update pie chart
