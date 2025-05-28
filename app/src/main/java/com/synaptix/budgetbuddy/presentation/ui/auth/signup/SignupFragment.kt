@@ -34,6 +34,7 @@ import kotlinx.coroutines.launch
 import com.google.android.material.snackbar.Snackbar
 import android.text.TextWatcher
 import android.text.Editable
+import kotlinx.coroutines.delay
 
 @AndroidEntryPoint
 class SignupFragment : Fragment(R.layout.fragment_auth_signup) {
@@ -53,22 +54,41 @@ class SignupFragment : Fragment(R.layout.fragment_auth_signup) {
     private fun setupViews() {
         // Add text change listeners for real-time validation
         binding.edtEmailAddress.addTextChangedListener(createTextWatcher { text ->
-            val error = viewModel.validateEmail(text.toString())
-            binding.tilEmail.error = error
+            // Clear error when user starts typing
+            binding.tilEmail.error = null
         })
 
         binding.edtPassword.addTextChangedListener(createTextWatcher { text ->
-            val error = viewModel.validatePassword(text.toString())
-            binding.tilPassword.error = error
+            // Clear error when user starts typing
+            binding.tilPassword.error = null
         })
 
         binding.edtTxtPasswordConfirm.addTextChangedListener(createTextWatcher { text ->
-            val error = viewModel.validatePasswordConfirmation(
-                binding.edtPassword.text.toString(),
-                text.toString()
-            )
-            binding.tilPasswordConfirm.error = error
+            // Clear error when user starts typing
+            binding.tilPasswordConfirm.error = null
         })
+
+        // Add focus change listeners to validate on focus loss
+        binding.edtEmailAddress.setOnFocusChangeListener { _, hasFocus ->
+            if (!hasFocus) {
+                binding.tilEmail.error = viewModel.validateEmail(binding.edtEmailAddress.text.toString())
+            }
+        }
+
+        binding.edtPassword.setOnFocusChangeListener { _, hasFocus ->
+            if (!hasFocus) {
+                binding.tilPassword.error = viewModel.validatePassword(binding.edtPassword.text.toString())
+            }
+        }
+
+        binding.edtTxtPasswordConfirm.setOnFocusChangeListener { _, hasFocus ->
+            if (!hasFocus) {
+                binding.tilPasswordConfirm.error = viewModel.validatePasswordConfirmation(
+                    binding.edtPassword.text.toString(),
+                    binding.edtTxtPasswordConfirm.text.toString()
+                )
+            }
+        }
 
         // Handle back button with animation
         binding.btnBackSignup.setOnClickListener {
@@ -77,6 +97,18 @@ class SignupFragment : Fragment(R.layout.fragment_auth_signup) {
 
         // Handle sign-up button click with animation
         binding.btnSignup.setOnClickListener {
+            val email = binding.edtEmailAddress.text.toString()
+            val password = binding.edtPassword.text.toString()
+            val confirmPassword = binding.edtTxtPasswordConfirm.text.toString()
+
+            // Validate first
+            if (!viewModel.validateInputs(email, password, confirmPassword)) {
+                binding.btnSignup.showError()
+                return@setOnClickListener
+            }
+
+            // Only start loading if validation passes
+            binding.btnSignup.startLoading()
             performSignup()
         }
     }
@@ -85,28 +117,12 @@ class SignupFragment : Fragment(R.layout.fragment_auth_signup) {
         val email = binding.edtEmailAddress.text.toString()
         val password = binding.edtPassword.text.toString()
 
-        // Animate button press
-        binding.btnSignup.animate()
-            .scaleX(0.95f)
-            .scaleY(0.95f)
-            .setDuration(100)
-            .withEndAction {
-                binding.btnSignup.animate()
-                    .scaleX(1f)
-                    .scaleY(1f)
-                    .setDuration(100)
-                    .start()
-            }
-            .start()
-
-        // Show loading state
-        showLoadingState()
-
         // Check if email exists and proceed with signup
         lifecycleScope.launch {
             try {
                 val emailExists = viewModel.checkEmailExists(email)
                 if (emailExists) {
+                    binding.btnSignup.showError()
                     showErrorState("Email already in use")
                     return@launch
                 }
@@ -114,6 +130,7 @@ class SignupFragment : Fragment(R.layout.fragment_auth_signup) {
                 // Proceed with signup
                 viewModel.signUp(email, password)
             } catch (e: Exception) {
+                binding.btnSignup.showError()
                 showErrorState("An error occurred. Please try again.")
             }
         }
@@ -123,69 +140,42 @@ class SignupFragment : Fragment(R.layout.fragment_auth_signup) {
         viewModel.signupState.observe(viewLifecycleOwner) { state ->
             when (state) {
                 is SignupUiState.Idle -> {
-                    showIdleState()
+                    enableInputs(true)
+                    binding.btnSignup.reset()
                 }
                 is SignupUiState.Loading -> {
-                    showLoadingState()
+                    enableInputs(false)
                 }
                 is SignupUiState.Success -> {
+                    binding.btnSignup.showSuccess()
                     showSuccessState()
                 }
                 is SignupUiState.Error -> {
+                    binding.btnSignup.showError()
                     showErrorState(state.message)
+                    enableInputs(true)
                 }
                 is SignupUiState.ValidationError -> {
                     binding.tilEmail.error = state.emailError
                     binding.tilPassword.error = state.passwordError
                     binding.tilPasswordConfirm.error = state.confirmPasswordError
+                    binding.btnSignup.showError()
+                    enableInputs(true)
                 }
             }
         }
     }
 
-    private fun showIdleState() {
-        binding.loadingOverlay.animate()
-            .alpha(0f)
-            .setDuration(200)
-            .withEndAction {
-                binding.loadingOverlay.visibility = View.GONE
-            }
-            .start()
-        enableInputs(true)
-    }
-
-    private fun showLoadingState() {
-        binding.loadingOverlay.visibility = View.VISIBLE
-        binding.loadingOverlay.alpha = 0f
-        binding.loadingOverlay.animate()
-            .alpha(1f)
-            .setDuration(200)
-            .start()
-        enableInputs(false)
-    }
-
     private fun showSuccessState() {
-        binding.loadingOverlay.animate()
-            .alpha(0f)
-            .setDuration(200)
-            .withEndAction {
-                binding.loadingOverlay.visibility = View.GONE
-                showSuccessMessage("Account created successfully!")
-                (activity as? AuthActivity)?.showLogin()
-            }
-            .start()
+        viewLifecycleOwner.lifecycleScope.launch {
+            showSuccessMessage("Account created successfully!")
+            delay(1000)
+            (activity as? AuthActivity)?.showLogin()
+        }
     }
 
     private fun showErrorState(message: String) {
-        binding.loadingOverlay.animate()
-            .alpha(0f)
-            .setDuration(200)
-            .withEndAction {
-                binding.loadingOverlay.visibility = View.GONE
-                enableInputs(true)
-                showErrorMessage(message)
-            }
-            .start()
+        showErrorMessage(message)
     }
 
     private fun createTextWatcher(onTextChanged: (Editable?) -> Unit): TextWatcher {
@@ -202,6 +192,7 @@ class SignupFragment : Fragment(R.layout.fragment_auth_signup) {
         Snackbar.make(binding.root, message, Snackbar.LENGTH_SHORT)
             .setBackgroundTint(resources.getColor(R.color.success, null))
             .setTextColor(resources.getColor(android.R.color.white, null))
+            .setAnimationMode(Snackbar.ANIMATION_MODE_SLIDE)
             .show()
     }
 
@@ -209,6 +200,7 @@ class SignupFragment : Fragment(R.layout.fragment_auth_signup) {
         Snackbar.make(binding.root, message, Snackbar.LENGTH_LONG)
             .setBackgroundTint(resources.getColor(R.color.error, null))
             .setTextColor(resources.getColor(android.R.color.white, null))
+            .setAnimationMode(Snackbar.ANIMATION_MODE_SLIDE)
             .setAction("Dismiss") { }
             .show()
     }
@@ -217,8 +209,8 @@ class SignupFragment : Fragment(R.layout.fragment_auth_signup) {
         binding.edtEmailAddress.isEnabled = enabled
         binding.edtPassword.isEnabled = enabled
         binding.edtTxtPasswordConfirm.isEnabled = enabled
-        binding.btnSignup.isEnabled = enabled
         binding.btnBackSignup.isEnabled = enabled
+        binding.btnSignup.isEnabled = enabled
     }
 
     override fun onDestroyView() {
@@ -226,3 +218,4 @@ class SignupFragment : Fragment(R.layout.fragment_auth_signup) {
         _binding = null
     }
 }
+

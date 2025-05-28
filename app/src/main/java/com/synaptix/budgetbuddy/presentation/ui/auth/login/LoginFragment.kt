@@ -28,11 +28,15 @@ import android.text.TextWatcher
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import com.google.android.material.snackbar.Snackbar
 import com.synaptix.budgetbuddy.R
 import com.synaptix.budgetbuddy.databinding.FragmentAuthLoginBinding
+import com.synaptix.budgetbuddy.presentation.ui.auth.AuthActivity
 import com.synaptix.budgetbuddy.presentation.ui.main.MainActivity
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class LoginFragment : Fragment(R.layout.fragment_auth_login) {
@@ -52,21 +56,45 @@ class LoginFragment : Fragment(R.layout.fragment_auth_login) {
     private fun setupViews() {
         // Add text change listeners for real-time validation
         binding.edtEmailAddress.addTextChangedListener(createTextWatcher { text ->
-            val error = viewModel.validateEmail(text.toString())
-            binding.tilEmail.error = error
+            // Clear error when user starts typing
+            binding.tilEmail.error = null
         })
 
         binding.edtPassword.addTextChangedListener(createTextWatcher { text ->
-            val error = viewModel.validatePassword(text.toString())
-            binding.tilPassword.error = error
+            // Clear error when user starts typing
+            binding.tilPassword.error = null
         })
+
+        // Add focus change listeners to validate on focus loss
+        binding.edtEmailAddress.setOnFocusChangeListener { _, hasFocus ->
+            if (!hasFocus) {
+                binding.tilEmail.error = viewModel.validateEmail(binding.edtEmailAddress.text.toString())
+            }
+        }
+
+        binding.edtPassword.setOnFocusChangeListener { _, hasFocus ->
+            if (!hasFocus) {
+                binding.tilPassword.error = viewModel.validatePassword(binding.edtPassword.text.toString())
+            }
+        }
 
         // Handle login button click with animation
         binding.btnLogin.setOnClickListener {
-            performLogin()
+            val email = binding.edtEmailAddress.text.toString()
+            val password = binding.edtPassword.text.toString()
+            
+            // Validate first
+            if (!viewModel.validateInputs(email, password)) {
+                binding.btnLogin.showError()
+                return@setOnClickListener
+            }
+            
+            // Only start loading if validation passes
+            binding.btnLogin.startLoading()
+            viewModel.login(email, password)
         }
 
-        // Handle back button click with animation
+        // Handle back button click
         binding.btnBackLogin.setOnClickListener {
             requireActivity().onBackPressedDispatcher.onBackPressed()
         }
@@ -76,93 +104,61 @@ class LoginFragment : Fragment(R.layout.fragment_auth_login) {
         viewModel.loginState.observe(viewLifecycleOwner) { state ->
             when (state) {
                 is LoginUiState.Idle -> {
-                    showIdleState()
+                    enableInputs(true)
+                    binding.btnLogin.reset()
                 }
                 is LoginUiState.Loading -> {
-                    showLoadingState()
+                    enableInputs(false)
                 }
                 is LoginUiState.Success -> {
-                    showSuccessState()
+                    binding.btnLogin.showSuccess()
+                    navigateToMain()
                 }
                 is LoginUiState.Error -> {
-                    showErrorState(state.message)
+                    binding.btnLogin.showError()
+                    showErrorMessage(state.message)
+                    enableInputs(true)
                 }
                 is LoginUiState.ValidationError -> {
                     binding.tilEmail.error = state.emailError
                     binding.tilPassword.error = state.passwordError
+                    binding.btnLogin.showError()
+                    enableInputs(true)
                 }
             }
         }
     }
 
-    private fun performLogin() {
-        val email = binding.edtEmailAddress.text.toString()
-        val password = binding.edtPassword.text.toString()
-        
-        // Animate button press
-        binding.btnLogin.animate()
-            .scaleX(0.95f)
-            .scaleY(0.95f)
-            .setDuration(100)
-            .withEndAction {
-                binding.btnLogin.animate()
-                    .scaleX(1f)
-                    .scaleY(1f)
-                    .setDuration(100)
-                    .start()
-            }
-            .start()
-
-        viewModel.login(email, password)
+    private fun navigateToMain() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            showSuccessMessage("Login successful")
+            delay(1000)
+            startActivity(Intent(requireContext(), MainActivity::class.java))
+            requireActivity().finish()
+        }
     }
 
-    private fun showIdleState() {
-        binding.loadingOverlay.animate()
-            .alpha(0f)
-            .setDuration(200)
-            .withEndAction {
-                binding.loadingOverlay.visibility = View.GONE
-            }
-            .start()
-        enableInputs(true)
+    private fun showSuccessMessage(message: String) {
+        Snackbar.make(binding.root, message, Snackbar.LENGTH_SHORT)
+            .setBackgroundTint(resources.getColor(R.color.success, null))
+            .setTextColor(resources.getColor(android.R.color.white, null))
+            .setAnimationMode(Snackbar.ANIMATION_MODE_SLIDE)
+            .show()
     }
 
-    private fun showLoadingState() {
-        binding.loadingOverlay.visibility = View.VISIBLE
-        binding.loadingOverlay.alpha = 0f
-        binding.loadingOverlay.animate()
-            .alpha(1f)
-            .setDuration(200)
-            .start()
-        enableInputs(false)
+    private fun showErrorMessage(message: String) {
+        Snackbar.make(binding.root, message, Snackbar.LENGTH_LONG)
+            .setBackgroundTint(resources.getColor(R.color.error, null))
+            .setTextColor(resources.getColor(android.R.color.white, null))
+            .setAnimationMode(Snackbar.ANIMATION_MODE_SLIDE)
+            .setAction("Dismiss") { }
+            .show()
     }
 
-    private fun showSuccessState() {
-        binding.loadingOverlay.animate()
-            .alpha(0f)
-            .setDuration(200)
-            .withEndAction {
-                binding.loadingOverlay.visibility = View.GONE
-                showSuccessMessage("Login successful")
-                // Navigate to main screen after successful login
-                val intent = Intent(requireContext(), MainActivity::class.java)
-                startActivity(intent)
-                requireActivity().finish()
-            }
-            .start()
-    }
-
-    private fun showErrorState(message: String) {
-        binding.loadingOverlay.animate()
-            .alpha(0f)
-            .setDuration(200)
-            .withEndAction {
-                binding.loadingOverlay.visibility = View.GONE
-                enableInputs(true)
-                showErrorMessage(message)
-                viewModel.resetState()
-            }
-            .start()
+    private fun enableInputs(enabled: Boolean) {
+        binding.edtEmailAddress.isEnabled = enabled
+        binding.edtPassword.isEnabled = enabled
+        binding.btnLogin.isEnabled = enabled
     }
 
     private fun createTextWatcher(onTextChanged: (Editable?) -> Unit): TextWatcher {
@@ -175,30 +171,9 @@ class LoginFragment : Fragment(R.layout.fragment_auth_login) {
         }
     }
 
-    private fun showSuccessMessage(message: String) {
-        Snackbar.make(binding.root, message, Snackbar.LENGTH_SHORT)
-            .setBackgroundTint(resources.getColor(R.color.success, null))
-            .setTextColor(resources.getColor(android.R.color.white, null))
-            .show()
-    }
-
-    private fun showErrorMessage(message: String) {
-        Snackbar.make(binding.root, message, Snackbar.LENGTH_LONG)
-            .setBackgroundTint(resources.getColor(R.color.error, null))
-            .setTextColor(resources.getColor(android.R.color.white, null))
-            .setAction("Dismiss") { }
-            .show()
-    }
-
-    private fun enableInputs(enabled: Boolean) {
-        binding.edtEmailAddress.isEnabled = enabled
-        binding.edtPassword.isEnabled = enabled
-        binding.btnLogin.isEnabled = enabled
-        binding.btnBackLogin.isEnabled = enabled
-    }
-
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }
 }
+
