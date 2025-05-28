@@ -45,7 +45,7 @@ class AnimatedButton @JvmOverloads constructor(
 
     private var loadingText = "Loading..."
     private var successText = "Success"
-    private var originalText = "Go"
+    private var originalText = "Login"
 
     private var originalBackgroundDrawable: Drawable? = null
     private var successBackground: Drawable? = null
@@ -55,6 +55,9 @@ class AnimatedButton @JvmOverloads constructor(
     private val animationDuration = 300L
     private val smallWidthDp = 48
     private val successScale = 1.05f
+
+    // Add callback for click events
+    private var onButtonClickListener: (() -> Unit)? = null
 
     init {
         // Inflate attributes
@@ -76,15 +79,14 @@ class AnimatedButton @JvmOverloads constructor(
             background = originalBackgroundDrawable
             setTextColor(originalTextColor)
             layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT)
-            setOnClickListener { if (!isAnimating) startLoading() }
         }
 
         // Center progress bar
         val progressParams = LayoutParams(
-            LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT
-        ).apply {
-            gravity = Gravity.CENTER
-        }
+            LayoutParams.WRAP_CONTENT,
+            LayoutParams.WRAP_CONTENT,
+            Gravity.CENTER
+        )
 
         addView(button)
         addView(progressBar, progressParams)
@@ -97,7 +99,23 @@ class AnimatedButton @JvmOverloads constructor(
         }
     }
 
-    fun startLoading() {
+    // Add method to set click listener
+    fun setOnButtonClickListener(listener: () -> Unit) {
+        onButtonClickListener = listener
+    }
+
+    // Override standard click listener
+    override fun setOnClickListener(l: OnClickListener?) {
+        button.setOnClickListener { 
+            if (!isAnimating) {
+                startLoading()
+                l?.onClick(this)
+            }
+        }
+    }
+
+    // Make startLoading private since it's now handled internally
+    private fun startLoading() {
         isAnimating = true
         button.isEnabled = false
 
@@ -124,9 +142,69 @@ class AnimatedButton @JvmOverloads constructor(
                     .setInterpolator(DecelerateInterpolator())
                     .start()
 
-                handler.postDelayed({ showSuccess() }, 1600)
-                handler.postDelayed({ reset() }, 2900)
+                button.scaleX = 1f
+                button.scaleY = 1f
             }.start()
+    }
+
+    // Add public methods for success and error states
+    fun showSuccess() {
+        // Step 1: Restore original width first
+        animateWidth(width, originalWidth)
+
+        // Step 2: Hide progress bar with animation
+        progressBar.animate()
+            .alpha(0f)
+            .setDuration(animationDuration)
+            .withEndAction {
+                progressBar.visibility = GONE
+
+                // Step 3: Now apply success state cleanly
+                button.apply {
+                    gravity = Gravity.CENTER
+                    setPadding(0, 0, 0, 0)
+                    scaleX = 1f
+                    scaleY = 1f
+                    background = successBackground
+                    setTextColor(successTextColor)
+                    text = successText
+                    isEnabled = false
+                }
+
+                // Step 4: Animate scale pop for success
+                button.animate()
+                    .scaleX(successScale)
+                    .scaleY(successScale)
+                    .setDuration(animationDuration)
+                    .setInterpolator(AccelerateDecelerateInterpolator())
+                    .withEndAction {
+                        button.animate()
+                            .scaleX(1f)
+                            .scaleY(1f)
+                            .setDuration(animationDuration)
+                            .setInterpolator(DecelerateInterpolator())
+                            .start()
+                    }.start()
+            }.start()
+    }
+
+    fun showError() {
+        reset()
+    }
+
+    // Make reset public for error handling
+    fun reset() {
+        animateWidth(width, originalWidth)
+        button.apply {
+            background = originalBackgroundDrawable
+            setTextColor(originalTextColor)
+            text = originalText
+            isEnabled = true
+            scaleX = 1f
+            scaleY = 1f
+        }
+        progressBar.visibility = GONE
+        isAnimating = false
     }
 
     private fun animateWidth(from: Int, to: Int) {
@@ -139,55 +217,6 @@ class AnimatedButton @JvmOverloads constructor(
             }
             start()
         }
-    }
-
-    private fun showSuccess() {
-        // First expand the button back to original width
-        animateWidth(width, originalWidth)
-
-        // Hide progress bar
-        progressBar.animate()
-            .alpha(0f)
-            .setDuration(animationDuration)
-            .withEndAction {
-                progressBar.visibility = GONE
-            }.start()
-
-        // Transform button to success state
-        button.apply {
-            background = successBackground
-            setTextColor(successTextColor)
-            text = successText
-            isEnabled = false
-        }
-
-        // Animate the button
-        button.animate()
-            .scaleX(successScale)
-            .scaleY(successScale)
-            .setDuration(animationDuration)
-            .setInterpolator(AccelerateDecelerateInterpolator())
-            .withEndAction {
-                button.animate()
-                    .scaleX(1f)
-                    .scaleY(1f)
-                    .setDuration(animationDuration)
-                    .setInterpolator(DecelerateInterpolator())
-                    .start()
-            }.start()
-    }
-
-    internal fun reset() {
-        animateWidth(width, originalWidth)
-        button.apply {
-            background = originalBackgroundDrawable
-            setTextColor(originalTextColor)
-            text = originalText
-            isEnabled = true
-            scaleX = 1f
-            scaleY = 1f
-        }
-        isAnimating = false
     }
 
     override fun onDetachedFromWindow() {

@@ -69,8 +69,9 @@ class LoginFragment : Fragment(R.layout.fragment_auth_login) {
             val password = binding.edtPassword.text.toString()
             
             if (viewModel.validateInputs(email, password)) {
-                binding.btnLogin.startLoading()
                 viewModel.login(email, password)
+            } else {
+                binding.btnLogin.showError()
             }
         }
 
@@ -85,22 +86,25 @@ class LoginFragment : Fragment(R.layout.fragment_auth_login) {
             when (state) {
                 is LoginUiState.Idle -> {
                     enableInputs(true)
+                    binding.btnLogin.reset()
                 }
                 is LoginUiState.Loading -> {
                     enableInputs(false)
                 }
                 is LoginUiState.Success -> {
+                    binding.btnLogin.showSuccess()
                     navigateToMain()
                 }
                 is LoginUiState.Error -> {
-                    binding.btnLogin.reset()
+                    binding.btnLogin.showError()
                     showErrorMessage(state.message)
                     enableInputs(true)
                 }
                 is LoginUiState.ValidationError -> {
                     binding.tilEmail.error = state.emailError
                     binding.tilPassword.error = state.passwordError
-                    binding.btnLogin.reset()
+                    binding.btnLogin.showError()
+                    enableInputs(true)
                 }
             }
         }

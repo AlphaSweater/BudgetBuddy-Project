@@ -27,6 +27,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="?attr/bb_background"
+    android:clipChildren="false"
+    android:clipToPadding="false"
     tools:context=".presentation.ui.auth.login.LoginFragment">
 
     <!-- Back Button -->
@@ -126,22 +128,22 @@
     <com.synaptix.budgetbuddy.presentation.ui.components.AnimatedButton
         android:id="@+id/btnLogin"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="@dimen/button_height"
         android:layout_marginHorizontal="@dimen/margin_xlarge"
         android:layout_marginTop="32dp"
-        android:minHeight="@dimen/button_height"
+        android:paddingBottom="0dp"
         android:textSize="@dimen/button_text_size"
         android:text="@string/login"
-        android:textColor="@android:color/white"
         android:background="@drawable/bg_animated_button_background"
         app:loadingText="Loading..."
-        app:successText="Done!"
+        app:successText="Success!"
         app:originalText="LOGIN"
         app:successBackground="@drawable/bg_animated_button_success_background"
-        app:originalTextColor="#FF5126"
-        app:successTextColor="#FFFFFF"
+        app:originalTextColor="?attr/bb_buttonText"
+        app:successTextColor="?attr/bb_buttonText"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tilPassword" />
+        app:layout_constraintTop_toBottomOf="@+id/tilPassword"
+        android:clickable="true"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
