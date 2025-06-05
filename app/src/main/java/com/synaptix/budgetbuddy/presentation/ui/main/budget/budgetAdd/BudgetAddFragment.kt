@@ -59,17 +59,21 @@ class BudgetAddFragment : Fragment() {
         return binding.root
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // --- Fragment Lifecycle ---
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupUI()
         observeViewModel()
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     override fun onResume() {
         super.onResume()
         observeViewModel()
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
@@ -82,6 +86,7 @@ class BudgetAddFragment : Fragment() {
         setupClickListeners()
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private fun setupCurrencySpinner() {
         val currencies = arrayOf("ZAR")
         val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, currencies)
@@ -93,7 +98,6 @@ class BudgetAddFragment : Fragment() {
         binding.btnSave.setOnClickListener { saveBudget() }
         binding.btnGoBack.setOnClickListener { findNavController().popBackStack() }
         binding.rowSelectCategory.setOnClickListener { showCategorySelector() }
-//        binding.rowSelectWallet.setOnClickListener { showWalletSelector() }
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
@@ -103,7 +107,6 @@ class BudgetAddFragment : Fragment() {
         viewModel.budgetAmount.value = binding.amount.text.toString().toDoubleOrNull() ?: 0.0
 
         if (viewModel.selectedCategories.value.isNullOrEmpty() ||
-//            viewModel.wallet.value == null ||
             viewModel.budgetName.value.isNullOrBlank() ||
             viewModel.budgetAmount.value!! <= 0.0
         ) {
@@ -137,10 +140,6 @@ class BudgetAddFragment : Fragment() {
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     // --- Popup Navigation ---
-    private fun showWalletSelector() {
-        findNavController().navigate(R.id.action_budgetAddFragment_to_budgetSelectWalletFragment)
-    }
-
     private fun showCategorySelector() {
         findNavController().navigate(R.id.action_budgetAddFragment_to_budgetSelectCategoryFragment)
     }
