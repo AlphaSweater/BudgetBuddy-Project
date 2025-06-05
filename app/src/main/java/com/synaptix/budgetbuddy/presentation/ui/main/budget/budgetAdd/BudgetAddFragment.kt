@@ -93,7 +93,7 @@ class BudgetAddFragment : Fragment() {
         binding.btnSave.setOnClickListener { saveBudget() }
         binding.btnGoBack.setOnClickListener { findNavController().popBackStack() }
         binding.rowSelectCategory.setOnClickListener { showCategorySelector() }
-        binding.rowSelectWallet.setOnClickListener { showWalletSelector() }
+//        binding.rowSelectWallet.setOnClickListener { showWalletSelector() }
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
@@ -145,15 +145,7 @@ class BudgetAddFragment : Fragment() {
         findNavController().navigate(R.id.action_budgetAddFragment_to_budgetSelectCategoryFragment)
     }
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-    // --- Update Methods ---
-    private fun updateSelectedWallet(walletName: String) {
-        if (walletName.isBlank()) {
-            binding.textSelectedWalletName.text = "No wallet selected"
-            return
-        }
-        binding.textSelectedWalletName.text = walletName
-    }
+
 
     private fun updateSelectedCategories() {
         val selectedCategories = viewModel.selectedCategories.value
@@ -170,11 +162,6 @@ class BudgetAddFragment : Fragment() {
     private fun observeViewModel() {
         viewModel.selectedCategories.observe(viewLifecycleOwner) { categories ->
             updateSelectedCategories()
-        }
-
-        viewModel.wallet.observe(viewLifecycleOwner) { wallet ->
-            updateSelectedWallet(wallet?.name ?: "")
-            Log.d("Wallet", "Selected Wallet ID: $wallet")
         }
 
         viewModel.budgetAmount.observe(viewLifecycleOwner) { amount ->
