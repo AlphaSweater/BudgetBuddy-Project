@@ -27,6 +27,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="?attr/bb_background"
+    android:clipChildren="false"
+    android:clipToPadding="false"
     tools:context=".presentation.ui.auth.login.LoginFragment">
 
     <!-- Back Button -->
@@ -123,40 +125,28 @@
     </com.google.android.material.textfield.TextInputLayout>
 
     <!-- Login Button -->
-    <com.google.android.material.button.MaterialButton
+    <com.synaptix.budgetbuddy.presentation.ui.components.AnimatedButton
         android:id="@+id/btnLogin"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="@dimen/button_height"
         android:layout_marginHorizontal="@dimen/margin_xlarge"
         android:layout_marginTop="32dp"
-        android:backgroundTint="?attr/bb_button"
-        android:minHeight="@dimen/button_height"
-        android:text="@string/login"
-        android:textColor="@android:color/white"
+        android:paddingBottom="0dp"
         android:textSize="@dimen/button_text_size"
-        app:cornerRadius="@dimen/button_corner_radius"
+        android:text="@string/login"
+        app:loadingText="Loading..."
+        app:successText="Success!"
+        app:errorText="Try Again"
+        app:originalText="LOGIN"
+        app:originalBackground="@drawable/bg_modern_button_background"
+        app:successBackground="@drawable/bg_animated_button_success_background"
+        app:errorBackground="@drawable/bg_animated_button_error_background"
+        app:originalTextColor="?attr/bb_buttonText"
+        app:successTextColor="?attr/bb_buttonText"
+        app:errorTextColor="?attr/bb_buttonText"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tilPassword" />
-
-    <!-- Loading Overlay -->
-    <FrameLayout
-        android:id="@+id/loadingOverlay"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="#80000000"
-        android:clickable="true"
-        android:focusable="true"
-        android:visibility="gone">
-
-        <com.google.android.material.progressindicator.CircularProgressIndicator
-            android:id="@+id/progressSpinner"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:indeterminate="true"
-            app:indicatorColor="@android:color/white"
-            app:trackColor="#4DFFFFFF" />
-    </FrameLayout>
+        app:layout_constraintTop_toBottomOf="@+id/tilPassword"
+        android:clickable="true"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

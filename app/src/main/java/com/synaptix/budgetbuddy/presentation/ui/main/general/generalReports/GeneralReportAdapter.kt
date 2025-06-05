@@ -1,87 +1,79 @@
 package com.synaptix.budgetbuddy.presentation.ui.main.general.generalReports
 
-import android.graphics.drawable.GradientDrawable
-import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.content.ContextCompat
-import androidx.recyclerview.widget.RecyclerView
 import com.synaptix.budgetbuddy.R
-import com.synaptix.budgetbuddy.core.model.BudgetListItems
+import com.synaptix.budgetbuddy.core.model.Category
+import com.synaptix.budgetbuddy.core.model.Transaction
+import com.synaptix.budgetbuddy.presentation.ui.common.BaseAdapter
 
-//class GeneralReportAdapter(private val items: List<BudgetListItems>) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-//
-//    companion object {
-//        private const val VIEW_TYPE_LABEL = 0
-//        private const val VIEW_TYPE_CATEGORY = 1
-//    }
-//
-//    override fun getItemViewType(position: Int): Int {
-//        return when (items[position]) {
-//            is BudgetListItems.BudgetLabelItem -> VIEW_TYPE_LABEL
-//            is BudgetListItems.BudgetCategoryItem -> VIEW_TYPE_CATEGORY
-//            else -> throw IllegalArgumentException("Invalid item type at position $position")
-//        }
-//    }
-//
-//    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-//        return when (viewType) {
-//            VIEW_TYPE_LABEL -> {
-//                val view = LayoutInflater.from(parent.context).inflate(R.layout.item_home_category, parent, false)
-//                LabelViewHolder(view)
-//            }
-//            VIEW_TYPE_CATEGORY -> {
-//                val view = LayoutInflater.from(parent.context).inflate(R.layout.item_home_category, parent, false)
-//                CategoryViewHolder(view)
-//            }
-//            else -> throw IllegalArgumentException("Unknown view type")
-//        }
-//    }
-//
-//    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-//        when (val item = items[position]) {
-//            is BudgetListItems.BudgetLabelItem -> (holder as LabelViewHolder).bind(item)
-//            is BudgetListItems.BudgetCategoryItem -> (holder as CategoryViewHolder).bind(item)
-//            else -> throw IllegalArgumentException("Unexpected item type at position $position: ${item::class.simpleName}")
-//        }
-//    }
-//
-//    override fun getItemCount(): Int = items.size
-//
-//    class LabelViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-//        fun bind(item: BudgetListItems.BudgetLabelItem) {
-//            val iconView = itemView.findViewById<ImageView>(R.id.iconCategory)
-//            val iconContainer = itemView.findViewById<LinearLayout>(R.id.iconCategoryContainer)
-//
-//            val resolvedColor = ContextCompat.getColor(itemView.context, item.labelColour)
-//            (iconContainer.background.mutate() as GradientDrawable).setColor(resolvedColor)
-//
-//            iconView.setImageResource(item.labelIcon)
-//
-//            itemView.findViewById<TextView>(R.id.txtCategoryName).text = item.labelName
-//            itemView.findViewById<TextView>(R.id.txtTransactions).text = "${item.transactionCount} transactions"
-//            itemView.findViewById<TextView>(R.id.txtAmount).text = item.amount
-//            itemView.findViewById<TextView>(R.id.txtDate).text = item.relativeDate
-//        }
-//    }
-//
-//    class CategoryViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-//        fun bind(item: BudgetListItems.BudgetCategoryItem) {
-//            val iconView = itemView.findViewById<ImageView>(R.id.iconCategory)
-//            val iconContainer = itemView.findViewById<LinearLayout>(R.id.iconCategoryContainer)
-//
-//            val resolvedColor = ContextCompat.getColor(itemView.context, item.color)
-//            (iconContainer.background.mutate() as GradientDrawable).setColor(resolvedColor)
-//
-//            iconView.setImageResource(item.categoryIcon)
-//
-//            itemView.findViewById<TextView>(R.id.txtCategoryName).text = item.categoryName
-//            itemView.findViewById<TextView>(R.id.txtTransactions).text = "${item.transactionCount} transactions"
-//            itemView.findViewById<TextView>(R.id.txtAmount).text = item.amount
-//            itemView.findViewById<TextView>(R.id.txtDate).text = item.relativeDate
-//        }
-//    }
-//}
+class GeneralReportAdapter(
+    private val onCategoryClick: ((Category) -> Unit)? = null
+) : BaseAdapter<ReportListItems, BaseAdapter.BaseViewHolder<ReportListItems>>() {
+
+    companion object {
+        private const val VIEW_TYPE_CATEGORY = 0
+    }
+
+    override fun getItemViewType(position: Int): Int = when (items[position]) {
+        is ReportListItems.ReportCategoryItem -> VIEW_TYPE_CATEGORY
+        else -> throw IllegalArgumentException("Invalid item type at position $position")
+    }
+
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int
+    ): BaseViewHolder<ReportListItems> {
+        return when (viewType) {
+            VIEW_TYPE_CATEGORY -> createViewHolder(
+                parent = parent,
+                layoutResId = R.layout.item_home_category
+            ) { CategoryViewHolder(it, onCategoryClick) }
+
+            else -> throw IllegalArgumentException("Unknown view type: $viewType")
+        }
+    }
+
+    class CategoryViewHolder(
+        itemView: View,
+        private val onClick: ((Category) -> Unit)?
+    ) : BaseViewHolder<ReportListItems>(itemView) {
+        private val iconView: ImageView = itemView.findViewById(R.id.categoryIcon)
+        private val nameText: TextView = itemView.findViewById(R.id.categoryName)
+        private val transactionsText: TextView = itemView.findViewById(R.id.categoryTransactions)
+        private val amountText: TextView = itemView.findViewById(R.id.categoryAmount)
+        private val dateText: TextView = itemView.findViewById(R.id.categoryDate)
+
+        override fun bind(item: ReportListItems) {
+            if (item !is ReportListItems.ReportCategoryItem) return
+
+            val resolvedColor = ContextCompat.getColor(itemView.context, item.category.color)
+
+            iconView.setImageResource(item.category.icon)
+            iconView.setColorFilter(resolvedColor)
+            nameText.text = item.category.name
+            transactionsText.text = "${item.transactionCount} transactions"
+            amountText.text = item.amount
+            dateText.text = item.relativeDate
+
+            itemView.setOnClickListener { onClick?.invoke(item.category) }
+        }
+    }
+}
+
+sealed class ReportListItems {
+    data class ReportTransactionItem(
+        val transaction: Transaction,
+        val relativeDate: String
+    ) : ReportListItems()
+
+    data class ReportCategoryItem(
+        val category: Category,
+        val transactionCount: Int,
+        val amount: String,
+        val relativeDate: String
+    ) : ReportListItems()
+}

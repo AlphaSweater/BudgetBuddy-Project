@@ -16,14 +16,15 @@ import com.synaptix.budgetbuddy.presentation.ui.common.BaseAdapter
 
 /**
  * Adapter for displaying a heterogeneous list of items in the home screen.
+ * 
  * This adapter handles multiple view types:
- * 1. Wallet items
- * 2. Transaction items
- * 3. Category items
- *
+ * 1. Wallet items - Shows wallet balance and recent activity
+ * 2. Transaction items - Shows transaction details with category and wallet info
+ * 3. Category items - Shows category summary with transaction count and amount
+ * 
  * Each item type has its own ViewHolder and layout resource.
  * The adapter follows the standard pattern for RecyclerView adapters in the app.
- *
+ * 
  * @param onWalletClick Optional callback for wallet item clicks
  * @param onTransactionClick Optional callback for transaction item clicks
  * @param onCategoryClick Optional callback for category item clicks
@@ -42,6 +43,9 @@ class HomeAdapter(
 
     /**
      * Determines the view type for the item at the given position.
+     * This is used by the RecyclerView to create the appropriate ViewHolder.
+     * 
+     * @param position The position of the item in the list
      * @return An integer representing the view type
      */
     override fun getItemViewType(position: Int): Int = when (items[position]) {
@@ -53,6 +57,10 @@ class HomeAdapter(
     /**
      * Creates the appropriate ViewHolder based on the view type.
      * Each view type has its own layout resource and ViewHolder implementation.
+     * 
+     * @param parent The ViewGroup into which the new View will be added
+     * @param viewType The view type of the new View
+     * @return A new ViewHolder that holds a View of the given view type
      */
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -81,6 +89,9 @@ class HomeAdapter(
     /**
      * ViewHolder for wallet items in the home screen.
      * Displays wallet name, balance, and relative date.
+     * 
+     * @param itemView The view for this ViewHolder
+     * @param onClick Optional callback for wallet item clicks
      */
     class WalletViewHolder(
         itemView: View,
@@ -91,6 +102,12 @@ class HomeAdapter(
         private val balanceText: TextView = itemView.findViewById(R.id.walletBalance)
         private val dateText: TextView = itemView.findViewById(R.id.lastActivity)
 
+        /**
+         * Binds wallet data to the view.
+         * Sets the wallet icon, name, balance, and last activity date.
+         * 
+         * @param item The HomeListItems object containing wallet data
+         */
         override fun bind(item: HomeListItems) {
             if (item !is HomeListItems.HomeWalletItem) return
 
@@ -109,6 +126,9 @@ class HomeAdapter(
      * ViewHolder for transaction items in the home screen.
      * Displays category icon, name, amount, date, and wallet name.
      * Applies category color to the icon background.
+     * 
+     * @param itemView The view for this ViewHolder
+     * @param onClick Optional callback for transaction item clicks
      */
     class TransactionViewHolder(
         itemView: View,
@@ -123,6 +143,13 @@ class HomeAdapter(
         private val amountText: TextView = itemView.findViewById(R.id.textAmount)
         private val dateText: TextView = itemView.findViewById(R.id.textDate)
 
+        /**
+         * Binds transaction data to the view.
+         * Sets the category icon and color, transaction details, and wallet info.
+         * Handles optional note display and amount color based on transaction type.
+         * 
+         * @param item The HomeListItems object containing transaction data
+         */
         override fun bind(item: HomeListItems) {
             if (item !is HomeListItems.HomeTransactionItem) return
 
@@ -159,36 +186,43 @@ class HomeAdapter(
         }
     }
 
+    /**
+     * ViewHolder for category items in the home screen.
+     * Displays category icon, name, transaction count, amount, and date.
+     * Applies category color to the icon background.
+     * 
+     * @param itemView The view for this ViewHolder
+     * @param onClick Optional callback for category item clicks
+     */
+    class CategoryViewHolder(
+        itemView: View,
+        private val onClick: ((Category) -> Unit)?
+    ) : BaseViewHolder<HomeListItems>(itemView) {
+        private val iconView: ImageView = itemView.findViewById(R.id.categoryIcon)
+        private val nameText: TextView = itemView.findViewById(R.id.categoryName)
+        private val transactionsText: TextView = itemView.findViewById(R.id.categoryTransactions)
+        private val amountText: TextView = itemView.findViewById(R.id.categoryAmount)
+        private val dateText: TextView = itemView.findViewById(R.id.categoryDate)
+
         /**
-         * ViewHolder for category items in the home screen.
-         * Displays category icon, name, transaction count, amount, and date.
-         * Applies category color to the icon background.
+         * Binds category data to the view.
+         * Sets the category icon and color, name, transaction count, amount, and date.
+         * 
+         * @param item The HomeListItems object containing category data
          */
-        class CategoryViewHolder(
-            itemView: View,
-            private val onClick: ((Category) -> Unit)?
-        ) : BaseViewHolder<HomeListItems>(itemView) {
-            private val iconView: ImageView = itemView.findViewById(R.id.categoryIcon)
-            private val nameText: TextView = itemView.findViewById(R.id.categoryName)
-            private val transactionsText: TextView =
-                itemView.findViewById(R.id.categoryTransactions)
-            private val amountText: TextView = itemView.findViewById(R.id.categoryAmount)
-            private val dateText: TextView = itemView.findViewById(R.id.categoryDate)
+        override fun bind(item: HomeListItems) {
+            if (item !is HomeListItems.HomeCategoryItem) return
 
-            override fun bind(item: HomeListItems) {
-                if (item !is HomeListItems.HomeCategoryItem) return
+            val resolvedColor = ContextCompat.getColor(itemView.context, item.category.color)
 
-                val resolvedColor = ContextCompat.getColor(itemView.context, item.category.color)
-                //(iconView.background.mutate() as GradientDrawable).setColor(resolvedColor)
+            iconView.setImageResource(item.category.icon)
+            iconView.setColorFilter(resolvedColor)
+            nameText.text = item.category.name
+            transactionsText.text = "${item.transactionCount} transactions"
+            amountText.text = item.amount
+            dateText.text = item.relativeDate
 
-                iconView.setImageResource(item.category.icon)
-                iconView.setColorFilter(resolvedColor)
-                nameText.text = item.category.name
-                transactionsText.text = "${item.transactionCount} transactions"
-                amountText.text = item.amount
-                dateText.text = item.relativeDate
-
-                itemView.setOnClickListener { onClick?.invoke(item.category) }
-            }
+            itemView.setOnClickListener { onClick?.invoke(item.category) }
         }
     }
+}

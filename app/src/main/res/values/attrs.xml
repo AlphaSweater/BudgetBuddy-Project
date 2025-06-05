@@ -43,4 +43,23 @@
         <attr name="buttonBackground" format="reference|color" />
         <attr name="textColor" format="color" />
     </declare-styleable>
+
+    <declare-styleable name="AnimatedButton">
+        <attr name="loadingText" format="string" />
+        <attr name="successText" format="string" />
+        <attr name="errorText" format="string" />
+        <attr name="originalTextSize" format="reference" />
+        <attr name="originalText" format="string" />
+        <attr name="originalBackground" format="reference" />
+        <attr name="successBackground" format="reference" />
+        <attr name="errorBackground" format="reference" />
+        <attr name="originalTextColor" format="color" />
+        <attr name="successTextColor" format="color" />
+        <attr name="errorTextColor" format="color" />
+        <attr name="originalTextStyle" format="enum">
+            <enum name="normal" value="0" />
+            <enum name="bold" value="1" />
+            <enum name="italic" value="2" />
+        </attr>
+    </declare-styleable>
 </resources>

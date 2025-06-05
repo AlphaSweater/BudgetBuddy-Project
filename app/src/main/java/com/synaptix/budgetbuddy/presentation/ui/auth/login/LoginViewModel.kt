@@ -52,6 +52,9 @@ class LoginViewModel @Inject constructor(
     private val _loginState = MutableLiveData<LoginUiState>(LoginUiState.Idle)
     val loginState: LiveData<LoginUiState> get() = _loginState
 
+    private val _isLoading = MutableLiveData(false)
+    val isLoading: LiveData<Boolean> = _isLoading
+
     fun validateEmail(email: String): String? {
         return when {
             email.isBlank() -> "Email is required"
@@ -85,20 +88,25 @@ class LoginViewModel @Inject constructor(
             return
         }
 
-        _loginState.value = LoginUiState.Loading // Set state to Loading before login attempt
-
         viewModelScope.launch {
             try {
-                val result = loginUserUseCase(email, password) // Call the use case to perform login
-                // Update the state based on the result of the login attempt
+                _isLoading.value = true
+                _loginState.value = LoginUiState.Loading
+
+                val result = loginUserUseCase(email, password)
+                
                 _loginState.value = when (result) {
-                    is LoginResult.Success -> LoginUiState.Success // If successful, show success
-                    is LoginResult.UserNotFound -> LoginUiState.Error("User not found") // User not found error
-                    is LoginResult.IncorrectPassword -> LoginUiState.Error("Incorrect password") // Incorrect password error
-                    is LoginResult.Error -> LoginUiState.Error(result.message) // General error with message
+                    is LoginResult.Success -> LoginUiState.Success
+                    is LoginResult.UserNotFound -> LoginUiState.Error("User not found")
+                    is LoginResult.IncorrectPassword -> LoginUiState.Error("Incorrect password")
+                    is LoginResult.Error -> LoginUiState.Error(result.message)
                 }
             } catch (e: Exception) {
-                _loginState.value = LoginUiState.Error(e.localizedMessage ?: "Unknown error")
+                _loginState.value = LoginUiState.Error(
+                    e.localizedMessage ?: "An unexpected error occurred"
+                )
+            } finally {
+                _isLoading.value = false
             }
         }
     }
@@ -106,5 +114,6 @@ class LoginViewModel @Inject constructor(
     // Function to reset the state back to idle
     fun resetState() {
         _loginState.value = LoginUiState.Idle
+        _isLoading.value = false
     }
 }
