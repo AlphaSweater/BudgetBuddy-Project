@@ -580,13 +580,16 @@ class GeneralReportsFragment : Fragment() {
                     Log.d("WalletDropdown", "walletState emitted with wallets: ${wallets.map { it.name }}")
 
                     if (wallets.isNotEmpty()) {
-                        val walletNames = wallets.map { it.name }
+                        // Create custom adapter with the wallet layout
                         val adapter = ArrayAdapter(
                             requireContext(),
-                            android.R.layout.simple_spinner_item,
-                            walletNames
+                            R.layout.spinner_item,
+                            wallets.map { it.name }
                         )
-                        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+
+                        // Set the dropdown view resource
+                        adapter.setDropDownViewResource(R.layout.spinner_item)
+
                         binding.spinnerWallet.adapter = adapter
 
                         var isUserInitiatedSelection = false
