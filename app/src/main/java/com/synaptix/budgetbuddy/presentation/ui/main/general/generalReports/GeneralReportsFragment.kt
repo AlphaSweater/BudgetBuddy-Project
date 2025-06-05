@@ -2,9 +2,12 @@ package com.synaptix.budgetbuddy.presentation.ui.main.general.generalReports
 
 import android.graphics.Color
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.content.ContextCompat
@@ -30,6 +33,7 @@ import com.github.mikephil.charting.formatter.PercentFormatter
 import com.synaptix.budgetbuddy.R
 import com.synaptix.budgetbuddy.core.model.Category
 import com.synaptix.budgetbuddy.core.model.Transaction
+import com.synaptix.budgetbuddy.core.model.Wallet
 import com.synaptix.budgetbuddy.databinding.FragmentGeneralReportsBinding
 import com.synaptix.budgetbuddy.extentions.getThemeColor
 import dagger.hilt.android.AndroidEntryPoint
@@ -118,6 +122,7 @@ class GeneralReportsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setupRecyclerViews()
         setupOnClickListeners()
+        setupWalletDropdown()
         observeStates()
     }
 
@@ -156,6 +161,10 @@ class GeneralReportsFragment : Fragment() {
             btnCategoryIncomeToggle.setOnClickListener {
                 showCategoryIncomeToggle()
             }
+
+            btnWalletArrow.setOnClickListener {
+                spinnerWallet.performClick()
+            }
         }
     }
 
@@ -177,46 +186,68 @@ class GeneralReportsFragment : Fragment() {
     private fun observeStates() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                // Launch a single coroutine to handle both states
                 launch {
                     var transactionsLoaded = false
                     var categoriesLoaded = false
 
-                    // Observe transactions
+                    // Collect wallet selection changes
+                    launch {
+                        viewModel.selectedWallet.collectLatest { selectedWallet ->
+                            Log.d("WalletDropdown", "Selected wallet changed: ${selectedWallet?.name}")
+
+                            // Update UI with filtered data
+                            when (val transactionsState = viewModel.transactionsState.value) {
+                                is GeneralReportsViewModel.TransactionState.Success -> {
+                                    updateItemsWithSelectedWallet(selectedWallet, transactionsState.transactions)
+                                }
+                                else -> {}
+                            }
+
+                            when (val categoriesState = viewModel.categoriesState.value) {
+                                is GeneralReportsViewModel.CategoryState.Success -> {
+                                    updateCategoryLists(categoriesState.categories)
+                                }
+                                else -> {}
+                            }
+                        }
+                    }
+
+                    // Collect transactions state
                     launch {
                         viewModel.transactionsState.collectLatest { state ->
                             when (state) {
                                 is GeneralReportsViewModel.TransactionState.Success -> {
                                     setupLineChart(state.transactions)
-//                                    updateTransactionLists(state.transactions)
                                     transactionsLoaded = true
+
+                                    // Update with current wallet selection
+                                    updateItemsWithSelectedWallet(viewModel.selectedWallet.value, state.transactions)
+
                                     if (categoriesLoaded) {
-                                        // Both data sets are loaded, update pie chart
                                         setupPieChart(binding.btnCategoryExpenseToggle.background != null)
                                     }
                                 }
-                                else -> {
-                                    // Handle other states if needed
-                                }
+                                else -> {}
                             }
                         }
                     }
 
-                    // Observe categories
+                    // Collect categories state
                     launch {
                         viewModel.categoriesState.collectLatest { state ->
                             when (state) {
                                 is GeneralReportsViewModel.CategoryState.Success -> {
                                     updateCategoryLists(state.categories)
                                     categoriesLoaded = true
+
+                                    // Update with current wallet selection
+                                    updateItemsWithSelectedWallet(viewModel.selectedWallet.value, null)
+
                                     if (transactionsLoaded) {
-                                        // Both data sets are loaded, update pie chart
                                         setupPieChart(binding.btnCategoryExpenseToggle.background != null)
                                     }
                                 }
-                                else -> {
-                                    // Handle other states if needed
-                                }
+                                else -> {}
                             }
                         }
                     }
@@ -225,25 +256,33 @@ class GeneralReportsFragment : Fragment() {
         }
     }
 
-    /**
-     * Updates the transaction lists based on the loaded data.
-     * 
-     * Data Processing:
-     * 1. Filters transactions by type (income/expense)
-     * 2. Maps transactions to UI items
-     * 3. Updates the appropriate adapter
-     * 
-     * The process ensures:
-     * - Proper separation of income and expense transactions
-     * - Correct formatting of dates and amounts
-     * - Efficient UI updates using adapters
-     */
-    private fun updateTransactionLists(transactions: List<Transaction>) {
-        val expenseTransactions = transactions.filter { 
-            it.category.type.equals("expense", ignoreCase = true) 
+    private fun updateItemsWithSelectedWallet(selectedWallet: Wallet?, transactions: List<Transaction>?) {
+        if (selectedWallet == null || transactions == null) {
+            Log.d("WalletDropdown", "No wallet or transactions available to update items.")
+            return
         }
-        val incomeTransactions = transactions.filter { 
-            it.category.type.equals("income", ignoreCase = true) 
+
+        // Filter transactions by wallet ID
+        val filteredTransactions = transactions.filter { it.wallet.id == selectedWallet.id }
+
+        // Update transaction lists with filtered data
+        updateTransactionLists(filteredTransactions)
+
+        Log.d("WalletDropdown", "Filtered transactions count: ${filteredTransactions.size}")
+
+        // Update the line chart with filtered data
+        setupLineChart(filteredTransactions)
+
+        // Update the pie chart with filtered data
+        setupPieChart(binding.btnCategoryExpenseToggle.background != null)
+    }
+
+    private fun updateTransactionLists(transactions: List<Transaction>) {
+        val expenseTransactions = transactions.filter {
+            it.category.type.equals("expense", ignoreCase = true)
+        }
+        val incomeTransactions = transactions.filter {
+            it.category.type.equals("income", ignoreCase = true)
         }
 
         val expenseItems = expenseTransactions.map { transaction ->
@@ -531,6 +570,57 @@ class GeneralReportsFragment : Fragment() {
             legend.isEnabled = false
             animateY(1000, Easing.EaseInOutQuad)
             invalidate()
+        }
+    }
+
+    private fun setupWalletDropdown() {
+        lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.walletState.collect { wallets ->
+                    Log.d("WalletDropdown", "walletState emitted with wallets: ${wallets.map { it.name }}")
+
+                    if (wallets.isNotEmpty()) {
+                        val walletNames = wallets.map { it.name }
+                        val adapter = ArrayAdapter(
+                            requireContext(),
+                            android.R.layout.simple_spinner_item,
+                            walletNames
+                        )
+                        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                        binding.spinnerWallet.adapter = adapter
+
+                        var isUserInitiatedSelection = false
+
+                        // Optional: restore spinner selection to current wallet in ViewModel
+                        val currentWallet = viewModel.selectedWallet.value
+                        val selectedIndex = wallets.indexOfFirst { it.id == currentWallet?.id }
+                        if (selectedIndex >= 0) {
+                            Log.d("WalletDropdown", "Restoring spinner selection to index: $selectedIndex")
+                            binding.spinnerWallet.setSelection(selectedIndex)
+                        }
+
+                        binding.spinnerWallet.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                            override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
+                                Log.d("WalletDropdown", "onItemSelected called with position: $position")
+                                if (!isUserInitiatedSelection) {
+                                    Log.d("WalletDropdown", "Ignoring initial automatic selection")
+                                    isUserInitiatedSelection = true
+                                    return
+                                }
+                                val selectedWallet = wallets[position]
+                                Log.d("WalletDropdown", "User selected wallet: ${selectedWallet.name}")
+                                viewModel.selectWallet(selectedWallet)
+                            }
+
+                            override fun onNothingSelected(parent: AdapterView<*>) {
+                                Log.d("WalletDropdown", "onNothingSelected called")
+                            }
+                        }
+                    } else {
+                        Log.d("WalletDropdown", "wallets list is empty")
+                    }
+                }
+            }
         }
     }
 

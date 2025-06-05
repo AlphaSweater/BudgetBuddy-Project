@@ -56,6 +56,7 @@ class WalletMainFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setupViews()
         observeViewModel()
+
     }
 
     private fun setupViews() {

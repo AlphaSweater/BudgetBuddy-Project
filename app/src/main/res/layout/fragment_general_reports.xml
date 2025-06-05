@@ -140,21 +140,24 @@
                             android:id="@+id/spinnerWallet"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:layout_toStartOf="@id/arrowIcon4"
+                            android:layout_toStartOf="@id/btnWalletArrow"
                             android:layout_toEndOf="@id/ivWalletIcon"
                             android:backgroundTint="?attr/bb_surface"
                             android:gravity="center_vertical"
                             android:popupBackground="?attr/bb_surface"
+                            android:textSize="12sp"
                             android:spinnerMode="dropdown" />
 
                         <ImageView
-                            android:id="@+id/arrowIcon4"
+                            android:id="@+id/btnWalletArrow"
                             android:layout_width="18dp"
                             android:layout_height="18dp"
                             android:layout_alignParentEnd="true"
                             android:layout_centerVertical="true"
                             android:src="@android:drawable/arrow_down_float"
-                            app:tint="?attr/bb_primaryText" />
+                            app:tint="?attr/bb_primaryText"
+                            android:clickable="true"
+                            android:focusable="true" />
 
 
                     </RelativeLayout>
