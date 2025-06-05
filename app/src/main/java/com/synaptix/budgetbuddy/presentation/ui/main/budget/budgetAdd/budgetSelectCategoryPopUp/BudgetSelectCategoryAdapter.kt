@@ -31,76 +31,48 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.synaptix.budgetbuddy.R
 import com.synaptix.budgetbuddy.core.model.Category
+import com.synaptix.budgetbuddy.presentation.ui.common.BaseAdapter
+import com.synaptix.budgetbuddy.presentation.ui.main.transaction.transactionSelectCategoryPopUp.TransactionSelectCategoryAdapter
 
 // Adapter class for displaying a list of categories in RecyclerView
 class BudgetSelectCategoryAdapter(
-    private val onSelectionChanged: (List<Category>) -> Unit
-) : RecyclerView.Adapter<BudgetSelectCategoryAdapter.CategoryViewHolder>() {
+    private val onCategoryClick: (Category) -> Unit
+) : BaseAdapter<Category, BudgetSelectCategoryAdapter.CategoryViewHolder>() {
 
-    private var categories: List<Category> = emptyList()
-    private val selectedCategories = mutableSetOf<Category>()
-
-    fun submitList(newCategories: List<Category>, initialSelected: List<Category> = emptyList()) {
-        categories = newCategories
-        selectedCategories.clear()
-        selectedCategories.addAll(initialSelected)
-        notifyDataSetChanged()
-    }
-
-    fun getSelectedCategories(): List<Category> = selectedCategories.toList()
-
-    // Inflates the item layout and creates the ViewHolder
+    /**
+     * Creates a new ViewHolder instance for category items.
+     * Uses the standard item_category layout resource.
+     */
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CategoryViewHolder {
-        val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_category, parent, false)
-        return CategoryViewHolder(view)
+        return createViewHolder(
+            parent = parent,
+            layoutResId = R.layout.item_transaction_category
+        ) { CategoryViewHolder(it) }
     }
 
-    // Binds data to the ViewHolder
-    override fun onBindViewHolder(holder: CategoryViewHolder, position: Int) {
-        holder.bind(categories[position])
-    }
-
-    // Returns total count of categories
-    override fun getItemCount(): Int = categories.size
-
-    // ViewHolder class to hold references to views in each item
-    inner class CategoryViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    /**
+     * ViewHolder class for category items.
+     * Responsible for binding category data to the view and handling click events.
+     */
+    inner class CategoryViewHolder(itemView: View) : BaseViewHolder<Category>(itemView) {
         private val categoryIcon: ImageView = itemView.findViewById(R.id.imgCategoryIcon)
         private val categoryName: TextView = itemView.findViewById(R.id.txtCategoryName)
-        private val checkBox: CheckBox = itemView.findViewById(R.id.checkSelect)
 
-        // Binds a Category object to the item layout
-        fun bind(category: Category) {
+        /**
+         * Binds category data to the view.
+         * Sets the category icon, name, and applies the category's color to the icon.
+         */
+        override fun bind(item: Category) {
             val context = itemView.context
 
-            // Set category name and icon
-            categoryName.text = category.name
-            categoryIcon.setImageResource(category.icon)
-            checkBox.isChecked = selectedCategories.contains(category)
-
-            // Set color filter for icon based on category color
-            val colorInt = ContextCompat.getColor(context, category.color)
+            categoryName.text = item.name
+            categoryIcon.setImageResource(item.icon)
+            val colorInt = ContextCompat.getColor(context, item.color)
             categoryIcon.setColorFilter(colorInt)
 
-            // Handle item click event
             itemView.setOnClickListener {
-                toggleCategorySelection(category)
+                onCategoryClick(item)
             }
-
-            checkBox.setOnClickListener {
-                toggleCategorySelection(category)
-            }
-        }
-
-        private fun toggleCategorySelection(category: Category) {
-            if (selectedCategories.contains(category)) {
-                selectedCategories.remove(category)
-            } else {
-                selectedCategories.add(category)
-            }
-            checkBox.isChecked = selectedCategories.contains(category)
-            onSelectionChanged(selectedCategories.toList())
         }
     }
 }
