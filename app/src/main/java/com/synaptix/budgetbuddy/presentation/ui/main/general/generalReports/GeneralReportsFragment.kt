@@ -23,6 +23,10 @@ import com.github.mikephil.charting.animation.Easing
 import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.charts.PieChart
 import com.github.mikephil.charting.components.XAxis
+import android.text.format.DateFormat
+import com.google.android.material.datepicker.MaterialDatePicker
+import java.util.*
+import androidx.core.util.Pair as UtilPair
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
@@ -86,6 +90,8 @@ class GeneralReportsFragment : Fragment() {
     // ViewBinding for safe view access
     private var _binding: FragmentGeneralReportsBinding? = null
     private val binding get() = _binding!!
+
+    private var currentDateRange: Pair<Long, Long>? = null
 
     // ViewModel for data management
     private val viewModel: GeneralReportsViewModel by viewModels()
@@ -155,6 +161,10 @@ class GeneralReportsFragment : Fragment() {
                 findNavController().popBackStack()
             }
 
+            btnTimePeriod.setOnClickListener(){
+                showDateRangePicker()
+            }
+
             btnCategoryExpenseToggle.setOnClickListener {
                 showCategoryExpenseToggle()
             }
@@ -188,68 +198,49 @@ class GeneralReportsFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
-                    var transactionsLoaded = false
-                    var categoriesLoaded = false
+                    // Observe wallet selection changes
+                    viewModel.selectedWallet.collect { selectedWallet ->
+                        Log.d("Filtering", "Wallet changed: ${selectedWallet?.name}")
+                        updateUI()
+                    }
+                }
 
-                    // Collect wallet selection changes
-                    launch {
-                        viewModel.selectedWallet.collectLatest { selectedWallet ->
-                            Log.d("WalletDropdown", "Selected wallet changed: ${selectedWallet?.name}")
+                launch {
+                    // Observe date range changes
+                    viewModel.dateRange.collect { dateRange ->
+                        Log.d("Filtering", "Date range changed: $dateRange")
+                        updateUI()
+                    }
+                }
 
-                            // Update UI with filtered data
-                            when (val transactionsState = viewModel.transactionsState.value) {
-                                is GeneralReportsViewModel.TransactionState.Success -> {
-                                    updateItemsWithSelectedWallet(selectedWallet, transactionsState.transactions)
+                launch {
+                    // Observe transactions - only update UI if we have both transactions and categories
+                    viewModel.transactionsState.collect { state ->
+                        when (state) {
+                            is GeneralReportsViewModel.TransactionState.Success -> {
+                                Log.d("Filtering", "Transactions updated: ${state.transactions.size} items")
+                                // Only update UI if we have categories loaded
+                                if (viewModel.categoriesState.value is GeneralReportsViewModel.CategoryState.Success) {
+                                    updateUI()
                                 }
-                                else -> {}
                             }
-
-                            when (val categoriesState = viewModel.categoriesState.value) {
-                                is GeneralReportsViewModel.CategoryState.Success -> {
-                                    updateCategoryLists(categoriesState.categories)
-                                }
-                                else -> {}
-                            }
+                            else -> {}
                         }
                     }
+                }
 
-                    // Collect transactions state
-                    launch {
-                        viewModel.transactionsState.collectLatest { state ->
-                            when (state) {
-                                is GeneralReportsViewModel.TransactionState.Success -> {
-                                    setupLineChart(state.transactions)
-                                    transactionsLoaded = true
-
-                                    // Update with current wallet selection
-                                    updateItemsWithSelectedWallet(viewModel.selectedWallet.value, state.transactions)
-
-                                    if (categoriesLoaded) {
-                                        setupPieChart(binding.btnCategoryExpenseToggle.background != null)
-                                    }
-                                }
-                                else -> {}
-                            }
-                        }
-                    }
-
-                    // Collect categories state
-                    launch {
-                        viewModel.categoriesState.collectLatest { state ->
-                            when (state) {
-                                is GeneralReportsViewModel.CategoryState.Success -> {
+                launch {
+                    // Observe categories - only update UI if we have both transactions and categories
+                    viewModel.categoriesState.collect { state ->
+                        when (state) {
+                            is GeneralReportsViewModel.CategoryState.Success -> {
+                                Log.d("Filtering", "Categories updated: ${state.categories.size} items")
+                                // Only update UI if we have transactions loaded
+                                if (viewModel.transactionsState.value is GeneralReportsViewModel.TransactionState.Success) {
                                     updateCategoryLists(state.categories)
-                                    categoriesLoaded = true
-
-                                    // Update with current wallet selection
-                                    updateItemsWithSelectedWallet(viewModel.selectedWallet.value, null)
-
-                                    if (transactionsLoaded) {
-                                        setupPieChart(binding.btnCategoryExpenseToggle.background != null)
-                                    }
                                 }
-                                else -> {}
                             }
+                            else -> {}
                         }
                     }
                 }
@@ -257,51 +248,22 @@ class GeneralReportsFragment : Fragment() {
         }
     }
 
-    private fun updateItemsWithSelectedWallet(selectedWallet: Wallet?, transactions: List<Transaction>?) {
-        if (selectedWallet == null || transactions == null) {
-            Log.d("WalletDropdown", "No wallet or transactions available to update items.")
-            return
+    private fun updateUI() {
+        when (val state = viewModel.transactionsState.value) {
+            is GeneralReportsViewModel.TransactionState.Success -> {
+                // Update charts with filtered transactions
+                setupLineChart(state.transactions)
+                setupPieChart(binding.btnCategoryExpenseToggle.background != null)
+
+                // Only update category lists, not transaction lists
+                viewModel.categoriesState.value.let { categoryState ->
+                    if (categoryState is GeneralReportsViewModel.CategoryState.Success) {
+                        updateCategoryLists(categoryState.categories)
+                    }
+                }
+            }
+            else -> {}
         }
-
-        // Filter transactions by wallet ID
-        val filteredTransactions = transactions.filter { it.wallet.id == selectedWallet.id }
-
-        // Update transaction lists with filtered data
-        updateTransactionLists(filteredTransactions)
-
-        Log.d("WalletDropdown", "Filtered transactions count: ${filteredTransactions.size}")
-
-        // Update the line chart with filtered data
-        setupLineChart(filteredTransactions)
-
-        // Update the pie chart with filtered data
-        setupPieChart(binding.btnCategoryExpenseToggle.background != null)
-    }
-
-    private fun updateTransactionLists(transactions: List<Transaction>) {
-        val expenseTransactions = transactions.filter {
-            it.category.type.equals("expense", ignoreCase = true)
-        }
-        val incomeTransactions = transactions.filter {
-            it.category.type.equals("income", ignoreCase = true)
-        }
-
-        val expenseItems = expenseTransactions.map { transaction ->
-            ReportListItems.ReportTransactionItem(
-                transaction = transaction,
-                relativeDate = formatDate(transaction.date)
-            )
-        }
-
-        val incomeItems = incomeTransactions.map { transaction ->
-            ReportListItems.ReportTransactionItem(
-                transaction = transaction,
-                relativeDate = formatDate(transaction.date)
-            )
-        }
-
-        expenseAdapter.submitList(expenseItems)
-        incomeAdapter.submitList(incomeItems)
     }
 
     /**
@@ -319,34 +281,36 @@ class GeneralReportsFragment : Fragment() {
      * - Efficient UI updates using adapters
      */
     private fun updateCategoryLists(categories: List<Category>) {
-        val expenseCategories = categories.filter {
-            it.type.equals("expense", ignoreCase = true)
-        }
-        val incomeCategories = categories.filter {
-            it.type.equals("income", ignoreCase = true)
+        // Get filtered transactions from ViewModel
+        val filteredTransactions = when (val state = viewModel.transactionsState.value) {
+            is GeneralReportsViewModel.TransactionState.Success -> state.transactions
+            else -> emptyList()
         }
 
+        val expenseCategories = categories.filter { it.type.equals("expense", ignoreCase = true) }
+        val incomeCategories = categories.filter { it.type.equals("income", ignoreCase = true) }
+
         val expenseItems = expenseCategories.map { category ->
-            val transactions = viewModel.getTransactionsByType("expense")
-                .filter { it.category.id == category.id }
+            val categoryTransactions = filteredTransactions.filter { it.category.id == category.id }
+            val totalAmount = categoryTransactions.sumOf { it.amount.toDouble() }
 
             ReportListItems.ReportCategoryItem(
                 category = category,
-                transactionCount = transactions.size,
-                amount = String.format("R %.2f", transactions.sumOf { it.amount }),
-                relativeDate = "This Month" // You can implement actual logic here
+                transactionCount = categoryTransactions.size,
+                amount = String.format("R %.2f", totalAmount),
+                relativeDate = "Selected Period"
             )
         }
 
         val incomeItems = incomeCategories.map { category ->
-            val transactions = viewModel.getTransactionsByType("income")
-                .filter { it.category.id == category.id }
+            val categoryTransactions = filteredTransactions.filter { it.category.id == category.id }
+            val totalAmount = categoryTransactions.sumOf { it.amount.toDouble() }
 
             ReportListItems.ReportCategoryItem(
                 category = category,
-                transactionCount = transactions.size,
-                amount = String.format("R %.2f", transactions.sumOf { it.amount }),
-                relativeDate = "This Month" // You can implement actual logic here
+                transactionCount = categoryTransactions.size,
+                amount = String.format("R %.2f", totalAmount),
+                relativeDate = "Selected Period"
             )
         }
 
@@ -630,30 +594,54 @@ class GeneralReportsFragment : Fragment() {
         }
     }
 
-    /**
-     * Formats a timestamp into a human-readable date string.
-     * Shows "Today", "Yesterday", or the date.
-     * 
-     * @param timestamp The timestamp to format
-     * @return Formatted date string
-     */
-    private fun formatDate(timestamp: Long): String {
+    private fun showDateRangePicker() {
         val calendar = Calendar.getInstance()
-        val now = Calendar.getInstance()
-        calendar.timeInMillis = timestamp
+        val currentYear = calendar.get(Calendar.YEAR)
+        val currentMonth = calendar.get(Calendar.MONTH)
+        val currentDay = calendar.get(Calendar.DAY_OF_MONTH)
 
-        return when {
-            calendar.get(Calendar.YEAR) == now.get(Calendar.YEAR) &&
-            calendar.get(Calendar.MONTH) == now.get(Calendar.MONTH) &&
-            calendar.get(Calendar.DAY_OF_MONTH) == now.get(Calendar.DAY_OF_MONTH) -> "Today"
-            calendar.get(Calendar.YEAR) == now.get(Calendar.YEAR) &&
-            calendar.get(Calendar.MONTH) == now.get(Calendar.MONTH) &&
-            calendar.get(Calendar.DAY_OF_MONTH) == now.get(Calendar.DAY_OF_MONTH) - 1 -> "Yesterday"
-            else -> {
-                val month = calendar.getDisplayName(Calendar.MONTH, Calendar.SHORT, Locale.getDefault())
-                val day = calendar.get(Calendar.DAY_OF_MONTH)
-                "$month $day"
-            }
+        // Default to last 30 days
+        val defaultEndDate = calendar.timeInMillis
+        calendar.add(Calendar.DAY_OF_MONTH, -30)
+        val defaultStartDate = calendar.timeInMillis
+
+        // Create and show the date range picker dialog
+        val dateRangePicker = MaterialDatePicker.Builder.dateRangePicker()
+            .setTitleText("Select Date Range")
+            .setSelection(
+                UtilPair(
+                    defaultStartDate,
+                    defaultEndDate
+                )
+            )
+            .build()
+
+        dateRangePicker.addOnPositiveButtonClickListener { selection ->
+            val startDate = selection.first ?: return@addOnPositiveButtonClickListener
+            val endDate = selection.second ?: return@addOnPositiveButtonClickListener
+            currentDateRange = startDate to endDate
+            updateTimePeriodButtonText()
+            viewModel.setDateRange(startDate, endDate)
+        }
+
+        dateRangePicker.addOnNegativeButtonClickListener {
+            currentDateRange = null
+            updateTimePeriodButtonText()
+            viewModel.clearDateRange()
+        }
+
+        dateRangePicker.show(childFragmentManager, "DATE_RANGE_PICKER")
+    }
+
+    // Add this function to update the button text
+    private fun updateTimePeriodButtonText() {
+        binding.btnTimePeriod.text = if (currentDateRange != null) {
+            val startDate = Date(currentDateRange!!.first)
+            val endDate = Date(currentDateRange!!.second)
+            val dateFormat = DateFormat.getMediumDateFormat(requireContext())
+            "${dateFormat.format(startDate)} - ${dateFormat.format(endDate)}"
+        } else {
+            "Select Time Period"
         }
     }
 

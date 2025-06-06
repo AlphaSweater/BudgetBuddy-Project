@@ -10,12 +10,14 @@ import com.synaptix.budgetbuddy.core.usecase.auth.GetUserIdUseCase
 import com.synaptix.budgetbuddy.core.usecase.main.category.GetCategoriesUseCase
 import com.synaptix.budgetbuddy.core.usecase.main.transaction.GetTransactionsUseCase
 import com.synaptix.budgetbuddy.core.usecase.main.wallet.GetWalletUseCase
+import com.synaptix.budgetbuddy.presentation.ui.main.general.generalTransactions.GeneralTransactionsViewModel.TransactionState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
+import java.util.Date
 import javax.inject.Inject
 
 /**
@@ -65,7 +67,9 @@ class GeneralReportsViewModel @Inject constructor(
     private val getCategoriesUseCase: GetCategoriesUseCase,
     private val getUserIdUseCase: GetUserIdUseCase,
     private val getWalletsUseCase: GetWalletUseCase
+
 ) : ViewModel() {
+
 
     /**
      * Sealed class representing the possible states for transaction data.
@@ -89,6 +93,8 @@ class GeneralReportsViewModel @Inject constructor(
         object Empty : CategoryState()
     }
 
+    private var _allTransactions = emptyList<Transaction>()
+    private var _filteredTransactions = emptyList<Transaction>()
     /**
      * StateFlow for transaction data.
      * This is a hot flow that maintains the current state and emits updates to collectors.
@@ -104,6 +110,9 @@ class GeneralReportsViewModel @Inject constructor(
      */
     private val _categoriesState = MutableStateFlow<CategoryState>(CategoryState.Loading)
     val categoriesState: StateFlow<CategoryState> = _categoriesState
+
+    private val _dateRange = MutableStateFlow<ClosedRange<Long>?>(null)
+    val dateRange: StateFlow<ClosedRange<Long>?> = _dateRange.asStateFlow()
 
     init {
         // Load data when the ViewModel is created
@@ -155,21 +164,18 @@ class GeneralReportsViewModel @Inject constructor(
 
             // Launch parallel coroutines for each data type
             launch {
-                // Transaction Flow Collection
                 getTransactionsUseCase.execute(userId)
                     .catch { e ->
-                        // Handle errors by setting Error state
                         _transactionsState.value = TransactionState.Error(e.message ?: "Unknown error")
                     }
                     .collect { result ->
-                        // Process successful result
-                        _transactionsState.value = when (result) {
+                        when (result) {
                             is GetTransactionsUseCase.GetTransactionsResult.Success -> {
-                                if (result.transactions.isEmpty()) TransactionState.Empty
-                                else TransactionState.Success(result.transactions)
+                                _allTransactions = result.transactions
+                                filterTransactions()
                             }
-                            is GetTransactionsUseCase.GetTransactionsResult.Error -> 
-                                TransactionState.Error("Failed to load transactions")
+                            is GetTransactionsUseCase.GetTransactionsResult.Error ->
+                                _transactionsState.value = TransactionState.Error("Failed to load transactions")
                         }
                     }
             }
@@ -221,12 +227,8 @@ class GeneralReportsViewModel @Inject constructor(
      * @return List of filtered transactions
      */
     fun getTransactionsByType(type: String): List<Transaction> {
-        return when (val state = transactionsState.value) {
-            is TransactionState.Success -> state.transactions.filter {
-                it.category.type.equals(type, ignoreCase = true) &&
-                        (selectedWallet.value == null || it.wallet.id == selectedWallet.value?.id)
-            }
-            else -> emptyList()
+        return _filteredTransactions.filter {
+            it.category.type.equals(type, ignoreCase = true)
         }
     }
 
@@ -247,10 +249,81 @@ class GeneralReportsViewModel @Inject constructor(
     }
 
 
-    fun selectWallet(wallet: Wallet) {
-        Log.d("WalletDropdown", "ViewModel selectWallet called with: ${wallet.name}")
-        _selectedWallet.value = wallet
+    private fun filterTransactions() {
+        Log.d("Filtering", "=== Starting filterTransactions() ===")
+        Log.d("Filtering", "Total transactions before filtering: ${_allTransactions.size}")
+        Log.d("Filtering", "Selected wallet: ${selectedWallet.value?.name ?: "None"}")
+        Log.d("Filtering", "Date range: ${_dateRange.value?.let {
+            "${Date(it.start)} to ${Date(it.endInclusive)}"
+        } ?: "None"}")
+
+        _filteredTransactions = _allTransactions
+            .mapIndexed { index, transaction ->
+                Log.d("Filtering", "\nTransaction #$index:")
+                Log.d("Filtering", "  - ID: ${transaction.id}")
+                Log.d("Filtering", "  - Wallet: ${transaction.wallet.name} (ID: ${transaction.wallet.id})")
+                Log.d("Filtering", "  - Date: ${Date(transaction.date)}")
+                Log.d("Filtering", "  - Category: ${transaction.category.name} (${transaction.category.type})")
+                Log.d("Filtering", "  - Amount: ${transaction.amount}")
+                transaction
+            }
+            .filter { transaction ->
+                // Apply wallet filter
+                val walletMatches = selectedWallet.value?.let { wallet ->
+                    val matches = transaction.wallet.id == wallet.id
+                    Log.d("Filtering", "  - Wallet matches: $matches (${transaction.wallet.name} vs ${wallet.name})")
+                    matches
+                } ?: true.also {
+                    Log.d("Filtering", "  - No wallet filter applied")
+                }
+
+                // Apply date range filter
+                val dateMatches = _dateRange.value?.let { range ->
+                    val inRange = transaction.date in range.start..range.endInclusive
+                    Log.d("Filtering", "  - Date in range (${
+                        Date(range.start)
+                    } - ${
+                        Date(range.endInclusive)
+                    }): $inRange (${Date(transaction.date)})")
+                    inRange
+                } ?: true.also {
+                    Log.d("Filtering", "  - No date range filter applied")
+                }
+
+                val matches = walletMatches && dateMatches
+                Log.d("Filtering", "  - Transaction ${if (matches) "PASSED" else "FILTERED OUT"}")
+                matches
+            }
+
+        Log.d("Filtering", "=== Filtering complete ===")
+        Log.d("Filtering", "Transactions after filtering: ${_filteredTransactions.size}")
+        Log.d("Filtering", "=================================")
+
+        // Update the state with filtered transactions
+        _transactionsState.value = if (_filteredTransactions.isEmpty()) {
+            Log.d("Filtering", "No transactions match the current filters")
+            TransactionState.Empty
+        } else {
+            Log.d("Filtering", "Updating UI with ${_filteredTransactions.size} filtered transactions")
+            TransactionState.Success(_filteredTransactions)
+        }
     }
 
+
+    // Update your selectWallet function to also filter transactions
+    fun selectWallet(wallet: Wallet?) {
+        _selectedWallet.value = wallet
+        filterTransactions()
+    }
+
+    fun setDateRange(startDate: Long, endDate: Long) {
+        _dateRange.value = startDate..endDate
+        filterTransactions()
+    }
+
+    fun clearDateRange() {
+        _dateRange.value = null
+        filterTransactions()
+    }
 
 }
