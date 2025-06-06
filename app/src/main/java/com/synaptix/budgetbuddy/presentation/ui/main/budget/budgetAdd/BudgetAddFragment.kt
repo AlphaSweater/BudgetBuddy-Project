@@ -21,9 +21,7 @@
 
 package com.synaptix.budgetbuddy.presentation.ui.main.budget.budgetAdd
 
-import android.graphics.BitmapFactory
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -31,13 +29,16 @@ import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.synaptix.budgetbuddy.R
 import com.synaptix.budgetbuddy.core.model.Category
 import com.synaptix.budgetbuddy.databinding.FragmentBudgetAddBinding
+import com.synaptix.budgetbuddy.extentions.getThemeColor
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
@@ -45,11 +46,8 @@ class BudgetAddFragment : Fragment() {
 
     private var _binding: FragmentBudgetAddBinding? = null
     private val binding get() = _binding!!
-
     private val viewModel: BudgetAddViewModel by activityViewModels()
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-    // --- Fragment Lifecycle Methods ---
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -61,25 +59,46 @@ class BudgetAddFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         setupUI()
-        observeViewModel()
+
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                launch {
+                    collectUiState()
+                }
+                launch {
+                    collectValidationState()
+                }
+                launch {
+                    collectSelectedCategories()
+                }
+            }
+        }
+
     }
 
-    override fun onResume() {
-        super.onResume()
-        observeViewModel()
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-    }
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-    // --- Setup Methods ---
     private fun setupUI() {
         setupCurrencySpinner()
-        setupClickListeners()
+
+        binding.btnSave.setOnClickListener {
+            viewModel.setBudgetName(binding.budgetName.text.toString())
+            viewModel.setBudgetAmount(binding.amount.text.toString().toDoubleOrNull())
+            viewModel.showValidationErrors()
+
+            if (viewModel.validateForm()) {
+                viewModel.addBudget()
+            }
+        }
+
+        binding.btnGoBack.setOnClickListener {
+            findNavController().popBackStack()
+        }
+
+        binding.rowSelectCategory.setOnClickListener {
+            findNavController().navigate(R.id.action_budgetAddFragment_to_budgetSelectCategoryFragment)
+        }
     }
 
     private fun setupCurrencySpinner() {
@@ -89,101 +108,64 @@ class BudgetAddFragment : Fragment() {
         binding.currencySpinner.adapter = adapter
     }
 
-    private fun setupClickListeners() {
-        binding.btnSave.setOnClickListener { saveBudget() }
-        binding.btnGoBack.setOnClickListener { findNavController().popBackStack() }
-        binding.rowSelectCategory.setOnClickListener { showCategorySelector() }
-        binding.rowSelectWallet.setOnClickListener { showWalletSelector() }
-    }
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-    // --- Save Logic ---
-    private fun saveBudget() {
-        viewModel.budgetName.value = binding.budgetName.text.toString()
-        viewModel.budgetAmount.value = binding.amount.text.toString().toDoubleOrNull() ?: 0.0
 
-        if (viewModel.selectedCategories.value.isNullOrEmpty() ||
-//            viewModel.wallet.value == null ||
-            viewModel.budgetName.value.isNullOrBlank() ||
-            viewModel.budgetAmount.value!! <= 0.0
-        ) {
-            Toast.makeText(
-                requireContext(),
-                "Please fill in all required fields correctly.",
-                Toast.LENGTH_SHORT
-            ).show()
-            return
-        }
-
-        viewLifecycleOwner.lifecycleScope.launch {
-            try {
-                viewModel.addBudget()
-                Toast.makeText(
-                    requireContext(),
-                    "Budget added successfully!",
-                    Toast.LENGTH_SHORT
-                ).show()
-                findNavController().popBackStack()
-                viewModel.reset()
-            } catch (e: Exception) {
-                Toast.makeText(
-                    requireContext(),
-                    "Failed to save budget: ${e.message}",
-                    Toast.LENGTH_SHORT
-                ).show()
+    private suspend fun collectUiState() {
+        viewModel.uiState.collectLatest { state ->
+            when (state) {
+                is BudgetAddViewModel.UiState.Loading -> {
+                    binding.btnSave.isEnabled = false
+                }
+                is BudgetAddViewModel.UiState.Success -> {
+                    Toast.makeText(requireContext(), "Budget added successfully!", Toast.LENGTH_SHORT).show()
+                    findNavController().popBackStack()
+                    viewModel.reset()
+                }
+                is BudgetAddViewModel.UiState.Error -> {
+                    binding.btnSave.isEnabled = true
+                    Toast.makeText(requireContext(), state.message, Toast.LENGTH_SHORT).show()
+                }
+                else -> {
+                    binding.btnSave.isEnabled = true
+                }
             }
         }
     }
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-    // --- Popup Navigation ---
-    private fun showWalletSelector() {
-        findNavController().navigate(R.id.action_budgetAddFragment_to_budgetSelectWalletFragment)
+    private suspend fun collectValidationState() {
+        viewModel.validationState.collectLatest { state ->
+            binding.textSelectedCategoryName.error = state.categoryError
+        }
     }
 
-    private fun showCategorySelector() {
-        findNavController().navigate(R.id.action_budgetAddFragment_to_budgetSelectCategoryFragment)
+    private suspend fun collectSelectedCategories() {
+        viewModel.selectedCategories.collectLatest { selected ->
+            if (selected.isEmpty()) {
+                updateSelectedCategory(null)
+                binding.textSelectedCategoryName.text = "No categories selected"
+            } else {
+                updateSelectedCategory(selected.first())
+                binding.textSelectedCategoryName.text = selected.joinToString(", ") { it.name }
+            }
+        }
     }
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-    // --- Update Methods ---
-    private fun updateSelectedWallet(walletName: String) {
-        if (walletName.isBlank()) {
-            binding.textSelectedWalletName.text = "No wallet selected"
+    private fun updateSelectedCategory(category: Category?) {
+        if (category == null) {
+            binding.textSelectedCategoryName.text = "Select category"
+            binding.imgSelectedCategoryIcon.setImageResource(R.drawable.ic_ui_categories)
+            binding.imgSelectedCategoryIcon.setColorFilter(requireContext().getThemeColor(R.attr.bb_accent))
             return
         }
-        binding.textSelectedWalletName.text = walletName
+
+        binding.textSelectedCategoryName.text = category.name
+        binding.imgSelectedCategoryIcon.setImageResource(category.icon)
+        binding.imgSelectedCategoryIcon.setColorFilter(requireContext().getColor(category.color))
     }
 
-    private fun updateSelectedCategories() {
-        val selectedCategories = viewModel.selectedCategories.value
-        if (selectedCategories.isNullOrEmpty()) {
-            binding.textSelectedCategoryName.text = "No categories selected"
-            return
-        }
-        val categoryNames = selectedCategories.joinToString(", ") { it.name }
-        binding.textSelectedCategoryName.text = categoryNames
-    }
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-    // --- Observers ---
-    private fun observeViewModel() {
-        viewModel.selectedCategories.observe(viewLifecycleOwner) { categories ->
-            updateSelectedCategories()
-        }
-
-        viewModel.wallet.observe(viewLifecycleOwner) { wallet ->
-            updateSelectedWallet(wallet?.name ?: "")
-            Log.d("Wallet", "Selected Wallet ID: $wallet")
-        }
-
-        viewModel.budgetAmount.observe(viewLifecycleOwner) { amount ->
-            Log.d("Amount", "Entered Amount: $amount")
-        }
-
-        viewModel.budgetName.observe(viewLifecycleOwner) { name ->
-            Log.d("Note", "Entered Note: $name")
-        }
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~EOF~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\

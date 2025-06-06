@@ -21,71 +21,144 @@
 
 package com.synaptix.budgetbuddy.presentation.ui.main.budget.budgetAdd
 
-import androidx.lifecycle.MutableLiveData
+import android.util.Log
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.synaptix.budgetbuddy.core.model.Category
-import com.synaptix.budgetbuddy.core.model.Wallet
 import com.synaptix.budgetbuddy.core.usecase.auth.GetUserIdUseCase
-import com.synaptix.budgetbuddy.core.usecase.auth.ValidateUserTotalsUseCase
 import com.synaptix.budgetbuddy.data.firebase.model.BudgetDTO
 import com.synaptix.budgetbuddy.data.firebase.repository.FirestoreBudgetRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-// --- ViewModel for Adding Budget ---
 @HiltViewModel
 class BudgetAddViewModel @Inject constructor(
     private val firestoreBudgetRepository: FirestoreBudgetRepository,
-    private val getUserIdUseCase: GetUserIdUseCase,
-    private val validateUserTotalsUseCase: ValidateUserTotalsUseCase
+    private val getUserIdUseCase: GetUserIdUseCase
 ) : ViewModel() {
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-    // LiveData for budget input fields
-    val budgetName = MutableLiveData<String?>()
-    val wallet = MutableLiveData<Wallet?>()
-    val selectedCategories = MutableLiveData<List<Category>>(emptyList())
-    val budgetAmount = MutableLiveData<Double?>()
+    sealed class UiState {
+        object Initial : UiState()
+        object Loading : UiState()
+        object Success : UiState()
+        data class Error(val message: String) : UiState()
+    }
 
-    private val _error = MutableLiveData<String?>()
-    val error: MutableLiveData<String?> = _error
+    data class ValidationState(
+        val isNameValid: Boolean = false,
+        val isAmountValid: Boolean = false,
+        val isCategoryValid: Boolean = false,
+        val nameError: String? = null,
+        val amountError: String? = null,
+        val categoryError: String? = null,
+        val shouldShowErrors: Boolean = false
+    )
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-    // Function to Add Budget
-    suspend fun addBudget() {
-        try {
-            val userId = getUserIdUseCase.execute()
-            val newBudgetDTO = BudgetDTO(
-                userId = userId,
-                name = budgetName.value ?: "",
-                amount = budgetAmount.value ?: 0.0,
-                spent = 0.0,
-                categoryIds = selectedCategories.value?.map { it.id } ?: emptyList(),
-                startDate = System.currentTimeMillis()
-            )
+    private val _uiState = MutableStateFlow<UiState>(UiState.Initial)
+    val uiState: StateFlow<UiState> = _uiState
 
-            when (val result = firestoreBudgetRepository.createBudget(newBudgetDTO.userId, newBudgetDTO)) {
-                is com.synaptix.budgetbuddy.core.model.Result.Success -> {
-                    // OK
-//                    validateUserTotalsUseCase.execute(userId)
+    private val _validationState = MutableStateFlow(ValidationState())
+    val validationState: StateFlow<ValidationState> = _validationState
+
+    private val _budgetName = MutableStateFlow<String?>(null)
+    val budgetName: StateFlow<String?> = _budgetName
+
+    private val _budgetAmount = MutableStateFlow<Double?>(null)
+    val budgetAmount: StateFlow<Double?> = _budgetAmount
+
+    private val _category = MutableStateFlow<Category?>(null)
+    val category: StateFlow<Category?> = _category
+
+    private val _selectedCategories = MutableStateFlow<List<Category>>(emptyList())
+    val selectedCategories: StateFlow<List<Category>> = _selectedCategories
+
+    fun setBudgetName(name: String) {
+        _budgetName.value = name
+        validateForm()
+    }
+
+    fun setBudgetAmount(amount: Double?) {
+        _budgetAmount.value = amount
+        validateForm()
+    }
+
+    fun setCategory(category: Category?) {
+        _category.value = category
+        validateForm()
+    }
+
+    fun setSelectedCategories(categories: List<Category>) {
+        _selectedCategories.value = categories
+        setCategory(categories.firstOrNull())
+        validateForm()
+    }
+
+    fun validateForm(): Boolean {
+        val currentState = _validationState.value
+        val isNameValid = !_budgetName.value.isNullOrBlank()
+        val isAmountValid = (_budgetAmount.value ?: 0.0) > 0.0
+        val isCategoryValid = _category.value != null
+
+        _validationState.value = currentState.copy(
+            isNameValid = isNameValid,
+            isAmountValid = isAmountValid,
+            isCategoryValid = isCategoryValid,
+            nameError = if (currentState.shouldShowErrors && !isNameValid) "Please enter a budget name" else null,
+            amountError = if (currentState.shouldShowErrors && !isAmountValid) "Enter a valid amount" else null,
+            categoryError = if (currentState.shouldShowErrors && !isCategoryValid) "Select a category" else null
+        )
+
+        return isNameValid && isAmountValid && isCategoryValid
+    }
+
+    fun showValidationErrors() {
+        _validationState.value = _validationState.value.copy(shouldShowErrors = true)
+        validateForm()
+    }
+
+    fun addBudget() {
+        if (!validateForm()) return
+
+        viewModelScope.launch {
+            _uiState.value = UiState.Loading
+
+            try {
+                val userId = getUserIdUseCase.execute()
+                val newBudgetDTO = BudgetDTO(
+                    userId = userId,
+                    name = _budgetName.value ?: "",
+                    amount = _budgetAmount.value ?: 0.0,
+                    spent = 0.0,
+                    categoryIds = _selectedCategories.value.map { it.id },
+                    startDate = System.currentTimeMillis()
+                )
+
+                when (val result = firestoreBudgetRepository.createBudget(userId, newBudgetDTO)) {
+                    is com.synaptix.budgetbuddy.core.model.Result.Success -> {
+                        reset()
+                        _uiState.value = UiState.Success
+                    }
+                    is com.synaptix.budgetbuddy.core.model.Result.Error -> {
+                        _uiState.value = UiState.Error(result.exception.message ?: "Failed to create budget")
+                    }
                 }
-                is com.synaptix.budgetbuddy.core.model.Result.Error -> {
-                    _error.value = result.exception.message
-                }
+            } catch (e: Exception) {
+                Log.e("BudgetAddViewModel", "Exception adding budget: ${e.message}")
+                _uiState.value = UiState.Error(e.message ?: "An unexpected error occurred")
             }
-        } catch (e: Exception) {
-            _error.value = e.message
         }
     }
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-    // Function to Reset Input Fields
     fun reset() {
-        budgetName.value = null
-        wallet.value = null
-        selectedCategories.value = emptyList()
-        budgetAmount.value = null
-        _error.value = null
+        _budgetName.value = null
+        _budgetAmount.value = null
+        _category.value = null
+        _selectedCategories.value = emptyList()
+        _uiState.value = UiState.Initial
+        _validationState.value = ValidationState(shouldShowErrors = false)
     }
 }
+
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~EOF~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
