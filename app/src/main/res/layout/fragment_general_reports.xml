@@ -271,6 +271,7 @@
                             android:background="@android:color/transparent" />
 
                         <TextView
+                            android:id="@+id/txtExpenseTotal"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:gravity="center"
@@ -299,6 +300,7 @@
                             android:textColor="?attr/bb_primaryText" />
 
                         <TextView
+                            android:id="@+id/txtIncomeTotal"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:gravity="center"

@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
+import java.util.Calendar
 import java.util.Date
 import javax.inject.Inject
 
@@ -162,7 +163,7 @@ class GeneralReportsViewModel @Inject constructor(
                 return@launch
             }
 
-            // Launch parallel coroutines for each data type
+            // Load transactions
             launch {
                 getTransactionsUseCase.execute(userId)
                     .catch { e ->
@@ -172,37 +173,38 @@ class GeneralReportsViewModel @Inject constructor(
                         when (result) {
                             is GetTransactionsUseCase.GetTransactionsResult.Success -> {
                                 _allTransactions = result.transactions
-                                filterTransactions()
+                                filterTransactions() // This will update the UI
                             }
-                            is GetTransactionsUseCase.GetTransactionsResult.Error ->
+                            is GetTransactionsUseCase.GetTransactionsResult.Error -> {
                                 _transactionsState.value = TransactionState.Error("Failed to load transactions")
+                            }
                         }
                     }
             }
 
+            // Load categories
             launch {
-                // Category Flow Collection
                 getCategoriesUseCase.execute(userId)
                     .catch { e ->
-                        // Handle errors by setting Error state
                         _categoriesState.value = CategoryState.Error(e.message ?: "Unknown error")
                     }
                     .collect { result ->
-                        // Process successful result
                         _categoriesState.value = when (result) {
                             is GetCategoriesUseCase.GetCategoriesResult.Success -> {
                                 if (result.categories.isEmpty()) CategoryState.Empty
                                 else CategoryState.Success(result.categories)
                             }
-                            is GetCategoriesUseCase.GetCategoriesResult.Error -> 
+                            is GetCategoriesUseCase.GetCategoriesResult.Error ->
                                 CategoryState.Error("Failed to load categories")
                         }
                     }
             }
+
+            // Load wallets
             launch {
                 getWalletsUseCase.execute(userId)
                     .catch { e ->
-                        // You can log this or create a WalletState sealed class if needed
+                        Log.e("WalletLoad", "Error loading wallets", e)
                     }
                     .collect { result ->
                         when (result) {
@@ -210,12 +212,11 @@ class GeneralReportsViewModel @Inject constructor(
                                 _walletState.value = result.wallets
                             }
                             is GetWalletUseCase.GetWalletResult.Error -> {
-                                // Log or ignore, based on your needs
+                                Log.e("WalletLoad", "Error: ${result.message}")
                             }
                         }
                     }
             }
-
         }
     }
 
@@ -250,63 +251,46 @@ class GeneralReportsViewModel @Inject constructor(
 
 
     private fun filterTransactions() {
-        Log.d("Filtering", "=== Starting filterTransactions() ===")
-        Log.d("Filtering", "Total transactions before filtering: ${_allTransactions.size}")
-        Log.d("Filtering", "Selected wallet: ${selectedWallet.value?.name ?: "None"}")
-        Log.d("Filtering", "Date range: ${_dateRange.value?.let {
-            "${Date(it.start)} to ${Date(it.endInclusive)}"
-        } ?: "None"}")
+        val dateRange = _dateRange.value
+        val selectedWallet = _selectedWallet.value
 
-        _filteredTransactions = _allTransactions
-            .mapIndexed { index, transaction ->
-                Log.d("Filtering", "\nTransaction #$index:")
-                Log.d("Filtering", "  - ID: ${transaction.id}")
-                Log.d("Filtering", "  - Wallet: ${transaction.wallet.name} (ID: ${transaction.wallet.id})")
-                Log.d("Filtering", "  - Date: ${Date(transaction.date)}")
-                Log.d("Filtering", "  - Category: ${transaction.category.name} (${transaction.category.type})")
-                Log.d("Filtering", "  - Amount: ${transaction.amount}")
-                transaction
-            }
-            .filter { transaction ->
-                // Apply wallet filter
-                val walletMatches = selectedWallet.value?.let { wallet ->
-                    val matches = transaction.wallet.id == wallet.id
-                    Log.d("Filtering", "  - Wallet matches: $matches (${transaction.wallet.name} vs ${wallet.name})")
-                    matches
-                } ?: true.also {
-                    Log.d("Filtering", "  - No wallet filter applied")
+        _filteredTransactions = _allTransactions.filter { transaction ->
+            // Date range filter
+            val isInDateRange = if (dateRange != null) {
+                // Convert transaction date to start of day for comparison
+                val cal = Calendar.getInstance().apply {
+                    timeInMillis = transaction.date
+                    set(Calendar.HOUR_OF_DAY, 0)
+                    set(Calendar.MINUTE, 0)
+                    set(Calendar.SECOND, 0)
+                    set(Calendar.MILLISECOND, 0)
                 }
-
-                // Apply date range filter
-                val dateMatches = _dateRange.value?.let { range ->
-                    val inRange = transaction.date in range.start..range.endInclusive
-                    Log.d("Filtering", "  - Date in range (${
-                        Date(range.start)
-                    } - ${
-                        Date(range.endInclusive)
-                    }): $inRange (${Date(transaction.date)})")
-                    inRange
-                } ?: true.also {
-                    Log.d("Filtering", "  - No date range filter applied")
-                }
-
-                val matches = walletMatches && dateMatches
-                Log.d("Filtering", "  - Transaction ${if (matches) "PASSED" else "FILTERED OUT"}")
-                matches
+                val transactionDay = cal.timeInMillis
+                transactionDay in dateRange.start..dateRange.endInclusive
+            } else {
+                // Default to last 3 months if no date range is set
+                val calendar = Calendar.getInstance()
+                val endDate = calendar.timeInMillis
+                calendar.add(Calendar.MONTH, -3)
+                val startDate = calendar.timeInMillis
+                transaction.date in startDate..endDate
             }
 
-        Log.d("Filtering", "=== Filtering complete ===")
-        Log.d("Filtering", "Transactions after filtering: ${_filteredTransactions.size}")
-        Log.d("Filtering", "=================================")
+            // Wallet filter - if selectedWallet is null, show all wallets
+            val isInSelectedWallet = selectedWallet?.let { wallet ->
+                transaction.wallet.id == wallet.id
+            } ?: true // If no wallet is selected (null), include all transactions
 
-        // Update the state with filtered transactions
-        _transactionsState.value = if (_filteredTransactions.isEmpty()) {
-            Log.d("Filtering", "No transactions match the current filters")
-            TransactionState.Empty
-        } else {
-            Log.d("Filtering", "Updating UI with ${_filteredTransactions.size} filtered transactions")
-            TransactionState.Success(_filteredTransactions)
+            isInDateRange && isInSelectedWallet
         }
+
+        Log.d("Filtering", "Filtered transactions: ${_filteredTransactions.size} items")
+        Log.d("Filtering", "Income transactions: ${_filteredTransactions.count { it.category.type.equals("income", true) }}")
+        Log.d("Filtering", "Expense transactions: ${_filteredTransactions.count { !it.category.type.equals("income", true) }}")
+        Log.d("Filtering", "Date range: ${dateRange?.let { "${Date(it.start)} - ${Date(it.endInclusive)}" } ?: "null"}")
+        Log.d("Filtering", "Selected wallet: ${selectedWallet?.name ?: "All Wallets"}")
+
+        _transactionsState.value = TransactionState.Success(_filteredTransactions)
     }
 
 
@@ -317,7 +301,24 @@ class GeneralReportsViewModel @Inject constructor(
     }
 
     fun setDateRange(startDate: Long, endDate: Long) {
-        _dateRange.value = startDate..endDate
+        // Normalize the dates to start and end of day
+        val startCal = Calendar.getInstance().apply {
+            timeInMillis = startDate
+            set(Calendar.HOUR_OF_DAY, 0)
+            set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
+        }
+
+        val endCal = Calendar.getInstance().apply {
+            timeInMillis = endDate
+            set(Calendar.HOUR_OF_DAY, 23)
+            set(Calendar.MINUTE, 59)
+            set(Calendar.SECOND, 59)
+            set(Calendar.MILLISECOND, 999)
+        }
+
+        _dateRange.value = startCal.timeInMillis..endCal.timeInMillis
         filterTransactions()
     }
 

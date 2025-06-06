@@ -44,6 +44,7 @@ import com.synaptix.budgetbuddy.extentions.getThemeColor
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
 
@@ -197,6 +198,9 @@ class GeneralReportsFragment : Fragment() {
     private fun observeStates() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                // Load data when the fragment starts
+                viewModel.loadData()
+
                 launch {
                     // Observe wallet selection changes
                     viewModel.selectedWallet.collect { selectedWallet ->
@@ -214,15 +218,20 @@ class GeneralReportsFragment : Fragment() {
                 }
 
                 launch {
-                    // Observe transactions - only update UI if we have both transactions and categories
+                    // Observe transactions
                     viewModel.transactionsState.collect { state ->
                         when (state) {
                             is GeneralReportsViewModel.TransactionState.Success -> {
                                 Log.d("Filtering", "Transactions updated: ${state.transactions.size} items")
-                                // Only update UI if we have categories loaded
-                                if (viewModel.categoriesState.value is GeneralReportsViewModel.CategoryState.Success) {
-                                    updateUI()
-                                }
+                                updateUI()
+                            }
+                            is GeneralReportsViewModel.TransactionState.Loading -> {
+                                // Show loading state if needed
+                                Log.d("Filtering", "Loading transactions...")
+                            }
+                            is GeneralReportsViewModel.TransactionState.Error -> {
+                                Log.e("Filtering", "Error loading transactions: ${state.message}")
+                                // Show error state if needed
                             }
                             else -> {}
                         }
@@ -230,15 +239,12 @@ class GeneralReportsFragment : Fragment() {
                 }
 
                 launch {
-                    // Observe categories - only update UI if we have both transactions and categories
+                    // Observe categories
                     viewModel.categoriesState.collect { state ->
                         when (state) {
                             is GeneralReportsViewModel.CategoryState.Success -> {
                                 Log.d("Filtering", "Categories updated: ${state.categories.size} items")
-                                // Only update UI if we have transactions loaded
-                                if (viewModel.transactionsState.value is GeneralReportsViewModel.TransactionState.Success) {
-                                    updateCategoryLists(state.categories)
-                                }
+                                updateCategoryLists(state.categories)
                             }
                             else -> {}
                         }
@@ -247,7 +253,6 @@ class GeneralReportsFragment : Fragment() {
             }
         }
     }
-
     private fun updateUI() {
         when (val state = viewModel.transactionsState.value) {
             is GeneralReportsViewModel.TransactionState.Success -> {
@@ -255,14 +260,20 @@ class GeneralReportsFragment : Fragment() {
                 setupLineChart(state.transactions)
                 setupPieChart(binding.btnCategoryExpenseToggle.background != null)
 
-                // Only update category lists, not transaction lists
-                viewModel.categoriesState.value.let { categoryState ->
-                    if (categoryState is GeneralReportsViewModel.CategoryState.Success) {
-                        updateCategoryLists(categoryState.categories)
-                    }
+                // Update category lists if we have categories loaded
+                (viewModel.categoriesState.value as? GeneralReportsViewModel.CategoryState.Success)?.let { categoryState ->
+                    updateCategoryLists(categoryState.categories)
                 }
             }
-            else -> {}
+            is GeneralReportsViewModel.TransactionState.Loading -> {
+                // Show loading state if needed
+            }
+            is GeneralReportsViewModel.TransactionState.Error -> {
+                // Show error state if needed
+            }
+            is GeneralReportsViewModel.TransactionState.Empty -> {
+                // Show empty state if needed
+            }
         }
     }
 
@@ -287,37 +298,69 @@ class GeneralReportsFragment : Fragment() {
             else -> emptyList()
         }
 
-        val expenseCategories = categories.filter { it.type.equals("expense", ignoreCase = true) }
-        val incomeCategories = categories.filter { it.type.equals("income", ignoreCase = true) }
+        val expenseTransactions = viewModel.getTransactionsByType("expense")
+        val incomeTransactions = viewModel.getTransactionsByType("income")
+
+        val totalExpense = expenseTransactions.sumOf { it.amount.toDouble() }
+        val totalIncome = incomeTransactions.sumOf { it.amount.toDouble() }
+
+        binding.apply {
+            btnCategoryExpenseToggle.findViewById<TextView>(R.id.txtExpenseTotal).text =
+                "-R ${String.format("%.2f", totalExpense)}"
+            btnCategoryIncomeToggle.findViewById<TextView>(R.id.txtIncomeTotal).text =
+                "R ${String.format("%.2f", totalIncome)}"
+        }
+
+        // Get unique category IDs from filtered transactions
+        val categoryIdsWithTransactions = filteredTransactions
+            .map { it.category.id }
+            .toSet()
+
+        // Filter categories to only those with transactions
+        val expenseCategories = categories
+            .filter {
+                it.type.equals("expense", ignoreCase = true) &&
+                        categoryIdsWithTransactions.contains(it.id)
+            }
+            .sortedBy { it.name }
+
+        val incomeCategories = categories
+            .filter {
+                it.type.equals("income", ignoreCase = true) &&
+                        categoryIdsWithTransactions.contains(it.id)
+            }
+            .sortedBy { it.name }
+
+        val dateFormat = SimpleDateFormat("MMM d", Locale.getDefault())
 
         val expenseItems = expenseCategories.map { category ->
             val categoryTransactions = filteredTransactions.filter { it.category.id == category.id }
-            val totalAmount = categoryTransactions.sumOf { it.amount.toDouble() }
-
             ReportListItems.ReportCategoryItem(
                 category = category,
                 transactionCount = categoryTransactions.size,
-                amount = String.format("R %.2f", totalAmount),
-                relativeDate = "Selected Period"
+                amount = String.format("R %.2f", categoryTransactions.sumOf { it.amount.toDouble() }),
+                relativeDate = categoryTransactions.maxByOrNull { it.date }?.let {
+                    dateFormat.format(Date(it.date))
+                } ?: "No date"
             )
         }
 
         val incomeItems = incomeCategories.map { category ->
             val categoryTransactions = filteredTransactions.filter { it.category.id == category.id }
-            val totalAmount = categoryTransactions.sumOf { it.amount.toDouble() }
-
             ReportListItems.ReportCategoryItem(
                 category = category,
                 transactionCount = categoryTransactions.size,
-                amount = String.format("R %.2f", totalAmount),
-                relativeDate = "Selected Period"
+                amount = String.format("R %.2f", categoryTransactions.sumOf { it.amount.toDouble() }),
+                relativeDate = categoryTransactions.maxByOrNull { it.date }?.let {
+                    dateFormat.format(Date(it.date))
+                } ?: "No date"
             )
         }
 
+        updateTotalBalance(filteredTransactions)
         expenseAdapter.submitList(expenseItems)
         incomeAdapter.submitList(incomeItems)
     }
-
     /**
      * Shows expense-related views and updates the pie chart.
      * Handles visibility of RecyclerViews and toggle states.
@@ -328,19 +371,27 @@ class GeneralReportsFragment : Fragment() {
             recyclerViewIncomeCategory.visibility = View.GONE
             setupPieChart(isExpense = true)
             highlightToggle(btnCategoryExpenseToggle, btnCategoryIncomeToggle)
+
+            // Calculate and display total expenses
+            val transactions = viewModel.getTransactionsByType("expense")
+            val totalExpense = transactions.sumOf { it.amount.toDouble() }
+            btnCategoryExpenseToggle.findViewById<TextView>(R.id.txtExpenseTotal).text =
+                "${String.format("%.2f", totalExpense)}"
         }
     }
 
-    /**
-     * Shows income-related views and updates the pie chart.
-     * Handles visibility of RecyclerViews and toggle states.
-     */
     private fun showCategoryIncomeToggle() {
         binding.apply {
             recyclerViewExpenseCategory.visibility = View.GONE
             recyclerViewIncomeCategory.visibility = View.VISIBLE
             setupPieChart(isExpense = false)
             highlightToggle(btnCategoryIncomeToggle, btnCategoryExpenseToggle)
+
+            // Calculate and display total income
+            val transactions = viewModel.getTransactionsByType("income")
+            val totalIncome = transactions.sumOf { it.amount.toDouble() }
+            btnCategoryIncomeToggle.findViewById<TextView>(R.id.txtIncomeTotal).text =
+                "${String.format("%.2f", totalIncome)}"
         }
     }
 
@@ -374,84 +425,134 @@ class GeneralReportsFragment : Fragment() {
      *    - Minimizes object creation
      *    - Optimizes drawing operations
      */
+
     private fun setupLineChart(transactions: List<Transaction>) {
         val lineChart: LineChart = binding.lineChart
         val context = lineChart.context
 
-        val months = listOf("Jan", "Feb", "Mar", "Apr", "May", "Jun")
-        val incomeValues = MutableList(6) { 0f }
-        val expenseValues = MutableList(6) { 0f }
+        // Get date range from ViewModel or use default (last 3 months)
+        val calendar = Calendar.getInstance()
+        val endDate = viewModel.dateRange.value?.endInclusive ?: calendar.timeInMillis
 
-        for (transaction in transactions) {
-            val calendar = Calendar.getInstance().apply {
-                timeInMillis = transaction.date
+        calendar.timeInMillis = viewModel.dateRange.value?.start ?: run {
+            calendar.add(Calendar.MONTH, -3)
+            calendar.timeInMillis
+        }
+        val startDate = calendar.timeInMillis
+
+        // Get all unique dates with transactions
+        val transactionDates = transactions
+            .filter { it.date in startDate..endDate }
+            .map { transaction ->
+                val cal = Calendar.getInstance().apply { timeInMillis = transaction.date }
+                cal.set(Calendar.HOUR_OF_DAY, 0)
+                cal.set(Calendar.MINUTE, 0)
+                cal.set(Calendar.SECOND, 0)
+                cal.set(Calendar.MILLISECOND, 0)
+                cal.timeInMillis
             }
-            val monthIndex = calendar.get(Calendar.MONTH)
-            val amount = transaction.amount.toFloat()
-            val categoryType = transaction.category.type.lowercase(Locale.getDefault())
+            .toSet()
+            .sorted()
 
-            if (monthIndex in 0..5) {
-                when (categoryType) {
-                    "income" -> incomeValues[monthIndex] += amount
-                    "expense" -> expenseValues[monthIndex] += amount
+        if (transactionDates.isEmpty()) {
+            lineChart.clear()
+            lineChart.setNoDataText("No transaction data available")
+            lineChart.setNoDataTextColor(context.getThemeColor(R.attr.bb_primaryText))
+            lineChart.invalidate()
+            return
+        }
+
+        // Calculate running balance
+        var runningBalance = 0.0
+        val dateFormat = SimpleDateFormat("MMM d", Locale.getDefault())
+        val balanceEntries = mutableListOf<Entry>()
+        val dates = mutableListOf<String>()
+
+        // Add initial point if needed
+        if (transactionDates.isNotEmpty()) {
+            val firstDate = transactionDates.first()
+            dates.add(dateFormat.format(Date(firstDate)))
+            balanceEntries.add(Entry(0f, runningBalance.toFloat()))
+        }
+
+        // Process transactions in date order
+        transactionDates.forEachIndexed { index, date ->
+            // Get all transactions for this date
+            val dailyTransactions = transactions.filter {
+                val cal = Calendar.getInstance().apply { timeInMillis = it.date }
+                cal.set(Calendar.HOUR_OF_DAY, 0)
+                cal.set(Calendar.MINUTE, 0)
+                cal.set(Calendar.SECOND, 0)
+                cal.set(Calendar.MILLISECOND, 0)
+                cal.timeInMillis == date
+            }
+
+            // Update running balance
+            dailyTransactions.forEach { transaction ->
+                if (transaction.category.type.equals("income", ignoreCase = true)) {
+                    runningBalance += transaction.amount.toDouble()
+                } else {
+                    runningBalance -= transaction.amount.toDouble()
                 }
             }
+
+            // Add entry for this date
+            dates.add(dateFormat.format(Date(date)))
+            balanceEntries.add(Entry((index + 1).toFloat(), runningBalance.toFloat()))
         }
 
-        val incomeEntries = incomeValues.mapIndexed { index, value -> Entry(index.toFloat(), value) }
-        val expenseEntries = expenseValues.mapIndexed { index, value -> Entry(index.toFloat(), value) }
-
-        val incomeDataSet = LineDataSet(incomeEntries, "Income").apply {
-            color = ContextCompat.getColor(context, R.color.profit_green)
+        // Create dataset
+        val dataSet = LineDataSet(balanceEntries, "Balance").apply {
+            color = ContextCompat.getColor(context, R.color.button)
             lineWidth = 2f
-            setCircleColor(ContextCompat.getColor(context, R.color.profit_green))
-            circleRadius = 4f
-            mode = LineDataSet.Mode.CUBIC_BEZIER
+            setCircleColor(ContextCompat.getColor(context, R.color.button))
+            circleRadius = 3f
+            mode = LineDataSet.Mode.LINEAR
             setDrawFilled(true)
-            fillDrawable = ContextCompat.getDrawable(context, R.drawable.gradient_income)
+            fillDrawable = ContextCompat.getDrawable(context, R.drawable.gradient_wallet)
             setDrawValues(false)
         }
 
-        val expenseDataSet = LineDataSet(expenseEntries, "Expense").apply {
-            color = ContextCompat.getColor(context, R.color.expense_red)
-            lineWidth = 2f
-            setCircleColor(ContextCompat.getColor(context, R.color.expense_red))
-            circleRadius = 4f
-            mode = LineDataSet.Mode.CUBIC_BEZIER
-            setDrawFilled(true)
-            fillDrawable = ContextCompat.getDrawable(context, R.drawable.gradient_expense)
-            setDrawValues(false)
-        }
-
-        val lineData = LineData(incomeDataSet, expenseDataSet)
+        val lineData = LineData(dataSet)
 
         lineChart.apply {
             clear()
             data = lineData
 
             xAxis.apply {
-                valueFormatter = IndexAxisValueFormatter(months)
+                valueFormatter = IndexAxisValueFormatter(dates)
                 granularity = 1f
                 textColor = context.getThemeColor(R.attr.bb_primaryText)
                 position = XAxis.XAxisPosition.BOTTOM
                 setDrawGridLines(false)
                 labelRotationAngle = -45f
+                labelCount = minOf(7, dates.size)
+                setCenterAxisLabels(false)
             }
 
             axisLeft.apply {
                 textColor = context.getThemeColor(R.attr.bb_primaryText)
-                setDrawGridLines(false)
+                setDrawGridLines(true)
+                gridLineWidth = 0.5f
+                axisMinimum = 0f
             }
 
             setExtraOffsets(0f, 0f, 0f, 30f)
             axisRight.isEnabled = false
             description.isEnabled = false
             legend.isEnabled = false
-            setScaleEnabled(false)
-            setPinchZoom(false)
+            setScaleEnabled(true)
+            setPinchZoom(true)
             animateXY(1000, 1200, Easing.EaseInOutCubic)
+            setVisibleXRangeMaximum(7f)
+            moveViewToX(if (dates.size > 7) (dates.size - 7).toFloat() else 0f)
             invalidate()
         }
+    }
+
+    private fun updateTotalBalance(transactions: List<Transaction>) {
+        val totalBalance = transactions.sumOf { it.amount }
+        binding.tvCurrencyTotal.text = String.format("R %.2f", totalBalance)
     }
 
     /**
@@ -477,29 +578,36 @@ class GeneralReportsFragment : Fragment() {
         val context = binding.root.context
         val pieChart: PieChart = binding.pieChart
 
-        val categories = if (isExpense) {
-            viewModel.getCategoriesByType("expense")
-        } else {
-            viewModel.getCategoriesByType("income")
-        }
-
+        // Get filtered transactions first
         val transactions = if (isExpense) {
             viewModel.getTransactionsByType("expense")
         } else {
             viewModel.getTransactionsByType("income")
         }
 
-        val categoryAmounts = transactions
-            .groupBy { it.category.id }
-            .mapValues { (_, transactions) -> transactions.sumOf { it.amount.toDouble() } }
+        // Get all categories of the type
+        val allCategories = if (isExpense) {
+            viewModel.getCategoriesByType("expense")
+        } else {
+            viewModel.getCategoriesByType("income")
+        }
 
-        val pieEntries = categories.mapNotNull { category ->
-            val amount = categoryAmounts[category.id] ?: 0.0
-            if (amount > 0) {
-                PieEntry(amount.toFloat(), category.name)
-            } else {
-                null
-            }
+        // Group transactions by category and calculate totals
+        val categoryTotals = transactions
+            .groupBy { it.category.id }
+            .mapValues { (_, trans) -> trans.sumOf { it.amount.toDouble() } }
+
+        // Filter out categories with no transactions
+        val categoriesWithTransactions = allCategories.filter { category ->
+            categoryTotals[category.id] != null
+        }
+
+        // Create pie entries only for categories with transactions
+        val pieEntries = categoriesWithTransactions.map { category ->
+            PieEntry(
+                categoryTotals[category.id]?.toFloat() ?: 0f,
+                category.name
+            )
         }
 
         if (pieEntries.isEmpty()) {
@@ -511,7 +619,7 @@ class GeneralReportsFragment : Fragment() {
         }
 
         val pieDataSet = PieDataSet(pieEntries, if (isExpense) "Expenses" else "Income").apply {
-            colors = categories.map { category ->
+            colors = categoriesWithTransactions.map { category ->
                 ContextCompat.getColor(context, category.color)
             }
             valueTextSize = 14f
@@ -527,7 +635,6 @@ class GeneralReportsFragment : Fragment() {
             isDrawHoleEnabled = true
             holeRadius = 50f
             setHoleColor(Color.TRANSPARENT)
-            centerText = if (isExpense) "Expenses" else "Income"
             setUsePercentValues(true)
             setDrawEntryLabels(true)
             setEntryLabelColor(context.getThemeColor(R.attr.bb_background))
@@ -547,47 +654,39 @@ class GeneralReportsFragment : Fragment() {
                     Log.d("WalletDropdown", "walletState emitted with wallets: ${wallets.map { it.name }}")
 
                     if (wallets.isNotEmpty()) {
-                        // Create custom adapter with the wallet layout
+                        // Create a list with "All Wallets" as the first item
+                        val walletNames = listOf("All Wallets") + wallets.map { it.name }
+
                         val adapter = ArrayAdapter(
                             requireContext(),
                             R.layout.spinner_item,
-                            wallets.map { it.name }
-                        )
-
-                        // Set the dropdown view resource
-                        adapter.setDropDownViewResource(R.layout.spinner_item)
+                            walletNames
+                        ).apply {
+                            setDropDownViewResource(R.layout.spinner_item)
+                        }
 
                         binding.spinnerWallet.adapter = adapter
 
-                        var isUserInitiatedSelection = false
+                        // Set the selection without triggering the listener
+                        binding.spinnerWallet.onItemSelectedListener = null // Remove any existing listener first
+                        binding.spinnerWallet.setSelection(0, false) // Select "All Wallets" by default
 
-                        // Optional: restore spinner selection to current wallet in ViewModel
-                        val currentWallet = viewModel.selectedWallet.value
-                        val selectedIndex = wallets.indexOfFirst { it.id == currentWallet?.id }
-                        if (selectedIndex >= 0) {
-                            Log.d("WalletDropdown", "Restoring spinner selection to index: $selectedIndex")
-                            binding.spinnerWallet.setSelection(selectedIndex)
-                        }
-
+                        // Set up the item selected listener
                         binding.spinnerWallet.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
                             override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
-                                Log.d("WalletDropdown", "onItemSelected called with position: $position")
-                                if (!isUserInitiatedSelection) {
-                                    Log.d("WalletDropdown", "Ignoring initial automatic selection")
-                                    isUserInitiatedSelection = true
-                                    return
+                                val selectedWallet = if (position == 0) {
+                                    null // "All Wallets" selected
+                                } else {
+                                    wallets[position - 1] // Adjust index since we added "All Wallets" at position 0
                                 }
-                                val selectedWallet = wallets[position]
-                                Log.d("WalletDropdown", "User selected wallet: ${selectedWallet.name}")
                                 viewModel.selectWallet(selectedWallet)
+                                Log.d("WalletDropdown", "Selected wallet: ${selectedWallet?.name ?: "All Wallets"}")
                             }
 
                             override fun onNothingSelected(parent: AdapterView<*>) {
-                                Log.d("WalletDropdown", "onNothingSelected called")
+                                viewModel.selectWallet(null)
                             }
                         }
-                    } else {
-                        Log.d("WalletDropdown", "wallets list is empty")
                     }
                 }
             }
