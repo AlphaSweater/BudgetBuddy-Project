@@ -1,6 +1,7 @@
 package com.synaptix.budgetbuddy.presentation.ui.main.general.generalReports
 
 import android.graphics.Color
+import android.graphics.Typeface
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -318,17 +319,17 @@ class GeneralReportsFragment : Fragment() {
      * - Efficient UI updates using adapters
      */
     private fun updateCategoryLists(categories: List<Category>) {
-        val expenseCategories = categories.filter { 
-            it.type.equals("expense", ignoreCase = true) 
+        val expenseCategories = categories.filter {
+            it.type.equals("expense", ignoreCase = true)
         }
-        val incomeCategories = categories.filter { 
-            it.type.equals("income", ignoreCase = true) 
+        val incomeCategories = categories.filter {
+            it.type.equals("income", ignoreCase = true)
         }
 
         val expenseItems = expenseCategories.map { category ->
             val transactions = viewModel.getTransactionsByType("expense")
                 .filter { it.category.id == category.id }
-            
+
             ReportListItems.ReportCategoryItem(
                 category = category,
                 transactionCount = transactions.size,
@@ -340,7 +341,7 @@ class GeneralReportsFragment : Fragment() {
         val incomeItems = incomeCategories.map { category ->
             val transactions = viewModel.getTransactionsByType("income")
                 .filter { it.category.id == category.id }
-            
+
             ReportListItems.ReportCategoryItem(
                 category = category,
                 transactionCount = transactions.size,
@@ -550,7 +551,8 @@ class GeneralReportsFragment : Fragment() {
                 ContextCompat.getColor(context, category.color)
             }
             valueTextSize = 14f
-            valueTextColor = context.getThemeColor(R.attr.bb_primaryText)
+            valueTextColor = context.getThemeColor(R.attr.bb_background)
+            valueTypeface = Typeface.DEFAULT_BOLD
             valueFormatter = PercentFormatter(pieChart)
         }
 
@@ -564,7 +566,8 @@ class GeneralReportsFragment : Fragment() {
             centerText = if (isExpense) "Expenses" else "Income"
             setUsePercentValues(true)
             setDrawEntryLabels(true)
-            setEntryLabelColor(context.getThemeColor(R.attr.bb_primaryText))
+            setEntryLabelColor(context.getThemeColor(R.attr.bb_background))
+            setEntryLabelTypeface(Typeface.DEFAULT_BOLD)
             setEntryLabelTextSize(12f)
             description.isEnabled = false
             legend.isEnabled = false
