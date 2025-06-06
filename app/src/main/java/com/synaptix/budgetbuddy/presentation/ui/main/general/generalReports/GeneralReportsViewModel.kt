@@ -1,15 +1,19 @@
 package com.synaptix.budgetbuddy.presentation.ui.main.general.generalReports
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.synaptix.budgetbuddy.core.model.Category
 import com.synaptix.budgetbuddy.core.model.Transaction
+import com.synaptix.budgetbuddy.core.model.Wallet
 import com.synaptix.budgetbuddy.core.usecase.auth.GetUserIdUseCase
 import com.synaptix.budgetbuddy.core.usecase.main.category.GetCategoriesUseCase
 import com.synaptix.budgetbuddy.core.usecase.main.transaction.GetTransactionsUseCase
+import com.synaptix.budgetbuddy.core.usecase.main.wallet.GetWalletUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -59,7 +63,8 @@ import javax.inject.Inject
 class GeneralReportsViewModel @Inject constructor(
     private val getTransactionsUseCase: GetTransactionsUseCase,
     private val getCategoriesUseCase: GetCategoriesUseCase,
-    private val getUserIdUseCase: GetUserIdUseCase
+    private val getUserIdUseCase: GetUserIdUseCase,
+    private val getWalletsUseCase: GetWalletUseCase
 ) : ViewModel() {
 
     /**
@@ -105,6 +110,12 @@ class GeneralReportsViewModel @Inject constructor(
         loadData()
     }
 
+    private val _walletState = MutableStateFlow<List<Wallet>>(emptyList())
+    val walletState: StateFlow<List<Wallet>> = _walletState
+
+
+    private val _selectedWallet = MutableStateFlow<Wallet?>(null)
+    val selectedWallet: StateFlow<Wallet?> = _selectedWallet.asStateFlow()
     /**
      * Loads all required data for the reports screen.
      * 
@@ -182,6 +193,23 @@ class GeneralReportsViewModel @Inject constructor(
                         }
                     }
             }
+            launch {
+                getWalletsUseCase.execute(userId)
+                    .catch { e ->
+                        // You can log this or create a WalletState sealed class if needed
+                    }
+                    .collect { result ->
+                        when (result) {
+                            is GetWalletUseCase.GetWalletResult.Success -> {
+                                _walletState.value = result.wallets
+                            }
+                            is GetWalletUseCase.GetWalletResult.Error -> {
+                                // Log or ignore, based on your needs
+                            }
+                        }
+                    }
+            }
+
         }
     }
 
@@ -194,8 +222,9 @@ class GeneralReportsViewModel @Inject constructor(
      */
     fun getTransactionsByType(type: String): List<Transaction> {
         return when (val state = transactionsState.value) {
-            is TransactionState.Success -> state.transactions.filter { 
-                it.category.type.equals(type, ignoreCase = true) 
+            is TransactionState.Success -> state.transactions.filter {
+                it.category.type.equals(type, ignoreCase = true) &&
+                        (selectedWallet.value == null || it.wallet.id == selectedWallet.value?.id)
             }
             else -> emptyList()
         }
@@ -216,4 +245,12 @@ class GeneralReportsViewModel @Inject constructor(
             else -> emptyList()
         }
     }
+
+
+    fun selectWallet(wallet: Wallet) {
+        Log.d("WalletDropdown", "ViewModel selectWallet called with: ${wallet.name}")
+        _selectedWallet.value = wallet
+    }
+
+
 }
