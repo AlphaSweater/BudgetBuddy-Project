@@ -20,15 +20,15 @@ class BudgetMainViewModel @Inject constructor(
 ) : ViewModel() {
 
     // Define state classes for UI
-    sealed class BudgetState {
-        object Loading : BudgetState()
-        data class Success(val budgets: List<Budget>) : BudgetState()
-        data class Error(val message: String) : BudgetState()
-        object Empty : BudgetState()
+    sealed class BudgetUiState {
+        object Loading : BudgetUiState()
+        data class Success(val budgets: List<Budget>) : BudgetUiState()
+        data class Error(val message: String) : BudgetUiState()
+        object Empty : BudgetUiState()
     }
 
-    private val _budgetState = MutableStateFlow<BudgetState>(BudgetState.Loading)
-    val budgetState: StateFlow<BudgetState> = _budgetState
+    private val _budgetUiState = MutableStateFlow<BudgetUiState>(BudgetUiState.Loading)
+    val budgetUiState: StateFlow<BudgetUiState> = _budgetUiState
 
     private val _budgetSummary = MutableStateFlow<BudgetSummary?>(null)
     val budgetSummary: StateFlow<BudgetSummary?> = _budgetSummary
@@ -45,25 +45,25 @@ class BudgetMainViewModel @Inject constructor(
         viewModelScope.launch {
             val userId = getUserIdUseCase.execute()
             if (userId.isEmpty()) {
-                _budgetState.value = BudgetState.Error("User ID is empty")
+                _budgetUiState.value = BudgetUiState.Error("User ID is empty")
                 return@launch
             }
 
             getBudgetsUseCase.execute(userId)
                 .catch { e ->
-                    _budgetState.value = BudgetState.Error(e.message ?: "Unknown error")
+                    _budgetUiState.value = BudgetUiState.Error(e.message ?: "Unknown error")
                 }
                 .collect { result ->
                     when (result) {
                         is GetBudgetsUseCase.GetBudgetsResult.Success -> {
                             if (result.budgets.isEmpty()) {
-                                _budgetState.value = BudgetState.Empty
+                                _budgetUiState.value = BudgetUiState.Empty
                             } else {
-                                _budgetState.value = BudgetState.Success(result.budgets)
+                                _budgetUiState.value = BudgetUiState.Success(result.budgets)
                             }
                         }
                         is GetBudgetsUseCase.GetBudgetsResult.Error -> {
-                            _budgetState.value = BudgetState.Error(result.message)
+                            _budgetUiState.value = BudgetUiState.Error(result.message)
                         }
                     }
                 }
