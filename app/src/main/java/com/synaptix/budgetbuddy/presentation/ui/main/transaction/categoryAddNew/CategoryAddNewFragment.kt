@@ -16,6 +16,7 @@ import com.google.android.material.snackbar.Snackbar
 import com.synaptix.budgetbuddy.R
 import com.synaptix.budgetbuddy.databinding.FragmentCategoryAddNewBinding
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
@@ -27,6 +28,8 @@ class CategoryAddNewFragment : Fragment() {
     private val viewModel: CategoryAddNewViewModel by viewModels()
     private lateinit var colorAdapter: ColorAdapter
     private lateinit var iconAdapter: IconAdapter
+
+    private var isUpdatingFromUser = false
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -64,7 +67,11 @@ class CategoryAddNewFragment : Fragment() {
 
     private fun setupListeners() {
         binding.categoryNameInput.doAfterTextChanged { text ->
-            viewModel.setCategoryName(text?.toString() ?: "")
+            if (!isUpdatingFromUser) {
+                isUpdatingFromUser = true
+                viewModel.setCategoryName(text?.toString() ?: "")
+                isUpdatingFromUser = false
+            }
         }
 
         binding.btnExpenseToggle.setOnClickListener {
@@ -104,8 +111,10 @@ class CategoryAddNewFragment : Fragment() {
                 // Collect form state
                 launch {
                     viewModel.categoryName.collect { name ->
-                        binding.categoryNameInput.setText(name)
-                    }
+                        if (!isUpdatingFromUser && binding.categoryNameInput.text.toString() != name) {
+                            binding.categoryNameInput.setText(name)
+                            }
+                        }
                 }
 
                 launch {
