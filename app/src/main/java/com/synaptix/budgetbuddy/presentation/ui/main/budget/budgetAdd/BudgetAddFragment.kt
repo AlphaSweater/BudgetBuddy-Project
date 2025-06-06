@@ -62,6 +62,8 @@ class BudgetAddFragment : Fragment() {
 
         setupUI()
 
+        observeSelectedCategoriesResult()
+
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
