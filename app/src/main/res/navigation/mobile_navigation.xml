@@ -54,6 +54,14 @@
             app:exitAnim="@anim/fade_out"
             app:popEnterAnim="@anim/fade_in"
             app:popExitAnim="@anim/slide_out_down"/>
+
+        <action
+            android:id="@+id/action_homeFragment_to_generalIndividualTransactionFragment"
+            app:destination="@id/generalIndividualTransactionFragment"
+            app:enterAnim="@anim/slide_in_up"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/slide_out_down"/>
     </fragment>
 
     <!-- ====================================================================================== -->
@@ -181,6 +189,16 @@
         android:name="com.synaptix.budgetbuddy.presentation.ui.main.general.generalTransactions.GeneralTransactionsFragment"
         android:label="General Reports"
         tools:layout="@layout/fragment_general_transactions"/>
+
+    <fragment
+        android:id="@+id/generalIndividualTransactionFragment"
+        android:name="com.synaptix.budgetbuddy.presentation.ui.main.general.generalIndividualTransaction.GeneralIndividualTransactionFragment"
+        android:label="Transaction Details"
+        tools:layout="@layout/fragment_general_individual_transaction">
+        <argument
+            android:name="transactionId"
+            app:argType="string" />
+    </fragment>
 
     <fragment
         android:id="@+id/navigation_general_reports"

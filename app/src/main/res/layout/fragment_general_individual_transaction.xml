@@ -116,6 +116,14 @@
                 android:textColor="?attr/bb_primaryText"
                 android:textSize="18sp" />
 
+            <TextView
+                android:id="@+id/walletName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:gravity="end"
+                android:textColor="?attr/bb_primaryText"
+                android:textSize="18sp" />
         </LinearLayout>
 
         <!-- Amount Row -->
@@ -143,12 +151,11 @@
                 android:textSize="18sp" />
 
             <TextView
-                android:layout_width="0dp"
+                android:id="@+id/textAmount"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="12dp"
-                android:layout_weight="1"
-                android:gravity="right"
-                android:text="R XXX"
+                android:gravity="end"
                 android:textColor="?attr/bb_expense"
                 android:textSize="18sp" />
         </LinearLayout>
@@ -168,17 +175,17 @@
                 app:tint="?attr/bb_expense" />
 
             <TextView
+                android:id="@+id/textNote"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="12dp"
                 android:layout_weight="1"
                 android:gravity="center_vertical"
-                android:text="Here the users note will be displayed"
                 android:textColor="?attr/bb_primaryText"
                 android:textSize="18sp" />
         </LinearLayout>
 
-        <!-- Note Row -->
+        <!-- Date Row -->
         <LinearLayout
             android:id="@+id/rowStartRow"
             style="@style/RowStyle"
@@ -199,6 +206,15 @@
                 android:layout_weight="1"
                 android:gravity="center_vertical"
                 android:text="@string/start_date"
+                android:textColor="?attr/bb_primaryText"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/textStartDate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:gravity="end"
                 android:textColor="?attr/bb_primaryText"
                 android:textSize="18sp" />
         </LinearLayout>
@@ -224,6 +240,15 @@
                 android:layout_weight="1"
                 android:gravity="center_vertical"
                 android:text="@string/recurrence"
+                android:textColor="?attr/bb_primaryText"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/textRecurrence"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:gravity="end"
                 android:textColor="?attr/bb_primaryText"
                 android:textSize="18sp" />
         </LinearLayout>
