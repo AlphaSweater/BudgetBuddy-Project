@@ -1,88 +1,104 @@
 package com.synaptix.budgetbuddy.presentation.ui.main.general.generalTransactions
 
-import android.graphics.drawable.GradientDrawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.synaptix.budgetbuddy.R
-import com.synaptix.budgetbuddy.core.model.BudgetListItems
+import com.synaptix.budgetbuddy.core.model.Transaction
+import com.synaptix.budgetbuddy.databinding.ItemHomeTransactionBinding
+import com.synaptix.budgetbuddy.presentation.ui.common.BaseAdapter
+import com.synaptix.budgetbuddy.presentation.ui.main.general.generalReports.ReportListItems
+import java.text.SimpleDateFormat
+import java.util.*
 
-//class GeneralTransactionsAdapter(private val items: List<BudgetListItems>) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-//
-//    companion object {
-//        private const val VIEW_TYPE_HEADER = 0
-//        private const val VIEW_TYPE_TRANSACTION = 1
-//    }
-//
-//    override fun getItemViewType(position: Int): Int {
-//        return when (items[position]) {
-//            is BudgetListItems.BudgetDateHeader -> VIEW_TYPE_HEADER
-//            is BudgetListItems.BudgetTransactionItem -> VIEW_TYPE_TRANSACTION
-//            else -> throw IllegalArgumentException("Unsupported item type at position $position")
-//        }
-//    }
-//    //took out if else statement this could be broken so note that
-//    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-//        return when (viewType) {
-//            GeneralTransactionsAdapter.VIEW_TYPE_HEADER -> {
-//                val view = LayoutInflater.from(parent.context).inflate(R.layout.item_date_header, parent, false)
-//                DateHeaderViewHolder(view)
-//            }
-//            GeneralTransactionsAdapter.VIEW_TYPE_TRANSACTION -> {
-//                val view = LayoutInflater.from(parent.context).inflate(R.layout.item_home_transaction, parent, false)
-//                TransactionViewHolder(view)
-//            }
-//            else -> throw IllegalArgumentException("Unknown view type")
-//        }
-//    }
-//    override fun getItemCount() = items.size
-//
-//    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-//        when (val item = items[position]) {
-//            is BudgetListItems.BudgetDateHeader -> (holder as DateHeaderViewHolder).bind(item)
-//            is BudgetListItems.BudgetTransactionItem -> (holder as TransactionViewHolder).bind(item)
-//            else -> throw IllegalArgumentException("Unsupported item type at position $position")
-//        }
-//    }
-//
-//    class DateHeaderViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-//        fun bind(item: BudgetListItems.BudgetDateHeader) {
-//            itemView.findViewById<TextView>(R.id.textDayNumber).text = item.dateNumber
-//            itemView.findViewById<TextView>(R.id.textRelativeDate).text = item.relativeDate
-//            itemView.findViewById<TextView>(R.id.textMonthYearDate).text = item.monthYearDate
-//            itemView.findViewById<TextView>(R.id.textTotalAmount).text = "R ${item.amountTotal}"
-//        }
-//    }
-//
-//    class TransactionViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-//        fun bind(item: BudgetListItems.BudgetTransactionItem) {
-//            val iconContainer = itemView.findViewById<LinearLayout>(R.id.iconCategoryContainer)
-//            val iconView = itemView.findViewById<ImageView>(R.id.iconCategory)
-//
-//            // Convert resource ID to actual color
-//            val resolvedColor = ContextCompat.getColor(itemView.context, item.categoryColour)
-//
-//            // Set the background circle color
-//            val background = iconContainer.background.mutate() as GradientDrawable
-//            background.setColor(resolvedColor)
-//
-//            // Set the icon
-//            iconView.setImageResource(item.categoryIcon)
-//
-//            itemView.findViewById<TextView>(R.id.textCategoryName).text = item.categoryName
-//            itemView.findViewById<TextView>(R.id.textWalletName).text = item.name
-//
-//            if (item.note == null) {
-//                itemView.findViewById<LinearLayout>(R.id.rowNote).visibility = View.GONE
-//            } else {
-//                itemView.findViewById<LinearLayout>(R.id.rowNote).visibility = View.VISIBLE
-//                itemView.findViewById<TextView>(R.id.textNote).text = item.note
-//            }
-//        }
-//    }
-//}
+class GeneralTransactionsAdapter(
+    private val onTransactionClick: (Transaction) -> Unit
+) : ListAdapter<ReportListItems.ReportTransactionItem, GeneralTransactionsAdapter.TransactionViewHolder>(
+    TransactionDiffCallback()
+) {
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TransactionViewHolder {
+        val binding = ItemHomeTransactionBinding.inflate(
+            LayoutInflater.from(parent.context),
+            parent,
+            false
+        )
+        return TransactionViewHolder(binding, onTransactionClick)
+    }
+
+    override fun onBindViewHolder(holder: TransactionViewHolder, position: Int) {
+        val item = getItem(position) as? ReportListItems.ReportTransactionItem
+        item?.let { holder.bind(it) }
+    }
+
+    class TransactionViewHolder(
+        private val binding: ItemHomeTransactionBinding,
+        private val onClick: (Transaction) -> Unit
+    ) : RecyclerView.ViewHolder(binding.root) {
+
+        fun bind(item: ReportListItems.ReportTransactionItem) {
+            val transaction = item.transaction
+            val context = itemView.context
+
+            // Set category icon and name
+            binding.iconCategory.setImageResource(transaction.category.icon)
+            binding.iconCategory.setColorFilter(
+                ContextCompat.getColor(context, transaction.category.color)
+            )
+            binding.textCategoryName.text = transaction.category.name
+
+            // Set wallet name
+            binding.textWalletName.text = transaction.wallet.name
+
+            val isIncome = transaction.category.type.equals("income", ignoreCase = true)
+            val amountText = if (isIncome) {
+                "+R ${String.format("%.2f", transaction.amount)}"
+            } else {
+                "-R ${String.format("%.2f", transaction.amount)}"
+            }
+            binding.textAmount.text = amountText
+            binding.textAmount.setTextColor(
+                ContextCompat.getColor(
+                    context,
+                    if (isIncome) R.color.profit_green else R.color.expense_red
+                )
+            )
+
+            // Set note if available
+            if (transaction.note.isNotEmpty()) {
+                binding.textNote.text = transaction.note
+                binding.rowNote.visibility = View.VISIBLE
+            } else {
+                binding.rowNote.visibility = View.GONE
+            }
+
+            // Set relative date
+            binding.textDate.text = item.relativeDate
+
+            // Set click listener
+            itemView.setOnClickListener { onClick(transaction) }
+        }
+    }
+
+    class TransactionDiffCallback : DiffUtil.ItemCallback<ReportListItems.ReportTransactionItem>() {
+        override fun areItemsTheSame(
+            oldItem: ReportListItems.ReportTransactionItem,
+            newItem: ReportListItems.ReportTransactionItem
+        ): Boolean {
+            return oldItem.transaction.id == newItem.transaction.id
+        }
+
+        override fun areContentsTheSame(
+            oldItem: ReportListItems.ReportTransactionItem,
+            newItem: ReportListItems.ReportTransactionItem
+        ): Boolean {
+            return oldItem == newItem
+        }
+    }
+}
