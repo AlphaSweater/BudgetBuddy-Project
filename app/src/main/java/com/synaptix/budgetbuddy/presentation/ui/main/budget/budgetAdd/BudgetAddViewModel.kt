@@ -37,10 +37,8 @@ import javax.inject.Inject
 class BudgetAddViewModel @Inject constructor(
     private val firestoreBudgetRepository: FirestoreBudgetRepository,
     private val getUserIdUseCase: GetUserIdUseCase
-//    private val validateUserTotalsUseCase: ValidateUserTotalsUseCase
 ) : ViewModel() {
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     sealed class UiState {
         object Initial : UiState()
         object Loading : UiState()
@@ -48,7 +46,6 @@ class BudgetAddViewModel @Inject constructor(
         data class Error(val message: String) : UiState()
     }
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     data class ValidationState(
         val isNameValid: Boolean = false,
         val isAmountValid: Boolean = false,
@@ -58,8 +55,6 @@ class BudgetAddViewModel @Inject constructor(
         val categoryError: String? = null,
         val shouldShowErrors: Boolean = false
     )
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
 
     private val _uiState = MutableStateFlow<UiState>(UiState.Initial)
     val uiState: StateFlow<UiState> = _uiState
@@ -79,7 +74,6 @@ class BudgetAddViewModel @Inject constructor(
     private val _selectedCategories = MutableStateFlow<List<Category>>(emptyList())
     val selectedCategories: StateFlow<List<Category>> = _selectedCategories
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     fun setBudgetName(name: String) {
         _budgetName.value = name
         validateForm()
@@ -95,13 +89,12 @@ class BudgetAddViewModel @Inject constructor(
         validateForm()
     }
 
-
     fun setSelectedCategories(categories: List<Category>) {
         _selectedCategories.value = categories
+        setCategory(categories.firstOrNull())
         validateForm()
     }
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     fun validateForm(): Boolean {
         val currentState = _validationState.value
         val isNameValid = !_budgetName.value.isNullOrBlank()
@@ -120,13 +113,11 @@ class BudgetAddViewModel @Inject constructor(
         return isNameValid && isAmountValid && isCategoryValid
     }
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     fun showValidationErrors() {
         _validationState.value = _validationState.value.copy(shouldShowErrors = true)
         validateForm()
     }
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     fun addBudget() {
         if (!validateForm()) return
 
@@ -169,4 +160,5 @@ class BudgetAddViewModel @Inject constructor(
         _validationState.value = ValidationState(shouldShowErrors = false)
     }
 }
+
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~EOF~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\

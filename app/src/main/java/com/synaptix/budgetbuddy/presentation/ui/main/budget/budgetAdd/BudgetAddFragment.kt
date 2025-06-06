@@ -107,6 +107,17 @@ class BudgetAddFragment : Fragment() {
         binding.currencySpinner.adapter = adapter
     }
 
+    private fun observeSelectedCategoriesResult() {
+        val navBackStackEntry = findNavController().currentBackStackEntry
+        val savedStateHandle = navBackStackEntry?.savedStateHandle
+
+        savedStateHandle?.getLiveData<List<Category>>("selected_categories")
+            ?.observe(viewLifecycleOwner) { categories ->
+                viewModel.setSelectedCategories(categories)
+                savedStateHandle.remove<List<Category>>("selected_categories")
+            }
+    }
+
     private suspend fun collectUiState() {
         viewModel.uiState.collectLatest { state ->
             when (state) {
@@ -141,12 +152,11 @@ class BudgetAddFragment : Fragment() {
                 updateSelectedCategory(null)
                 binding.textSelectedCategoryName.text = "No categories selected"
             } else {
-                updateSelectedCategory(selected.first()) // <- Call here
+                updateSelectedCategory(selected.first())
                 binding.textSelectedCategoryName.text = selected.joinToString(", ") { it.name }
             }
         }
     }
-
 
     private fun updateSelectedCategory(category: Category?) {
         if (category == null) {
