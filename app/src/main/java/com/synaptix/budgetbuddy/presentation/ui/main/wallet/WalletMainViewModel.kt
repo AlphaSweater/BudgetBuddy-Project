@@ -2,10 +2,13 @@ package com.synaptix.budgetbuddy.presentation.ui.main.wallet
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.synaptix.budgetbuddy.core.model.Transaction
 import com.synaptix.budgetbuddy.core.model.Wallet
 import com.synaptix.budgetbuddy.core.usecase.auth.GetUserIdUseCase
+import com.synaptix.budgetbuddy.core.usecase.main.transaction.GetTransactionsUseCase
 import com.synaptix.budgetbuddy.core.usecase.main.wallet.GetWalletUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -13,7 +16,8 @@ import javax.inject.Inject
 @HiltViewModel
 class WalletMainViewModel @Inject constructor(
     private val getWalletUseCase: GetWalletUseCase,
-    private val getUserIdUseCase: GetUserIdUseCase
+    private val getUserIdUseCase: GetUserIdUseCase,
+    private val getTransactionsUseCase: GetTransactionsUseCase // Add this line
 ) : ViewModel() {
 
     sealed class WalletState {
@@ -32,8 +36,15 @@ class WalletMainViewModel @Inject constructor(
     private val _isBalanceVisible = MutableStateFlow(true)
     val isBalanceVisible: StateFlow<Boolean> = _isBalanceVisible
 
+    // Transactions state
+    private val _transactions = MutableStateFlow<List<Transaction>>(emptyList())
+    val transactions: StateFlow<List<Transaction>> = _transactions
+
+    private var transactionsJob: Job? = null
+
     init {
         refreshData()
+        loadTransactions() // Load transactions when ViewModel is created
     }
 
     fun refreshData() {
@@ -47,7 +58,7 @@ class WalletMainViewModel @Inject constructor(
 
             getWalletUseCase.execute(userId)
                 .catch { e ->
-                    _walletState.value = WalletState.Empty
+                    _walletState.value = WalletState.Error(e.message ?: "Unknown error occurred")
                     _totalBalance.value = 0.0
                 }
                 .collect { result ->
@@ -62,11 +73,38 @@ class WalletMainViewModel @Inject constructor(
                             calculateTotalBalance(walletsList)
                         }
                         is GetWalletUseCase.GetWalletResult.Error -> {
-                            _walletState.value = WalletState.Empty
+                            _walletState.value = WalletState.Error(result.message)
                             _totalBalance.value = 0.0
                         }
                     }
                 }
+        }
+    }
+
+    private fun loadTransactions() {
+        // Cancel any existing job to avoid multiple subscriptions
+        transactionsJob?.cancel()
+
+        transactionsJob = viewModelScope.launch {
+            val userId = getUserIdUseCase.execute()
+            if (userId.isNotEmpty()) {
+                getTransactionsUseCase.execute(userId)
+                    .catch { e ->
+                        // Handle error, maybe log it
+                        _transactions.value = emptyList()
+                    }
+                    .collect { result ->
+                        when (result) {
+                            is GetTransactionsUseCase.GetTransactionsResult.Success -> {
+                                _transactions.value = result.transactions
+                            }
+                            is GetTransactionsUseCase.GetTransactionsResult.Error -> {
+                                // Handle error, maybe log it
+                                _transactions.value = emptyList()
+                            }
+                        }
+                    }
+            }
         }
     }
 
@@ -78,5 +116,10 @@ class WalletMainViewModel @Inject constructor(
 
     fun toggleBalanceVisibility() {
         _isBalanceVisible.value = !_isBalanceVisible.value
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        transactionsJob?.cancel()
     }
 }
