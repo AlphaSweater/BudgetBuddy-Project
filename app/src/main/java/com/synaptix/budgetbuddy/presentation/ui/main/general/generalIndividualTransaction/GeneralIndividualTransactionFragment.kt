@@ -11,9 +11,9 @@ import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.util.Log
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
-import androidx.navigation.fragment.navArgs
 import com.synaptix.budgetbuddy.R
 import com.synaptix.budgetbuddy.databinding.FragmentGeneralIndividualTransactionBinding
 import com.synaptix.budgetbuddy.presentation.ui.main.home.HomeMainViewModel
@@ -21,6 +21,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import androidx.core.content.ContextCompat
 
 @AndroidEntryPoint
 class GeneralIndividualTransactionFragment : Fragment() {
@@ -28,9 +29,7 @@ class GeneralIndividualTransactionFragment : Fragment() {
     private var _binding: FragmentGeneralIndividualTransactionBinding? = null
     private val binding get() = _binding!!
 
-    private val viewModel: GeneralIndividualTransactionViewModel by viewModels()
-    private val homeViewModel: HomeMainViewModel by activityViewModels()
-    private val args: GeneralIndividualTransactionFragmentArgs by navArgs()
+    private val viewModel: GeneralIndividualTransactionViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -43,6 +42,7 @@ class GeneralIndividualTransactionFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        Log.d("TransactionFragment", "onViewCreated")
         setupViews()
         observeTransaction()
     }
@@ -54,19 +54,31 @@ class GeneralIndividualTransactionFragment : Fragment() {
     }
 
     private fun observeTransaction() {
+        Log.d("TransactionFragment", "Starting to observe transaction")
         viewModel.selectedTransaction.observe(viewLifecycleOwner) { transaction ->
+            Log.d("TransactionFragment", "Received transaction: ${transaction?.id}")
             transaction?.let {
-                // Update top bar
-                binding.individualCategoryName.text = it.category.name
-                binding.amount.text = "R ${String.format("%.2f", it.amount)}"
+                // Update top bar with color and sign based on category type
+                val amountText = when (it.category.type.lowercase()) {
+                    "expense" -> {
+                        binding.amount.setTextColor(ContextCompat.getColor(requireContext(), R.color.expense_red))
+                        "-R ${String.format("%.2f", it.amount)}"
+                    }
+                    "income" -> {
+                        binding.amount.setTextColor(ContextCompat.getColor(requireContext(), R.color.profit_green))
+                        "+R ${String.format("%.2f", it.amount)}"
+                    }
+                    else -> "R ${String.format("%.2f", it.amount)}"
+                }
+                binding.amount.text = amountText
 
                 // Update wallet row
                 binding.rowSelectWallet.findViewById<TextView>(R.id.walletName)?.text = 
                     it.wallet.name
 
-                // Update amount row
-                binding.rowAmountRow.findViewById<TextView>(R.id.textAmount)?.text = 
-                    "R ${String.format("%.2f", it.amount)}"
+                // Update category row
+                binding.individualCategoryName.text =
+                    it.category.name
 
                 // Update note row
                 binding.rowNoteRow.findViewById<TextView>(R.id.textNote)?.text = 
@@ -88,6 +100,9 @@ class GeneralIndividualTransactionFragment : Fragment() {
                 } else {
                     binding.imageView3.visibility = View.GONE
                 }
+            } ?: run {
+                Log.d("TransactionFragment", "No transaction found, navigating back")
+                findNavController().popBackStack()
             }
         }
     }

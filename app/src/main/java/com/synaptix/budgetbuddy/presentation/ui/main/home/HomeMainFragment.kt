@@ -5,6 +5,7 @@ import android.graphics.Color
 import android.graphics.Typeface
 import android.os.Bundle
 import android.util.TypedValue
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -39,6 +40,7 @@ import com.synaptix.budgetbuddy.core.model.HomeListItems
 import com.synaptix.budgetbuddy.core.model.Transaction
 import com.synaptix.budgetbuddy.core.model.Wallet
 import com.synaptix.budgetbuddy.databinding.FragmentHomeBinding
+import com.synaptix.budgetbuddy.presentation.ui.main.general.generalIndividualTransaction.GeneralIndividualTransactionViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -884,12 +886,13 @@ class HomeMainFragment : Fragment() {
      * To be implemented when the details screen is ready.
      */
     private fun navigateToTransactionDetails(transaction: Transaction) {
+        Log.d("HomeFragment", "Navigating to transaction details: ${transaction.id}")
         // Set the transaction in the destination fragment's ViewModel first
-        val transactionViewModel: GeneralIndividualTransactionViewModel by viewModels()
+        val transactionViewModel: GeneralIndividualTransactionViewModel by activityViewModels()
         transactionViewModel.setTransaction(transaction)
         
         // Then navigate using Safe Args
-        val action = HomeMainFragmentDirections.actionHomeFragmentToGeneralIndividualTransactionFragment(transaction.id)
+        val action = HomeMainFragmentDirections.actionHomeFragmentToGeneralIndividualTransactionFragment()
         findNavController().navigate(action)
     }
 
