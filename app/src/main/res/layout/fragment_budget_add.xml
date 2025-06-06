@@ -165,6 +165,7 @@
                 android:paddingVertical="8dp">
 
                 <ImageView
+                    android:id="@+id/imgSelectedCategoryIcon"
                     style="@style/RowIconStyle"
                     android:src="@drawable/ic_edit_note_24"
                     app:tint="?attr/bb_button" />

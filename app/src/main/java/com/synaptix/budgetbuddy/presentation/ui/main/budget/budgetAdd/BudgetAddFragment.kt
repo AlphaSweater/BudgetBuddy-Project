@@ -21,9 +21,7 @@
 
 package com.synaptix.budgetbuddy.presentation.ui.main.budget.budgetAdd
 
-import android.graphics.BitmapFactory
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -31,7 +29,6 @@ import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -39,6 +36,7 @@ import androidx.navigation.fragment.findNavController
 import com.synaptix.budgetbuddy.R
 import com.synaptix.budgetbuddy.core.model.Category
 import com.synaptix.budgetbuddy.databinding.FragmentBudgetAddBinding
+import com.synaptix.budgetbuddy.extentions.getThemeColor
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -66,11 +64,18 @@ class BudgetAddFragment : Fragment() {
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                collectUiState()
-                collectValidationState()
-                collectSelectedCategories()
+                launch {
+                    collectUiState()
+                }
+                launch {
+                    collectValidationState()
+                }
+                launch {
+                    collectSelectedCategories()
+                }
             }
         }
+
     }
 
     private fun setupUI() {
@@ -132,10 +137,28 @@ class BudgetAddFragment : Fragment() {
 
     private suspend fun collectSelectedCategories() {
         viewModel.selectedCategories.collectLatest { selected ->
-            binding.textSelectedCategoryName.text =
-                if (selected.isEmpty()) "No categories selected"
-                else selected.joinToString(", ") { it.name }
+            if (selected.isEmpty()) {
+                updateSelectedCategory(null)
+                binding.textSelectedCategoryName.text = "No categories selected"
+            } else {
+                updateSelectedCategory(selected.first()) // <- Call here
+                binding.textSelectedCategoryName.text = selected.joinToString(", ") { it.name }
+            }
         }
+    }
+
+
+    private fun updateSelectedCategory(category: Category?) {
+        if (category == null) {
+            binding.textSelectedCategoryName.text = "Select category"
+            binding.imgSelectedCategoryIcon.setImageResource(R.drawable.ic_ui_categories)
+            binding.imgSelectedCategoryIcon.setColorFilter(requireContext().getThemeColor(R.attr.bb_accent))
+            return
+        }
+
+        binding.textSelectedCategoryName.text = category.name
+        binding.imgSelectedCategoryIcon.setImageResource(category.icon)
+        binding.imgSelectedCategoryIcon.setColorFilter(requireContext().getColor(category.color))
     }
 
     override fun onDestroyView() {
