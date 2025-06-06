@@ -24,7 +24,6 @@
 <androidx.coordinatorlayout.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="?attr/bb_background">
@@ -780,9 +779,11 @@
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="16dp"
                 android:layout_marginTop="60dp"
+                android:layout_marginBottom="60dp"
                 app:cardBackgroundColor="?attr/bb_surface"
                 app:cardCornerRadius="16dp"
                 app:cardElevation="4dp"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/cardsContainer">
@@ -793,23 +794,21 @@
                     android:orientation="vertical"
                     android:padding="16dp">
 
-                    <!-- 1st Achievement -->
+                    <!-- Achievement 1 -->
                     <androidx.constraintlayout.widget.ConstraintLayout
                         android:id="@+id/rowAchievement1"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:paddingVertical="8dp">
+                        android:layout_marginBottom="24dp">
 
                         <ImageView
                             android:id="@+id/achievementIcon1"
                             android:layout_width="40dp"
                             android:layout_height="40dp"
-                            android:layout_marginEnd="8dp"
                             android:src="@drawable/ic_ui_achievement_medal"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintEnd_toStartOf="@+id/textAchievementLabel1"
+                            app:layout_constraintBottom_toBottomOf="@id/badgeStatus1"
                             app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintTop_toTopOf="@id/textAchievementLabel1"
                             app:tint="@color/cat_dark_green" />
 
                         <TextView
@@ -817,7 +816,6 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="8dp"
-                            android:layout_marginTop="-15dp"
                             android:text="Rainy Day Badge"
                             android:textColor="?attr/bb_primaryText"
                             android:textSize="18sp"
@@ -829,9 +827,8 @@
                             android:id="@+id/textAchievementDescription1"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="2dp"
-                            android:layout_marginEnd="15dp"
-                            android:text="Build an emergency fund of at least R 2000"
+                            android:layout_marginTop="4dp"
+                            android:text="Build an emergency fund of at least      R 2000"
                             android:textColor="?attr/bb_secondaryText"
                             android:textSize="16sp"
                             app:layout_constraintEnd_toStartOf="@id/badgeStatus1"
@@ -842,7 +839,7 @@
                             android:id="@+id/badgeStatus1"
                             android:layout_width="24dp"
                             android:layout_height="24dp"
-                            android:layout_marginTop="5dp"
+                            android:layout_marginTop="12dp"
                             android:layout_marginEnd="8dp"
                             android:src="@drawable/ic_ui_circle_check"
                             app:layout_constraintBottom_toBottomOf="parent"
@@ -850,12 +847,12 @@
                             app:layout_constraintTop_toTopOf="parent" />
                     </androidx.constraintlayout.widget.ConstraintLayout>
 
-                    <!-- 2nd Achievement -->
+                    <!-- Achievement 2 -->
                     <androidx.constraintlayout.widget.ConstraintLayout
                         android:id="@+id/rowAchievement2"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:paddingVertical="8dp">
+                        android:layout_marginBottom="24dp">
 
                         <ImageView
                             android:id="@+id/achievementIcon2"
@@ -863,10 +860,9 @@
                             android:layout_height="40dp"
                             android:layout_marginEnd="8dp"
                             android:src="@drawable/ic_ui_achievement_medal"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintEnd_toStartOf="@+id/textAchievementLabel2"
+                            app:layout_constraintBottom_toBottomOf="@id/badgeStatus2"
                             app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintTop_toTopOf="@id/textAchievementLabel2"
                             app:tint="@color/cat_dark_blue" />
 
                         <TextView
@@ -885,127 +881,132 @@
                             android:id="@+id/textAchievementDescription2"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:text="Skip Impulse shopping for 30 days"
+                            android:layout_marginTop="4dp"
+                            android:text="Skip impulse shopping for 30 days"
                             android:textColor="?attr/bb_secondaryText"
                             android:textSize="16sp"
-                            app:layout_constraintStart_toStartOf="@id/textAchievementLabel2"
-                            app:layout_constraintTop_toBottomOf="@id/textAchievementLabel2"
                             app:layout_constraintEnd_toStartOf="@id/badgeStatus2"
-                            android:layout_marginTop="2dp" />
+                            app:layout_constraintStart_toStartOf="@id/textAchievementLabel2"
+                            app:layout_constraintTop_toBottomOf="@id/textAchievementLabel2" />
 
                         <ImageView
                             android:id="@+id/badgeStatus2"
                             android:layout_width="24dp"
                             android:layout_height="24dp"
+                            android:layout_marginTop="24dp"
+                            android:layout_marginEnd="8dp"
                             android:src="@drawable/ic_ui_circle_check"
-                            app:layout_constraintTop_toTopOf="parent"
-                            app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintBottom_toBottomOf="parent"
-                            android:layout_marginEnd="8dp" />
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
                     </androidx.constraintlayout.widget.ConstraintLayout>
 
-                    <!-- 3rd Achievement -->
+                    <!-- Achievement 3 -->
                     <androidx.constraintlayout.widget.ConstraintLayout
                         android:id="@+id/rowAchievement3"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:paddingVertical="8dp">
+                        android:layout_marginBottom="24dp">
 
                         <ImageView
                             android:id="@+id/achievementIcon3"
                             android:layout_width="40dp"
                             android:layout_height="40dp"
+                            android:layout_marginEnd="8dp"
                             android:src="@drawable/ic_ui_achievement_medal"
-                            app:tint="@color/cat_dark_pink"
-                            app:layout_constraintTop_toTopOf="parent"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintStart_toStartOf="parent" />
+                            app:layout_constraintBottom_toBottomOf="@id/badgeStatus3"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="@id/textAchievementLabel3"
+                            app:tint="@color/cat_dark_pink" />
 
                         <TextView
                             android:id="@+id/textAchievementLabel3"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
                             android:text="Savings Streak Badge"
                             android:textColor="?attr/bb_primaryText"
                             android:textSize="18sp"
-                            app:layout_constraintStart_toEndOf="@id/achievementIcon3"
-                            app:layout_constraintTop_toTopOf="@id/achievementIcon3"
                             app:layout_constraintEnd_toStartOf="@id/badgeStatus3"
-                            android:layout_marginStart="8dp" />
+                            app:layout_constraintStart_toEndOf="@id/achievementIcon3"
+                            app:layout_constraintTop_toTopOf="@id/achievementIcon3" />
 
                         <TextView
                             android:id="@+id/textAchievementDescription3"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
                             android:text="Save something every week for 3 months"
                             android:textColor="?attr/bb_secondaryText"
                             android:textSize="16sp"
-                            app:layout_constraintStart_toStartOf="@id/textAchievementLabel3"
-                            app:layout_constraintTop_toBottomOf="@id/textAchievementLabel3"
                             app:layout_constraintEnd_toStartOf="@id/badgeStatus3"
-                            android:layout_marginTop="2dp" />
+                            app:layout_constraintStart_toStartOf="@id/textAchievementLabel3"
+                            app:layout_constraintTop_toBottomOf="@id/textAchievementLabel3" />
 
                         <ImageView
                             android:id="@+id/badgeStatus3"
                             android:layout_width="24dp"
                             android:layout_height="24dp"
+                            android:layout_marginTop="12dp"
+                            android:layout_marginEnd="8dp"
                             android:src="@drawable/ic_ui_circle_check"
-                            app:layout_constraintTop_toTopOf="parent"
-                            app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintBottom_toBottomOf="parent"
-                            android:layout_marginEnd="8dp" />
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
                     </androidx.constraintlayout.widget.ConstraintLayout>
 
-                    <!-- 4th Achievement -->
+                    <!-- Achievement 4 -->
                     <androidx.constraintlayout.widget.ConstraintLayout
                         android:id="@+id/rowAchievement4"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:paddingVertical="8dp">
+                        android:layout_marginBottom="24dp">
 
                         <ImageView
                             android:id="@+id/achievementIcon4"
                             android:layout_width="40dp"
                             android:layout_height="40dp"
+                            android:layout_marginEnd="8dp"
                             android:src="@drawable/ic_ui_achievement_medal"
-                            app:tint="@color/cat_dark_maroon"
-                            app:layout_constraintTop_toTopOf="parent"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintStart_toStartOf="parent" />
+                            app:layout_constraintBottom_toBottomOf="@id/badgeStatus4"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="@id/textAchievementLabel4"
+                            app:tint="@color/cat_dark_maroon" />
 
                         <TextView
                             android:id="@+id/textAchievementLabel4"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
                             android:text="Goal Crusher Badge"
                             android:textColor="?attr/bb_primaryText"
                             android:textSize="18sp"
-                            app:layout_constraintStart_toEndOf="@id/achievementIcon4"
-                            app:layout_constraintTop_toTopOf="@id/achievementIcon4"
                             app:layout_constraintEnd_toStartOf="@id/badgeStatus4"
-                            android:layout_marginStart="8dp" />
+                            app:layout_constraintStart_toEndOf="@id/achievementIcon4"
+                            app:layout_constraintTop_toTopOf="@id/achievementIcon4" />
 
                         <TextView
                             android:id="@+id/textAchievementDescription4"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:text="Hit a specific savings goal for an event"
+                            android:layout_marginTop="4dp"
+                            android:text="Hit a specific savings goal for an        event"
                             android:textColor="?attr/bb_secondaryText"
                             android:textSize="16sp"
-                            app:layout_constraintStart_toStartOf="@id/textAchievementLabel4"
-                            app:layout_constraintTop_toBottomOf="@id/textAchievementLabel4"
                             app:layout_constraintEnd_toStartOf="@id/badgeStatus4"
-                            android:layout_marginTop="2dp" />
+                            app:layout_constraintStart_toStartOf="@id/textAchievementLabel4"
+                            app:layout_constraintTop_toBottomOf="@id/textAchievementLabel4" />
 
                         <ImageView
                             android:id="@+id/badgeStatus4"
                             android:layout_width="24dp"
                             android:layout_height="24dp"
+                            android:layout_marginTop="10dp"
+                            android:layout_marginEnd="8dp"
                             android:src="@drawable/ic_ui_circle_check"
-                            app:layout_constraintTop_toTopOf="parent"
-                            app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintBottom_toBottomOf="parent"
-                            android:layout_marginEnd="8dp" />
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
                     </androidx.constraintlayout.widget.ConstraintLayout>
 
                 </LinearLayout>
