@@ -1,7 +1,5 @@
 package com.synaptix.budgetbuddy.presentation.ui.main.budget
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.synaptix.budgetbuddy.core.model.Budget
@@ -9,9 +7,8 @@ import com.synaptix.budgetbuddy.core.usecase.auth.GetUserIdUseCase
 import com.synaptix.budgetbuddy.core.usecase.main.budget.GetBudgetsUseCase
 import com.synaptix.budgetbuddy.core.usecase.main.display.BudgetSummary
 import com.synaptix.budgetbuddy.core.usecase.main.display.TotalBudgetUseCase
-import com.synaptix.budgetbuddy.data.firebase.mapper.FirebaseMapper.toDomain
-import com.synaptix.budgetbuddy.data.firebase.repository.FirestoreBudgetRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -22,56 +19,66 @@ class BudgetMainViewModel @Inject constructor(
     private val totalBudgetUseCase: TotalBudgetUseCase
 ) : ViewModel() {
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-    // LiveData for budget summary and budgets
-    private val _budgetSummary = MutableLiveData<BudgetSummary>()
-    val budgetSummary: LiveData<BudgetSummary> = _budgetSummary
+    // Define state classes for UI
+    sealed class BudgetState {
+        object Loading : BudgetState()
+        data class Success(val budgets: List<Budget>) : BudgetState()
+        data class Error(val message: String) : BudgetState()
+        object Empty : BudgetState()
+    }
 
-    private val _budgets = MutableLiveData<List<Budget>>()
-    val budgets: LiveData<List<Budget>> = _budgets
+    private val _budgetState = MutableStateFlow<BudgetState>(BudgetState.Loading)
+    val budgetState: StateFlow<BudgetState> = _budgetState
 
-    private val _error = MutableLiveData<String?>()
-    val error: LiveData<String?> = _error
+    private val _budgetSummary = MutableStateFlow<BudgetSummary?>(null)
+    val budgetSummary: StateFlow<BudgetSummary?> = _budgetSummary
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-    // Function to fetch budgets and budget summary
+    private val _error = MutableStateFlow<String?>(null)
+    val error: StateFlow<String?> = _error
+
+    init {
+        fetchBudgets()
+        fetchBudgetSummary()
+    }
+
     fun fetchBudgets() {
         viewModelScope.launch {
-            try {
-                val userId = getUserIdUseCase.execute()
-                if (userId.isEmpty()) {
-                    _error.value = "User ID is empty"
-                    return@launch
-                }
-
-                when (val result = getBudgetsUseCase.execute(userId)) {
-                    is GetBudgetsUseCase.GetBudgetsResult.Success -> {
-                        _budgets.value = result.budgets
-                        _error.value = null
-                    }
-                    is GetBudgetsUseCase.GetBudgetsResult.Error -> {
-                        _error.value = result.message
-                        _budgets.value = emptyList()
-                    }
-                }
-            } catch (e: Exception) {
-                _error.value = e.message ?: "An unknown error occurred"
-                _budgets.value = emptyList()
+            val userId = getUserIdUseCase.execute()
+            if (userId.isEmpty()) {
+                _budgetState.value = BudgetState.Error("User ID is empty")
+                return@launch
             }
+
+            getBudgetsUseCase.execute(userId)
+                .catch { e ->
+                    _budgetState.value = BudgetState.Error(e.message ?: "Unknown error")
+                }
+                .collect { result ->
+                    when (result) {
+                        is GetBudgetsUseCase.GetBudgetsResult.Success -> {
+                            if (result.budgets.isEmpty()) {
+                                _budgetState.value = BudgetState.Empty
+                            } else {
+                                _budgetState.value = BudgetState.Success(result.budgets)
+                            }
+                        }
+                        is GetBudgetsUseCase.GetBudgetsResult.Error -> {
+                            _budgetState.value = BudgetState.Error(result.message)
+                        }
+                    }
+                }
         }
     }
 
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-    // Function to fetch budget summary
     fun fetchBudgetSummary() {
         viewModelScope.launch {
+            val userId = getUserIdUseCase.execute()
+            if (userId.isEmpty()) {
+                _error.value = "User ID is empty"
+                return@launch
+            }
+
             try {
-                val userId = getUserIdUseCase.execute()
-                if (userId.isEmpty()) {
-                    _error.value = "User ID is empty"
-                    return@launch
-                }
                 val summary = totalBudgetUseCase.execute(userId)
                 _budgetSummary.value = summary
             } catch (e: Exception) {
