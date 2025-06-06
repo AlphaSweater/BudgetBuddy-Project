@@ -62,7 +62,6 @@ class BudgetAddFragment : Fragment() {
 
         setupUI()
 
-        observeSelectedCategoriesResult()
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -109,16 +108,7 @@ class BudgetAddFragment : Fragment() {
         binding.currencySpinner.adapter = adapter
     }
 
-    private fun observeSelectedCategoriesResult() {
-        val navBackStackEntry = findNavController().currentBackStackEntry
-        val savedStateHandle = navBackStackEntry?.savedStateHandle
 
-        savedStateHandle?.getLiveData<List<Category>>("selected_categories")
-            ?.observe(viewLifecycleOwner) { categories ->
-                viewModel.setSelectedCategories(categories)
-                savedStateHandle.remove<List<Category>>("selected_categories")
-            }
-    }
 
     private suspend fun collectUiState() {
         viewModel.uiState.collectLatest { state ->
