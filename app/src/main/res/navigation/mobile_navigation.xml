@@ -74,11 +74,6 @@
         android:label="@string/title_transaction"
         tools:layout="@layout/fragment_transaction_add">
 
-        <argument
-            android:name="screenMode"
-            app:argType="com.synaptix.budgetbuddy.ScreenMode"
-            android:defaultValue="CREATE" />
-
         <action
             android:id="@+id/action_transactionAddFragment_to_transactionSelectWalletFragment"
             app:destination="@id/navigation_transaction_select_wallet"

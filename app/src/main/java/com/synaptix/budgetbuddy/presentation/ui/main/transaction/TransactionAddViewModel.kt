@@ -125,6 +125,11 @@ class TransactionAddViewModel @Inject constructor(
     private val _wallet = MutableStateFlow<Wallet?>(null)
     val wallet: StateFlow<Wallet?> = _wallet
 
+    fun setWallet(wallet: Wallet?) {
+        _wallet.value = wallet
+        validateForm()
+    }
+
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private val _currency = MutableStateFlow("ZAR")
     val currency: StateFlow<String> = _currency
