@@ -899,7 +899,7 @@ class HomeMainFragment : Fragment() {
         )
 
         findNavController().navigate(
-            R.id.action_homeFragment_to_transactionAddFragment,
+            R.id.transaction_navigation_graph,
             bundle
         )
     }
