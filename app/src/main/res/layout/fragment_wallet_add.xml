@@ -48,25 +48,25 @@
                 android:layout_height="match_parent"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
-                android:paddingHorizontal="4dp">
+                android:paddingHorizontal="4dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp">
 
                 <ImageButton
                     android:id="@+id/btnGoBack"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    android:background="?attr/selectableItemBackgroundBorderless"
+                    style="@style/ToolButtonIcon"
                     android:contentDescription="@string/back"
-                    android:src="?attr/actionModeCloseDrawable"
-                    app:tint="?attr/bb_primaryText" />
+                    android:src="@drawable/ic_ui_arrow_back" />
 
                 <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Add New Wallet"
-                    android:textColor="?attr/bb_primaryText"
-                    android:textSize="20sp"
-                    android:textStyle="bold" />
+                    android:id="@+id/toolbarTitle"
+                    style="@style/ToolBarTitle"
+                    android:text="Add New Wallet" />
+
+                <ImageButton
+                    style="@style/ToolButtonIcon"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp" />
             </LinearLayout>
         </androidx.appcompat.widget.Toolbar>
     </com.google.android.material.appbar.AppBarLayout>
