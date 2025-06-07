@@ -890,10 +890,14 @@ class HomeMainFragment : Fragment() {
     private fun navigateToTransactionDetails(transaction: Transaction) {
         Log.d("HomeFragment", "Navigating to transaction details: ${transaction.id}")
         // Set the transaction in the destination fragment's ViewModel first
-        val transactionViewModel: TransactionAddViewModel by activityViewModels()
-        transactionViewModel.setTransaction(transaction)
+        val transactionAddViewModel: TransactionAddViewModel by activityViewModels()
+        transactionAddViewModel.setTransaction(transaction)
+        transactionAddViewModel.setScreenMode(TransactionAddViewModel.ScreenMode.VIEW)
 
-        val bundle = bundleOf("screenMode" to TransactionAddViewModel.ScreenMode.VIEW)
+        val bundle = bundleOf(
+            "screenMode" to TransactionAddViewModel.ScreenMode.VIEW
+        )
+
         findNavController().navigate(
             R.id.action_homeFragment_to_transactionAddFragment,
             bundle

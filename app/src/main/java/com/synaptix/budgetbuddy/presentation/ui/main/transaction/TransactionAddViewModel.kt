@@ -66,23 +66,8 @@ class TransactionAddViewModel @Inject constructor(
     private val _screenMode = MutableStateFlow<ScreenMode>(ScreenMode.CREATE)
     val screenMode: StateFlow<ScreenMode> = _screenMode
 
-    fun setScreenMode(mode: ScreenMode, transaction: Transaction? = null) {
+    fun setScreenMode(mode: ScreenMode) {
         _screenMode.value = mode
-        _transaction.value = transaction
-
-        when (mode) {
-            ScreenMode.VIEW, ScreenMode.EDIT -> {
-                transaction?.let { populateTransactionData(it) }
-            }
-            ScreenMode.CREATE -> {
-                reset()
-            }
-        }
-    }
-
-    init {
-        val mode = savedStateHandle.get<String>("screenMode") ?: "CREATE"
-        _screenMode.value = ScreenMode.valueOf(mode)
     }
 
     private val _transaction = MutableStateFlow<Transaction?>(null)
@@ -196,10 +181,6 @@ class TransactionAddViewModel @Inject constructor(
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-    private val _saveState = MutableStateFlow(false)
-    val saveState: StateFlow<Boolean> = _saveState
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     // Function to validate the form inputs
     fun validateForm(): Boolean {
         val currentState = _validationState.value
@@ -209,7 +190,7 @@ class TransactionAddViewModel @Inject constructor(
         val isWalletValid = _wallet.value != null
         val isDateValid = !_date.value.isNullOrBlank()
 
-        _saveState.value = true
+
         _validationState.value = currentState.copy(
             isAmountValid = isAmountValid,
             isCurrencyValid = isCurrencyValid,
@@ -313,7 +294,6 @@ class TransactionAddViewModel @Inject constructor(
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     fun reset() {
-        _saveState.value = false
         _amount.value = null
         _date.value = getCurrentDate()
         _note.value = null

@@ -72,6 +72,9 @@ class TransactionAddFragment : Fragment() {
         setupImagePickers()
         observeViewModel()
 
+        val screenMode = arguments?.getSerializable("screenMode") as? ScreenMode ?: ScreenMode.CREATE
+        transactionAddViewModel.setScreenMode(screenMode)
+
         // Apply screen mode specific settings
         applyScreenMode(transactionAddViewModel.screenMode.value)
     }
@@ -79,7 +82,6 @@ class TransactionAddFragment : Fragment() {
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     override fun onResume() {
         super.onResume()
-        restoreState()
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
@@ -94,20 +96,6 @@ class TransactionAddFragment : Fragment() {
         setupCurrencySpinner()
         setupClickListeners()
         setupTextWatchers()
-    }
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-    private fun restoreState() {
-        if (!transactionAddViewModel.saveState.value) {
-            reset()
-            return
-        }
-
-        binding.apply {
-            edtTextAmount.setText(transactionAddViewModel.amount.value?.toString() ?: "")
-            edtTextNote.setText(transactionAddViewModel.note.value)
-            showImagePreview(transactionAddViewModel.imageBytes.value)
-        }
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
@@ -253,6 +241,7 @@ class TransactionAddFragment : Fragment() {
     private fun setupClickListeners() {
         with(binding) {
             btnGoBack.setOnClickListener {
+                transactionAddViewModel.reset()
                 findNavController().popBackStack()
             }
 
@@ -261,7 +250,7 @@ class TransactionAddFragment : Fragment() {
             }
 
             btnEdit.setOnClickListener {
-                transactionAddViewModel.setScreenMode(ScreenMode.EDIT, transactionAddViewModel.transaction.value)
+                transactionAddViewModel.setScreenMode(ScreenMode.EDIT)
                 applyScreenMode(ScreenMode.EDIT)
             }
 
@@ -618,15 +607,6 @@ class TransactionAddFragment : Fragment() {
                             }
                         } else {
                             binding.imagePreview.visibility = View.GONE
-                        }
-                    }
-                }
-
-                // Collect save state
-                launch {
-                    transactionAddViewModel.saveState.collect { shouldSave ->
-                        if (!shouldSave) {
-                            reset()
                         }
                     }
                 }
