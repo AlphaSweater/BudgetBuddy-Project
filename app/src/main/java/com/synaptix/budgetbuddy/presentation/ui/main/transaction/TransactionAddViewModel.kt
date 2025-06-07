@@ -161,6 +161,7 @@ class TransactionAddViewModel @Inject constructor(
     fun setCategory(category: Category?) {
         _category.value = category
         validateForm()
+        checkForChanges()
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
@@ -170,6 +171,7 @@ class TransactionAddViewModel @Inject constructor(
     fun setWallet(wallet: Wallet?) {
         _wallet.value = wallet
         validateForm()
+        checkForChanges()
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
@@ -179,6 +181,7 @@ class TransactionAddViewModel @Inject constructor(
     fun setCurrency(currency: String) {
         _currency.value = currency
         validateForm()
+        checkForChanges()
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
@@ -188,6 +191,7 @@ class TransactionAddViewModel @Inject constructor(
     fun setAmount(amount: Double?) {
         _amount.value = amount
         validateForm()
+        checkForChanges()
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
@@ -197,6 +201,7 @@ class TransactionAddViewModel @Inject constructor(
     fun setDate(date: String) {
         _date.value = date
         validateForm()
+        checkForChanges()
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
@@ -205,6 +210,7 @@ class TransactionAddViewModel @Inject constructor(
 
     fun setNote(note: String) {
         _note.value = note
+        checkForChanges()
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
@@ -213,6 +219,7 @@ class TransactionAddViewModel @Inject constructor(
 
     fun setImageBytes(bytes: ByteArray?) {
         _imageBytes.value = bytes
+        checkForChanges()
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
@@ -221,6 +228,7 @@ class TransactionAddViewModel @Inject constructor(
 
     fun setRecurrenceData(data: RecurrenceData) {
         _recurrenceData.value = data
+        checkForChanges()
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
@@ -229,12 +237,14 @@ class TransactionAddViewModel @Inject constructor(
 
     fun setLabels(labels: List<Label>) {
         _selectedLabels.value = labels
+        checkForChanges()
     }
 
     fun removeLabel(label: Label) {
         val currentLabels = _selectedLabels.value.toMutableList()
         currentLabels.remove(label)
         _selectedLabels.value = currentLabels
+        checkForChanges()
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
@@ -374,6 +384,7 @@ class TransactionAddViewModel @Inject constructor(
         _selectedLabels.value = emptyList()
         _validationState.value = ValidationState(shouldShowErrors = false)
         _savingUiState.value = SavingUiState.Idle
+        _hasUnsavedChanges.value = false
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
@@ -386,6 +397,51 @@ class TransactionAddViewModel @Inject constructor(
             .parse(dateStr)?.time ?: System.currentTimeMillis()
     } catch (e: Exception) {
         System.currentTimeMillis()
+    }
+
+    private val _hasUnsavedChanges = MutableStateFlow(false)
+    val hasUnsavedChanges: StateFlow<Boolean> = _hasUnsavedChanges
+
+    private fun checkForChanges() {
+        val originalTransaction = _transaction.value
+        if (originalTransaction == null) {
+            _hasUnsavedChanges.value = false
+            return
+        }
+
+        val hasChanges = originalTransaction.amount != (_amount.value ?: 0.0) ||
+                originalTransaction.currency != _currency.value ||
+                originalTransaction.note != (_note.value ?: "") ||
+                originalTransaction.category != _category.value ||
+                originalTransaction.wallet != _wallet.value ||
+                originalTransaction.date != parseDate(_date.value) ||
+                originalTransaction.labels != _selectedLabels.value ||
+                originalTransaction.recurrenceData != _recurrenceData.value ||
+                _imageBytes.value != null // If there's a new image, consider it changed
+
+        _hasUnsavedChanges.value = hasChanges
+    }
+
+    fun revertChanges() {
+        val originalTransaction = _transaction.value ?: return
+        
+        // Restore all values from the original transaction
+        _amount.value = originalTransaction.amount
+        _currency.value = originalTransaction.currency
+        _note.value = originalTransaction.note
+        _date.value = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+            .format(Date(originalTransaction.date))
+        _category.value = originalTransaction.category
+        _wallet.value = originalTransaction.wallet
+        _selectedLabels.value = originalTransaction.labels
+        _recurrenceData.value = originalTransaction.recurrenceData
+        _imageBytes.value = null // Reset image since we can't restore it from URL
+        
+        // Reset validation state
+        _validationState.value = ValidationState(shouldShowErrors = false)
+        
+        // Reset unsaved changes flag
+        _hasUnsavedChanges.value = false
     }
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~EOF~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\

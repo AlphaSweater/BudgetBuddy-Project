@@ -115,7 +115,7 @@ class TransactionAddFragment : Fragment() {
     private fun setupAmountWatcher() {
         var current = transactionAddViewModel.amount.value.toString()
 
-        binding.edtTextAmount.addTextChangedListener(object : TextWatcher {
+        val watcher = object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
 
@@ -153,13 +153,16 @@ class TransactionAddFragment : Fragment() {
                     binding.edtTextAmount.addTextChangedListener(this)
                 }
             }
-        })
+        }
+        binding.edtTextAmount.addTextChangedListener(watcher)
+        binding.edtTextAmount.tag = watcher
     }
 
     private fun setupNoteWatcher() {
-        binding.edtTextNote.doAfterTextChanged { text ->
+        val watcher = binding.edtTextNote.doAfterTextChanged { text ->
             transactionAddViewModel.setNote(text.toString())
         }
+        binding.edtTextNote.tag = watcher
     }
 
     private fun setupImagePickers() {
@@ -332,14 +335,14 @@ class TransactionAddFragment : Fragment() {
             btnGoBack.setOnClickListener {
                 when (transactionAddViewModel.screenMode.value) {
                     TransactionAddViewModel.ScreenMode.EDIT -> {
-                        // Switch back to view mode
-                        transactionAddViewModel.setScreenMode(TransactionAddViewModel.ScreenMode.VIEW)
-                        applyScreenMode(TransactionAddViewModel.ScreenMode.VIEW)
+                        if (transactionAddViewModel.hasUnsavedChanges.value) {
+                            showDiscardChangesDialog()
+                        } else {
+                            switchToViewMode()
+                        }
                     }
                     TransactionAddViewModel.ScreenMode.VIEW,
                     TransactionAddViewModel.ScreenMode.CREATE -> {
-                        // Pop back stack
-                        transactionAddViewModel.setScreenModeBusy(false)
                         findNavController().popBackStack()
                     }
                 }
@@ -798,6 +801,40 @@ class TransactionAddFragment : Fragment() {
         Snackbar.make(binding.root, message, Snackbar.LENGTH_SHORT)
             .setBackgroundTint(resources.getColor(R.color.success, null))
             .show()
+    }
+
+    private fun showDiscardChangesDialog() {
+        AlertDialog.Builder(requireContext())
+            .setTitle("Discard Changes?")
+            .setMessage("You have unsaved changes. Are you sure you want to discard them?")
+            .setPositiveButton("Discard") { _, _ ->
+                // Temporarily remove text watchers
+                binding.edtTextAmount.removeTextChangedListener(binding.edtTextAmount.tag as? TextWatcher)
+                binding.edtTextNote.removeTextChangedListener(binding.edtTextNote.tag as? TextWatcher)
+                
+                // Revert changes in ViewModel
+                transactionAddViewModel.revertChanges()
+                
+                // Update text fields with reverted values
+                val amount = transactionAddViewModel.amount.value
+                val formattedAmount = if (amount == 0.0) "" else DecimalFormat("#,##0.00").format(amount)
+                binding.edtTextAmount.setText(formattedAmount)
+                binding.edtTextNote.setText(transactionAddViewModel.note.value)
+                
+                // Reattach text watchers
+                setupAmountWatcher()
+                setupNoteWatcher()
+                
+                // Switch to view mode
+                switchToViewMode()
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
+    }
+
+    private fun switchToViewMode() {
+        transactionAddViewModel.setScreenMode(TransactionAddViewModel.ScreenMode.VIEW)
+        applyScreenMode(TransactionAddViewModel.ScreenMode.VIEW)
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
