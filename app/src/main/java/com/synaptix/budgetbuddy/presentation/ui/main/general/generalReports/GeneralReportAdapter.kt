@@ -14,27 +14,16 @@ class GeneralReportAdapter(
     private val onCategoryClick: ((Category) -> Unit)? = null
 ) : BaseAdapter<ReportListItems, BaseAdapter.BaseViewHolder<ReportListItems>>() {
 
-    companion object {
-        private const val VIEW_TYPE_CATEGORY = 0
-    }
-
-    override fun getItemViewType(position: Int): Int = when (items[position]) {
-        is ReportListItems.ReportCategoryItem -> VIEW_TYPE_CATEGORY
-        else -> throw IllegalArgumentException("Invalid item type at position $position")
-    }
+    override fun getItemViewType(position: Int): Int = 0 // Only one view type
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
     ): BaseViewHolder<ReportListItems> {
-        return when (viewType) {
-            VIEW_TYPE_CATEGORY -> createViewHolder(
-                parent = parent,
-                layoutResId = R.layout.item_home_category
-            ) { CategoryViewHolder(it, onCategoryClick) }
-
-            else -> throw IllegalArgumentException("Unknown view type: $viewType")
-        }
+        return createViewHolder(
+            parent = parent,
+            layoutResId = R.layout.item_home_category
+        ) { CategoryViewHolder(it, onCategoryClick) }
     }
 
     class CategoryViewHolder(
@@ -76,4 +65,5 @@ sealed class ReportListItems {
         val amount: String,
         val relativeDate: String
     ) : ReportListItems()
+
 }
