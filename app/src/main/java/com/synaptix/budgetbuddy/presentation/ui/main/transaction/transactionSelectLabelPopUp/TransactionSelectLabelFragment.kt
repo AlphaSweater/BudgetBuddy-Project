@@ -57,6 +57,8 @@ class TransactionSelectLabelFragment : Fragment() {
         observeLabels()
         observeLoadingState()
         observeErrorState()
+
+        // Load labels
         labelViewModel.loadLabelsForUser()
     }
 
@@ -72,6 +74,10 @@ class TransactionSelectLabelFragment : Fragment() {
         setupRecyclerView()
         setupClickListeners()
         setupSearch()
+        
+        // Clear search text and reset visibility states
+        binding.createNewLabelContainer.visibility = View.GONE
+        binding.noLabelsContainer.visibility = View.GONE
     }
 
     private fun setupRecyclerView() {
@@ -81,7 +87,7 @@ class TransactionSelectLabelFragment : Fragment() {
         }
 
         // Initialize with selected labels from ViewModel
-        val initialSelected = sharedViewModel.selectedLabels.value ?: emptyList()
+        val initialSelected = sharedViewModel.selectedLabels.value
         labelAdapter.submitList(emptyList(), initialSelected)
     }
 
@@ -103,7 +109,28 @@ class TransactionSelectLabelFragment : Fragment() {
 
     private fun setupSearch() {
         binding.searchEditText.doAfterTextChanged { text ->
-            labelViewModel.filterLabels(text?.toString() ?: "")
+            val query = text?.toString() ?: ""
+            labelViewModel.filterLabels(query)
+            
+            // Only show create new label option if there's a non-empty query
+            if (query.isNotEmpty() || query.isNotBlank()) {
+                // Check if there's an exact match with any existing label
+                val hasExactMatch = labelViewModel.filteredLabels.value.any { 
+                    it.name.equals(query, ignoreCase = true) 
+                }
+                
+                // Show create new label option only if there's no exact match
+                binding.createNewLabelContainer.visibility = if (!hasExactMatch) View.VISIBLE else View.GONE
+                
+                // Update create new label text
+                binding.textCreateNew.text = "Create new label \"$query\""
+            } else {
+                // Hide create new label option when query is empty
+                binding.createNewLabelContainer.visibility = View.GONE
+            }
+            
+            // Show/hide no labels state
+            binding.noLabelsContainer.visibility = if (query.isNotEmpty() && labelViewModel.filteredLabels.value.isEmpty()) View.VISIBLE else View.GONE
         }
     }
 
@@ -124,7 +151,7 @@ class TransactionSelectLabelFragment : Fragment() {
                 binding.loadingContainer.visibility = if (isLoading) View.VISIBLE else View.GONE
                 binding.recyclerViewLabels.visibility = if (isLoading) View.GONE else View.VISIBLE
                 binding.searchLayout.visibility = if (isLoading) View.GONE else View.VISIBLE
-                binding.createNewLabelContainer.visibility = if (isLoading) View.GONE else View.VISIBLE
+//                binding.createNewLabelContainer.visibility = if (isLoading) View.GONE else View.VISIBLE
             }
         }
     }
@@ -148,6 +175,8 @@ class TransactionSelectLabelFragment : Fragment() {
             labelViewModel.createNewLabel(name)
             // Clear the search field after creating
             binding.searchEditText.setText("")
+            // Hide the create new label container
+            binding.createNewLabelContainer.visibility = View.GONE
         } else {
             showError("Invalid label name. Please try again.")
         }
