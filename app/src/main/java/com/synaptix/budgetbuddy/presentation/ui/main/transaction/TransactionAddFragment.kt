@@ -44,6 +44,9 @@ import kotlinx.coroutines.delay
 @AndroidEntryPoint
 class TransactionAddFragment : Fragment() {
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // Properties
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private var _binding: FragmentTransactionAddBinding? = null
     private val binding get() = _binding!!
 
@@ -54,7 +57,8 @@ class TransactionAddFragment : Fragment() {
     private var tempImageUri: Uri? = null
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-    // --- Lifecycle ---
+    // Fragment Lifecycle
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -64,8 +68,6 @@ class TransactionAddFragment : Fragment() {
         return binding.root
     }
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-    // --- Fragment Lifecycle ---
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupViews()
@@ -74,157 +76,23 @@ class TransactionAddFragment : Fragment() {
 
         val screenMode = arguments?.getSerializable("screenMode") as? ScreenMode ?: ScreenMode.CREATE
         transactionAddViewModel.setScreenMode(screenMode)
-
-        // Apply screen mode specific settings
         applyScreenMode(transactionAddViewModel.screenMode.value)
     }
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-    override fun onResume() {
-        super.onResume()
-    }
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-    // --- Setup Methods ---
+    // Initial Setup Methods
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private fun setupViews() {
         setupCurrencySpinner()
         setupClickListeners()
         setupTextWatchers()
     }
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-    private fun applyScreenMode(mode: ScreenMode) {
-        when (mode) {
-            ScreenMode.VIEW -> {
-                // Show edit button, hide clear button
-                binding.btnEdit.visibility = View.VISIBLE
-                binding.btnClear.visibility = View.GONE
-                binding.btnSave.visibility = View.GONE
-
-                // Disable all interactive elements
-                binding.apply {
-                    // Disable amount input
-                    edtTextAmount.isEnabled = false
-                    spinnerCurrency.isEnabled = false
-                    
-                    // Disable note input
-                    edtTextNote.isEnabled = false
-                    
-                    // Disable selection rows
-                    rowSelectCategory.isEnabled = false
-                    rowSelectWallet.isEnabled = false
-                    rowSelectLabels.isEnabled = false
-                    rowSelectDate.isEnabled = false
-                    rowSelectRecurrenceRate.isEnabled = false
-                    rowSelectPhoto.isEnabled = false
-                    
-                    // Hide photo removal button
-                    btnRemovePhoto.visibility = View.GONE
-                    
-                    // Remove click listeners
-                    rowSelectCategory.setOnClickListener(null)
-                    rowSelectWallet.setOnClickListener(null)
-                    rowSelectLabels.setOnClickListener(null)
-                    rowSelectDate.setOnClickListener(null)
-                    rowSelectRecurrenceRate.setOnClickListener(null)
-                    rowSelectPhoto.setOnClickListener(null)
-                }
-            }
-
-            ScreenMode.EDIT -> {
-                // Hide edit button, show update button
-                binding.btnEdit.visibility = View.GONE
-                binding.btnClear.visibility = View.VISIBLE
-                binding.btnSave.apply {
-                    text = "Update"
-                    visibility = View.VISIBLE
-                }
-
-                // Enable all interactive elements
-                binding.apply {
-                    edtTextAmount.isEnabled = true
-                    spinnerCurrency.isEnabled = true
-                    edtTextNote.isEnabled = true
-                    rowSelectCategory.isEnabled = true
-                    rowSelectWallet.isEnabled = true
-                    rowSelectLabels.isEnabled = true
-                    rowSelectDate.isEnabled = true
-                    rowSelectRecurrenceRate.isEnabled = true
-                    rowSelectPhoto.isEnabled = true
-                    
-                    // Show photo removal button if there's an image
-                    btnRemovePhoto.visibility = if (transactionAddViewModel.imageBytes.value != null) View.VISIBLE else View.GONE
-                }
-
-                // Restore click listeners
-                setupClickListeners()
-            }
-
-            ScreenMode.CREATE -> {
-                // Hide edit button, show save and clear buttons
-                binding.btnEdit.visibility = View.GONE
-                binding.btnClear.visibility = View.VISIBLE
-                binding.btnSave.apply {
-                    text = "Save"
-                    visibility = View.VISIBLE
-                }
-
-                // Enable all interactive elements
-                binding.apply {
-                    edtTextAmount.isEnabled = true
-                    spinnerCurrency.isEnabled = true
-                    edtTextNote.isEnabled = true
-                    rowSelectCategory.isEnabled = true
-                    rowSelectWallet.isEnabled = true
-                    rowSelectLabels.isEnabled = true
-                    rowSelectDate.isEnabled = true
-                    rowSelectRecurrenceRate.isEnabled = true
-                    rowSelectPhoto.isEnabled = true
-                    
-                    // Show photo removal button if there's an image
-                    btnRemovePhoto.visibility = if (transactionAddViewModel.imageBytes.value != null) View.VISIBLE else View.GONE
-                }
-
-                // Restore click listeners
-                setupClickListeners()
-            }
-        }
-    }
-
-    // New function to populate fields in edit mode
-    private fun populateFieldsForEdit(transaction: Transaction) {
-        binding.apply {
-            // Set amount and currency
-            edtTextAmount.setText(transaction.amount.toString())
-            spinnerCurrency.setSelection(0) // Assuming ZAR is the only currency for now
-
-            // Set note
-            edtTextNote.setText(transaction.note)
-
-            // Set date
-            val date = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-                .format(Date(transaction.date))
-            textSelectedDate.text = date
-
-            // Show image if exists
-            transaction.photoUrl?.let { url ->
-                // TODO: Load image from URL and show in imagePreview
-                imagePreviewContainer.visibility = View.VISIBLE
-            }
-
-            // Update category, wallet, labels, and recurrence data
-            // These will be handled by the ViewModel observers
-        }
-    }
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-    //Handles the setup of the currency spinner.
     private fun setupCurrencySpinner() {
         val adapter = ArrayAdapter(
             requireContext(),
@@ -236,8 +104,128 @@ class TransactionAddFragment : Fragment() {
         binding.spinnerCurrency.adapter = adapter
     }
 
+    private fun setupTextWatchers() {
+        binding.edtTextAmount.doAfterTextChanged { text ->
+            val amount = text.toString().toDoubleOrNull()
+            transactionAddViewModel.setAmount(amount)
+            updateAmountAppearance(amount)
+        }
+
+        binding.edtTextNote.doAfterTextChanged { text ->
+            transactionAddViewModel.setNote(text.toString())
+        }
+    }
+
+    private fun setupImagePickers() {
+        takePictureLauncher = registerForActivityResult(ActivityResultContracts.TakePicture()) { success ->
+            if (success && tempImageUri != null) {
+                handleImageResult(tempImageUri!!)
+            }
+        }
+
+        pickImageLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+            uri?.let { handleImageResult(it) }
+        }
+
+        binding.imagePreview.setOnClickListener {
+            showFullScreenImage()
+        }
+
+        binding.btnRemovePhoto.setOnClickListener {
+            removePhoto()
+        }
+    }
+
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-    //Handles the setup of click listeners for various UI elements.
+    // Screen Mode Handling
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    private fun applyScreenMode(mode: ScreenMode) {
+        when (mode) {
+            ScreenMode.VIEW -> applyViewMode()
+            ScreenMode.EDIT -> applyEditMode()
+            ScreenMode.CREATE -> applyCreateMode()
+        }
+    }
+
+    private fun applyViewMode() {
+        binding.apply {
+            btnEdit.visibility = View.VISIBLE
+            btnClear.visibility = View.GONE
+            btnSave.visibility = View.GONE
+
+            disableAllInteractiveElements()
+        }
+    }
+
+    private fun applyEditMode() {
+        binding.apply {
+            btnEdit.visibility = View.GONE
+            btnClear.visibility = View.VISIBLE
+            btnSave.apply {
+                text = "Update"
+                visibility = View.VISIBLE
+            }
+
+            enableAllInteractiveElements()
+            btnRemovePhoto.visibility = if (transactionAddViewModel.imageBytes.value != null) View.VISIBLE else View.GONE
+        }
+        setupClickListeners()
+    }
+
+    private fun applyCreateMode() {
+        binding.apply {
+            btnEdit.visibility = View.GONE
+            btnClear.visibility = View.VISIBLE
+            btnSave.apply {
+                text = "Save"
+                visibility = View.VISIBLE
+            }
+
+            enableAllInteractiveElements()
+            btnRemovePhoto.visibility = if (transactionAddViewModel.imageBytes.value != null) View.VISIBLE else View.GONE
+        }
+        setupClickListeners()
+    }
+
+    private fun disableAllInteractiveElements() {
+        binding.apply {
+            edtTextAmount.isEnabled = false
+            spinnerCurrency.isEnabled = false
+            edtTextNote.isEnabled = false
+            rowSelectCategory.isEnabled = false
+            rowSelectWallet.isEnabled = false
+            rowSelectLabels.isEnabled = false
+            rowSelectDate.isEnabled = false
+            rowSelectRecurrenceRate.isEnabled = false
+            rowSelectPhoto.isEnabled = false
+            btnRemovePhoto.visibility = View.GONE
+
+            rowSelectCategory.setOnClickListener(null)
+            rowSelectWallet.setOnClickListener(null)
+            rowSelectLabels.setOnClickListener(null)
+            rowSelectDate.setOnClickListener(null)
+            rowSelectRecurrenceRate.setOnClickListener(null)
+            rowSelectPhoto.setOnClickListener(null)
+        }
+    }
+
+    private fun enableAllInteractiveElements() {
+        binding.apply {
+            edtTextAmount.isEnabled = true
+            spinnerCurrency.isEnabled = true
+            edtTextNote.isEnabled = true
+            rowSelectCategory.isEnabled = true
+            rowSelectWallet.isEnabled = true
+            rowSelectLabels.isEnabled = true
+            rowSelectDate.isEnabled = true
+            rowSelectRecurrenceRate.isEnabled = true
+            rowSelectPhoto.isEnabled = true
+        }
+    }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // Click Listeners
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private fun setupClickListeners() {
         with(binding) {
             btnGoBack.setOnClickListener {
@@ -285,42 +273,27 @@ class TransactionAddFragment : Fragment() {
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-    //Handles the setup of text watchers for input fields.
-    private fun setupTextWatchers() {
-        binding.edtTextAmount.doAfterTextChanged { text ->
-            transactionAddViewModel.setAmount(text.toString().toDoubleOrNull())
-        }
+    // Navigation Methods
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    private fun showLabelsSelector() {
+        findNavController().navigate(R.id.action_transactionAddFragment_to_transactionSelectLabelFragment)
+    }
 
-        binding.edtTextNote.doAfterTextChanged { text ->
-            transactionAddViewModel.setNote(text.toString())
-        }
+    private fun showWalletSelector() {
+        findNavController().navigate(R.id.action_transactionAddFragment_to_transactionSelectWalletFragment)
+    }
+
+    private fun showCategorySelector() {
+        findNavController().navigate(R.id.action_transactionAddFragment_to_transactionSelectCategoryFragment)
+    }
+
+    private fun showRecurrenceSelector() {
+        findNavController().navigate(R.id.action_transactionAddFragment_to_transactionSelectRecurrenceFragment)
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-    //Handles the setup of image pickers for taking or selecting photos.
-    private fun setupImagePickers() {
-        takePictureLauncher = registerForActivityResult(ActivityResultContracts.TakePicture()) { success ->
-            if (success && tempImageUri != null) {
-                handleImageResult(tempImageUri!!)
-            }
-        }
-
-        pickImageLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
-            uri?.let { handleImageResult(it) }
-        }
-
-        // Setup click listeners for image preview and remove button
-        binding.imagePreview.setOnClickListener {
-            showFullScreenImage()
-        }
-
-        binding.btnRemovePhoto.setOnClickListener {
-            removePhoto()
-        }
-    }
-
+    // Image Handling
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-    // --- Image Handling ---
     private fun handleImageResult(uri: Uri) {
         try {
             requireContext().contentResolver.openInputStream(uri)?.use { inputStream ->
@@ -333,25 +306,6 @@ class TransactionAddFragment : Fragment() {
         }
     }
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-    //Handles showing the date picker dialog for selecting a date.
-    private fun showDatePicker() {
-        val picker = MaterialDatePicker.Builder.datePicker()
-            .setTitleText("Select Date")
-            .setSelection(MaterialDatePicker.todayInUtcMilliseconds())
-            .build()
-
-        picker.addOnPositiveButtonClickListener { selection ->
-            val date = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-                .format(Date(selection))
-            transactionAddViewModel.setDate(date)
-        }
-
-        picker.show(parentFragmentManager, "DATE_PICKER")
-    }
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-    //Handles showing the image preview in a dialog.
     private fun showImagePreview(bytes: ByteArray?) {
         if (bytes == null) {
             binding.imagePreviewContainer.visibility = View.GONE
@@ -363,16 +317,12 @@ class TransactionAddFragment : Fragment() {
         binding.imagePreview.setImageBitmap(bitmap)
     }
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-    //Handles removing the selected photo from the transaction.
     private fun removePhoto() {
         transactionAddViewModel.setImageBytes(null)
         binding.imagePreviewContainer.visibility = View.GONE
         binding.imagePreview.setImageBitmap(null)
     }
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-    //Handles showing the full-screen image in a dialog.
     private fun showFullScreenImage() {
         transactionAddViewModel.imageBytes.value?.let { bytes ->
             val dialog = AlertDialog.Builder(requireContext(), R.style.FullScreenDialog)
@@ -396,8 +346,6 @@ class TransactionAddFragment : Fragment() {
         }
     }
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-    //Handles showing the dialog for selecting image source (camera or gallery).
     private fun showImageSourceDialog() {
         val options = arrayOf("Take Photo", "Choose from Gallery", "Cancel")
         AlertDialog.Builder(requireContext())
@@ -412,8 +360,6 @@ class TransactionAddFragment : Fragment() {
             .show()
     }
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-    //Handles launching the camera to take a photo.
     private fun launchCamera() {
         val contentValues = ContentValues().apply {
             put(MediaStore.Images.Media.DISPLAY_NAME, "transaction_${System.currentTimeMillis()}.jpg")
@@ -434,48 +380,44 @@ class TransactionAddFragment : Fragment() {
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-    // --- Update Methods ---
+    // UI Update Methods
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private fun updateSelectedLabels(labels: List<Label>) {
         binding.chipGroupLabels.removeAllViews()
         
         if (labels.isEmpty()) {
             binding.textSelectedLabels.visibility = View.VISIBLE
-            return
-        }
-
-        binding.textSelectedLabels.visibility = View.GONE
-        
-        labels.forEach { label ->
-            val chip = com.google.android.material.chip.Chip(requireContext()).apply {
-                text = label.name
-                isCloseIconVisible = true
-                setOnCloseIconClickListener {
-                    transactionAddViewModel.removeLabel(label)
+        } else {
+            binding.textSelectedLabels.visibility = View.GONE
+            
+            labels.forEach { label ->
+                val chip = com.google.android.material.chip.Chip(requireContext()).apply {
+                    text = label.name
+                    isCloseIconVisible = true
+                    setOnCloseIconClickListener {
+                        transactionAddViewModel.removeLabel(label)
+                    }
                 }
+                binding.chipGroupLabels.addView(chip)
             }
-            binding.chipGroupLabels.addView(chip)
         }
+        updateLabelsAppearance(labels)
     }
 
     private fun updateSelectedCategory(category: Category?) {
         if (category == null) {
             binding.textSelectedCategoryName.text = "Select category"
             binding.imgSelectedCategoryIcon.setImageResource(R.drawable.ic_ui_categories)
-            binding.imgSelectedCategoryIcon.setColorFilter(requireContext().getThemeColor(R.attr.bb_accent))
-            return
+        } else {
+            binding.textSelectedCategoryName.text = category.name
+            binding.imgSelectedCategoryIcon.setImageResource(category.icon)
         }
-
-        binding.textSelectedCategoryName.text = category.name
-        binding.imgSelectedCategoryIcon.setImageResource(category.icon)
-        binding.imgSelectedCategoryIcon.setColorFilter(requireContext().getColor(category.color))
+        updateCategoryAppearance(category)
     }
 
     private fun updateSelectedWallet(wallet: Wallet?) {
-        if (wallet == null) {
-            binding.textSelectedWalletName.text = "Select wallet"
-            return
-        }
-        binding.textSelectedWalletName.text = wallet.name
+        binding.textSelectedWalletName.text = wallet?.name ?: "Select wallet"
+        updateWalletAppearance(wallet)
     }
 
     private fun updateSelectedDate(date: String?) {
@@ -483,17 +425,20 @@ class TransactionAddFragment : Fragment() {
             val currentDate = LocalDate.now()
             val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
             binding.textSelectedDate.text = currentDate.format(formatter)
-            return
+        } else {
+            binding.textSelectedDate.text = date
         }
-        binding.textSelectedDate.text = date
+        updateDateAppearance(date)
     }
 
     private fun updateSelectedRecurrence(recurrence: RecurrenceData) {
         binding.textSelectedRecurrenceRate.text = recurrence.toDisplayString()
+        updateRecurrenceAppearance(recurrence)
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-    // --- Save Logic ---
+    // Form Handling
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private fun saveTransaction() {
         val amount = binding.edtTextAmount.text.toString().toDoubleOrNull()
         transactionAddViewModel.setAmount(amount)
@@ -507,115 +452,23 @@ class TransactionAddFragment : Fragment() {
         val currency = binding.spinnerCurrency.selectedItem.toString()
         transactionAddViewModel.setCurrency(currency)
 
-        // Show validation errors if any
         transactionAddViewModel.showValidationErrors()
-
-        // Check if form is valid before proceeding
         if (!transactionAddViewModel.validateForm()) return
 
-        // Call addTransaction
         transactionAddViewModel.addTransaction()
     }
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-    // --- Popup Navigation ---
-    private fun showLabelsSelector() {
-        findNavController().navigate(R.id.action_transactionAddFragment_to_transactionSelectLabelFragment)
-    }
-
-    private fun showWalletSelector() {
-        findNavController().navigate(R.id.action_transactionAddFragment_to_transactionSelectWalletFragment)
-    }
-
-    private fun showCategorySelector(){
-        findNavController().navigate(R.id.action_transactionAddFragment_to_transactionSelectCategoryFragment)
-    }
-
-    private fun showRecurrenceSelector(){
-        findNavController().navigate(R.id.action_transactionAddFragment_to_transactionSelectRecurrenceFragment)
-    }
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-    // --- Observers ---
-    private fun observeViewModel() {
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                // Collect UI state
-                launch {
-                    transactionAddViewModel.uiState.collect { state ->
-                        handleUiState(state)
-                    }
-                }
-
-                // Collect validation state
-                launch {
-                    transactionAddViewModel.validationState.collect { state ->
-                        handleValidationState(state)
-                    }
-                }
-
-                // Collect transaction data for edit/view mode
-                launch {
-                    transactionAddViewModel.transaction.collect { transaction ->
-                        transaction?.let { populateFieldsForEdit(it) }
-                    }
-                }
-
-                // Collect category
-                launch {
-                    transactionAddViewModel.category.collect { category ->
-                        updateSelectedCategory(category)
-                    }
-                }
-
-                // Collect wallet
-                launch {
-                    transactionAddViewModel.wallet.collect { wallet ->
-                        updateSelectedWallet(wallet)
-                    }
-                }
-
-                // Collect date
-                launch {
-                    transactionAddViewModel.date.collect { date ->
-                        updateSelectedDate(date)
-                    }
-                }
-
-                // Collect recurrence data
-                launch {
-                    transactionAddViewModel.recurrenceData.collect { rate ->
-                        updateSelectedRecurrence(rate)
-                    }
-                }
-
-                // Collect selected labels
-                launch {
-                    transactionAddViewModel.selectedLabels.collect { labels ->
-                        updateSelectedLabels(labels)
-                    }
-                }
-
-                // Collect image bytes
-                launch {
-                    transactionAddViewModel.imageBytes.collect { bytes ->
-                        if (bytes != null) {
-                            val bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
-                            binding.imagePreview.apply {
-                                setImageBitmap(bitmap)
-                                visibility = View.VISIBLE
-                            }
-                        } else {
-                            binding.imagePreview.visibility = View.GONE
-                        }
-                    }
-                }
-            }
+    private fun reset() {
+        transactionAddViewModel.reset()
+        binding.apply {
+            edtTextAmount.setText("")
+            edtTextNote.setText("")
         }
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-    // --- UI State Handlers ---
+    // UI State Handlers
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private fun handleUiState(state: TransactionAddViewModel.UiState) {
         when (state) {
             is TransactionAddViewModel.UiState.Loading -> {
@@ -630,9 +483,8 @@ class TransactionAddFragment : Fragment() {
                 binding.successCheckmark.visibility = View.VISIBLE
                 binding.loadingText.text = "Transaction saved successfully!"
                 
-                // Add a slight delay before closing to show the success state
                 viewLifecycleOwner.lifecycleScope.launch {
-                    delay(1000) // Show success state for 1 second
+                    delay(1000)
                     binding.loadingOverlay.visibility = View.GONE
                     transactionAddViewModel.reset()
                     findNavController().popBackStack()
@@ -650,11 +502,8 @@ class TransactionAddFragment : Fragment() {
         }
     }
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-    //Handles the validation state and shows/hides error messages for each field.
     private fun handleValidationState(state: TransactionAddViewModel.ValidationState) {
         with(binding) {
-            // Show/hide error messages for each field
             textAmountError.apply {
                 text = state.amountError
                 visibility = if (state.shouldShowErrors && state.amountError != null) View.VISIBLE else View.GONE
@@ -683,13 +532,123 @@ class TransactionAddFragment : Fragment() {
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // UI Formatting
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    private fun formatAmount(amount: Double?): String {
+        return amount?.let {
+            String.format("%.2f", it)
+        } ?: "0.00"
+    }
+
+    private fun updateAmountAppearance(amount: Double?) {
+        binding.edtTextAmount.apply {
+            setText(formatAmount(amount))
+            // Set text color based on amount
+            setTextColor(
+                when {
+                    amount == null || amount == 0.0 -> requireContext().getThemeColor(R.attr.bb_secondaryText)
+                    amount > 0 -> requireContext().getColor(R.color.profit_green)
+                    else -> requireContext().getColor(R.color.expense_red)
+                }
+            )
+        }
+    }
+
+    private fun formatDate(date: Long): String {
+        return SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+            .format(Date(date))
+    }
+
+    private fun formatCurrency(amount: Double?, currency: String): String {
+        return amount?.let {
+            "$currency ${formatAmount(it)}"
+        } ?: "$currency 0.00"
+    }
+
+    private fun updateCategoryAppearance(category: Category?) {
+        binding.apply {
+            if (category == null) {
+                imgSelectedCategoryIcon.setColorFilter(requireContext().getThemeColor(R.attr.bb_accent))
+                textSelectedCategoryName.setTextColor(requireContext().getThemeColor(R.attr.bb_secondaryText))
+            } else {
+                imgSelectedCategoryIcon.setColorFilter(requireContext().getColor(category.color))
+                textSelectedCategoryName.setTextColor(requireContext().getThemeColor(R.attr.bb_primaryText))
+            }
+        }
+    }
+
+    private fun updateWalletAppearance(wallet: Wallet?) {
+        binding.apply {
+            textSelectedWalletName.setTextColor(
+                if (wallet == null) {
+                    requireContext().getThemeColor(R.attr.bb_secondaryText)
+                } else {
+                    requireContext().getThemeColor(R.attr.bb_primaryText)
+                }
+            )
+        }
+    }
+
+    private fun updateDateAppearance(date: String?) {
+        binding.apply {
+            textSelectedDate.setTextColor(
+                if (date == null) {
+                    requireContext().getThemeColor(R.attr.bb_secondaryText)
+                } else {
+                    requireContext().getThemeColor(R.attr.bb_primaryText)
+                }
+            )
+        }
+    }
+
+    private fun updateRecurrenceAppearance(recurrence: RecurrenceData) {
+        binding.apply {
+            textSelectedRecurrenceRate.setTextColor(
+                if (recurrence == RecurrenceData.DEFAULT) {
+                    requireContext().getThemeColor(R.attr.bb_secondaryText)
+                } else {
+                    requireContext().getThemeColor(R.attr.bb_primaryText)
+                }
+            )
+        }
+    }
+
+    private fun updateLabelsAppearance(labels: List<Label>) {
+        binding.apply {
+            textSelectedLabels.setTextColor(
+                if (labels.isEmpty()) {
+                    requireContext().getThemeColor(R.attr.bb_secondaryText)
+                } else {
+                    requireContext().getThemeColor(R.attr.bb_primaryText)
+                }
+            )
+        }
+    }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // Helper Methods
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    private fun showDatePicker() {
+        val picker = MaterialDatePicker.Builder.datePicker()
+            .setTitleText("Select Date")
+            .setSelection(MaterialDatePicker.todayInUtcMilliseconds())
+            .build()
+
+        picker.addOnPositiveButtonClickListener { selection ->
+            val date = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+                .format(Date(selection))
+            transactionAddViewModel.setDate(date)
+        }
+
+        picker.show(parentFragmentManager, "DATE_PICKER")
+    }
+
     private fun showError(message: String) {
         Snackbar.make(binding.root, message, Snackbar.LENGTH_SHORT)
             .setBackgroundTint(resources.getColor(R.color.error, null))
             .show()
     }
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private fun showSuccess(message: String) {
         Snackbar.make(binding.root, message, Snackbar.LENGTH_SHORT)
             .setBackgroundTint(resources.getColor(R.color.success, null))
@@ -697,12 +656,31 @@ class TransactionAddFragment : Fragment() {
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-    // Resets the form to its initial state
-    private fun reset() {
-        transactionAddViewModel.reset()
-        binding.apply {
-            edtTextAmount.setText("")
-            edtTextNote.setText("")
+    // ViewModel Observers
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    private fun observeViewModel() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                launch { transactionAddViewModel.uiState.collect { handleUiState(it) } }
+                launch { transactionAddViewModel.validationState.collect { handleValidationState(it) } }
+//                launch { transactionAddViewModel.transaction.collect { it?.let { populateFieldsForEdit(it) } } }
+                launch { transactionAddViewModel.category.collect { updateSelectedCategory(it) } }
+                launch { transactionAddViewModel.wallet.collect { updateSelectedWallet(it) } }
+                launch { transactionAddViewModel.date.collect { updateSelectedDate(it) } }
+                launch { transactionAddViewModel.recurrenceData.collect { updateSelectedRecurrence(it) } }
+                launch { transactionAddViewModel.selectedLabels.collect { updateSelectedLabels(it) } }
+                launch { transactionAddViewModel.imageBytes.collect { bytes ->
+                    if (bytes != null) {
+                        val bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
+                        binding.imagePreview.apply {
+                            setImageBitmap(bitmap)
+                            visibility = View.VISIBLE
+                        }
+                    } else {
+                        binding.imagePreview.visibility = View.GONE
+                    }
+                }}
+            }
         }
     }
 }
