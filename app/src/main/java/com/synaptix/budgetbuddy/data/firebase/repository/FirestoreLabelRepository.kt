@@ -7,6 +7,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 import javax.inject.Singleton
+import android.util.Log
+import kotlinx.coroutines.flow.map
 
 @Singleton
 class FirestoreLabelRepository @Inject constructor(
@@ -128,7 +130,12 @@ class FirestoreLabelRepository @Inject constructor(
 
     // Real-time listeners
     fun observeLabelsForUser(userId: String): Flow<List<LabelDTO>> {
+        Log.d("FirestoreLabelRepository", "Starting to observe labels for user: $userId")
         return observeCollection(userId, createBaseQuery(userId))
+            .map { labels ->
+                Log.d("FirestoreLabelRepository", "Received ${labels.size} labels from Firestore")
+                labels
+            }
     }
 
     fun observeLabels(userId: String, labelIds: List<String>): Flow<List<LabelDTO>> {

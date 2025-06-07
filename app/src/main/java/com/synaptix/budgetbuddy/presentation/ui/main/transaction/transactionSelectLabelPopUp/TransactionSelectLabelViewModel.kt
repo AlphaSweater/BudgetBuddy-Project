@@ -4,19 +4,20 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.synaptix.budgetbuddy.core.model.Label
+import com.synaptix.budgetbuddy.core.model.User
 import com.synaptix.budgetbuddy.core.usecase.auth.GetUserIdUseCase
-import com.synaptix.budgetbuddy.core.usecase.main.label.GetLabelUseCase
+import com.synaptix.budgetbuddy.core.usecase.main.label.AddLabelUseCase
+import com.synaptix.budgetbuddy.core.usecase.main.label.GetLabelsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class TransactionSelectLabelViewModel @Inject constructor(
-    private val getLabelUseCase: GetLabelUseCase,
-    private val getUserIdUseCase: GetUserIdUseCase
+    private val getLabelsUseCase: GetLabelsUseCase,
+    private val getUserIdUseCase: GetUserIdUseCase,
+    private val addLabelUseCase: AddLabelUseCase
 ) : ViewModel() {
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
@@ -28,6 +29,12 @@ class TransactionSelectLabelViewModel @Inject constructor(
     private val _filteredLabels = MutableStateFlow<List<Label>>(emptyList())
     val filteredLabels: StateFlow<List<Label>> = _filteredLabels
 
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> = _isLoading
+
+    private val _error = MutableStateFlow<String?>(null)
+    val error: StateFlow<String?> = _error
+
     private var searchQuery: String = ""
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
@@ -35,15 +42,45 @@ class TransactionSelectLabelViewModel @Inject constructor(
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     fun loadLabelsForUser() {
         viewModelScope.launch {
-            val userId = getUserIdUseCase.execute()
-            when (val result = getLabelUseCase.execute(userId)) {
-                is GetLabelUseCase.GetLabelsResult.Success -> {
-                    _labels.value = result.labels
-                    filterLabels()
+            _isLoading.value = true
+            _error.value = null
+
+            try {
+                val userId = getUserIdUseCase.execute()
+                Log.d("TransactionSelectLabelViewModel", "Loading labels for user: $userId")
+                
+                if (userId.isEmpty()) {
+                    Log.e("TransactionSelectLabelViewModel", "User ID is empty")
+                    _error.value = "User ID is empty"
+                    return@launch
                 }
-                is GetLabelUseCase.GetLabelsResult.Error -> {
-                    // Handle error case if needed
-                }
+
+                getLabelsUseCase.execute(userId)
+                    .catch { e ->
+                        Log.e("TransactionSelectLabelViewModel", "Error loading labels: ${e.message}")
+                        _error.value = "Failed to load labels: ${e.message}"
+                    }
+                    .collect { result ->
+                        when (result) {
+                            is GetLabelsUseCase.GetLabelsResult.Success -> {
+                                Log.d("TransactionSelectLabelViewModel", "Received ${result.labels.size} labels")
+                                _labels.value = result.labels
+                                filterLabels()
+                                _isLoading.value = false
+                            }
+                            is GetLabelsUseCase.GetLabelsResult.Error -> {
+                                Log.e("TransactionSelectLabelViewModel", "Error result: ${result.message}")
+                                _error.value = result.message
+                                _isLoading.value = false
+                            }
+                        }
+                    }
+            } catch (e: Exception) {
+                Log.e("TransactionSelectLabelViewModel", "Exception loading labels: ${e.message}")
+                _error.value = "Failed to load labels: ${e.message}"
+                _isLoading.value = false
+            } finally {
+                _isLoading.value = false
             }
         }
     }
@@ -77,11 +114,32 @@ class TransactionSelectLabelViewModel @Inject constructor(
     fun createNewLabel(name: String) {
         viewModelScope.launch {
             try {
-                // TODO: Implement your database logic here
-                // After successful creation, reload the labels
-                loadLabelsForUser()
+                val userId = getUserIdUseCase.execute()
+                if (userId.isEmpty()) {
+                    _error.value = "User ID is empty"
+                    return@launch
+                }
+
+                val user = User(userId, "", "", "")
+                val newLabel = Label.new(
+                    user = user,
+                    name = name
+                )
+
+                addLabelUseCase.execute(newLabel).collect { result ->
+                    when (result) {
+                        is AddLabelUseCase.AddLabelResult.Success -> {
+                            Log.d("TransactionSelectLabelViewModel", "Label created successfully: ${result.labelId}")
+                            // Labels will be automatically updated through the Flow
+                        }
+                        is AddLabelUseCase.AddLabelResult.Error -> {
+                            _error.value = result.message
+                        }
+                    }
+                }
             } catch (e: Exception) {
-                // TODO: Handle error case
+                Log.e("TransactionSelectLabelViewModel", "Exception creating label: ${e.message}")
+                _error.value = "Failed to create label: ${e.message}"
             }
         }
     }
@@ -90,5 +148,9 @@ class TransactionSelectLabelViewModel @Inject constructor(
         return name.isNotBlank() && 
                name.length <= 50 && // Adjust max length as needed
                !_labels.value.any { it.name.equals(name, ignoreCase = true) }
+    }
+
+    fun clearError() {
+        _error.value = null
     }
 }

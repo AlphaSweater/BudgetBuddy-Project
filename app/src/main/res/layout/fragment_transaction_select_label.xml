@@ -184,6 +184,25 @@
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
+    <!-- Loading Progress Bar -->
+    <FrameLayout
+        android:id="@+id/loadingContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#80000000"
+        android:clickable="true"
+        android:focusable="true"
+        android:visibility="gone">
+
+        <ProgressBar
+            android:id="@+id/progressBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:indeterminateTint="?attr/bb_primaryText"/>
+
+    </FrameLayout>
+
     <!-- Bottom Save Button -->
     <FrameLayout
         android:id="@+id/bottomButtonContainer"

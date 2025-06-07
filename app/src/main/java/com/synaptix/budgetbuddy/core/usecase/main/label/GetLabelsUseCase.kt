@@ -21,17 +21,20 @@
 
 package com.synaptix.budgetbuddy.core.usecase.main.label
 
+import android.util.Log
 import com.synaptix.budgetbuddy.core.model.Label
 import com.synaptix.budgetbuddy.data.firebase.repository.FirestoreLabelRepository
-import com.synaptix.budgetbuddy.core.usecase.main.label.GetLabelUseCase.GetLabelsResult.*
 import com.synaptix.budgetbuddy.data.firebase.repository.FirestoreUserRepository
-import com.synaptix.budgetbuddy.core.model.Result
 import com.synaptix.budgetbuddy.data.firebase.mapper.FirebaseMapper.toDomain
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 // UseCase class for retrieving labels associated with a user
-class GetLabelUseCase @Inject constructor(
+class GetLabelsUseCase @Inject constructor(
     // Injecting the LabelRepository to handle label-related operations
     private val labelRepository: FirestoreLabelRepository,
     private val userRepository: FirestoreUserRepository
@@ -43,33 +46,33 @@ class GetLabelUseCase @Inject constructor(
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     // Executes the operation to fetch labels for the specified user
-    suspend fun execute(userId: String): GetLabelsResult {
+    fun execute(userId: String): Flow<GetLabelsResult> {
+        Log.d("GetLabelsUseCase", "Starting to fetch labels for user: $userId")
+        
         // Input validation
         if (userId.isEmpty()) {
-            return Error("Invalid user ID")
+            Log.e("GetLabelsUseCase", "Invalid user ID")
+            return kotlinx.coroutines.flow.flow { 
+                emit(GetLabelsResult.Error("Invalid user ID")) 
+            }
         }
 
-        return try {
-            val userResult = userRepository.getUserProfile(userId)
-            val user = when (userResult) {
-                is Result.Success -> userResult.data?.toDomain()
-                is Result.Error -> return Error("Failed to get user data: ${userResult.exception.message}")
+        return combine(
+            userRepository.observeUserProfile(userId),
+            labelRepository.observeLabelsForUser(userId)
+        ) { user, labels ->
+            Log.d("GetLabelsUseCase", "Received data - User: ${user != null}, Labels count: ${labels.size}")
+            
+            if (user == null) {
+                Log.e("GetLabelsUseCase", "User not found")
+                GetLabelsResult.Error("User not found")
+            } else {
+                val domainUser = user.toDomain()
+                val domainLabels = labels.map { it.toDomain(domainUser) }
+                Log.d("GetLabelsUseCase", "Successfully mapped ${domainLabels.size} labels")
+                GetLabelsResult.Success(domainLabels)
             }
-
-            // Attempt to retrieve labels from the repository
-            val labelsResult = labelRepository.getLabelsForUser(userId)
-            val labels = when (labelsResult) {
-                is Result.Success -> labelsResult.data.map { it.toDomain(user) }
-                is Result.Error -> return Error("Failed to get labels: ${labelsResult.exception.message}")
-            }
-
-            // Return the labels if successful
-            println("Labels retrieved: $labels")
-            Success(labels)
-        } catch (e: Exception) {
-            println("Failed to get labels: ${e.message}")
-            Error("Failed to get labels: ${e.message}")
-        }
+        }.flowOn(Dispatchers.IO)
     }
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~EOF~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\

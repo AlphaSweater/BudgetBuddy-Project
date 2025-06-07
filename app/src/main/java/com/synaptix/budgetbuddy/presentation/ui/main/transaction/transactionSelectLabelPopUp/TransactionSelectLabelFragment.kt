@@ -11,6 +11,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.navGraphViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.snackbar.Snackbar
 import com.synaptix.budgetbuddy.databinding.FragmentTransactionSelectLabelBinding
 import com.synaptix.budgetbuddy.presentation.ui.main.transaction.TransactionAddViewModel
 import com.synaptix.budgetbuddy.R
@@ -54,6 +55,9 @@ class TransactionSelectLabelFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setupViews()
         observeLabels()
+        observeLoadingState()
+        observeErrorState()
+        labelViewModel.loadLabelsForUser()
     }
 
     override fun onDestroyView() {
@@ -99,37 +103,39 @@ class TransactionSelectLabelFragment : Fragment() {
 
     private fun setupSearch() {
         binding.searchEditText.doAfterTextChanged { text ->
-            val query = text?.toString() ?: ""
-            labelViewModel.filterLabels(query)
-            
-            // Check if there's an exact match with any existing label
-            val hasExactMatch = labelViewModel.filteredLabels.value.any { 
-                it.name.equals(query, ignoreCase = true) 
-            }
-            
-            // Show/hide create new label option
-            binding.createNewLabelContainer.visibility = if (query.isNotEmpty() && !hasExactMatch) View.VISIBLE else View.GONE
-            
-            // Update create new label text
-            binding.textCreateNew.text = "Create new label \"$query\""
-            
-            binding.noLabelsContainer.visibility = View.GONE
+            labelViewModel.filterLabels(text?.toString() ?: "")
         }
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-    // ViewModel Observers
+    // Observation Methods
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private fun observeLabels() {
         viewLifecycleOwner.lifecycleScope.launch {
-            labelViewModel.loadLabelsForUser()
             labelViewModel.filteredLabels.collectLatest { labels ->
-                val selectedLabels = sharedViewModel.selectedLabels.value
-                labelAdapter.submitList(labels, selectedLabels)
-                
-                // Show/hide no labels state
-                binding.noLabelsContainer.visibility = if (labels.isEmpty()) View.VISIBLE else View.GONE
-                binding.recyclerViewLabels.visibility = if (labels.isEmpty()) View.GONE else View.VISIBLE
+                labelAdapter.submitList(labels, labelAdapter.getSelectedLabels())
+            }
+        }
+    }
+
+    private fun observeLoadingState() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            labelViewModel.isLoading.collectLatest { isLoading ->
+                binding.loadingContainer.visibility = if (isLoading) View.VISIBLE else View.GONE
+                binding.recyclerViewLabels.visibility = if (isLoading) View.GONE else View.VISIBLE
+                binding.searchLayout.visibility = if (isLoading) View.GONE else View.VISIBLE
+                binding.createNewLabelContainer.visibility = if (isLoading) View.GONE else View.VISIBLE
+            }
+        }
+    }
+
+    private fun observeErrorState() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            labelViewModel.error.collectLatest { error ->
+                error?.let {
+                    showError(it)
+                    labelViewModel.clearError()
+                }
             }
         }
     }
@@ -148,6 +154,6 @@ class TransactionSelectLabelFragment : Fragment() {
     }
 
     private fun showError(message: String) {
-        // TODO: Implement error display (e.g., Snackbar)
+        Snackbar.make(binding.root, message, Snackbar.LENGTH_LONG).show()
     }
 }
