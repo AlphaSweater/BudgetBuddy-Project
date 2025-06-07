@@ -23,40 +23,40 @@ import javax.inject.Inject
 
 /**
  * ViewModel for the General Reports screen.
- * 
+ *
  * This ViewModel is responsible for:
  * 1. Managing the UI state for transactions and categories
  * 2. Loading data from the backend
  * 3. Transforming data for the UI
  * 4. Handling errors and empty states
- * 
+ *
  * The ViewModel uses Kotlin Flows for reactive programming:
  * - StateFlow for UI state management
  * - Flow for data streams from the backend
- * 
+ *
  * Data Flow:
  * Repository -> UseCase -> ViewModel -> UI
- * 
+ *
  * Key Concepts:
  * 1. StateFlow:
  *    - A hot flow that maintains the current state
  *    - Emits updates to all collectors when the state changes
  *    - Unlike LiveData, it's designed for coroutines
  *    - Example: _transactionsState emits updates when transaction data changes
- * 
+ *
  * 2. Coroutines:
  *    - Lightweight threads for asynchronous operations
  *    - viewModelScope: Coroutine scope tied to ViewModel lifecycle
  *    - launch: Starts a new coroutine
  *    - collect: Collects values from a Flow
  *    - catch: Handles errors in a Flow
- * 
+ *
  * 3. Flow:
  *    - Cold stream of values
  *    - Can emit multiple values over time
  *    - Must be collected to start emitting
  *    - Example: getTransactionsUseCase.execute() returns a Flow
- * 
+ *
  * 4. State Management:
  *    - Sealed classes represent different states (Loading, Success, Error, Empty)
  *    - StateFlow holds the current state
@@ -128,28 +128,28 @@ class GeneralReportsViewModel @Inject constructor(
     val selectedWallet: StateFlow<Wallet?> = _selectedWallet.asStateFlow()
     /**
      * Loads all required data for the reports screen.
-     * 
+     *
      * Data Flow Process:
      * 1. Get User ID:
      *    - Synchronously get the current user's ID
      *    - If no user ID, set all states to Empty
-     * 
+     *
      * 2. Parallel Data Loading:
      *    - Launch separate coroutines for transactions and categories
      *    - Each coroutine runs independently
      *    - Both coroutines run in parallel for better performance
-     * 
+     *
      * 3. Flow Collection:
      *    - Each UseCase returns a Flow
      *    - collect() starts collecting values from the Flow
      *    - catch() handles any errors in the Flow
      *    - State is updated based on the result
-     * 
+     *
      * 4. Error Handling:
      *    - Each Flow has its own error handling
      *    - Errors are caught and converted to Error state
      *    - UI can handle Error state appropriately
-     * 
+     *
      * Example Flow:
      * Repository (Firebase) -> UseCase (Flow) -> ViewModel (StateFlow) -> UI (collect)
      */
@@ -223,27 +223,31 @@ class GeneralReportsViewModel @Inject constructor(
     /**
      * Gets transactions filtered by type (income/expense).
      * This is a helper function used by the UI to get filtered data.
-     * 
+     *
      * @param type The type of transactions to filter ("income" or "expense")
      * @return List of filtered transactions
      */
     fun getTransactionsByType(type: String): List<Transaction> {
-        return _filteredTransactions.filter {
-            it.category.type.equals(type, ignoreCase = true)
+        return _filteredTransactions.filter { transaction ->
+            if (type.equals("income", ignoreCase = true)) {
+                transaction.category.type.equals("income", ignoreCase = true)
+            } else {
+                !transaction.category.type.equals("income", ignoreCase = true)
+            }
         }
     }
 
     /**
      * Gets categories filtered by type (income/expense).
      * This is a helper function used by the UI to get filtered data.
-     * 
+     *
      * @param type The type of categories to filter ("income" or "expense")
      * @return List of filtered categories
      */
     fun getCategoriesByType(type: String): List<Category> {
         return when (val state = categoriesState.value) {
-            is CategoryState.Success -> state.categories.filter { 
-                it.type.equals(type, ignoreCase = true) 
+            is CategoryState.Success -> state.categories.filter {
+                it.type.equals(type, ignoreCase = true)
             }
             else -> emptyList()
         }
@@ -293,7 +297,6 @@ class GeneralReportsViewModel @Inject constructor(
         _transactionsState.value = TransactionState.Success(_filteredTransactions)
     }
 
-
     // Update your selectWallet function to also filter transactions
     fun selectWallet(wallet: Wallet?) {
         _selectedWallet.value = wallet
@@ -326,5 +329,4 @@ class GeneralReportsViewModel @Inject constructor(
         _dateRange.value = null
         filterTransactions()
     }
-
 }
