@@ -56,8 +56,8 @@
             app:popExitAnim="@anim/slide_out_down"/>
 
         <action
-            android:id="@+id/action_homeFragment_to_generalIndividualTransactionFragment"
-            app:destination="@id/generalIndividualTransactionFragment"
+            android:id="@+id/action_homeFragment_to_transactionAddFragment"
+            app:destination="@id/navigation_transaction_add"
             app:enterAnim="@anim/slide_in_up"
             app:exitAnim="@anim/fade_out"
             app:popEnterAnim="@anim/fade_in"

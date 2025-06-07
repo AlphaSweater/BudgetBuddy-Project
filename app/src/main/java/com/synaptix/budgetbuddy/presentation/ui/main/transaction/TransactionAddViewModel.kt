@@ -1,6 +1,7 @@
 package com.synaptix.budgetbuddy.presentation.ui.main.transaction
 
 import android.util.Log
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.synaptix.budgetbuddy.core.model.Category
@@ -26,7 +27,8 @@ import java.io.Serializable
 class TransactionAddViewModel @Inject constructor(
     private val getUserIdUseCase: GetUserIdUseCase,
     private val addTransactionUseCase: AddTransactionUseCase,
-    private val uploadImageUseCase: UploadImageUseCase
+    private val uploadImageUseCase: UploadImageUseCase,
+    savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
     sealed class UiState {
@@ -64,13 +66,10 @@ class TransactionAddViewModel @Inject constructor(
     private val _screenMode = MutableStateFlow<ScreenMode>(ScreenMode.CREATE)
     val screenMode: StateFlow<ScreenMode> = _screenMode
 
-    private val _transaction = MutableStateFlow<Transaction?>(null)
-    val transaction: StateFlow<Transaction?> = _transaction
-
     fun setScreenMode(mode: ScreenMode, transaction: Transaction? = null) {
         _screenMode.value = mode
         _transaction.value = transaction
-        
+
         when (mode) {
             ScreenMode.VIEW, ScreenMode.EDIT -> {
                 transaction?.let { populateTransactionData(it) }
@@ -79,6 +78,19 @@ class TransactionAddViewModel @Inject constructor(
                 reset()
             }
         }
+    }
+
+    init {
+        val mode = savedStateHandle.get<String>("screenMode") ?: "CREATE"
+        _screenMode.value = ScreenMode.valueOf(mode)
+    }
+
+    private val _transaction = MutableStateFlow<Transaction?>(null)
+    val transaction: StateFlow<Transaction?> = _transaction
+
+    fun setTransaction(transaction: Transaction?) {
+        _transaction.value = transaction
+        transaction?.let { populateTransactionData(it) }
     }
 
     private fun populateTransactionData(transaction: Transaction) {

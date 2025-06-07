@@ -12,6 +12,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.annotation.AttrRes
 import androidx.core.content.ContextCompat
+import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -41,6 +42,7 @@ import com.synaptix.budgetbuddy.core.model.Transaction
 import com.synaptix.budgetbuddy.core.model.Wallet
 import com.synaptix.budgetbuddy.databinding.FragmentHomeBinding
 import com.synaptix.budgetbuddy.presentation.ui.main.general.generalIndividualTransaction.GeneralIndividualTransactionViewModel
+import com.synaptix.budgetbuddy.presentation.ui.main.transaction.TransactionAddViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -888,12 +890,14 @@ class HomeMainFragment : Fragment() {
     private fun navigateToTransactionDetails(transaction: Transaction) {
         Log.d("HomeFragment", "Navigating to transaction details: ${transaction.id}")
         // Set the transaction in the destination fragment's ViewModel first
-        val transactionViewModel: GeneralIndividualTransactionViewModel by activityViewModels()
+        val transactionViewModel: TransactionAddViewModel by activityViewModels()
         transactionViewModel.setTransaction(transaction)
-        
-        // Then navigate using Safe Args
-        val action = HomeMainFragmentDirections.actionHomeFragmentToGeneralIndividualTransactionFragment()
-        findNavController().navigate(action)
+
+        val bundle = bundleOf("screenMode" to TransactionAddViewModel.ScreenMode.VIEW)
+        findNavController().navigate(
+            R.id.action_homeFragment_to_transactionAddFragment,
+            bundle
+        )
     }
 
     /**

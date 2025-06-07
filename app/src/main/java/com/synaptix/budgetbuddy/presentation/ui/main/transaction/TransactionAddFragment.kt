@@ -32,12 +32,12 @@ import com.synaptix.budgetbuddy.core.model.Category
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import android.widget.ImageView
-import androidx.navigation.fragment.navArgs
 import com.synaptix.budgetbuddy.core.model.RecurrenceData
 import com.synaptix.budgetbuddy.core.model.Wallet
 import com.synaptix.budgetbuddy.extentions.getThemeColor
 import kotlin.toString
 import com.synaptix.budgetbuddy.core.model.Label
+import com.synaptix.budgetbuddy.core.model.Transaction
 import com.synaptix.budgetbuddy.presentation.ui.main.transaction.TransactionAddViewModel.ScreenMode
 import kotlinx.coroutines.delay
 
@@ -47,10 +47,7 @@ class TransactionAddFragment : Fragment() {
     private var _binding: FragmentTransactionAddBinding? = null
     private val binding get() = _binding!!
 
-    private val viewModel: TransactionAddViewModel by activityViewModels()
-
-    private val args: TransactionAddFragmentArgs by navArgs()
-    private lateinit var screenMode: ScreenMode
+    private val transactionAddViewModel: TransactionAddViewModel by activityViewModels()
 
     private lateinit var takePictureLauncher: ActivityResultLauncher<Uri>
     private lateinit var pickImageLauncher: ActivityResultLauncher<String>
@@ -71,16 +68,12 @@ class TransactionAddFragment : Fragment() {
     // --- Fragment Lifecycle ---
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        // Initialize screen mode based on arguments
-        screenMode = args.screenMode
-
         setupViews()
         setupImagePickers()
         observeViewModel()
 
         // Apply screen mode specific settings
-        applyScreenMode(screenMode)
+        applyScreenMode(transactionAddViewModel.screenMode.value)
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
@@ -105,15 +98,15 @@ class TransactionAddFragment : Fragment() {
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private fun restoreState() {
-        if (!viewModel.saveState.value) {
+        if (!transactionAddViewModel.saveState.value) {
             reset()
             return
         }
 
         binding.apply {
-            edtTextAmount.setText(viewModel.amount.value?.toString() ?: "")
-            edtTextNote.setText(viewModel.note.value)
-            showImagePreview(viewModel.imageBytes.value)
+            edtTextAmount.setText(transactionAddViewModel.amount.value?.toString() ?: "")
+            edtTextNote.setText(transactionAddViewModel.note.value)
+            showImagePreview(transactionAddViewModel.imageBytes.value)
         }
     }
 
@@ -262,7 +255,7 @@ class TransactionAddFragment : Fragment() {
             }
 
             btnEdit.setOnClickListener {
-                viewModel.setScreenMode(ScreenMode.EDIT, viewModel.transaction.value)
+                transactionAddViewModel.setScreenMode(ScreenMode.EDIT, transactionAddViewModel.transaction.value)
             }
 
             rowSelectCategory.setOnClickListener {
@@ -299,11 +292,11 @@ class TransactionAddFragment : Fragment() {
     //Handles the setup of text watchers for input fields.
     private fun setupTextWatchers() {
         binding.edtTextAmount.doAfterTextChanged { text ->
-            viewModel.setAmount(text.toString().toDoubleOrNull())
+            transactionAddViewModel.setAmount(text.toString().toDoubleOrNull())
         }
 
         binding.edtTextNote.doAfterTextChanged { text ->
-            viewModel.setNote(text.toString())
+            transactionAddViewModel.setNote(text.toString())
         }
     }
 
@@ -336,7 +329,7 @@ class TransactionAddFragment : Fragment() {
         try {
             requireContext().contentResolver.openInputStream(uri)?.use { inputStream ->
                 val bytes = inputStream.readBytes()
-                viewModel.setImageBytes(bytes)
+                transactionAddViewModel.setImageBytes(bytes)
                 showImagePreview(bytes)
             }
         } catch (e: Exception) {
@@ -355,7 +348,7 @@ class TransactionAddFragment : Fragment() {
         picker.addOnPositiveButtonClickListener { selection ->
             val date = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
                 .format(Date(selection))
-            viewModel.setDate(date)
+            transactionAddViewModel.setDate(date)
         }
 
         picker.show(parentFragmentManager, "DATE_PICKER")
@@ -377,7 +370,7 @@ class TransactionAddFragment : Fragment() {
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     //Handles removing the selected photo from the transaction.
     private fun removePhoto() {
-        viewModel.setImageBytes(null)
+        transactionAddViewModel.setImageBytes(null)
         binding.imagePreviewContainer.visibility = View.GONE
         binding.imagePreview.setImageBitmap(null)
     }
@@ -385,7 +378,7 @@ class TransactionAddFragment : Fragment() {
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     //Handles showing the full-screen image in a dialog.
     private fun showFullScreenImage() {
-        viewModel.imageBytes.value?.let { bytes ->
+        transactionAddViewModel.imageBytes.value?.let { bytes ->
             val dialog = AlertDialog.Builder(requireContext(), R.style.FullScreenDialog)
                 .setView(
                     ImageView(requireContext()).apply {
@@ -461,7 +454,7 @@ class TransactionAddFragment : Fragment() {
                 text = label.name
                 isCloseIconVisible = true
                 setOnCloseIconClickListener {
-                    viewModel.removeLabel(label)
+                    transactionAddViewModel.removeLabel(label)
                 }
             }
             binding.chipGroupLabels.addView(chip)
@@ -507,25 +500,25 @@ class TransactionAddFragment : Fragment() {
     // --- Save Logic ---
     private fun saveTransaction() {
         val amount = binding.edtTextAmount.text.toString().toDoubleOrNull()
-        viewModel.setAmount(amount)
+        transactionAddViewModel.setAmount(amount)
 
         val date = binding.textSelectedDate.text.toString()
-        viewModel.setDate(date)
+        transactionAddViewModel.setDate(date)
 
         val note = binding.edtTextNote.text.toString()
-        viewModel.setNote(note)
+        transactionAddViewModel.setNote(note)
 
         val currency = binding.spinnerCurrency.selectedItem.toString()
-        viewModel.setCurrency(currency)
+        transactionAddViewModel.setCurrency(currency)
 
         // Show validation errors if any
-        viewModel.showValidationErrors()
+        transactionAddViewModel.showValidationErrors()
 
         // Check if form is valid before proceeding
-        if (!viewModel.validateForm()) return
+        if (!transactionAddViewModel.validateForm()) return
 
         // Call addTransaction
-        viewModel.addTransaction()
+        transactionAddViewModel.addTransaction()
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
@@ -553,63 +546,63 @@ class TransactionAddFragment : Fragment() {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 // Collect UI state
                 launch {
-                    viewModel.uiState.collect { state ->
+                    transactionAddViewModel.uiState.collect { state ->
                         handleUiState(state)
                     }
                 }
 
                 // Collect validation state
                 launch {
-                    viewModel.validationState.collect { state ->
+                    transactionAddViewModel.validationState.collect { state ->
                         handleValidationState(state)
                     }
                 }
 
                 // Collect transaction data for edit/view mode
                 launch {
-                    viewModel.transaction.collect { transaction ->
+                    transactionAddViewModel.transaction.collect { transaction ->
                         transaction?.let { populateFieldsForEdit(it) }
                     }
                 }
 
                 // Collect category
                 launch {
-                    viewModel.category.collect { category ->
+                    transactionAddViewModel.category.collect { category ->
                         updateSelectedCategory(category)
                     }
                 }
 
                 // Collect wallet
                 launch {
-                    viewModel.wallet.collect { wallet ->
+                    transactionAddViewModel.wallet.collect { wallet ->
                         updateSelectedWallet(wallet)
                     }
                 }
 
                 // Collect date
                 launch {
-                    viewModel.date.collect { date ->
+                    transactionAddViewModel.date.collect { date ->
                         updateSelectedDate(date)
                     }
                 }
 
                 // Collect recurrence data
                 launch {
-                    viewModel.recurrenceData.collect { rate ->
+                    transactionAddViewModel.recurrenceData.collect { rate ->
                         updateSelectedRecurrence(rate)
                     }
                 }
 
                 // Collect selected labels
                 launch {
-                    viewModel.selectedLabels.collect { labels ->
+                    transactionAddViewModel.selectedLabels.collect { labels ->
                         updateSelectedLabels(labels)
                     }
                 }
 
                 // Collect image bytes
                 launch {
-                    viewModel.imageBytes.collect { bytes ->
+                    transactionAddViewModel.imageBytes.collect { bytes ->
                         if (bytes != null) {
                             val bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
                             binding.imagePreview.apply {
@@ -624,7 +617,7 @@ class TransactionAddFragment : Fragment() {
 
                 // Collect save state
                 launch {
-                    viewModel.saveState.collect { shouldSave ->
+                    transactionAddViewModel.saveState.collect { shouldSave ->
                         if (!shouldSave) {
                             reset()
                         }
@@ -654,7 +647,7 @@ class TransactionAddFragment : Fragment() {
                 viewLifecycleOwner.lifecycleScope.launch {
                     delay(1000) // Show success state for 1 second
                     binding.loadingOverlay.visibility = View.GONE
-                    viewModel.reset()
+                    transactionAddViewModel.reset()
                     findNavController().popBackStack()
                 }
             }
@@ -719,7 +712,7 @@ class TransactionAddFragment : Fragment() {
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     // Resets the form to its initial state
     private fun reset() {
-        viewModel.reset()
+        transactionAddViewModel.reset()
         binding.apply {
             edtTextAmount.setText("")
             edtTextNote.setText("")
