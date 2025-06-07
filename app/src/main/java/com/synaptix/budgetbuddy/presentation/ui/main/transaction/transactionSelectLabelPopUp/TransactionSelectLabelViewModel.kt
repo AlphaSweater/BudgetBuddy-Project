@@ -53,6 +53,12 @@ class TransactionSelectLabelViewModel @Inject constructor(
         }
     }
 
+    fun shouldShowCreateNew(): Boolean {
+        return searchQuery.isNotEmpty() && _filteredLabels.value.none { 
+            it.name.equals(searchQuery, ignoreCase = true) 
+        }
+    }
+
     fun updateSelectedLabels(selectedLabels: List<Label>) {
         _labels.update { currentLabels ->
             currentLabels.map { label ->

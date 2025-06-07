@@ -91,7 +91,7 @@
                 style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
+                android:layout_marginBottom="8dp"
                 android:background="@android:color/transparent"
                 android:hint="Search labels"
                 android:textColor="?attr/bb_secondaryText"
@@ -108,6 +108,36 @@
                     android:inputType="text"
                     android:maxLines="1" />
             </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Create New Label Option -->
+            <LinearLayout
+                android:id="@+id/createNewLabelContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="12dp"
+                android:background="?attr/bb_surface"
+                android:visibility="gone"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackground">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_ui_circle_add"
+                    android:contentDescription="Add icon"
+                    app:tint="?attr/bb_primaryText" />
+
+                <TextView
+                    android:id="@+id/textCreateNew"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:text="Create new label"
+                    android:textSize="16sp"
+                    android:textColor="?attr/bb_primaryText"/>
+            </LinearLayout>
 
             <!-- RecyclerView -->
             <androidx.recyclerview.widget.RecyclerView

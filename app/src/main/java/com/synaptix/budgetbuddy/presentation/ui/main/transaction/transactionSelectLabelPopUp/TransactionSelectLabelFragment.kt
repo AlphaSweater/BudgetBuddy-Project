@@ -31,10 +31,6 @@ class TransactionSelectLabelFragment : Fragment() {
         TransactionSelectLabelAdapter(
             onSelectionChanged = { selectedLabels ->
                 labelViewModel.updateSelectedLabels(selectedLabels)
-            },
-            onCreateNewLabel = { searchQuery ->
-                // TODO: Implement create new label functionality
-                // This will be implemented by you
             }
         )
     }
@@ -64,7 +60,7 @@ class TransactionSelectLabelFragment : Fragment() {
 
         // Initialize with selected labels from ViewModel
         val initialSelected = sharedViewModel.selectedLabels.value ?: emptyList()
-        labelAdapter.submitList(emptyList(), initialSelected, showCreateNew = true)
+        labelAdapter.submitList(emptyList(), initialSelected)
     }
 
     private fun setupClickListeners() {
@@ -76,12 +72,25 @@ class TransactionSelectLabelFragment : Fragment() {
             sharedViewModel.setLabels(labelAdapter.getSelectedLabels())
             findNavController().popBackStack()
         }
+
+        binding.createNewLabelContainer.setOnClickListener {
+            val searchQuery = binding.searchEditText.text?.toString() ?: ""
+            // TODO: Implement create new label functionality
+            // This will be implemented by you
+        }
     }
 
     private fun setupSearch() {
         binding.searchEditText.doAfterTextChanged { text ->
             val query = text?.toString() ?: ""
             labelViewModel.filterLabels(query)
+            
+            // Show/hide create new label option
+            binding.createNewLabelContainer.visibility = if (query.isNotEmpty()) View.VISIBLE else View.GONE
+            
+            // Update create new label text
+            binding.textCreateNew.text = "Create \"$query\""
+            
             binding.noLabelsContainer.visibility = View.GONE
         }
     }
@@ -91,7 +100,7 @@ class TransactionSelectLabelFragment : Fragment() {
             labelViewModel.loadLabelsForUser()
             labelViewModel.filteredLabels.collectLatest { labels ->
                 val selectedLabels = sharedViewModel.selectedLabels.value ?: emptyList()
-                labelAdapter.submitList(labels, selectedLabels, showCreateNew = true)
+                labelAdapter.submitList(labels, selectedLabels)
                 
                 // Show/hide no labels state
                 binding.noLabelsContainer.visibility = if (labels.isEmpty()) View.VISIBLE else View.GONE
