@@ -265,216 +265,12 @@
                     </LinearLayout>
 
                     <!-- Row 4 -->
-                    <LinearLayout
-                        android:id="@+id/rowSelectCategories"
-                        style="@style/RowStyle"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:background="?attr/selectableItemBackground"
-                        android:orientation="horizontal"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/rowSelectEnableNotifications">
-
-                        <FrameLayout
-                            android:layout_width="50dp"
-                            android:layout_height="50dp">
-
-                            <ImageView
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:scaleType="centerCrop"
-                                android:src="@drawable/ic_circle_24"
-                                app:tint="?attr/bb_primaryText" />
-
-                            <ImageView
-                                android:layout_width="wrap_content"
-                                android:layout_height="25dp"
-                                android:layout_gravity="center"
-                                android:src="@drawable/ic_ui_categories"
-                                app:tint="?attr/bb_background" />
-                        </FrameLayout>
-
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="12dp"
-                            android:layout_weight="1"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:id="@+id/textSelectedCategories"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Categories"
-                                android:textColor="?attr/bb_primaryText"
-                                android:textSize="16sp" />
-                        </LinearLayout>
-
-                        <ImageView
-                            style="@style/IconButton"
-                            android:src="@drawable/ic_ui_croc_right"
-                            app:tint="?attr/bb_secondaryText" />
-                    </LinearLayout>
 
                     <!-- Row 5 -->
-                    <LinearLayout
-                        android:id="@+id/rowSelectScheduledTransactions"
-                        style="@style/RowStyle"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:background="?attr/selectableItemBackground"
-                        android:orientation="horizontal"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/rowSelectCategories">
-
-                        <FrameLayout
-                            android:layout_width="50dp"
-                            android:layout_height="50dp">
-
-                            <ImageView
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:scaleType="centerCrop"
-                                android:src="@drawable/ic_circle_24"
-                                app:tint="?attr/bb_primaryText" />
-
-                            <ImageView
-                                android:layout_width="wrap_content"
-                                android:layout_height="25dp"
-                                android:layout_gravity="center"
-                                android:src="@drawable/ic_ui_calendar"
-                                app:tint="?attr/bb_background" />
-                        </FrameLayout>
-
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="12dp"
-                            android:layout_weight="1"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:id="@+id/textSelectedScheduledTransactions"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Scheduled Transactions"
-                                android:textColor="?attr/bb_primaryText"
-                                android:textSize="16sp" />
-                        </LinearLayout>
-
-                        <ImageView
-                            style="@style/IconButton"
-                            android:src="@drawable/ic_ui_croc_right"
-                            app:tint="?attr/bb_secondaryText" />
-                    </LinearLayout>
 
                     <!-- Row 6 -->
-                    <LinearLayout
-                        android:id="@+id/rowSelectPrivacySettings"
-                        style="@style/RowStyle"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:background="?attr/selectableItemBackground"
-                        android:orientation="horizontal"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/rowSelectScheduledTransactions">
-
-                        <FrameLayout
-                            android:layout_width="50dp"
-                            android:layout_height="50dp">
-
-                            <ImageView
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:scaleType="centerCrop"
-                                android:src="@drawable/ic_circle_24"
-                                app:tint="?attr/bb_primaryText" />
-
-                            <ImageView
-                                android:layout_width="wrap_content"
-                                android:layout_height="25dp"
-                                android:layout_gravity="center"
-                                android:src="@drawable/ic_ui_privacy_shield"
-                                app:tint="?attr/bb_background" />
-                        </FrameLayout>
-
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="12dp"
-                            android:layout_weight="1"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:id="@+id/textSelectedPrivacySettings"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Privacy Settings"
-                                android:textColor="?attr/bb_primaryText"
-                                android:textSize="16sp" />
-                        </LinearLayout>
-
-                        <ImageView
-                            style="@style/IconButton"
-                            android:src="@drawable/ic_ui_croc_right"
-                            app:tint="?attr/bb_secondaryText" />
-                    </LinearLayout>
 
                     <!-- Row 7 -->
-                    <LinearLayout
-                        android:id="@+id/rowSelectSecuritySettings"
-                        style="@style/RowStyle"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:background="?attr/selectableItemBackground"
-                        android:orientation="horizontal"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/rowSelectPrivacySettings">
-
-                        <FrameLayout
-                            android:layout_width="50dp"
-                            android:layout_height="50dp">
-
-                            <ImageView
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:scaleType="centerCrop"
-                                android:src="@drawable/ic_circle_24"
-                                app:tint="?attr/bb_primaryText" />
-
-                            <ImageView
-                                android:layout_width="wrap_content"
-                                android:layout_height="25dp"
-                                android:layout_gravity="center"
-                                android:src="@drawable/ic_ui_security_fingerprint"
-                                app:tint="?attr/bb_background" />
-                        </FrameLayout>
-
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="12dp"
-                            android:layout_weight="1"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:id="@+id/textSelectedSecuritySettings"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Security Settings"
-                                android:textColor="?attr/bb_primaryText"
-                                android:textSize="16sp" />
-                        </LinearLayout>
-
-                        <ImageView
-                            style="@style/IconButton"
-                            android:src="@drawable/ic_ui_croc_right"
-                            app:tint="?attr/bb_secondaryText" />
-                    </LinearLayout>
 
                     <!-- Row 8 -->
                     <LinearLayout
@@ -486,7 +282,7 @@
                         android:orientation="horizontal"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/rowSelectSecuritySettings">
+                        app:layout_constraintTop_toBottomOf="@+id/rowSelectEnableNotifications">
 
                         <FrameLayout
                             android:layout_width="50dp"
@@ -580,6 +376,50 @@
                             style="@style/IconButton"
                             android:src="@drawable/ic_ui_croc_right"
                             app:tint="?attr/bb_secondaryText" />
+                    </LinearLayout>
+                    <LinearLayout
+                        android:id="@+id/rowSelectDeleteAccount"
+                        style="@style/RowStyle"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:background="?attr/selectableItemBackground"
+                        android:orientation="horizontal"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/rowSelectLogout">
+
+                        <FrameLayout
+                            android:layout_width="50dp"
+                            android:layout_height="50dp">
+
+                            <ImageView
+                                android:layout_width="40dp"
+                                android:layout_height="40dp"
+                                android:rotation="45"
+                                android:layout_gravity="center"
+                                android:src="@drawable/ic_add_circle_40"
+                                app:tint="@color/expense_red" />
+                        </FrameLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="12dp"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Delete Account"
+                                android:textColor="@color/expense_red"
+                                android:textSize="16sp" />
+                        </LinearLayout>
+
+                        <ImageView
+                            style="@style/IconButton"
+                            android:src="@drawable/ic_ui_croc_right"
+                            app:tint="@color/expense_red" />
                     </LinearLayout>
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
