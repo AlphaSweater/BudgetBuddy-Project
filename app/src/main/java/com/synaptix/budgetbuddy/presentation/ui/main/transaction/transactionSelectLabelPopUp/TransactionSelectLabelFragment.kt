@@ -28,9 +28,15 @@ class TransactionSelectLabelFragment : Fragment() {
     private val labelViewModel: TransactionSelectLabelViewModel by viewModels()
 
     private val labelAdapter by lazy {
-        TransactionSelectLabelAdapter { selectedLabels ->
-            labelViewModel.updateSelectedLabels(selectedLabels)
-        }
+        TransactionSelectLabelAdapter(
+            onSelectionChanged = { selectedLabels ->
+                labelViewModel.updateSelectedLabels(selectedLabels)
+            },
+            onCreateNewLabel = { searchQuery ->
+                // TODO: Implement create new label functionality
+                // This will be implemented by you
+            }
+        )
     }
 
     override fun onCreateView(
@@ -58,7 +64,7 @@ class TransactionSelectLabelFragment : Fragment() {
 
         // Initialize with selected labels from ViewModel
         val initialSelected = sharedViewModel.selectedLabels.value ?: emptyList()
-        labelAdapter.submitList(emptyList(), initialSelected)
+        labelAdapter.submitList(emptyList(), initialSelected, showCreateNew = true)
     }
 
     private fun setupClickListeners() {
@@ -74,7 +80,9 @@ class TransactionSelectLabelFragment : Fragment() {
 
     private fun setupSearch() {
         binding.searchEditText.doAfterTextChanged { text ->
-            labelViewModel.filterLabels(text?.toString() ?: "")
+            val query = text?.toString() ?: ""
+            labelViewModel.filterLabels(query)
+            binding.noLabelsContainer.visibility = View.GONE
         }
     }
 
@@ -83,7 +91,11 @@ class TransactionSelectLabelFragment : Fragment() {
             labelViewModel.loadLabelsForUser()
             labelViewModel.filteredLabels.collectLatest { labels ->
                 val selectedLabels = sharedViewModel.selectedLabels.value ?: emptyList()
-                labelAdapter.submitList(labels, selectedLabels)
+                labelAdapter.submitList(labels, selectedLabels, showCreateNew = true)
+                
+                // Show/hide no labels state
+                binding.noLabelsContainer.visibility = if (labels.isEmpty()) View.VISIBLE else View.GONE
+                binding.recyclerViewLabels.visibility = if (labels.isEmpty()) View.GONE else View.VISIBLE
             }
         }
     }

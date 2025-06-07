@@ -93,7 +93,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
                 android:background="@android:color/transparent"
-                android:hint="Search categories"
+                android:hint="Search labels"
                 android:textColor="?attr/bb_secondaryText"
                 app:endIconMode="clear_text"
                 app:startIconDrawable="@drawable/ic_ui_search"
@@ -117,6 +117,40 @@
                 android:layout_weight="1"
                 android:layout_marginTop="16dp"
                 tools:listitem="@layout/item_transaction_label"/>
+
+            <!-- No Labels State -->
+            <LinearLayout
+                android:id="@+id/noLabelsContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:visibility="gone"
+                android:layout_marginTop="32dp">
+
+                <ImageView
+                    android:layout_width="120dp"
+                    android:layout_height="120dp"
+                    android:src="@drawable/ic_ui_circle_add"
+                    android:alpha="0.5"
+                    android:contentDescription="No labels icon"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="No Labels Found"
+                    android:textSize="18sp"
+                    android:textColor="?attr/bb_primaryText"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Create a new label to get started"
+                    android:textSize="14sp"
+                    android:textColor="?attr/bb_secondaryText"/>
+            </LinearLayout>
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
