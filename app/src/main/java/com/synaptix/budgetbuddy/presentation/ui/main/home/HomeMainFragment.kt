@@ -21,6 +21,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.navGraphViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.github.mikephil.charting.animation.Easing
 import com.github.mikephil.charting.charts.BarChart
@@ -889,13 +890,11 @@ class HomeMainFragment : Fragment() {
      */
     private fun navigateToTransactionDetails(transaction: Transaction) {
         Log.d("HomeFragment", "Navigating to transaction details: ${transaction.id}")
-        // Set the transaction in the destination fragment's ViewModel first
-        val transactionAddViewModel: TransactionAddViewModel by activityViewModels()
-        transactionAddViewModel.setTransaction(transaction)
-        transactionAddViewModel.setScreenMode(TransactionAddViewModel.ScreenMode.VIEW)
 
+        // Create a bundle with the necessary arguments
         val bundle = bundleOf(
-            "screenMode" to TransactionAddViewModel.ScreenMode.VIEW
+            "screenMode" to TransactionAddViewModel.ScreenMode.VIEW,
+            "transactionId" to transaction.id
         )
 
         findNavController().navigate(

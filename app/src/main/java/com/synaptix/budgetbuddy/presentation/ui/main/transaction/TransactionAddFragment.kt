@@ -8,7 +8,6 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import androidx.activity.result.ActivityResultLauncher
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -40,7 +39,6 @@ import com.synaptix.budgetbuddy.core.model.Wallet
 import com.synaptix.budgetbuddy.extentions.getThemeColor
 import kotlin.toString
 import com.synaptix.budgetbuddy.core.model.Label
-import com.synaptix.budgetbuddy.core.model.Transaction
 import com.synaptix.budgetbuddy.presentation.ui.main.transaction.TransactionAddViewModel.ScreenMode
 import kotlinx.coroutines.delay
 import java.math.BigDecimal
@@ -80,22 +78,15 @@ class TransactionAddFragment : Fragment() {
         setupImagePickers()
         observeViewModel()
 
-        // Set up initial state based on screen mode
-        if (!transactionAddViewModel.isScreenModeBusy()) {
-            val screenMode = arguments?.getSerializable("screenMode") as? ScreenMode ?: ScreenMode.CREATE
-            transactionAddViewModel.setScreenMode(screenMode)
-            transactionAddViewModel.setScreenModeBusy(true)
-        }
-
         applyScreenMode(transactionAddViewModel.screenMode.value)
         populateInitialFormValues()
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        if (!transactionAddViewModel.isScreenModeBusy()) {
-            reset()
-        }
+//        if (!transactionAddViewModel.screenModeBusy.value) {
+//            reset()
+//        }
         _binding = null
     }
 
@@ -595,16 +586,41 @@ class TransactionAddFragment : Fragment() {
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     // UI State Handlers
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-    private fun handleUiState(state: TransactionAddViewModel.UiState) {
+    private fun handleLoadingUiState(state: TransactionAddViewModel.LoadingUiState) {
         when (state) {
-            is TransactionAddViewModel.UiState.Loading -> {
+            is TransactionAddViewModel.LoadingUiState.Loading -> {
+                binding.loadingOverlay.visibility = View.VISIBLE
+                binding.progressBar.visibility = View.VISIBLE
+                binding.successCheckmark.visibility = View.GONE
+                binding.loadingText.text = "Loading..."
+            }
+            is TransactionAddViewModel.LoadingUiState.Loaded -> {
+                binding.loadingOverlay.visibility = View.GONE
+                binding.progressBar.visibility = View.GONE
+                populateInitialFormValues()
+            }
+            is TransactionAddViewModel.LoadingUiState.Error -> {
+                binding.loadingOverlay.visibility = View.GONE
+                binding.progressBar.visibility = View.GONE
+                showError(state.message)
+            }
+            else -> {
+                binding.loadingOverlay.visibility = View.GONE
+                binding.progressBar.visibility = View.GONE
+            }
+        }
+    }
+
+    private fun handleSavingUiState(state: TransactionAddViewModel.SavingUiState) {
+        when (state) {
+            is TransactionAddViewModel.SavingUiState.Saving -> {
                 binding.btnSave.isEnabled = false
                 binding.loadingOverlay.visibility = View.VISIBLE
                 binding.progressBar.visibility = View.VISIBLE
                 binding.successCheckmark.visibility = View.GONE
                 binding.loadingText.text = "Saving transaction..."
             }
-            is TransactionAddViewModel.UiState.Success -> {
+            is TransactionAddViewModel.SavingUiState.Success -> {
                 binding.progressBar.visibility = View.GONE
                 binding.successCheckmark.visibility = View.VISIBLE
                 binding.loadingText.text = "Transaction saved successfully!"
@@ -616,7 +632,7 @@ class TransactionAddFragment : Fragment() {
                     findNavController().popBackStack()
                 }
             }
-            is TransactionAddViewModel.UiState.Error -> {
+            is TransactionAddViewModel.SavingUiState.Error -> {
                 binding.btnSave.isEnabled = true
                 binding.loadingOverlay.visibility = View.GONE
                 showError(state.message)
@@ -793,9 +809,9 @@ class TransactionAddFragment : Fragment() {
     private fun observeViewModel() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                launch { transactionAddViewModel.uiState.collect { handleUiState(it) } }
+                launch { transactionAddViewModel.loadingUiState.collect { handleLoadingUiState(it) } }
+                launch { transactionAddViewModel.savingUiState.collect { handleSavingUiState(it) } }
                 launch { transactionAddViewModel.validationState.collect { handleValidationState(it) } }
-//                launch { transactionAddViewModel.transaction.collect { it?.let { populateFieldsForEdit(it) } } }
                 launch { transactionAddViewModel.category.collect { updateSelectedCategory(it) } }
                 launch { transactionAddViewModel.wallet.collect { updateSelectedWallet(it) } }
                 launch { transactionAddViewModel.date.collect { updateSelectedDate(it) } }

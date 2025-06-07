@@ -20,6 +20,7 @@ import com.synaptix.budgetbuddy.core.model.Transaction
 import com.synaptix.budgetbuddy.core.model.User
 import com.synaptix.budgetbuddy.core.usecase.main.transaction.AddTransactionUseCase
 import com.synaptix.budgetbuddy.core.usecase.main.transaction.AddTransactionUseCase.AddTransactionResult
+import com.synaptix.budgetbuddy.core.usecase.main.transaction.GetTransactionUseCase
 import com.synaptix.budgetbuddy.core.usecase.main.transaction.UploadImageUseCase
 import java.io.Serializable
 
@@ -27,15 +28,23 @@ import java.io.Serializable
 class TransactionAddViewModel @Inject constructor(
     private val getUserIdUseCase: GetUserIdUseCase,
     private val addTransactionUseCase: AddTransactionUseCase,
+    private val getTransactionUseCase: GetTransactionUseCase,
     private val uploadImageUseCase: UploadImageUseCase,
-    savedStateHandle: SavedStateHandle
+    private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
-    sealed class UiState {
-        object Initial : UiState()
-        object Loading : UiState()
-        object Success : UiState()
-        data class Error(val message: String) : UiState()
+    sealed class LoadingUiState {
+        object Idle : LoadingUiState()
+        object Loading : LoadingUiState()
+        object Loaded : LoadingUiState()
+        data class Error(val message: String) : LoadingUiState()
+    }
+    
+    sealed class SavingUiState {
+        object Idle : SavingUiState()
+        object Saving : SavingUiState()
+        object Success : SavingUiState()
+        data class Error(val message: String) : SavingUiState()
     }
 
     enum class ScreenMode : Serializable {
@@ -58,28 +67,36 @@ class TransactionAddViewModel @Inject constructor(
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     // UI State
-    private val _uiState = MutableStateFlow<UiState>(UiState.Initial)
-    val uiState: StateFlow<UiState> = _uiState
+    private val _savingUiState = MutableStateFlow<SavingUiState>(SavingUiState.Idle)
+    val savingUiState: StateFlow<SavingUiState> = _savingUiState
+
+    private val _loadingUiState = MutableStateFlow<LoadingUiState>(LoadingUiState.Idle)
+    val loadingUiState: StateFlow<LoadingUiState> = _loadingUiState
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     // Screen Mode
-    private val _screenMode = MutableStateFlow<ScreenMode>(ScreenMode.CREATE)
-    val screenMode: StateFlow<ScreenMode> = _screenMode
+    private val _screenMode = MutableStateFlow(
+        savedStateHandle["screenMode"] ?: ScreenMode.CREATE
+    )
+    val screenMode: StateFlow<ScreenMode> get() = _screenMode
 
     fun setScreenMode(mode: ScreenMode) {
         _screenMode.value = mode
+        savedStateHandle["screenMode"] = mode
     }
 
-    // Boolean to show not to change the screen mode when busy
-    private var _screenModeBusy = MutableStateFlow(false)
+    private val _screenModeBusy = MutableStateFlow(false)
+    val screenModeBusy: StateFlow<Boolean> get() = _screenModeBusy
 
     fun setScreenModeBusy(isBusy: Boolean) {
         _screenModeBusy.value = isBusy
     }
 
-    fun isScreenModeBusy(): Boolean {
-        return _screenModeBusy.value
-    }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // Transaction Data stuff
+
+    private val transactionId: String? = savedStateHandle["transactionId"]
 
     private val _transaction = MutableStateFlow<Transaction?>(null)
     val transaction: StateFlow<Transaction?> = _transaction
@@ -101,6 +118,47 @@ class TransactionAddViewModel @Inject constructor(
         _recurrenceData.value = transaction.recurrenceData
         // Note: Image handling will be done separately
     }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // Initialize based on screen mode
+
+    init {
+        when (screenMode.value) {
+            ScreenMode.VIEW, ScreenMode.EDIT -> {
+                transactionId?.let { loadTransaction(it) }
+            }
+            ScreenMode.CREATE -> reset()
+        }
+    }
+
+    private fun loadTransaction(id: String) {
+        viewModelScope.launch {
+            _loadingUiState.value = LoadingUiState.Loading
+
+            val currentUserId = getUserIdUseCase.execute()
+            if (currentUserId.isEmpty()) {
+                _loadingUiState.value = LoadingUiState.Error("User ID is empty")
+                return@launch
+            }
+
+            Log.d("TransactionAddViewModel", "Loading Transaction: $id")
+
+            val result = getTransactionUseCase.execute(currentUserId, id)
+
+            when (result) {
+                is GetTransactionUseCase.GetTransactionResult.Success -> {
+                    Log.d("TransactionAddViewModel", "Transaction loaded successfully: ${result.transaction.id}")
+                    setTransaction(result.transaction)
+                    _loadingUiState.value = LoadingUiState.Loaded
+                }
+                is GetTransactionUseCase.GetTransactionResult.Error -> {
+                    Log.e("TransactionAddViewModel", "Error loading transaction: ${result.message}")
+                    _loadingUiState.value = LoadingUiState.Error(result.message)
+                }
+            }
+        }
+    }
+
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     // Validation State
@@ -230,12 +288,12 @@ class TransactionAddViewModel @Inject constructor(
         if (!validateForm()) return
 
         viewModelScope.launch {
-            _uiState.value = UiState.Loading
+            _savingUiState.value = SavingUiState.Saving
 
             try {
                 val userId = getUserIdUseCase.execute()
                 if (userId.isEmpty()) {
-                    _uiState.value = UiState.Error("User ID is empty")
+                    _savingUiState.value = SavingUiState.Error("User ID is empty")
                     return@launch
                 }
 
@@ -281,24 +339,24 @@ class TransactionAddViewModel @Inject constructor(
                 addTransactionUseCase.execute(finalTransaction)
                     .catch { e ->
                         Log.e("TransactionAddViewModel", "Error in transaction flow: ${e.message}")
-                        _uiState.value = UiState.Error(e.message ?: "Failed to add transaction")
+                        _savingUiState.value = SavingUiState.Error(e.message ?: "Failed to add transaction")
                     }
                     .collect { result ->
                         when (result) {
                             is AddTransactionResult.Success -> {
                                 Log.d("TransactionAddViewModel", "Transaction added successfully: ${result.transactionId}")
                                 reset()
-                                _uiState.value = UiState.Success
+                                _savingUiState.value = SavingUiState.Success
                             }
                             is AddTransactionResult.Error -> {
                                 Log.e("TransactionAddViewModel", "Error adding transaction: ${result.message}")
-                                _uiState.value = UiState.Error(result.message)
+                                _savingUiState.value = SavingUiState.Error(result.message)
                             }
                         }
                     }
             } catch (e: Exception) {
                 Log.e("TransactionAddViewModel", "Exception adding transaction: ${e.message}")
-                _uiState.value = UiState.Error(e.message ?: "Failed to add transaction")
+                _savingUiState.value = SavingUiState.Error(e.message ?: "Failed to add transaction")
             }
         }
     }
@@ -314,7 +372,7 @@ class TransactionAddViewModel @Inject constructor(
         _recurrenceData.value = RecurrenceData.DEFAULT
         _selectedLabels.value = emptyList()
         _validationState.value = ValidationState(shouldShowErrors = false)
-        _uiState.value = UiState.Initial
+        _savingUiState.value = SavingUiState.Idle
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
