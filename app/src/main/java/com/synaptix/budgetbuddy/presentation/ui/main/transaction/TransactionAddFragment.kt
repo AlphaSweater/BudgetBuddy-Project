@@ -54,7 +54,7 @@ class TransactionAddFragment : Fragment() {
     private var _binding: FragmentTransactionAddBinding? = null
     private val binding get() = _binding!!
 
-    private val transactionAddViewModel: TransactionAddViewModel by navGraphViewModels(R.id.transaction_navigation_graph) {defaultViewModelProviderFactory}
+    private val transactionAddViewModel: TransactionAddViewModel by navGraphViewModels(R.id.ind_transaction_navigation_graph) {defaultViewModelProviderFactory}
 
     private lateinit var takePictureLauncher: ActivityResultLauncher<Uri>
     private lateinit var pickImageLauncher: ActivityResultLauncher<String>
@@ -84,9 +84,6 @@ class TransactionAddFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-//        if (!transactionAddViewModel.screenModeBusy.value) {
-//            reset()
-//        }
         _binding = null
     }
 
@@ -693,8 +690,8 @@ class TransactionAddFragment : Fragment() {
             textAmountSign.apply {
                 visibility = if (category != null && amount != null && amount != 0.0) View.VISIBLE else View.GONE
                 text = when (category?.type) {
-                    "expense" -> "-"
-                    "income" -> "+"
+                    "expense" -> "- "
+                    "income" -> "+ "
                     else -> ""
                 }
                 setTextColor(

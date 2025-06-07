@@ -2,14 +2,14 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/transaction_navigation_graph"
+    android:id="@+id/ind_transaction_navigation_graph"
     app:startDestination="@id/navigation_transaction_add">
 
     <!-- Main Transaction Add Fragment -->
     <fragment
         android:id="@+id/navigation_transaction_add"
         android:name="com.synaptix.budgetbuddy.presentation.ui.main.transaction.TransactionAddFragment"
-        android:label="@string/title_transaction"
+        android:label="Transaction"
         tools:layout="@layout/fragment_transaction_add">
 
         <action

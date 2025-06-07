@@ -29,7 +29,7 @@ class TransactionSelectCategoryFragment : Fragment() {
     private var _binding: FragmentTransactionSelectCategoryBinding? = null
     private val binding get() = _binding!!
 
-    private val sharedViewModel: TransactionAddViewModel by navGraphViewModels(R.id.transaction_navigation_graph) {defaultViewModelProviderFactory}
+    private val sharedViewModel: TransactionAddViewModel by navGraphViewModels(R.id.ind_transaction_navigation_graph) {defaultViewModelProviderFactory}
     private val categoryViewModel: TransactionSelectCategoryViewModel by viewModels()
 
     private val expenseAdapter by lazy {

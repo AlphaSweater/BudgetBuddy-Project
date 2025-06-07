@@ -119,18 +119,6 @@ class TransactionAddViewModel @Inject constructor(
         // Note: Image handling will be done separately
     }
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-    // Initialize based on screen mode
-
-    init {
-        when (screenMode.value) {
-            ScreenMode.VIEW, ScreenMode.EDIT -> {
-                transactionId?.let { loadTransaction(it) }
-            }
-            ScreenMode.CREATE -> reset()
-        }
-    }
-
     private fun loadTransaction(id: String) {
         viewModelScope.launch {
             _loadingUiState.value = LoadingUiState.Loading
@@ -247,6 +235,19 @@ class TransactionAddViewModel @Inject constructor(
         val currentLabels = _selectedLabels.value.toMutableList()
         currentLabels.remove(label)
         _selectedLabels.value = currentLabels
+    }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // Initialize the ViewModel based on the screen mode
+    init {
+        when (screenMode.value) {
+            ScreenMode.VIEW, ScreenMode.EDIT -> {
+                transactionId?.let { loadTransaction(it) }
+            }
+            ScreenMode.CREATE -> {
+                reset()
+            }
+        }
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\

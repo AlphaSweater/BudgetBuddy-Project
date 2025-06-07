@@ -26,7 +26,7 @@ class TransactionSelectWalletFragment : Fragment() {
     private var _binding: FragmentTransactionSelectWalletBinding? = null
     private val binding get() = _binding!!
 
-    private val sharedViewModel: TransactionAddViewModel by navGraphViewModels(R.id.transaction_navigation_graph) {defaultViewModelProviderFactory}
+    private val sharedViewModel: TransactionAddViewModel by navGraphViewModels(R.id.ind_transaction_navigation_graph) {defaultViewModelProviderFactory}
     private val walletViewModel: TransactionSelectWalletViewModel by viewModels()
 
     private val walletAdapter by lazy {
