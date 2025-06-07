@@ -10,9 +10,11 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.navGraphViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.synaptix.budgetbuddy.databinding.FragmentTransactionSelectLabelBinding
 import com.synaptix.budgetbuddy.presentation.ui.main.transaction.TransactionAddViewModel
+import com.synaptix.budgetbuddy.R
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -23,7 +25,7 @@ class TransactionSelectLabelFragment : Fragment() {
     private var _binding: FragmentTransactionSelectLabelBinding? = null
     private val binding get() = _binding!!
 
-    private val viewModel: TransactionAddViewModel by activityViewModels()
+    private val sharedViewModel: TransactionAddViewModel by navGraphViewModels(R.id.transaction_navigation_graph) {defaultViewModelProviderFactory}
     private val labelViewModel: TransactionSelectLabelViewModel by viewModels()
 
     private val labelAdapter by lazy {
@@ -56,7 +58,7 @@ class TransactionSelectLabelFragment : Fragment() {
         }
 
         // Initialize with selected labels from ViewModel
-        val initialSelected = viewModel.selectedLabels.value ?: emptyList()
+        val initialSelected = sharedViewModel.selectedLabels.value ?: emptyList()
         labelAdapter.submitList(emptyList(), initialSelected)
     }
 
@@ -66,7 +68,7 @@ class TransactionSelectLabelFragment : Fragment() {
         }
 
         binding.btnSave.setOnClickListener {
-            viewModel.setLabels(labelAdapter.getSelectedLabels())
+            sharedViewModel.setLabels(labelAdapter.getSelectedLabels())
             findNavController().popBackStack()
         }
     }
@@ -81,7 +83,7 @@ class TransactionSelectLabelFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             labelViewModel.loadLabelsForUser()
             labelViewModel.filteredLabels.collectLatest { labels ->
-                val selectedLabels = viewModel.selectedLabels.value ?: emptyList()
+                val selectedLabels = sharedViewModel.selectedLabels.value ?: emptyList()
                 labelAdapter.submitList(labels, selectedLabels)
             }
         }

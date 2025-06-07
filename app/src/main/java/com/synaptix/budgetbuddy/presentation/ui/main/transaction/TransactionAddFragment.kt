@@ -34,6 +34,7 @@ import com.synaptix.budgetbuddy.core.model.Category
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import android.widget.ImageView
+import androidx.navigation.navGraphViewModels
 import com.synaptix.budgetbuddy.core.model.RecurrenceData
 import com.synaptix.budgetbuddy.core.model.Wallet
 import com.synaptix.budgetbuddy.extentions.getThemeColor
@@ -55,7 +56,7 @@ class TransactionAddFragment : Fragment() {
     private var _binding: FragmentTransactionAddBinding? = null
     private val binding get() = _binding!!
 
-    private val transactionAddViewModel: TransactionAddViewModel by activityViewModels()
+    private val transactionAddViewModel: TransactionAddViewModel by navGraphViewModels(R.id.transaction_navigation_graph) {defaultViewModelProviderFactory}
 
     private lateinit var takePictureLauncher: ActivityResultLauncher<Uri>
     private lateinit var pickImageLauncher: ActivityResultLauncher<String>

@@ -7,7 +7,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -17,12 +16,12 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import com.synaptix.budgetbuddy.R
-import com.synaptix.budgetbuddy.core.model.Category
 import com.synaptix.budgetbuddy.databinding.FragmentTransactionSelectCategoryBinding
 import com.synaptix.budgetbuddy.presentation.ui.main.transaction.TransactionAddViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import androidx.core.view.isVisible
+import androidx.navigation.navGraphViewModels
 
 @AndroidEntryPoint
 class TransactionSelectCategoryFragment : Fragment() {
@@ -30,19 +29,19 @@ class TransactionSelectCategoryFragment : Fragment() {
     private var _binding: FragmentTransactionSelectCategoryBinding? = null
     private val binding get() = _binding!!
 
-    private val viewModel: TransactionAddViewModel by activityViewModels()
+    private val sharedViewModel: TransactionAddViewModel by navGraphViewModels(R.id.transaction_navigation_graph) {defaultViewModelProviderFactory}
     private val categoryViewModel: TransactionSelectCategoryViewModel by viewModels()
 
     private val expenseAdapter by lazy {
         TransactionSelectCategoryAdapter { category ->
-            viewModel.setCategory(category)
+            sharedViewModel.setCategory(category)
             findNavController().popBackStack()
         }
     }
 
     private val incomeAdapter by lazy {
         TransactionSelectCategoryAdapter { category ->
-            viewModel.setCategory(category)
+            sharedViewModel.setCategory(category)
             findNavController().popBackStack()
         }
     }
