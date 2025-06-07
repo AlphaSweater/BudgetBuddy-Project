@@ -5,12 +5,14 @@ import android.graphics.Color
 import android.graphics.Typeface
 import android.os.Bundle
 import android.util.TypedValue
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.annotation.AttrRes
 import androidx.core.content.ContextCompat
+import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -38,6 +40,7 @@ import com.synaptix.budgetbuddy.core.model.HomeListItems
 import com.synaptix.budgetbuddy.core.model.Transaction
 import com.synaptix.budgetbuddy.core.model.Wallet
 import com.synaptix.budgetbuddy.databinding.FragmentHomeBinding
+import com.synaptix.budgetbuddy.presentation.ui.main.transaction.TransactionAddViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -883,7 +886,18 @@ class HomeMainFragment : Fragment() {
      * To be implemented when the details screen is ready.
      */
     private fun navigateToTransactionDetails(transaction: Transaction) {
-        // TODO: Implement navigation to transaction details
+        Log.d("HomeFragment", "Navigating to transaction details: ${transaction.id}")
+
+        // Create a bundle with the necessary arguments
+        val bundle = bundleOf(
+            "screenMode" to TransactionAddViewModel.ScreenMode.VIEW,
+            "transactionId" to transaction.id
+        )
+
+        findNavController().navigate(
+            R.id.ind_transaction_navigation_graph,
+            bundle
+        )
     }
 
     /**

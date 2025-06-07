@@ -5,12 +5,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.navGraphViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import com.synaptix.budgetbuddy.R
@@ -18,6 +18,7 @@ import com.synaptix.budgetbuddy.databinding.FragmentTransactionSelectWalletBindi
 import com.synaptix.budgetbuddy.presentation.ui.main.transaction.TransactionAddViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import kotlin.getValue
 
 @AndroidEntryPoint
 class TransactionSelectWalletFragment : Fragment() {
@@ -25,12 +26,12 @@ class TransactionSelectWalletFragment : Fragment() {
     private var _binding: FragmentTransactionSelectWalletBinding? = null
     private val binding get() = _binding!!
 
-    private val viewModel: TransactionAddViewModel by activityViewModels()
+    private val sharedViewModel: TransactionAddViewModel by navGraphViewModels(R.id.ind_transaction_navigation_graph) {defaultViewModelProviderFactory}
     private val walletViewModel: TransactionSelectWalletViewModel by viewModels()
 
     private val walletAdapter by lazy {
         TransactionSelectWalletAdapter { wallet ->
-            viewModel.setWallet(wallet)
+            sharedViewModel.setWallet(wallet)
             findNavController().popBackStack()
         }
     }

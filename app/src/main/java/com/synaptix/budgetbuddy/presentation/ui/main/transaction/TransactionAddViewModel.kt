@@ -1,6 +1,7 @@
 package com.synaptix.budgetbuddy.presentation.ui.main.transaction
 
 import android.util.Log
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.synaptix.budgetbuddy.core.model.Category
@@ -19,20 +20,35 @@ import com.synaptix.budgetbuddy.core.model.Transaction
 import com.synaptix.budgetbuddy.core.model.User
 import com.synaptix.budgetbuddy.core.usecase.main.transaction.AddTransactionUseCase
 import com.synaptix.budgetbuddy.core.usecase.main.transaction.AddTransactionUseCase.AddTransactionResult
+import com.synaptix.budgetbuddy.core.usecase.main.transaction.GetTransactionUseCase
 import com.synaptix.budgetbuddy.core.usecase.main.transaction.UploadImageUseCase
+import java.io.Serializable
 
 @HiltViewModel
 class TransactionAddViewModel @Inject constructor(
     private val getUserIdUseCase: GetUserIdUseCase,
     private val addTransactionUseCase: AddTransactionUseCase,
-    private val uploadImageUseCase: UploadImageUseCase
+    private val getTransactionUseCase: GetTransactionUseCase,
+    private val uploadImageUseCase: UploadImageUseCase,
+    private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
-    sealed class UiState {
-        object Initial : UiState()
-        object Loading : UiState()
-        object Success : UiState()
-        data class Error(val message: String) : UiState()
+    sealed class LoadingUiState {
+        object Idle : LoadingUiState()
+        object Loading : LoadingUiState()
+        object Loaded : LoadingUiState()
+        data class Error(val message: String) : LoadingUiState()
+    }
+    
+    sealed class SavingUiState {
+        object Idle : SavingUiState()
+        object Saving : SavingUiState()
+        object Success : SavingUiState()
+        data class Error(val message: String) : SavingUiState()
+    }
+
+    enum class ScreenMode : Serializable {
+        VIEW, EDIT, CREATE
     }
 
     data class ValidationState(
@@ -51,8 +67,86 @@ class TransactionAddViewModel @Inject constructor(
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     // UI State
-    private val _uiState = MutableStateFlow<UiState>(UiState.Initial)
-    val uiState: StateFlow<UiState> = _uiState
+    private val _savingUiState = MutableStateFlow<SavingUiState>(SavingUiState.Idle)
+    val savingUiState: StateFlow<SavingUiState> = _savingUiState
+
+    private val _loadingUiState = MutableStateFlow<LoadingUiState>(LoadingUiState.Idle)
+    val loadingUiState: StateFlow<LoadingUiState> = _loadingUiState
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // Screen Mode
+    private val _screenMode = MutableStateFlow(
+        savedStateHandle["screenMode"] ?: ScreenMode.CREATE
+    )
+    val screenMode: StateFlow<ScreenMode> get() = _screenMode
+
+    fun setScreenMode(mode: ScreenMode) {
+        _screenMode.value = mode
+        savedStateHandle["screenMode"] = mode
+    }
+
+    private val _screenModeBusy = MutableStateFlow(false)
+    val screenModeBusy: StateFlow<Boolean> get() = _screenModeBusy
+
+    fun setScreenModeBusy(isBusy: Boolean) {
+        _screenModeBusy.value = isBusy
+    }
+
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // Transaction Data stuff
+
+    private val transactionId: String? = savedStateHandle["transactionId"]
+
+    private val _transaction = MutableStateFlow<Transaction?>(null)
+    val transaction: StateFlow<Transaction?> = _transaction
+
+    fun setTransaction(transaction: Transaction?) {
+        _transaction.value = transaction
+        transaction?.let { populateTransactionData(it) }
+    }
+
+    private fun populateTransactionData(transaction: Transaction) {
+        _amount.value = transaction.amount
+        _currency.value = transaction.currency
+        _note.value = transaction.note
+        _date.value = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+            .format(Date(transaction.date))
+        _category.value = transaction.category
+        _wallet.value = transaction.wallet
+        _selectedLabels.value = transaction.labels
+        _recurrenceData.value = transaction.recurrenceData
+        // Note: Image handling will be done separately
+    }
+
+    private fun loadTransaction(id: String) {
+        viewModelScope.launch {
+            _loadingUiState.value = LoadingUiState.Loading
+
+            val currentUserId = getUserIdUseCase.execute()
+            if (currentUserId.isEmpty()) {
+                _loadingUiState.value = LoadingUiState.Error("User ID is empty")
+                return@launch
+            }
+
+            Log.d("TransactionAddViewModel", "Loading Transaction: $id")
+
+            val result = getTransactionUseCase.execute(currentUserId, id)
+
+            when (result) {
+                is GetTransactionUseCase.GetTransactionResult.Success -> {
+                    Log.d("TransactionAddViewModel", "Transaction loaded successfully: ${result.transaction.id}")
+                    setTransaction(result.transaction)
+                    _loadingUiState.value = LoadingUiState.Loaded
+                }
+                is GetTransactionUseCase.GetTransactionResult.Error -> {
+                    Log.e("TransactionAddViewModel", "Error loading transaction: ${result.message}")
+                    _loadingUiState.value = LoadingUiState.Error(result.message)
+                }
+            }
+        }
+    }
+
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     // Validation State
@@ -64,97 +158,151 @@ class TransactionAddViewModel @Inject constructor(
     private val _category = MutableStateFlow<Category?>(null)
     val category: StateFlow<Category?> = _category
 
+    fun setCategory(category: Category?) {
+        _category.value = category
+        validateForm()
+        checkForChanges()
+    }
+
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private val _wallet = MutableStateFlow<Wallet?>(null)
     val wallet: StateFlow<Wallet?> = _wallet
+
+    fun setWallet(wallet: Wallet?) {
+        _wallet.value = wallet
+        validateForm()
+        checkForChanges()
+    }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private val _currency = MutableStateFlow("ZAR")
     val currency: StateFlow<String> = _currency
 
+    fun setCurrency(currency: String) {
+        _currency.value = currency
+        validateForm()
+        checkForChanges()
+    }
+
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private val _amount = MutableStateFlow<Double?>(null)
     val amount: StateFlow<Double?> = _amount
+
+    fun setAmount(amount: Double?) {
+        _amount.value = amount
+        validateForm()
+        checkForChanges()
+    }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private val _date = MutableStateFlow(getCurrentDate())
     val date: StateFlow<String> = _date
 
+    fun setDate(date: String) {
+        _date.value = date
+        validateForm()
+        checkForChanges()
+    }
+
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private val _note = MutableStateFlow<String?>(null)
     val note: StateFlow<String?> = _note
+
+    fun setNote(note: String) {
+        _note.value = note
+        checkForChanges()
+    }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private val _imageBytes = MutableStateFlow<ByteArray?>(null)
     val imageBytes: StateFlow<ByteArray?> = _imageBytes
 
+    fun setImageBytes(bytes: ByteArray?) {
+        _imageBytes.value = bytes
+        checkForChanges()
+    }
+
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private val _recurrenceData = MutableStateFlow(RecurrenceData.DEFAULT)
     val recurrenceData: StateFlow<RecurrenceData> = _recurrenceData
+
+    fun setRecurrenceData(data: RecurrenceData) {
+        _recurrenceData.value = data
+        checkForChanges()
+    }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private val _selectedLabels = MutableStateFlow<List<Label>>(emptyList())
     val selectedLabels: StateFlow<List<Label>> = _selectedLabels
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-    private val _saveState = MutableStateFlow(false)
-    val saveState: StateFlow<Boolean> = _saveState
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-    fun setCategory(category: Category?) {
-        _category.value = category
-        validateForm()
-    }
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     fun setLabels(labels: List<Label>) {
         _selectedLabels.value = labels
+        checkForChanges()
     }
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-    fun setWallet(wallet: Wallet?) {
-        _wallet.value = wallet
-        validateForm()
-    }
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-    fun setCurrency(currency: String) {
-        _currency.value = currency
-        validateForm()
-    }
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-    fun setAmount(amount: Double?) {
-        _amount.value = amount
-        validateForm()
-    }
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-    fun setDate(date: String) {
-        _date.value = date
-        validateForm()
-    }
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-    fun setNote(note: String) {
-        _note.value = note
-    }
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-    fun setRecurrenceData(data: RecurrenceData) {
-        _recurrenceData.value = data
-    }
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-    fun setImageBytes(bytes: ByteArray?) {
-        _imageBytes.value = bytes
-    }
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     fun removeLabel(label: Label) {
         val currentLabels = _selectedLabels.value.toMutableList()
         currentLabels.remove(label)
         _selectedLabels.value = currentLabels
+        checkForChanges()
+    }
+
+    private val _hasUnsavedChanges = MutableStateFlow(false)
+    val hasUnsavedChanges: StateFlow<Boolean> = _hasUnsavedChanges
+
+    private fun checkForChanges() {
+        val originalTransaction = _transaction.value
+        if (originalTransaction == null) {
+            _hasUnsavedChanges.value = false
+            return
+        }
+
+        val hasChanges = originalTransaction.amount != (_amount.value ?: 0.0) ||
+                originalTransaction.currency != _currency.value ||
+                originalTransaction.note != (_note.value ?: "") ||
+                originalTransaction.category != _category.value ||
+                originalTransaction.wallet != _wallet.value ||
+                originalTransaction.date != parseDate(_date.value) ||
+                originalTransaction.labels != _selectedLabels.value ||
+                originalTransaction.recurrenceData != _recurrenceData.value ||
+                _imageBytes.value != null // If there's a new image, consider it changed
+
+        _hasUnsavedChanges.value = hasChanges
+    }
+
+    fun revertChanges() {
+        val originalTransaction = _transaction.value ?: return
+
+        // Restore all values from the original transaction
+        _amount.value = originalTransaction.amount
+        _currency.value = originalTransaction.currency
+        _note.value = originalTransaction.note
+        _date.value = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+            .format(Date(originalTransaction.date))
+        _category.value = originalTransaction.category
+        _wallet.value = originalTransaction.wallet
+        _selectedLabels.value = originalTransaction.labels
+        _recurrenceData.value = originalTransaction.recurrenceData
+        _imageBytes.value = null // Reset image since we can't restore it from URL
+
+        // Reset validation state
+        _validationState.value = ValidationState(shouldShowErrors = false)
+
+        // Reset unsaved changes flag
+        _hasUnsavedChanges.value = false
+    }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // Initialize the ViewModel based on the screen mode
+    init {
+        when (screenMode.value) {
+            ScreenMode.VIEW, ScreenMode.EDIT -> {
+                transactionId?.let { loadTransaction(it) }
+            }
+            ScreenMode.CREATE -> {
+                reset()
+            }
+        }
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
@@ -167,7 +315,7 @@ class TransactionAddViewModel @Inject constructor(
         val isWalletValid = _wallet.value != null
         val isDateValid = !_date.value.isNullOrBlank()
 
-        _saveState.value = true
+
         _validationState.value = currentState.copy(
             isAmountValid = isAmountValid,
             isCurrencyValid = isCurrencyValid,
@@ -196,12 +344,12 @@ class TransactionAddViewModel @Inject constructor(
         if (!validateForm()) return
 
         viewModelScope.launch {
-            _uiState.value = UiState.Loading
+            _savingUiState.value = SavingUiState.Saving
 
             try {
                 val userId = getUserIdUseCase.execute()
                 if (userId.isEmpty()) {
-                    _uiState.value = UiState.Error("User ID is empty")
+                    _savingUiState.value = SavingUiState.Error("User ID is empty")
                     return@launch
                 }
 
@@ -247,41 +395,26 @@ class TransactionAddViewModel @Inject constructor(
                 addTransactionUseCase.execute(finalTransaction)
                     .catch { e ->
                         Log.e("TransactionAddViewModel", "Error in transaction flow: ${e.message}")
-                        _uiState.value = UiState.Error(e.message ?: "Failed to add transaction")
+                        _savingUiState.value = SavingUiState.Error(e.message ?: "Failed to add transaction")
                     }
                     .collect { result ->
                         when (result) {
                             is AddTransactionResult.Success -> {
                                 Log.d("TransactionAddViewModel", "Transaction added successfully: ${result.transactionId}")
                                 reset()
-                                _uiState.value = UiState.Success
+                                _savingUiState.value = SavingUiState.Success
                             }
                             is AddTransactionResult.Error -> {
                                 Log.e("TransactionAddViewModel", "Error adding transaction: ${result.message}")
-                                _uiState.value = UiState.Error(result.message)
+                                _savingUiState.value = SavingUiState.Error(result.message)
                             }
                         }
                     }
             } catch (e: Exception) {
                 Log.e("TransactionAddViewModel", "Exception adding transaction: ${e.message}")
-                _uiState.value = UiState.Error(e.message ?: "Failed to add transaction")
+                _savingUiState.value = SavingUiState.Error(e.message ?: "Failed to add transaction")
             }
         }
-    }
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-    fun reset() {
-        _saveState.value = false
-        _amount.value = null
-        _date.value = getCurrentDate()
-        _note.value = null
-        _category.value = null
-        _wallet.value = null
-        _imageBytes.value = null
-        _recurrenceData.value = RecurrenceData.DEFAULT
-        _selectedLabels.value = emptyList()
-        _validationState.value = ValidationState(shouldShowErrors = false)
-        _uiState.value = UiState.Initial
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
@@ -294,6 +427,21 @@ class TransactionAddViewModel @Inject constructor(
             .parse(dateStr)?.time ?: System.currentTimeMillis()
     } catch (e: Exception) {
         System.currentTimeMillis()
+    }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    fun reset() {
+        _amount.value = null
+        _date.value = getCurrentDate()
+        _note.value = null
+        _category.value = null
+        _wallet.value = null
+        _imageBytes.value = null
+        _recurrenceData.value = RecurrenceData.DEFAULT
+        _selectedLabels.value = emptyList()
+        _validationState.value = ValidationState(shouldShowErrors = false)
+        _savingUiState.value = SavingUiState.Idle
+        _hasUnsavedChanges.value = false
     }
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~EOF~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\

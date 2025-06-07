@@ -3,12 +3,14 @@ package com.synaptix.budgetbuddy.presentation.ui.main
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.os.bundleOf
 import androidx.navigation.NavController
 import androidx.navigation.NavOptions
 import androidx.navigation.findNavController
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.synaptix.budgetbuddy.R
 import com.synaptix.budgetbuddy.databinding.ActivityMainBinding
+import com.synaptix.budgetbuddy.presentation.ui.main.transaction.TransactionAddViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -58,7 +60,13 @@ class MainActivity : AppCompatActivity() {
 
         // ✅ Navigate to add transaction screen from FAB
         binding.fabAddTransaction.setOnClickListener {
-            navController.navigate(R.id.navigation_transaction_add)
+            val bundle = bundleOf(
+                "screenMode" to TransactionAddViewModel.ScreenMode.CREATE
+            )
+
+            navController.navigate(
+                R.id.ind_transaction_navigation_graph,
+                bundle)
         }
 
         // ✅ Hide bottom nav on certain fragments

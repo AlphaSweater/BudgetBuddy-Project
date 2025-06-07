@@ -91,9 +91,9 @@
                 style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
+                android:layout_marginBottom="8dp"
                 android:background="@android:color/transparent"
-                android:hint="Search categories"
+                android:hint="Search labels"
                 android:textColor="?attr/bb_secondaryText"
                 app:endIconMode="clear_text"
                 app:startIconDrawable="@drawable/ic_ui_search"
@@ -109,6 +109,70 @@
                     android:maxLines="1" />
             </com.google.android.material.textfield.TextInputLayout>
 
+            <!-- Create New Label Option -->
+            <LinearLayout
+                android:id="@+id/createNewLabelContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="12dp"
+                android:background="?attr/bb_surface"
+                android:visibility="gone"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackground">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_ui_circle_add"
+                    android:contentDescription="Add icon"
+                    app:tint="?attr/bb_primaryText" />
+
+                <TextView
+                    android:id="@+id/textCreateNew"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:text="Create new label"
+                    android:textSize="16sp"
+                    android:textColor="?attr/bb_primaryText"/>
+            </LinearLayout>
+
+            <!-- No Labels State -->
+            <LinearLayout
+                android:id="@+id/noLabelsContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:visibility="gone"
+                android:layout_marginTop="32dp">
+
+                <ImageView
+                    android:layout_width="120dp"
+                    android:layout_height="120dp"
+                    android:src="@drawable/ic_ui_label"
+                    android:alpha="0.5"
+                    android:contentDescription="No labels icon"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="No Labels Found, search to make some!"
+                    android:textSize="18sp"
+                    android:textColor="?attr/bb_primaryText"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Create a new label to get started"
+                    android:textSize="14sp"
+                    android:textColor="?attr/bb_secondaryText"/>
+            </LinearLayout>
+
             <!-- RecyclerView -->
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerViewLabels"
@@ -119,6 +183,25 @@
                 tools:listitem="@layout/item_transaction_label"/>
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
+
+    <!-- Loading Progress Bar -->
+    <FrameLayout
+        android:id="@+id/loadingContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#80000000"
+        android:clickable="true"
+        android:focusable="true"
+        android:visibility="gone">
+
+        <ProgressBar
+            android:id="@+id/progressBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:indeterminateTint="?attr/bb_primaryText"/>
+
+    </FrameLayout>
 
     <!-- Bottom Save Button -->
     <FrameLayout
