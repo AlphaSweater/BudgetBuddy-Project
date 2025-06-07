@@ -20,7 +20,12 @@ import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
 import android.text.style.StyleSpan
 import android.util.TypedValue
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import com.synaptix.budgetbuddy.core.usecase.main.display.BudgetSummary
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import java.text.NumberFormat
 import java.util.Locale
 
@@ -37,6 +42,7 @@ class BudgetMainFragment : Fragment() {
         }
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -46,19 +52,21 @@ class BudgetMainFragment : Fragment() {
         return binding.root
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupUI()
-        observeViewModel()
-        viewModel.fetchBudgets()
-        viewModel.fetchBudgetSummary()
+        setupClickListeners()
+        collectUiState()
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private fun setupUI() {
         setupRecyclerView()
         setupClickListeners()
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private fun setupRecyclerView() {
         binding.recyclerViewBudgetMain.apply {
             layoutManager = LinearLayoutManager(requireContext())
@@ -66,103 +74,96 @@ class BudgetMainFragment : Fragment() {
         }
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private fun setupClickListeners() {
         binding.createBudgetButton.setOnClickListener {
             findNavController().navigate(R.id.action_budgetMainFragment_to_budgetAddFragment)
         }
-        
-//        binding.saveButton.setOnClickListener {
-////            val minGoalText = binding.inputMinGoal.text.toString()
-////            val maxGoalText = binding.inputMaxGoal.text.toString()
-//
-////            val minGoal = minGoalText.toDoubleOrNull()
-////            val maxGoal = maxGoalText.toDoubleOrNull()
-//
-//            if (minGoal == null || maxGoal == null) {
-//                Toast.makeText(
-//                    requireContext(),
-//                    "Please enter valid goal values.",
-//                    Toast.LENGTH_SHORT
-//                ).show()
-//                return@setOnClickListener
-//            }
-//            // TODO: Save the min and max goals to the ViewModel or database
-////            viewModel.saveMinMaxGoals(minGoal, maxGoal)
-//        }
     }
 
-    private fun observeViewModel() {
-//        viewModel.minMaxGoal.observe(viewLifecycleOwner) { minMaxGoal ->
-//            if (minMaxGoal != null) {
-//                binding.minValueSpent.text = "R%.2f".format(minMaxGoal.minGoal)
-//                binding.minValueTotal.text = "R%.2f".format(minMaxGoal.maxGoal)
-//            } else {
-//                binding.minValueSpent.text = "N/A"
-//                binding.minValueTotal.text = "N/A"
-//            }
-//        }
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // Collect UI state from ViewModel and update the UI accordingly
+    private fun collectUiState() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                launch {
+                    viewModel.budgetUiState.collect { state ->
+                        when (state) {
+                            is BudgetMainViewModel.BudgetUiState.Loading -> {
+                                // Show loading if needed
+                            }
+                            is BudgetMainViewModel.BudgetUiState.Success -> {
+                                val budgetItems = state.budgets.map { budget ->
+                                    BudgetListItems.BudgetBudgetItem(
+                                        budget = budget,
+                                        status = "R ${budget.spent} spent of R ${budget.amount}"
+                                    )
+                                }
+                                budgetAdapter.submitList(budgetItems)
+                            }
+                            is BudgetMainViewModel.BudgetUiState.Error -> {
+                                Toast.makeText(requireContext(), state.message, Toast.LENGTH_LONG).show()
+                            }
+                            is BudgetMainViewModel.BudgetUiState.Empty -> {
+                                budgetAdapter.submitList(emptyList())
+                            }
+                        }
+                    }
+                }
 
-        viewModel.budgets.observe(viewLifecycleOwner) { budgetList ->
-            val budgetItems = budgetList.map { budget ->
-                BudgetListItems.BudgetBudgetItem(
-                    budget = budget,
-                    status = "R ${budget.spent} spent of R ${budget.amount}"
-                )
+                launch {
+                    viewModel.budgetSummary.collect { summary ->
+                        summary?.let { updateSummaryUI(it) }
+                    }
+                }
             }
-            budgetAdapter.submitList(budgetItems)
         }
-
-        viewModel.budgetSummary.observe(viewLifecycleOwner) { summary ->
-            val typedValue = TypedValue()
-            val theme = requireContext().theme
-            theme.resolveAttribute(R.attr.bb_primaryText, typedValue, true)
-            val primaryColor = typedValue.data
-
-            val greenColor = ContextCompat.getColor(requireContext(), R.color.profit_green)
-            val blueColor = ContextCompat.getColor(requireContext(), R.color.info_blue)
-
-            // Format with grouping (e.g., 2,000.00)
-            val currencyFormat = NumberFormat.getNumberInstance(Locale("en", "ZA")).apply {
-                maximumFractionDigits = 2
-                minimumFractionDigits = 2
-            }
-
-            val formattedBudgeted = currencyFormat.format(summary.totalBudgeted) // 2,000.00
-            val formattedSpent = currencyFormat.format(summary.totalSpent)
-
-            val budgetedFullText = "ZAR $formattedBudgeted"
-            val spentFullText = "ZAR $formattedSpent"
-
-            val budgetedText = SpannableString(budgetedFullText).apply {
-                // ZAR styling
-                setSpan(ForegroundColorSpan(primaryColor), 0, 3, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-                setSpan(StyleSpan(Typeface.BOLD), 0, 3, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-
-                // Amount styling
-                setSpan(ForegroundColorSpan(greenColor), 4, length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-                setSpan(StyleSpan(Typeface.BOLD), 4, length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-            }
-            binding.totalBudgetedTextView.text = budgetedText
-
-            val spentText = SpannableString(spentFullText).apply {
-                // ZAR styling
-                setSpan(ForegroundColorSpan(primaryColor), 0, 3, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-                setSpan(StyleSpan(Typeface.BOLD), 0, 3, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-
-                // Amount styling
-                setSpan(ForegroundColorSpan(blueColor), 4, length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-                setSpan(StyleSpan(Typeface.BOLD), 4, length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-            }
-            binding.totalSpentTextView.text = spentText
-        }
-
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // Update the summary UI with formatted budget and spent amounts
+    private fun updateSummaryUI(summary: BudgetSummary) {
+        val typedValue = TypedValue()
+        val theme = requireContext().theme
+        theme.resolveAttribute(R.attr.bb_primaryText, typedValue, true)
+        val primaryColor = typedValue.data
+
+        val greenColor = ContextCompat.getColor(requireContext(), R.color.profit_green)
+        val blueColor = ContextCompat.getColor(requireContext(), R.color.info_blue)
+
+        val currencyFormat = NumberFormat.getNumberInstance(Locale("en", "ZA")).apply {
+            maximumFractionDigits = 2
+            minimumFractionDigits = 2
+        }
+
+        val formattedBudgeted = currencyFormat.format(summary.totalBudgeted)
+        val formattedSpent = currencyFormat.format(summary.totalSpent)
+
+        val budgetedText = SpannableString("ZAR $formattedBudgeted").apply {
+            setSpan(ForegroundColorSpan(primaryColor), 0, 3, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+            setSpan(StyleSpan(Typeface.BOLD), 0, 3, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+            setSpan(ForegroundColorSpan(greenColor), 4, length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+            setSpan(StyleSpan(Typeface.BOLD), 4, length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+        }
+
+        val spentText = SpannableString("ZAR $formattedSpent").apply {
+            setSpan(ForegroundColorSpan(primaryColor), 0, 3, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+            setSpan(StyleSpan(Typeface.BOLD), 0, 3, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+            setSpan(ForegroundColorSpan(blueColor), 4, length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+            setSpan(StyleSpan(Typeface.BOLD), 4, length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+        }
+
+        binding.totalBudgetedTextView.text = budgetedText
+        binding.totalSpentTextView.text = spentText
+    }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private fun onBudgetClicked(budget: Budget) {
         // TODO: Navigate to budget report or details
         findNavController().navigate(R.id.action_budgetMainFragment_to_budgetReportFragment)
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
