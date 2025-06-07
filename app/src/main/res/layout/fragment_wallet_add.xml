@@ -140,7 +140,7 @@
                                 android:inputType="text"
                                 android:textColor="?attr/bb_primaryText"
                                 android:textColorHint="?attr/bb_secondaryText"
-                                android:textSize="32sp" />
+                                android:textSize="20sp" />
                         </LinearLayout>
                     </LinearLayout>
 
@@ -159,59 +159,75 @@
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:padding="16dp">
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginTop="16dp">
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Amount"
-                            android:textColor="?attr/bb_secondaryText"
-                            android:textSize="14sp" />
+                        <ImageView
+                            style="@style/RowIconStyle"
+                            android:src="@drawable/ic_money_24"
+                            app:tint="?attr/bb_accent" />
 
                         <LinearLayout
-                            android:layout_width="match_parent"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="8dp"
-                            android:gravity="center_vertical"
-                            android:orientation="horizontal">
+                            android:layout_weight="1"
+                            android:layout_marginStart="12dp"
+                            android:orientation="vertical">
 
-                            <Spinner
-                                android:id="@+id/spinnerCurrency"
+                            <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:background="@null"
-                                android:minWidth="80dp"
-                                android:spinnerMode="dropdown" />
+                                android:text="Amount"
+                                android:textColor="?attr/bb_secondaryText"
+                                android:textSize="14sp" />
 
-                            <EditText
-                                android:id="@+id/edtTextAmount"
-                                android:layout_width="0dp"
+                            <LinearLayout
+                                android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:background="@null"
-                                android:hint="0.00"
-                                android:inputType="numberDecimal"
-                                android:textColor="?attr/bb_primaryText"
-                                android:textColorHint="?attr/bb_secondaryText"
-                                android:textSize="32sp" />
-                        </LinearLayout>
+                                android:layout_marginTop="4dp"
+                                android:orientation="horizontal"
+                                android:gravity="center_vertical">
 
-                        <!-- Error for amount selection -->
-                        <TextView
-                            android:id="@+id/textInitialAmountError"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textColor="@android:color/holo_red_light"
-                            android:textSize="12sp"
-                            android:visibility="gone"
-                            android:layout_marginStart="82dp"
-                            android:layout_marginTop="0dp"/>
+                                <Spinner
+                                    android:id="@+id/spinnerCurrency"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:background="@null"
+                                    android:minWidth="80dp"
+                                    android:spinnerMode="dropdown" />
+
+                                <EditText
+                                    android:id="@+id/edtTextAmount"
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:layout_marginStart="8dp"
+                                    android:background="@null"
+                                    android:hint="0.00"
+                                    android:inputType="numberDecimal"
+                                    android:textColor="?attr/bb_primaryText"
+                                    android:textColorHint="?attr/bb_secondaryText"
+                                    android:textSize="20sp" />
+                            </LinearLayout>
+                        </LinearLayout>
                     </LinearLayout>
+
+                    <!-- Error for amount -->
+                    <TextView
+                        android:id="@+id/textAmountError"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="60dp"
+                        android:layout_marginTop="4dp"
+                        android:textColor="@android:color/holo_red_light"
+                        android:textSize="12sp"
+                        android:visibility="gone"/>
+
 
                     <!-- Error for initial amount -->
                     <TextView
-                        android:id="@+id/textAmountError"
+                        android:id="@+id/textinitAmountError"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textColor="@android:color/holo_red_light"
@@ -220,6 +236,7 @@
                         android:layout_marginStart="60dp"
                         android:layout_marginTop="4dp"/>
                 </LinearLayout>
+
             </com.google.android.material.card.MaterialCardView>
 
             <!-- Spending Goals Card -->
@@ -273,7 +290,7 @@
                                 android:inputType="numberDecimal"
                                 android:textColor="?attr/bb_primaryText"
                                 android:textColorHint="?attr/bb_secondaryText"
-                                android:textSize="32sp" />
+                                android:textSize="20sp" />
                         </LinearLayout>
                     </LinearLayout>
 
@@ -325,7 +342,7 @@
                                 android:inputType="numberDecimal"
                                 android:textColor="?attr/bb_primaryText"
                                 android:textColorHint="?attr/bb_secondaryText"
-                                android:textSize="32sp" />
+                                android:textSize="20sp" />
                         </LinearLayout>
                     </LinearLayout>
 

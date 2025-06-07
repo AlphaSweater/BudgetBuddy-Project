@@ -177,10 +177,10 @@ class WalletAddFragment : Fragment() {
                 visibility = if (state.shouldShowErrors && state.walletAmountError != null) View.VISIBLE else View.GONE
             }
 
-            textCurrencyError.apply {
-                text = state.walletCurrencyError
-                visibility = if (state.shouldShowErrors && state.walletCurrencyError != null) View.VISIBLE else View.GONE
-            }
+//            textCurrencyError.apply {
+//                text = state.walletCurrencyError
+//                visibility = if (state.shouldShowErrors && state.walletCurrencyError != null) View.VISIBLE else View.GONE
+//            }
         }
     }
 
