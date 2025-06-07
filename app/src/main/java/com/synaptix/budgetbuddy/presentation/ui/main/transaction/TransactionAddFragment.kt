@@ -121,36 +121,120 @@ class TransactionAddFragment : Fragment() {
     private fun applyScreenMode(mode: ScreenMode) {
         when (mode) {
             ScreenMode.VIEW -> {
+                // Show edit button, hide other action buttons
+                binding.btnEdit.visibility = View.VISIBLE
                 binding.btnSave.visibility = View.GONE
                 binding.btnClear.visibility = View.GONE
 
-                // Disable inputs
-                binding.edtTextAmount.isEnabled = false
-                binding.edtTextNote.isEnabled = false
-                binding.spinnerCurrency.isEnabled = false
-                binding.rowSelectCategory.isEnabled = false
-                binding.rowSelectWallet.isEnabled = false
-                binding.rowSelectLabels.isEnabled = false
-                binding.rowSelectDate.isEnabled = false
-                binding.rowSelectRecurrenceRate.isEnabled = false
-                binding.rowSelectPhoto.isEnabled = false
-                binding.btnRemovePhoto.visibility = View.GONE
+                // Disable all interactive elements
+                binding.apply {
+                    // Disable amount input
+                    edtTextAmount.isEnabled = false
+                    spinnerCurrency.isEnabled = false
+                    
+                    // Disable note input
+                    edtTextNote.isEnabled = false
+                    
+                    // Disable selection rows
+                    rowSelectCategory.isEnabled = false
+                    rowSelectWallet.isEnabled = false
+                    rowSelectLabels.isEnabled = false
+                    rowSelectDate.isEnabled = false
+                    rowSelectRecurrenceRate.isEnabled = false
+                    rowSelectPhoto.isEnabled = false
+                    
+                    // Hide photo removal button
+                    btnRemovePhoto.visibility = View.GONE
+                    
+                    // Remove click listeners
+                    rowSelectCategory.setOnClickListener(null)
+                    rowSelectWallet.setOnClickListener(null)
+                    rowSelectLabels.setOnClickListener(null)
+                    rowSelectDate.setOnClickListener(null)
+                    rowSelectRecurrenceRate.setOnClickListener(null)
+                    rowSelectPhoto.setOnClickListener(null)
+                }
             }
 
             ScreenMode.EDIT -> {
-                binding.btnSave.text = "Update"
-                binding.btnSave.visibility = View.VISIBLE
+                // Hide edit button, show update button
+                binding.btnEdit.visibility = View.GONE
+                binding.btnSave.apply {
+                    text = "Update"
+                    visibility = View.VISIBLE
+                }
                 binding.btnClear.visibility = View.GONE
+
+                // Enable all interactive elements
+                binding.apply {
+                    edtTextAmount.isEnabled = true
+                    spinnerCurrency.isEnabled = true
+                    edtTextNote.isEnabled = true
+                    rowSelectCategory.isEnabled = true
+                    rowSelectWallet.isEnabled = true
+                    rowSelectLabels.isEnabled = true
+                    rowSelectDate.isEnabled = true
+                    rowSelectRecurrenceRate.isEnabled = true
+                    rowSelectPhoto.isEnabled = true
+                }
+
+                // Restore click listeners
+                setupClickListeners()
             }
 
             ScreenMode.CREATE -> {
-                binding.btnSave.text = "Save"
-                binding.btnSave.visibility = View.VISIBLE
+                // Hide edit button, show save and clear buttons
+                binding.btnEdit.visibility = View.GONE
+                binding.btnSave.apply {
+                    text = "Save"
+                    visibility = View.VISIBLE
+                }
                 binding.btnClear.visibility = View.VISIBLE
+
+                // Enable all interactive elements
+                binding.apply {
+                    edtTextAmount.isEnabled = true
+                    spinnerCurrency.isEnabled = true
+                    edtTextNote.isEnabled = true
+                    rowSelectCategory.isEnabled = true
+                    rowSelectWallet.isEnabled = true
+                    rowSelectLabels.isEnabled = true
+                    rowSelectDate.isEnabled = true
+                    rowSelectRecurrenceRate.isEnabled = true
+                    rowSelectPhoto.isEnabled = true
+                }
+
+                // Restore click listeners
+                setupClickListeners()
             }
         }
     }
 
+    // New function to populate fields in edit mode
+    private fun populateFieldsForEdit(transaction: Transaction) {
+        binding.apply {
+            // Set amount and currency
+            edtTextAmount.setText(transaction.amount.toString())
+            spinnerCurrency.setSelection(0) // Assuming ZAR is the only currency for now
+
+            // Set note
+            edtTextNote.setText(transaction.note)
+
+            // Set date
+            val date = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+                .format(Date(transaction.date))
+            textSelectedDate.text = date
+
+            // Show image if exists
+            transaction.photoUrl?.let { url ->
+                // TODO: Load image from URL and show in imagePreview
+                imagePreviewContainer.visibility = View.VISIBLE
+            }
+
+            // Update category, wallet, labels, and recurrence data
+            // These will be handled by the ViewModel observers
+        }
+    }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     //Handles the setup of the currency spinner.
@@ -175,6 +259,10 @@ class TransactionAddFragment : Fragment() {
 
             btnClear.setOnClickListener {
                 reset()
+            }
+
+            btnEdit.setOnClickListener {
+                viewModel.setScreenMode(ScreenMode.EDIT, viewModel.transaction.value)
             }
 
             rowSelectCategory.setOnClickListener {
@@ -474,6 +562,13 @@ class TransactionAddFragment : Fragment() {
                 launch {
                     viewModel.validationState.collect { state ->
                         handleValidationState(state)
+                    }
+                }
+
+                // Collect transaction data for edit/view mode
+                launch {
+                    viewModel.transaction.collect { transaction ->
+                        transaction?.let { populateFieldsForEdit(it) }
                     }
                 }
 

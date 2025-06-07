@@ -65,6 +65,17 @@
                     android:text="@string/add_new_transaction" />
 
                 <ImageButton
+                    android:id="@+id/btnEdit"
+                    style="@style/ToolButtonIcon"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="Edit transaction"
+                    android:src="@drawable/ic_ui_edit"
+                    android:visibility="gone"
+                    app:tint="?attr/bb_primaryText" />
+
+                <ImageButton
                     android:id="@+id/btnClear"
                     style="@style/ToolButtonIcon"
                     android:layout_width="48dp"

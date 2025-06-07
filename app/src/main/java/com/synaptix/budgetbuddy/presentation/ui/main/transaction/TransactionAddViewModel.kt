@@ -64,11 +64,34 @@ class TransactionAddViewModel @Inject constructor(
     private val _screenMode = MutableStateFlow<ScreenMode>(ScreenMode.CREATE)
     val screenMode: StateFlow<ScreenMode> = _screenMode
 
-    fun setScreenMode(mode: ScreenMode) {
+    private val _transaction = MutableStateFlow<Transaction?>(null)
+    val transaction: StateFlow<Transaction?> = _transaction
+
+    fun setScreenMode(mode: ScreenMode, transaction: Transaction? = null) {
         _screenMode.value = mode
-        if (mode == ScreenMode.CREATE) {
-            reset()
+        _transaction.value = transaction
+        
+        when (mode) {
+            ScreenMode.VIEW, ScreenMode.EDIT -> {
+                transaction?.let { populateTransactionData(it) }
+            }
+            ScreenMode.CREATE -> {
+                reset()
+            }
         }
+    }
+
+    private fun populateTransactionData(transaction: Transaction) {
+        _amount.value = transaction.amount
+        _currency.value = transaction.currency
+        _note.value = transaction.note
+        _date.value = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+            .format(Date(transaction.date))
+        _category.value = transaction.category
+        _wallet.value = transaction.wallet
+        _selectedLabels.value = transaction.labels
+        _recurrenceData.value = transaction.recurrenceData
+        // Note: Image handling will be done separately
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
