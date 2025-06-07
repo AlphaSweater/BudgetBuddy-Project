@@ -111,7 +111,7 @@ class TransactionSelectLabelFragment : Fragment() {
             binding.createNewLabelContainer.visibility = if (query.isNotEmpty() && !hasExactMatch) View.VISIBLE else View.GONE
             
             // Update create new label text
-            binding.textCreateNew.text = "Create \"$query\""
+            binding.textCreateNew.text = "Create new label \"$query\""
             
             binding.noLabelsContainer.visibility = View.GONE
         }

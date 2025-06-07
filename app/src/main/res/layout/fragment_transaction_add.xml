@@ -71,7 +71,7 @@
                     android:layout_height="48dp"
                     android:background="?attr/selectableItemBackgroundBorderless"
                     android:contentDescription="Edit transaction"
-                    android:src="@drawable/ic_ui_edit"
+                    android:src="@drawable/ic_ui_pencil"
                     android:visibility="gone"
                     app:tint="?attr/bb_primaryText" />
 
@@ -368,7 +368,7 @@
 
                         <ImageView
                             style="@style/RowIconStyle"
-                            android:src="@drawable/ic_add_circle_40"
+                            android:src="@drawable/ic_ui_labels"
                             app:tint="?attr/bb_accent" />
 
                         <LinearLayout
