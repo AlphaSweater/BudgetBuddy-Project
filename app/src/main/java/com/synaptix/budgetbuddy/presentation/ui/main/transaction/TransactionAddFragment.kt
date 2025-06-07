@@ -60,7 +60,6 @@ class TransactionAddFragment : Fragment() {
     private lateinit var takePictureLauncher: ActivityResultLauncher<Uri>
     private lateinit var pickImageLauncher: ActivityResultLauncher<String>
     private var tempImageUri: Uri? = null
-    private var isUpdatingAmount = false
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     // Fragment Lifecycle
@@ -83,10 +82,12 @@ class TransactionAddFragment : Fragment() {
         val screenMode = arguments?.getSerializable("screenMode") as? ScreenMode ?: ScreenMode.CREATE
         transactionAddViewModel.setScreenMode(screenMode)
         applyScreenMode(transactionAddViewModel.screenMode.value)
+        populateInitialFormValues()
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
+        reset()
         _binding = null
     }
 
@@ -116,7 +117,7 @@ class TransactionAddFragment : Fragment() {
     }
 
     private fun setupAmountWatcher() {
-        var current = ""
+        var current = transactionAddViewModel.amount.value.toString()
 
         binding.edtTextAmount.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
@@ -185,6 +186,26 @@ class TransactionAddFragment : Fragment() {
         }
     }
 
+    private fun populateInitialFormValues() {
+        val amount = transactionAddViewModel.amount.value ?: 0.0
+        val note = transactionAddViewModel.note.value.orEmpty()
+
+        // Format the amount without triggering the TextWatcher
+        val formattedAmount = if (amount == 0.0) "" else DecimalFormat("#,##0.00").format(amount)
+
+        // Set values manually
+        binding.edtTextAmount.setText(formattedAmount)
+        binding.edtTextNote.setText(note)
+
+        // Re-attach TextWatchers
+        setupAmountWatcher()
+        setupNoteWatcher()
+
+        // Update appearance
+        updateAmountAppearance(amount)
+    }
+
+
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     // Screen Mode Handling
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
@@ -204,6 +225,7 @@ class TransactionAddFragment : Fragment() {
 
             disableAllInteractiveElements()
         }
+
     }
 
     private fun applyEditMode() {
@@ -278,7 +300,6 @@ class TransactionAddFragment : Fragment() {
     private fun setupClickListeners() {
         with(binding) {
             btnGoBack.setOnClickListener {
-                transactionAddViewModel.reset()
                 findNavController().popBackStack()
             }
 
@@ -431,27 +452,6 @@ class TransactionAddFragment : Fragment() {
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     // UI Update Methods
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-    private fun updateSelectedLabels(labels: List<Label>) {
-        binding.chipGroupLabels.removeAllViews()
-        
-        if (labels.isEmpty()) {
-            binding.textSelectedLabels.visibility = View.VISIBLE
-        } else {
-            binding.textSelectedLabels.visibility = View.GONE
-            
-            labels.forEach { label ->
-                val chip = com.google.android.material.chip.Chip(requireContext()).apply {
-                    text = label.name
-                    isCloseIconVisible = true
-                    setOnCloseIconClickListener {
-                        transactionAddViewModel.removeLabel(label)
-                    }
-                }
-                binding.chipGroupLabels.addView(chip)
-            }
-        }
-        updateLabelsAppearance(labels)
-    }
 
     private fun updateSelectedCategory(category: Category?) {
         if (category == null) {
@@ -479,6 +479,28 @@ class TransactionAddFragment : Fragment() {
             binding.textSelectedDate.text = date
         }
         updateDateAppearance(date)
+    }
+
+    private fun updateSelectedLabels(labels: List<Label>) {
+        binding.chipGroupLabels.removeAllViews()
+
+        if (labels.isEmpty()) {
+            binding.textSelectedLabels.visibility = View.VISIBLE
+        } else {
+            binding.textSelectedLabels.visibility = View.GONE
+
+            labels.forEach { label ->
+                val chip = com.google.android.material.chip.Chip(requireContext()).apply {
+                    text = label.name
+                    isCloseIconVisible = true
+                    setOnCloseIconClickListener {
+                        transactionAddViewModel.removeLabel(label)
+                    }
+                }
+                binding.chipGroupLabels.addView(chip)
+            }
+        }
+        updateLabelsAppearance(labels)
     }
 
     private fun updateSelectedRecurrence(recurrence: RecurrenceData) {
