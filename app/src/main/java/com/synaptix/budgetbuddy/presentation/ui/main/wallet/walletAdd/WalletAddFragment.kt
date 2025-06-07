@@ -92,7 +92,7 @@ class WalletAddFragment : Fragment() {
                 viewModel.setWalletName(text.toString())
             }
 
-            binding.edtInitialAmount.doAfterTextChanged { text ->
+            binding.edtTextAmount.doAfterTextChanged { text ->
                 viewModel.setWalletAmount(text.toString())
             }
         }
@@ -103,7 +103,7 @@ class WalletAddFragment : Fragment() {
         val walletName = binding.edtWalletName.text.toString()
         viewModel.setWalletName(walletName)
 
-        val walletAmount = binding.edtInitialAmount.text.toString()
+        val walletAmount = binding.edtTextAmount.text.toString()
         viewModel.setWalletAmount(walletAmount)
 
         val walletCurrency = binding.spinnerCurrency.selectedItem.toString()
@@ -177,10 +177,10 @@ class WalletAddFragment : Fragment() {
                 visibility = if (state.shouldShowErrors && state.walletAmountError != null) View.VISIBLE else View.GONE
             }
 
-            textCurrencyError.apply {
-                text = state.walletCurrencyError
-                visibility = if (state.shouldShowErrors && state.walletCurrencyError != null) View.VISIBLE else View.GONE
-            }
+//            textCurrencyError.apply {
+//                text = state.walletCurrencyError
+//                visibility = if (state.shouldShowErrors && state.walletCurrencyError != null) View.VISIBLE else View.GONE
+//            }
         }
     }
 
