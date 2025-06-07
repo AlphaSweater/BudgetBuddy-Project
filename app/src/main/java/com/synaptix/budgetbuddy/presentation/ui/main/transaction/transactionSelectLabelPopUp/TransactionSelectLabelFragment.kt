@@ -124,7 +124,7 @@ class TransactionSelectLabelFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             labelViewModel.loadLabelsForUser()
             labelViewModel.filteredLabels.collectLatest { labels ->
-                val selectedLabels = sharedViewModel.selectedLabels.value ?: emptyList()
+                val selectedLabels = sharedViewModel.selectedLabels.value
                 labelAdapter.submitList(labels, selectedLabels)
                 
                 // Show/hide no labels state
