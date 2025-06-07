@@ -332,22 +332,13 @@
                             android:background="?attr/selectableItemBackgroundBorderless">
 
                             <ImageView
-                                android:id="@+id/minIcon"
-                                android:layout_width="32dp"
-                                android:layout_height="32dp"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
                                 android:layout_gravity="center"
-                                android:src="@drawable/ic_wallet_24"
+                                android:src="@drawable/ic_ui_minimum"
                                 app:tint="?attr/bb_button" />
 
-                            <ImageView
-                                android:id="@+id/minEdit"
-                                android:layout_width="20dp"
-                                android:layout_height="20dp"
-                                android:layout_gravity="bottom|end"
-                                android:layout_marginEnd="-2dp"
-                                android:layout_marginBottom="-2dp"
-                                android:src="@drawable/ic_edit_24"
-                                app:tint="?attr/bb_button" />
+
                         </FrameLayout>
 
                         <LinearLayout
@@ -415,7 +406,7 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
                                 android:layout_gravity="center"
-                                android:src="@drawable/ic_edit_note_24"
+                                android:src="@drawable/ic_ui_maximum"
                                 app:tint="?attr/bb_button" />
                         </FrameLayout>
 
