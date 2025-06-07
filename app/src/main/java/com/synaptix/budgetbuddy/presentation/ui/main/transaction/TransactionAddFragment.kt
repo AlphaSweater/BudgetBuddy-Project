@@ -55,6 +55,7 @@ class TransactionAddFragment : Fragment() {
     private lateinit var takePictureLauncher: ActivityResultLauncher<Uri>
     private lateinit var pickImageLauncher: ActivityResultLauncher<String>
     private var tempImageUri: Uri? = null
+    private var isUpdatingAmount = false
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     // Fragment Lifecycle
@@ -413,6 +414,7 @@ class TransactionAddFragment : Fragment() {
             binding.imgSelectedCategoryIcon.setImageResource(category.icon)
         }
         updateCategoryAppearance(category)
+        updateAmountAppearance(transactionAddViewModel.amount.value)
     }
 
     private fun updateSelectedWallet(wallet: Wallet?) {
@@ -541,28 +543,40 @@ class TransactionAddFragment : Fragment() {
     }
 
     private fun updateAmountAppearance(amount: Double?) {
-        binding.edtTextAmount.apply {
-            setText(formatAmount(amount))
-            // Set text color based on amount
-            setTextColor(
+        val category = transactionAddViewModel.category.value
+        binding.apply {
+            // Update amount field color
+            edtTextAmount.setTextColor(
                 when {
-                    amount == null || amount == 0.0 -> requireContext().getThemeColor(R.attr.bb_secondaryText)
-                    amount > 0 -> requireContext().getColor(R.color.profit_green)
-                    else -> requireContext().getColor(R.color.expense_red)
+                    category == null -> requireContext().getThemeColor(R.attr.bb_primaryText)
+                    category.type == "expense" -> requireContext().getColor(R.color.expense_red)
+                    category.type == "income" -> requireContext().getColor(R.color.profit_green)
+                    else -> requireContext().getThemeColor(R.attr.bb_primaryText)
                 }
             )
+
+            // Update sign visibility and text
+            textAmountSign.apply {
+                visibility = if (category != null && amount != null && amount != 0.0) View.VISIBLE else View.GONE
+                text = when (category?.type) {
+                    "expense" -> "-"
+                    "income" -> "+"
+                    else -> ""
+                }
+                setTextColor(
+                    when (category?.type) {
+                        "expense" -> requireContext().getColor(R.color.expense_red)
+                        "income" -> requireContext().getColor(R.color.profit_green)
+                        else -> requireContext().getThemeColor(R.attr.bb_primaryText)
+                    }
+                )
+            }
         }
     }
 
     private fun formatDate(date: Long): String {
         return SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
             .format(Date(date))
-    }
-
-    private fun formatCurrency(amount: Double?, currency: String): String {
-        return amount?.let {
-            "$currency ${formatAmount(it)}"
-        } ?: "$currency 0.00"
     }
 
     private fun updateCategoryAppearance(category: Category?) {
@@ -623,6 +637,19 @@ class TransactionAddFragment : Fragment() {
                 }
             )
         }
+    }
+
+    private fun getDisplayAmount(amount: Double?, category: Category?): String {
+        if (category == null) return formatAmount(amount)
+        
+        return amount?.let {
+            val formattedAmount = formatAmount(it)
+            when (category.type) {
+                "expense" -> "-$formattedAmount"
+                "income" -> "+$formattedAmount"
+                else -> formattedAmount
+            }
+        } ?: "0.00"
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
