@@ -21,6 +21,9 @@ import kotlinx.coroutines.launch
 @AndroidEntryPoint
 class TransactionSelectLabelFragment : Fragment() {
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // Properties
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private var _binding: FragmentTransactionSelectLabelBinding? = null
     private val binding get() = _binding!!
 
@@ -35,6 +38,9 @@ class TransactionSelectLabelFragment : Fragment() {
         )
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // Fragment Lifecycle
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -46,10 +52,22 @@ class TransactionSelectLabelFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        setupViews()
+        observeLabels()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // Initial Setup Methods
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    private fun setupViews() {
         setupRecyclerView()
         setupClickListeners()
         setupSearch()
-        observeLabels()
     }
 
     private fun setupRecyclerView() {
@@ -75,8 +93,7 @@ class TransactionSelectLabelFragment : Fragment() {
 
         binding.createNewLabelContainer.setOnClickListener {
             val searchQuery = binding.searchEditText.text?.toString() ?: ""
-            // TODO: Implement create new label functionality
-            // This will be implemented by you
+            handleCreateNewLabel(searchQuery)
         }
     }
 
@@ -85,8 +102,13 @@ class TransactionSelectLabelFragment : Fragment() {
             val query = text?.toString() ?: ""
             labelViewModel.filterLabels(query)
             
+            // Check if there's an exact match with any existing label
+            val hasExactMatch = labelViewModel.filteredLabels.value.any { 
+                it.name.equals(query, ignoreCase = true) 
+            }
+            
             // Show/hide create new label option
-            binding.createNewLabelContainer.visibility = if (query.isNotEmpty()) View.VISIBLE else View.GONE
+            binding.createNewLabelContainer.visibility = if (query.isNotEmpty() && !hasExactMatch) View.VISIBLE else View.GONE
             
             // Update create new label text
             binding.textCreateNew.text = "Create \"$query\""
@@ -95,6 +117,9 @@ class TransactionSelectLabelFragment : Fragment() {
         }
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // ViewModel Observers
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private fun observeLabels() {
         viewLifecycleOwner.lifecycleScope.launch {
             labelViewModel.loadLabelsForUser()
@@ -109,8 +134,20 @@ class TransactionSelectLabelFragment : Fragment() {
         }
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // Label Creation Methods
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    private fun handleCreateNewLabel(name: String) {
+        if (labelViewModel.validateLabelName(name)) {
+            labelViewModel.createNewLabel(name)
+            // Clear the search field after creating
+            binding.searchEditText.setText("")
+        } else {
+            showError("Invalid label name. Please try again.")
+        }
+    }
+
+    private fun showError(message: String) {
+        // TODO: Implement error display (e.g., Snackbar)
     }
 }

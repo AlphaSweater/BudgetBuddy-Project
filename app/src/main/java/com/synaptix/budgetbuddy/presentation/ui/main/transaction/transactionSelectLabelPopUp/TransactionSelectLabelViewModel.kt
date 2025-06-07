@@ -19,6 +19,9 @@ class TransactionSelectLabelViewModel @Inject constructor(
     private val getUserIdUseCase: GetUserIdUseCase
 ) : ViewModel() {
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // State Properties
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private val _labels = MutableStateFlow<List<Label>>(emptyList())
     val labels: StateFlow<List<Label>> = _labels
 
@@ -27,6 +30,9 @@ class TransactionSelectLabelViewModel @Inject constructor(
 
     private var searchQuery: String = ""
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // Data Loading Methods
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     fun loadLabelsForUser() {
         viewModelScope.launch {
             val userId = getUserIdUseCase.execute()
@@ -42,6 +48,9 @@ class TransactionSelectLabelViewModel @Inject constructor(
         }
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // Label Management Methods
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     fun filterLabels(query: String = searchQuery) {
         searchQuery = query
         _filteredLabels.value = if (query.isEmpty()) {
@@ -60,5 +69,26 @@ class TransactionSelectLabelViewModel @Inject constructor(
             }
         }
         filterLabels()
+    }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // Label Creation Methods
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    fun createNewLabel(name: String) {
+        viewModelScope.launch {
+            try {
+                // TODO: Implement your database logic here
+                // After successful creation, reload the labels
+                loadLabelsForUser()
+            } catch (e: Exception) {
+                // TODO: Handle error case
+            }
+        }
+    }
+
+    fun validateLabelName(name: String): Boolean {
+        return name.isNotBlank() && 
+               name.length <= 50 && // Adjust max length as needed
+               !_labels.value.any { it.name.equals(name, ignoreCase = true) }
     }
 }
