@@ -576,7 +576,8 @@
         android:layout_gravity="bottom"
         android:background="?attr/bb_background"
         android:elevation="8dp"
-        android:padding="16dp">
+        android:padding="16dp"
+        android:visibility="gone">
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnSave"

@@ -221,6 +221,8 @@ class TransactionAddFragment : Fragment() {
             btnEdit.visibility = View.VISIBLE
             btnClear.visibility = View.GONE
             btnSave.visibility = View.GONE
+            bottomButtonContainer.visibility = View.GONE
+            toolbarTitle.text = "Transaction Details"
 
             disableAllInteractiveElements()
         }
@@ -234,6 +236,8 @@ class TransactionAddFragment : Fragment() {
                 text = "Update"
                 visibility = View.VISIBLE
             }
+            bottomButtonContainer.visibility = View.VISIBLE
+            toolbarTitle.text = "Edit Transaction"
 
             enableAllInteractiveElements()
             btnRemovePhoto.visibility = if (transactionAddViewModel.imageBytes.value != null) View.VISIBLE else View.GONE
@@ -249,6 +253,8 @@ class TransactionAddFragment : Fragment() {
                 text = "Save"
                 visibility = View.VISIBLE
             }
+            bottomButtonContainer.visibility = View.VISIBLE
+            toolbarTitle.text = "Add New Transaction"
 
             enableAllInteractiveElements()
             btnRemovePhoto.visibility = if (transactionAddViewModel.imageBytes.value != null) View.VISIBLE else View.GONE
