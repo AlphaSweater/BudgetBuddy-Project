@@ -32,6 +32,9 @@ data class Category(
     val type: String,  // Income or Expense
     val icon: Int,     // Resource ID for the category icon
     val color: Int,     // Resource ID or color integer for display
+
+    // Not Mapped
+    var isSelected: Boolean = false
 ) : Entity {
     companion object {
         fun new(

@@ -1,0 +1,298 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/rootLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/bb_background">
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/cardViewGoals"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="24dp"
+        app:cardBackgroundColor="?attr/bb_surface"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="0dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <!-- Heading App Bar -->
+            <com.google.android.material.appbar.AppBarLayout
+                android:id="@+id/appBarLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@android:color/transparent"
+                app:elevation="0dp">
+
+                <androidx.appcompat.widget.Toolbar
+                    android:id="@+id/toolbar"
+                    android:layout_width="match_parent"
+                    android:layout_height="?attr/actionBarSize"
+                    android:background="@android:color/transparent">
+
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
+
+                        <!-- Back Button aligned to start -->
+                        <ImageButton
+                            android:id="@+id/btnGoBack"
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            android:layout_gravity="start|center_vertical"
+                            android:background="?attr/selectableItemBackgroundBorderless"
+                            android:contentDescription="@string/back"
+                            android:src="?attr/actionModeCloseDrawable"
+                            app:tint="?attr/bb_primaryText" />
+
+                        <!-- Centered Heading -->
+                        <TextView
+                            android:id="@+id/txtTitle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:text="Monthly Goals"
+                            android:textColor="?attr/bb_primaryText"
+                            android:textSize="20sp"
+                            android:textStyle="bold" />
+                    </FrameLayout>
+                </androidx.appcompat.widget.Toolbar>
+            </com.google.android.material.appbar.AppBarLayout>
+
+
+            <!-- Category Select Row -->
+            <LinearLayout
+                android:id="@+id/rowSelectCategory"
+                style="@style/RowStyle"
+                android:padding="16dp"
+                android:gravity="center_vertical"
+                android:minHeight="72dp">
+
+                <FrameLayout
+                    android:id="@+id/btnCategoryIcon"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:background="?attr/selectableItemBackgroundBorderless">
+
+                    <ImageView
+                        android:id="@+id/ivWalletIcon"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="center"
+                        android:src="@drawable/ic_circle_24"
+                        app:tint="?attr/bb_button" />
+                </FrameLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="16dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Category"
+                        android:textColor="?attr/bb_secondaryText"
+                        android:textSize="14sp" />
+
+                    <EditText
+                        android:id="@+id/edtCategory"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@null"
+                        android:hint="Select Category"
+                        android:inputType="text"
+                        android:textColor="?attr/bb_primaryText"
+                        android:textColorHint="?attr/bb_secondaryText"
+                        android:textSize="16sp"
+                        android:minHeight="40dp"
+                        android:gravity="center_vertical"
+                        android:paddingVertical="4dp" />
+
+                    <!-- Error for category -->
+                    <TextView
+                        android:id="@+id/textCategoryError"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@android:color/holo_red_light"
+                        android:textSize="12sp"
+                        android:visibility="gone"
+                        android:layout_marginStart="0dp"
+                        android:layout_marginTop="0dp"/>
+                </LinearLayout>
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginHorizontal="16dp"
+                android:background="?attr/bb_secondaryText" />
+
+            <!-- Minimum Amount Row -->
+            <LinearLayout
+                android:id="@+id/rowMinimumAmount"
+                style="@style/RowStyle"
+                android:padding="16dp"
+                android:gravity="center_vertical"
+                android:minHeight="72dp">
+
+                <FrameLayout
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:background="?attr/selectableItemBackgroundBorderless">
+
+                    <ImageView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="center"
+                        android:src="@drawable/ic_ui_notebook"
+                        app:tint="?attr/bb_button" />
+                </FrameLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Minimum Amount"
+                        android:textColor="?attr/bb_secondaryText"
+                        android:textSize="14sp" />
+
+                    <EditText
+                        android:id="@+id/edtMinimumAmount"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@null"
+                        android:hint="0.00"
+                        android:inputType="numberDecimal"
+                        android:textColor="?attr/bb_primaryText"
+                        android:textColorHint="?attr/bb_secondaryText"
+                        android:textSize="16sp"
+                        android:minHeight="40dp"
+                        android:gravity="center_vertical"
+                        android:paddingVertical="4dp" />
+
+                    <!-- Error for Minimum Amount -->
+                    <TextView
+                        android:id="@+id/textCurrencyError"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@android:color/holo_red_light"
+                        android:textSize="12sp"
+                        android:visibility="gone"
+                        android:layout_marginStart="0dp"
+                        android:layout_marginTop="0dp"/>
+                </LinearLayout>
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginHorizontal="16dp"
+                android:background="?attr/bb_secondaryText" />
+
+            <!-- Max Amount Row -->
+            <LinearLayout
+                android:id="@+id/rowSelectMaxAmount"
+                style="@style/RowStyle"
+                android:padding="16dp"
+                android:gravity="center_vertical"
+                android:minHeight="72dp">
+
+                <FrameLayout
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:background="?attr/selectableItemBackgroundBorderless">
+
+                    <ImageView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="center"
+                        android:src="@drawable/ic_ui_notebook"
+                        app:tint="?attr/bb_button" />
+                </FrameLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Max Amount"
+                        android:textColor="?attr/bb_secondaryText"
+                        android:textSize="14sp" />
+
+                    <EditText
+                        android:id="@+id/edtMaxAmount"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@null"
+                        android:hint="0.00"
+                        android:inputType="numberDecimal"
+                        android:textColor="?attr/bb_primaryText"
+                        android:textColorHint="?attr/bb_secondaryText"
+                        android:textSize="16sp"
+                        android:minHeight="40dp"
+                        android:gravity="center_vertical"
+                        android:paddingVertical="4dp" />
+
+                    <!-- Error for max amount -->
+                    <TextView
+                        android:id="@+id/textAmountError"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@android:color/holo_red_light"
+                        android:textSize="12sp"
+                        android:visibility="gone"
+                        android:layout_marginStart="0dp"
+                        android:layout_marginTop="0dp"/>
+                </LinearLayout>
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginHorizontal="16dp"
+                android:background="?attr/bb_secondaryText" />
+
+            <!-- Save Button -->
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:elevation="8dp"
+                android:padding="16dp">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnSave"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingVertical="16dp"
+                    android:text="@string/save"
+                    android:textColor="@android:color/white"
+                    android:textSize="16sp"
+                    app:backgroundTint="?attr/bb_button"
+                    app:cornerRadius="16dp" />
+            </FrameLayout>
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -909,7 +909,7 @@ class HomeMainFragment : Fragment() {
      * To be implemented when the screen is ready.
      */
     private fun navigateToAllWallets() {
-        // TODO: Implement navigation to all wallets
+        findNavController().navigate(R.id.action_homeFragment_to_walletMainFragment)
     }
 
     /**
@@ -917,7 +917,7 @@ class HomeMainFragment : Fragment() {
      * To be implemented when the screen is ready.
      */
     private fun navigateToAllCategories() {
-        // TODO: Implement navigation to all categories
+        findNavController().navigate(R.id.action_homeFragment_to_generalReportsFragment)
     }
 
     /**
@@ -925,7 +925,7 @@ class HomeMainFragment : Fragment() {
      * Currently navigates to the reports screen.
      */
     private fun navigateToAllTransactions() {
-        findNavController().navigate(R.id.action_homeFragment_to_generalReportsFragment)
+        findNavController().navigate(R.id.action_homeFragment_to_generalTransactionsFragment)
     }
 
     //================================================================================
