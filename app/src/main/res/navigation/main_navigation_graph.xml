@@ -84,6 +84,10 @@
         android:label="Wallet"
         tools:layout="@layout/fragment_wallet_main">
 
+        <argument
+            android:name="walletId"
+            app:argType="string" />
+
         <action
             android:id="@+id/action_walletMainFragment_to_addWalletFragment"
             app:destination="@id/navigation_wallet_add"
