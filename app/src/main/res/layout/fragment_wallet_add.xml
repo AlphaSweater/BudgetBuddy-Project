@@ -27,57 +27,59 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?attr/bb_background">
+    android:background="?attr/bb_background"
+    tools:context=".presentation.ui.main.wallet.WalletAddFragment">
+<!-- Top App Bar -->
+<com.google.android.material.appbar.AppBarLayout
+    android:id="@+id/appBarLayout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@android:color/transparent"
+    app:elevation="0dp">
 
-    <!-- Top App Bar -->
-    <com.google.android.material.appbar.AppBarLayout
-        android:id="@+id/appBarLayout"
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@android:color/transparent"
-        app:elevation="0dp">
+        android:layout_height="?attr/actionBarSize"
+        android:background="@android:color/transparent">
 
-        <androidx.appcompat.widget.Toolbar
-            android:id="@+id/toolbar"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="@android:color/transparent">
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingHorizontal="4dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp">
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:paddingHorizontal="4dp">
+            <ImageButton
+                android:id="@+id/btnGoBack"
+                style="@style/ToolButtonIcon"
+                android:contentDescription="@string/back"
+                android:src="@drawable/ic_ui_arrow_back" />
 
-                <ImageButton
-                    android:id="@+id/btnGoBack"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:contentDescription="@string/back"
-                    android:src="?attr/actionModeCloseDrawable"
-                    app:tint="?attr/bb_primaryText" />
+            <TextView
+                android:id="@+id/toolbarTitle"
+                style="@style/ToolBarTitle"
+                android:text="Add New Wallet" />
 
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Add New Wallet"
-                    android:textColor="?attr/bb_primaryText"
-                    android:textSize="20sp"
-                    android:textStyle="bold" />
-            </LinearLayout>
-        </androidx.appcompat.widget.Toolbar>
-    </com.google.android.material.appbar.AppBarLayout>
+            <ImageButton
+                android:id="@+id/btnClear"
+                style="@style/ToolButtonIcon"
+                android:contentDescription="Clear form"
+                android:src="@drawable/ic_ui_clear" />
+        </LinearLayout>
+    </androidx.appcompat.widget.Toolbar>
+</com.google.android.material.appbar.AppBarLayout>
 
     <!-- Main Content -->
     <androidx.core.widget.NestedScrollView
+        android:id="@+id/contentScrollView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:clipToPadding="false"
         android:fillViewport="true"
-        android:paddingBottom="98dp"
+        android:layout_marginBottom="90dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <LinearLayout
@@ -103,11 +105,10 @@
 
                     <!-- Wallet Name Row -->
                     <LinearLayout
-                        android:id="@+id/rowSelectWalletName"
-                        style="@style/RowStyle"
-                        android:padding="16dp"
-                        android:gravity="center_vertical"
-                        android:minHeight="72dp">
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
 
                         <FrameLayout
                             android:id="@+id/btnWalletEdit"
@@ -116,29 +117,21 @@
                             android:background="?attr/selectableItemBackgroundBorderless">
 
                             <ImageView
-                                android:id="@+id/ivWalletIcon"
-                                android:layout_width="32dp"
-                                android:layout_height="32dp"
-                                android:layout_gravity="center"
+                                style="@style/RowIconStyle"
                                 android:src="@drawable/ic_wallet_24"
-                                app:tint="?attr/bb_button" />
+                                app:tint="?attr/bb_accent" />
 
                             <ImageView
                                 android:id="@+id/ivEdit"
-                                android:layout_width="20dp"
-                                android:layout_height="20dp"
-                                android:layout_gravity="bottom|end"
-                                android:layout_marginEnd="-2dp"
-                                android:layout_marginBottom="-2dp"
-                                android:src="@drawable/ic_edit_24"
-                                app:tint="?attr/bb_button" />
+                                style="@style/EditIconStyle"
+                                android:src="@drawable/ic_edit_24" />
                         </FrameLayout>
 
                         <LinearLayout
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:layout_marginStart="16dp"
+                            android:layout_marginStart="12dp"
                             android:orientation="vertical">
 
                             <TextView
@@ -152,60 +145,45 @@
                                 android:id="@+id/edtWalletName"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
                                 android:background="@null"
                                 android:hint="Enter wallet name"
                                 android:inputType="text"
                                 android:textColor="?attr/bb_primaryText"
                                 android:textColorHint="?attr/bb_secondaryText"
-                                android:textSize="16sp"
-                                android:minHeight="40dp"
-                                android:gravity="center_vertical"
-                                android:paddingVertical="4dp" />
-
-                            <!-- Error for wallet name -->
-                            <TextView
-                                android:id="@+id/textNameError"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:textColor="@android:color/holo_red_light"
-                                android:textSize="12sp"
-                                android:visibility="gone"
-                                android:layout_marginStart="0dp"
-                                android:layout_marginTop="0dp"/>
+                                android:textSize="32sp" />
                         </LinearLayout>
                     </LinearLayout>
 
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:layout_marginHorizontal="16dp"
-                        android:background="?attr/bb_secondaryText" />
+                    <!-- Error for wallet name -->
+                    <TextView
+                        android:id="@+id/textNameError"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@android:color/holo_red_light"
+                        android:textSize="12sp"
+                        android:visibility="gone"
+                        android:layout_marginStart="60dp"
+                        android:layout_marginTop="4dp"/>
 
                     <!-- Currency Row -->
                     <LinearLayout
-                        android:id="@+id/rowSelectCurrency"
-                        style="@style/RowStyle"
-                        android:padding="16dp"
-                        android:gravity="center_vertical"
-                        android:minHeight="72dp">
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
 
-                        <FrameLayout
-                            android:layout_width="48dp"
-                            android:layout_height="48dp"
-                            android:background="?attr/selectableItemBackgroundBorderless">
-
-                            <ImageView
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:layout_gravity="center"
-                                android:src="@drawable/ic_money_24"
-                                app:tint="?attr/bb_button" />
-                        </FrameLayout>
+                        <ImageView
+                            style="@style/RowIconStyle"
+                            android:src="@drawable/ic_ui_currency"
+                            app:tint="?attr/bb_accent" />
 
                         <LinearLayout
-                            android:layout_width="match_parent"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:layout_marginStart="16dp"
+                            android:layout_weight="1"
+                            android:layout_marginStart="12dp"
                             android:orientation="vertical">
 
                             <TextView
@@ -218,54 +196,43 @@
                             <Spinner
                                 android:id="@+id/spinnerCurrency"
                                 android:layout_width="match_parent"
-                                android:layout_height="40dp"
-                                android:background="@null"
-                                android:spinnerMode="dropdown" />
-
-                            <!-- Error for currency -->
-                            <TextView
-                                android:id="@+id/textCurrencyError"
-                                android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:textColor="@android:color/holo_red_light"
-                                android:textSize="12sp"
-                                android:visibility="gone"
-                                android:layout_marginStart="0dp"
-                                android:layout_marginTop="0dp"/>
+                                android:layout_marginTop="4dp"
+                                android:background="@null"
+                                android:minWidth="80dp"
+                                android:spinnerMode="dropdown" />
                         </LinearLayout>
                     </LinearLayout>
 
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:layout_marginHorizontal="16dp"
-                        android:background="?attr/bb_secondaryText" />
+                    <!-- Error for currency -->
+                    <TextView
+                        android:id="@+id/textCurrencyError"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@android:color/holo_red_light"
+                        android:textSize="12sp"
+                        android:visibility="gone"
+                        android:layout_marginStart="60dp"
+                        android:layout_marginTop="4dp"/>
 
                     <!-- Initial Amount Row -->
                     <LinearLayout
-                        android:id="@+id/rowSelectInitialAmount"
-                        style="@style/RowStyle"
-                        android:padding="16dp"
-                        android:gravity="center_vertical"
-                        android:minHeight="72dp">
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
 
-                        <FrameLayout
-                            android:layout_width="48dp"
-                            android:layout_height="48dp"
-                            android:background="?attr/selectableItemBackgroundBorderless">
-
-                            <ImageView
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:layout_gravity="center"
-                                android:src="@drawable/ic_edit_note_24"
-                                app:tint="?attr/bb_button" />
-                        </FrameLayout>
+                        <ImageView
+                            style="@style/RowIconStyle"
+                            android:src="@drawable/ic_ui_amount"
+                            app:tint="?attr/bb_accent" />
 
                         <LinearLayout
-                            android:layout_width="match_parent"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:layout_marginStart="16dp"
+                            android:layout_weight="1"
+                            android:layout_marginStart="12dp"
                             android:orientation="vertical">
 
                             <TextView
@@ -279,30 +246,30 @@
                                 android:id="@+id/edtInitialAmount"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
                                 android:background="@null"
                                 android:hint="0.00"
                                 android:inputType="numberDecimal"
                                 android:textColor="?attr/bb_primaryText"
                                 android:textColorHint="?attr/bb_secondaryText"
-                                android:textSize="16sp"
-                                android:minHeight="40dp"
-                                android:gravity="center_vertical"
-                                android:paddingVertical="4dp" />
-
-                            <!-- Error for initial amount -->
-                            <TextView
-                                android:id="@+id/textAmountError"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:textColor="@android:color/holo_red_light"
-                                android:textSize="12sp"
-                                android:visibility="gone"
-                                android:layout_marginStart="0dp"
-                                android:layout_marginTop="0dp"/>
+                                android:textSize="32sp" />
                         </LinearLayout>
                     </LinearLayout>
+
+                    <!-- Error for initial amount -->
+                    <TextView
+                        android:id="@+id/textAmountError"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@android:color/holo_red_light"
+                        android:textSize="12sp"
+                        android:visibility="gone"
+                        android:layout_marginStart="60dp"
+                        android:layout_marginTop="4dp"/>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
+
+            <!-- Spending Goals Card -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -317,41 +284,29 @@
                     android:orientation="vertical"
                     android:padding="16dp">
 
-                    <!-- Wallet Name Row -->
+                    <!-- Minimum Amount Row -->
                     <LinearLayout
-                        android:id="@+id/rowSelectMinAmount"
-                        style="@style/RowStyle"
-                        android:padding="16dp"
-                        android:gravity="center_vertical"
-                        android:minHeight="72dp">
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
 
-                        <FrameLayout
-                            android:id="@+id/btnMinAmount"
-                            android:layout_width="48dp"
-                            android:layout_height="48dp"
-                            android:background="?attr/selectableItemBackgroundBorderless">
-
-                            <ImageView
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:layout_gravity="center"
-                                android:src="@drawable/ic_ui_minimum"
-                                app:tint="?attr/bb_button" />
-
-
-                        </FrameLayout>
+                        <ImageView
+                            style="@style/RowIconStyle"
+                            android:src="@drawable/ic_ui_minimum"
+                            app:tint="?attr/bb_accent" />
 
                         <LinearLayout
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:layout_marginStart="16dp"
+                            android:layout_marginStart="12dp"
                             android:orientation="vertical">
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Minimum Spening Goal"
+                                android:text="Minimum Spending Goal"
                                 android:textColor="?attr/bb_secondaryText"
                                 android:textSize="14sp" />
 
@@ -359,61 +314,45 @@
                                 android:id="@+id/edtMinAmount"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
                                 android:background="@null"
                                 android:hint="0.00"
                                 android:inputType="numberDecimal"
                                 android:textColor="?attr/bb_primaryText"
                                 android:textColorHint="?attr/bb_secondaryText"
-                                android:textSize="16sp"
-                                android:minHeight="40dp"
-                                android:gravity="center_vertical"
-                                android:paddingVertical="4dp" />
-
-                            <!-- Error for wallet name -->
-                            <TextView
-                                android:id="@+id/textMinAmountError"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:textColor="@android:color/holo_red_light"
-                                android:textSize="12sp"
-                                android:visibility="gone"
-                                android:layout_marginStart="0dp"
-                                android:layout_marginTop="0dp"/>
+                                android:textSize="32sp" />
                         </LinearLayout>
                     </LinearLayout>
 
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:layout_marginHorizontal="16dp"
-                        android:background="?attr/bb_secondaryText" />
+                    <!-- Error for min amount -->
+                    <TextView
+                        android:id="@+id/textMinAmountError"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@android:color/holo_red_light"
+                        android:textSize="12sp"
+                        android:visibility="gone"
+                        android:layout_marginStart="60dp"
+                        android:layout_marginTop="4dp"/>
 
-
-                    <!-- Initial Amount Row -->
+                    <!-- Maximum Amount Row -->
                     <LinearLayout
-                        android:id="@+id/rowSelectMaxAmount"
-                        style="@style/RowStyle"
-                        android:padding="16dp"
-                        android:gravity="center_vertical"
-                        android:minHeight="72dp">
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
 
-                        <FrameLayout
-                            android:layout_width="48dp"
-                            android:layout_height="48dp"
-                            android:background="?attr/selectableItemBackgroundBorderless">
-
-                            <ImageView
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:layout_gravity="center"
-                                android:src="@drawable/ic_ui_maximum"
-                                app:tint="?attr/bb_button" />
-                        </FrameLayout>
+                        <ImageView
+                            style="@style/RowIconStyle"
+                            android:src="@drawable/ic_ui_maximum"
+                            app:tint="?attr/bb_accent" />
 
                         <LinearLayout
-                            android:layout_width="match_parent"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:layout_marginStart="16dp"
+                            android:layout_weight="1"
+                            android:layout_marginStart="12dp"
                             android:orientation="vertical">
 
                             <TextView
@@ -427,28 +366,26 @@
                                 android:id="@+id/edtMaxAmount"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
                                 android:background="@null"
                                 android:hint="0.00"
                                 android:inputType="numberDecimal"
                                 android:textColor="?attr/bb_primaryText"
                                 android:textColorHint="?attr/bb_secondaryText"
-                                android:textSize="16sp"
-                                android:minHeight="40dp"
-                                android:gravity="center_vertical"
-                                android:paddingVertical="4dp" />
-
-                            <!-- Error for initial amount -->
-                            <TextView
-                                android:id="@+id/textMaxAmountError"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:textColor="@android:color/holo_red_light"
-                                android:textSize="12sp"
-                                android:visibility="gone"
-                                android:layout_marginStart="0dp"
-                                android:layout_marginTop="0dp"/>
+                                android:textSize="32sp" />
                         </LinearLayout>
                     </LinearLayout>
+
+                    <!-- Error for max amount -->
+                    <TextView
+                        android:id="@+id/textMaxAmountError"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@android:color/holo_red_light"
+                        android:textSize="12sp"
+                        android:visibility="gone"
+                        android:layout_marginStart="60dp"
+                        android:layout_marginTop="4dp"/>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
@@ -470,13 +407,19 @@
                     <LinearLayout
                         android:id="@+id/rowSelectEnableNotifications"
                         style="@style/RowStyle"
-                        android:padding="16dp">
+                        android:background="?attr/selectableItemBackground">
+
+                        <ImageView
+                            style="@style/RowIconStyle"
+                            android:src="@drawable/ic_ui_notification"
+                            app:tint="?attr/bb_accent" />
 
                         <LinearLayout
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:orientation="vertical">
+                            android:orientation="vertical"
+                            android:layout_marginStart="12dp">
 
                             <TextView
                                 android:layout_width="wrap_content"
@@ -511,13 +454,19 @@
                     <LinearLayout
                         android:id="@+id/rowSelectExcludeTotal"
                         style="@style/RowStyle"
-                        android:padding="16dp">
+                        android:background="?attr/selectableItemBackground">
+
+                        <ImageView
+                            style="@style/RowIconStyle"
+                            android:src="@drawable/ic_ui_hide"
+                            app:tint="?attr/bb_accent" />
 
                         <LinearLayout
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:orientation="vertical">
+                            android:orientation="vertical"
+                            android:layout_marginStart="12dp">
 
                             <TextView
                                 android:layout_width="wrap_content"
@@ -545,8 +494,6 @@
             </com.google.android.material.card.MaterialCardView>
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
-
-    <!-- Bottom Save Button -->
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -566,5 +513,4 @@
             app:backgroundTint="?attr/bb_button"
             app:cornerRadius="16dp" />
     </FrameLayout>
-
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
