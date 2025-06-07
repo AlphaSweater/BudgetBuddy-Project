@@ -110,22 +110,11 @@
                         android:orientation="horizontal"
                         android:gravity="center_vertical">
 
-                        <FrameLayout
-                            android:id="@+id/btnWalletEdit"
-                            android:layout_width="48dp"
-                            android:layout_height="48dp"
-                            android:background="?attr/selectableItemBackgroundBorderless">
-
                             <ImageView
                                 style="@style/RowIconStyle"
                                 android:src="@drawable/ic_wallet_24"
                                 app:tint="?attr/bb_accent" />
 
-                            <ImageView
-                                android:id="@+id/ivEdit"
-                                style="@style/EditIconStyle"
-                                android:src="@drawable/ic_edit_24" />
-                        </FrameLayout>
 
                         <LinearLayout
                             android:layout_width="0dp"
@@ -170,83 +159,36 @@
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical">
+                        android:orientation="vertical"
+                        android:padding="16dp">
 
-                        <ImageView
-                            style="@style/RowIconStyle"
-                            android:src="@drawable/ic_ui_currency"
-                            app:tint="?attr/bb_accent" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Amount"
+                            android:textColor="?attr/bb_secondaryText"
+                            android:textSize="14sp" />
 
                         <LinearLayout
-                            android:layout_width="0dp"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:layout_marginStart="12dp"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Currency"
-                                android:textColor="?attr/bb_secondaryText"
-                                android:textSize="14sp" />
+                            android:layout_marginTop="8dp"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
 
                             <Spinner
                                 android:id="@+id/spinnerCurrency"
-                                android:layout_width="match_parent"
+                                android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="4dp"
                                 android:background="@null"
                                 android:minWidth="80dp"
                                 android:spinnerMode="dropdown" />
-                        </LinearLayout>
-                    </LinearLayout>
-
-                    <!-- Error for currency -->
-                    <TextView
-                        android:id="@+id/textCurrencyError"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textColor="@android:color/holo_red_light"
-                        android:textSize="12sp"
-                        android:visibility="gone"
-                        android:layout_marginStart="60dp"
-                        android:layout_marginTop="4dp"/>
-
-                    <!-- Initial Amount Row -->
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical">
-
-                        <ImageView
-                            style="@style/RowIconStyle"
-                            android:src="@drawable/ic_ui_amount"
-                            app:tint="?attr/bb_accent" />
-
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:layout_marginStart="12dp"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Initial Amount"
-                                android:textColor="?attr/bb_secondaryText"
-                                android:textSize="14sp" />
 
                             <EditText
-                                android:id="@+id/edtInitialAmount"
-                                android:layout_width="match_parent"
+                                android:id="@+id/edtTextAmount"
+                                android:layout_width="0dp"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="4dp"
+                                android:layout_weight="1"
                                 android:background="@null"
                                 android:hint="0.00"
                                 android:inputType="numberDecimal"
@@ -254,6 +196,17 @@
                                 android:textColorHint="?attr/bb_secondaryText"
                                 android:textSize="32sp" />
                         </LinearLayout>
+
+                        <!-- Error for amount selection -->
+                        <TextView
+                            android:id="@+id/textInitialAmountError"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@android:color/holo_red_light"
+                            android:textSize="12sp"
+                            android:visibility="gone"
+                            android:layout_marginStart="82dp"
+                            android:layout_marginTop="0dp"/>
                     </LinearLayout>
 
                     <!-- Error for initial amount -->
@@ -409,11 +362,6 @@
                         style="@style/RowStyle"
                         android:background="?attr/selectableItemBackground">
 
-                        <ImageView
-                            style="@style/RowIconStyle"
-                            android:src="@drawable/ic_ui_notification"
-                            app:tint="?attr/bb_accent" />
-
                         <LinearLayout
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
@@ -455,11 +403,6 @@
                         android:id="@+id/rowSelectExcludeTotal"
                         style="@style/RowStyle"
                         android:background="?attr/selectableItemBackground">
-
-                        <ImageView
-                            style="@style/RowIconStyle"
-                            android:src="@drawable/ic_ui_hide"
-                            app:tint="?attr/bb_accent" />
 
                         <LinearLayout
                             android:layout_width="0dp"
