@@ -42,6 +42,7 @@ class BudgetMainFragment : Fragment() {
         }
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -51,6 +52,7 @@ class BudgetMainFragment : Fragment() {
         return binding.root
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupUI()
@@ -58,11 +60,13 @@ class BudgetMainFragment : Fragment() {
         collectUiState()
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private fun setupUI() {
         setupRecyclerView()
         setupClickListeners()
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private fun setupRecyclerView() {
         binding.recyclerViewBudgetMain.apply {
             layoutManager = LinearLayoutManager(requireContext())
@@ -70,12 +74,14 @@ class BudgetMainFragment : Fragment() {
         }
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private fun setupClickListeners() {
         binding.createBudgetButton.setOnClickListener {
             findNavController().navigate(R.id.action_budgetMainFragment_to_budgetAddFragment)
         }
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private fun collectUiState() {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -113,6 +119,7 @@ class BudgetMainFragment : Fragment() {
         }
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private fun updateSummaryUI(summary: BudgetSummary) {
         val typedValue = TypedValue()
         val theme = requireContext().theme
@@ -148,11 +155,13 @@ class BudgetMainFragment : Fragment() {
         binding.totalSpentTextView.text = spentText
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private fun onBudgetClicked(budget: Budget) {
         // TODO: Navigate to budget report or details
         findNavController().navigate(R.id.action_budgetMainFragment_to_budgetReportFragment)
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null

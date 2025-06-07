@@ -41,6 +41,8 @@ class BudgetMainViewModel @Inject constructor(
         fetchBudgetSummary()
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // Function to fetch budgets and update UI state
     fun fetchBudgets() {
         viewModelScope.launch {
             val userId = getUserIdUseCase.execute()
@@ -70,6 +72,8 @@ class BudgetMainViewModel @Inject constructor(
         }
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // Function to fetch budget summary and update state
     fun fetchBudgetSummary() {
         viewModelScope.launch {
             val userId = getUserIdUseCase.execute()
