@@ -107,54 +107,54 @@
             </LinearLayout>
 
             <!-- Wallet Row -->
-            <LinearLayout
-                android:id="@+id/rowSelectWallet"
-                style="@style/RowStyle"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:paddingVertical="8dp">
+<!--            <LinearLayout-->
+<!--                android:id="@+id/rowSelectWallet"-->
+<!--                style="@style/RowStyle"-->
+<!--                android:orientation="horizontal"-->
+<!--                android:gravity="center_vertical"-->
+<!--                android:paddingVertical="8dp">-->
 
-                <ImageView
-                    style="@style/RowIconStyle"
-                    android:src="@drawable/ic_wallet_24"
-                    app:tint="?attr/bb_button" />
+<!--                <ImageView-->
+<!--                    style="@style/RowIconStyle"-->
+<!--                    android:src="@drawable/ic_wallet_24"-->
+<!--                    app:tint="?attr/bb_button" />-->
 
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical"
-                    android:layout_marginStart="12dp">
+<!--                <LinearLayout-->
+<!--                    android:layout_width="0dp"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_weight="1"-->
+<!--                    android:orientation="vertical"-->
+<!--                    android:layout_marginStart="12dp">-->
 
-                    <!-- Top Label -->
-                    <TextView
-                        android:id="@+id/textWalletLabel"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/wallet"
-                        android:textColor="?attr/bb_primaryText"
-                        android:textSize="18sp" />
+<!--                    &lt;!&ndash; Top Label &ndash;&gt;-->
+<!--                    <TextView-->
+<!--                        android:id="@+id/textWalletLabel"-->
+<!--                        android:layout_width="wrap_content"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:text="@string/wallet"-->
+<!--                        android:textColor="?attr/bb_primaryText"-->
+<!--                        android:textSize="18sp" />-->
 
-                    <!-- Selected wallet name -->
-                    <TextView
-                        android:id="@+id/textSelectedWalletName"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="No wallet selected"
-                        android:textColor="?attr/bb_secondaryText"
-                        android:textSize="14sp"
-                        android:visibility="visible"
-                        android:paddingTop="2dp" />
-                </LinearLayout>
+<!--                    &lt;!&ndash; Selected wallet name &ndash;&gt;-->
+<!--                    <TextView-->
+<!--                        android:id="@+id/textSelectedWalletName"-->
+<!--                        android:layout_width="wrap_content"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:text="No wallet selected"-->
+<!--                        android:textColor="?attr/bb_secondaryText"-->
+<!--                        android:textSize="14sp"-->
+<!--                        android:visibility="visible"-->
+<!--                        android:paddingTop="2dp" />-->
+<!--                </LinearLayout>-->
 
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:layout_marginStart="8dp"
-                    android:background="@null"
-                    android:rotation="180"
-                    android:src="?attr/actionModeCloseDrawable" />
-            </LinearLayout>
+<!--                <ImageView-->
+<!--                    android:layout_width="24dp"-->
+<!--                    android:layout_height="24dp"-->
+<!--                    android:layout_marginStart="8dp"-->
+<!--                    android:background="@null"-->
+<!--                    android:rotation="180"-->
+<!--                    android:src="?attr/actionModeCloseDrawable" />-->
+<!--            </LinearLayout>-->
 
             <!-- Budget Category -->
             <LinearLayout
@@ -165,6 +165,7 @@
                 android:paddingVertical="8dp">
 
                 <ImageView
+                    android:id="@+id/imgSelectedCategoryIcon"
                     style="@style/RowIconStyle"
                     android:src="@drawable/ic_edit_note_24"
                     app:tint="?attr/bb_button" />
