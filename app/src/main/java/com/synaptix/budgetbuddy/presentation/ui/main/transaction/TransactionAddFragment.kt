@@ -114,10 +114,10 @@ class TransactionAddFragment : Fragment() {
     private fun applyScreenMode(mode: ScreenMode) {
         when (mode) {
             ScreenMode.VIEW -> {
-                // Show edit button, hide other action buttons
+                // Show edit button, hide clear button
                 binding.btnEdit.visibility = View.VISIBLE
-                binding.btnSave.visibility = View.GONE
                 binding.btnClear.visibility = View.GONE
+                binding.btnSave.visibility = View.GONE
 
                 // Disable all interactive elements
                 binding.apply {
@@ -152,11 +152,11 @@ class TransactionAddFragment : Fragment() {
             ScreenMode.EDIT -> {
                 // Hide edit button, show update button
                 binding.btnEdit.visibility = View.GONE
+                binding.btnClear.visibility = View.VISIBLE
                 binding.btnSave.apply {
                     text = "Update"
                     visibility = View.VISIBLE
                 }
-                binding.btnClear.visibility = View.GONE
 
                 // Enable all interactive elements
                 binding.apply {
@@ -169,6 +169,9 @@ class TransactionAddFragment : Fragment() {
                     rowSelectDate.isEnabled = true
                     rowSelectRecurrenceRate.isEnabled = true
                     rowSelectPhoto.isEnabled = true
+                    
+                    // Show photo removal button if there's an image
+                    btnRemovePhoto.visibility = if (transactionAddViewModel.imageBytes.value != null) View.VISIBLE else View.GONE
                 }
 
                 // Restore click listeners
@@ -178,11 +181,11 @@ class TransactionAddFragment : Fragment() {
             ScreenMode.CREATE -> {
                 // Hide edit button, show save and clear buttons
                 binding.btnEdit.visibility = View.GONE
+                binding.btnClear.visibility = View.VISIBLE
                 binding.btnSave.apply {
                     text = "Save"
                     visibility = View.VISIBLE
                 }
-                binding.btnClear.visibility = View.VISIBLE
 
                 // Enable all interactive elements
                 binding.apply {
@@ -195,6 +198,9 @@ class TransactionAddFragment : Fragment() {
                     rowSelectDate.isEnabled = true
                     rowSelectRecurrenceRate.isEnabled = true
                     rowSelectPhoto.isEnabled = true
+                    
+                    // Show photo removal button if there's an image
+                    btnRemovePhoto.visibility = if (transactionAddViewModel.imageBytes.value != null) View.VISIBLE else View.GONE
                 }
 
                 // Restore click listeners
@@ -256,6 +262,7 @@ class TransactionAddFragment : Fragment() {
 
             btnEdit.setOnClickListener {
                 transactionAddViewModel.setScreenMode(ScreenMode.EDIT, transactionAddViewModel.transaction.value)
+                applyScreenMode(ScreenMode.EDIT)
             }
 
             rowSelectCategory.setOnClickListener {
