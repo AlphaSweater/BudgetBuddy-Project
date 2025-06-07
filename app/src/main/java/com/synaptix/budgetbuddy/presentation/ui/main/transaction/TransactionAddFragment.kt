@@ -232,7 +232,6 @@ class TransactionAddFragment : Fragment() {
 
             disableAllInteractiveElements()
         }
-
     }
 
     private fun applyEditMode() {
@@ -265,6 +264,25 @@ class TransactionAddFragment : Fragment() {
         setupClickListeners()
     }
 
+    private fun findCrocIcons(): List<ImageView> {
+        val crocIcons = mutableListOf<ImageView>()
+        
+        // Find all ImageViews in the root view
+        fun findImageViews(view: View) {
+            if (view is ImageView && view.drawable?.constantState == resources.getDrawable(R.drawable.ic_ui_croc_right, null).constantState) {
+                crocIcons.add(view)
+            }
+            if (view is ViewGroup) {
+                for (i in 0 until view.childCount) {
+                    findImageViews(view.getChildAt(i))
+                }
+            }
+        }
+        
+        findImageViews(binding.root)
+        return crocIcons
+    }
+
     private fun disableAllInteractiveElements() {
         binding.apply {
             edtTextAmount.isEnabled = false
@@ -277,6 +295,14 @@ class TransactionAddFragment : Fragment() {
             rowSelectRecurrenceRate.isEnabled = false
             rowSelectPhoto.isEnabled = false
             btnRemovePhoto.visibility = View.GONE
+
+            // Hide all croc icons
+            imgCrocCategory.visibility = View.INVISIBLE
+            imgCrocWallet.visibility = View.INVISIBLE
+            imgCrocDate.visibility = View.INVISIBLE
+            imgCrocLabels.visibility = View.INVISIBLE
+            imgCrocRecurrence.visibility = View.INVISIBLE
+            imgCrocPhoto.visibility = View.INVISIBLE
 
             rowSelectCategory.setOnClickListener(null)
             rowSelectWallet.setOnClickListener(null)
@@ -298,6 +324,14 @@ class TransactionAddFragment : Fragment() {
             rowSelectDate.isEnabled = true
             rowSelectRecurrenceRate.isEnabled = true
             rowSelectPhoto.isEnabled = true
+
+            // Show all croc icons
+            imgCrocCategory.visibility = View.VISIBLE
+            imgCrocWallet.visibility = View.VISIBLE
+            imgCrocDate.visibility = View.VISIBLE
+            imgCrocLabels.visibility = View.VISIBLE
+            imgCrocRecurrence.visibility = View.VISIBLE
+            imgCrocPhoto.visibility = View.VISIBLE
         }
     }
 
@@ -307,8 +341,19 @@ class TransactionAddFragment : Fragment() {
     private fun setupClickListeners() {
         with(binding) {
             btnGoBack.setOnClickListener {
-                transactionAddViewModel.setScreenModeBusy(false)
-                findNavController().popBackStack()
+                when (transactionAddViewModel.screenMode.value) {
+                    TransactionAddViewModel.ScreenMode.EDIT -> {
+                        // Switch back to view mode
+                        transactionAddViewModel.setScreenMode(TransactionAddViewModel.ScreenMode.VIEW)
+                        applyScreenMode(TransactionAddViewModel.ScreenMode.VIEW)
+                    }
+                    TransactionAddViewModel.ScreenMode.VIEW,
+                    TransactionAddViewModel.ScreenMode.CREATE -> {
+                        // Pop back stack
+                        transactionAddViewModel.setScreenModeBusy(false)
+                        findNavController().popBackStack()
+                    }
+                }
             }
 
             btnClear.setOnClickListener {

@@ -237,6 +237,7 @@
                         </LinearLayout>
 
                         <ImageView
+                            android:id="@+id/imgCrocCategory"
                             style="@style/IconButton"
                             android:src="@drawable/ic_ui_croc_right"
                             app:tint="?attr/bb_secondaryText" />
@@ -291,6 +292,7 @@
                         </LinearLayout>
 
                         <ImageView
+                            android:id="@+id/imgCrocWallet"
                             style="@style/IconButton"
                             android:src="@drawable/ic_ui_croc_right"
                             app:tint="?attr/bb_secondaryText" />
@@ -342,6 +344,7 @@
                         </LinearLayout>
 
                         <ImageView
+                            android:id="@+id/imgCrocDate"
                             style="@style/IconButton"
                             android:src="@drawable/ic_ui_croc_right"
                             app:tint="?attr/bb_secondaryText" />
@@ -403,6 +406,7 @@
                         </LinearLayout>
 
                         <ImageView
+                            android:id="@+id/imgCrocLabels"
                             style="@style/IconButton"
                             android:src="@drawable/ic_ui_croc_right"
                             app:tint="?attr/bb_secondaryText" />
@@ -495,6 +499,7 @@
                         </LinearLayout>
 
                         <ImageView
+                            android:id="@+id/imgCrocRecurrence"
                             style="@style/IconButton"
                             android:src="@drawable/ic_ui_croc_right"
                             app:tint="?attr/bb_secondaryText" />
@@ -521,6 +526,7 @@
                             android:textSize="16sp" />
 
                         <ImageView
+                            android:id="@+id/imgCrocPhoto"
                             style="@style/IconButton"
                             android:src="@drawable/ic_ui_croc_right"
                             app:tint="?attr/bb_secondaryText" />
