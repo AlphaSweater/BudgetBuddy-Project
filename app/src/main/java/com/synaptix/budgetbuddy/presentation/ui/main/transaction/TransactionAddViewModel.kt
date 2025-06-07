@@ -70,6 +70,17 @@ class TransactionAddViewModel @Inject constructor(
         _screenMode.value = mode
     }
 
+    // Boolean to show not to change the screen mode when busy
+    private var _screenModeBusy = MutableStateFlow(false)
+
+    fun setScreenModeBusy(isBusy: Boolean) {
+        _screenModeBusy.value = isBusy
+    }
+
+    fun isScreenModeBusy(): Boolean {
+        return _screenModeBusy.value
+    }
+
     private val _transaction = MutableStateFlow<Transaction?>(null)
     val transaction: StateFlow<Transaction?> = _transaction
 

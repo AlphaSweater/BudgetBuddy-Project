@@ -79,15 +79,22 @@ class TransactionAddFragment : Fragment() {
         setupImagePickers()
         observeViewModel()
 
-        val screenMode = arguments?.getSerializable("screenMode") as? ScreenMode ?: ScreenMode.CREATE
-        transactionAddViewModel.setScreenMode(screenMode)
+        // Set up initial state based on screen mode
+        if (!transactionAddViewModel.isScreenModeBusy()) {
+            val screenMode = arguments?.getSerializable("screenMode") as? ScreenMode ?: ScreenMode.CREATE
+            transactionAddViewModel.setScreenMode(screenMode)
+            transactionAddViewModel.setScreenModeBusy(true)
+        }
+
         applyScreenMode(transactionAddViewModel.screenMode.value)
         populateInitialFormValues()
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        reset()
+        if (!transactionAddViewModel.isScreenModeBusy()) {
+            reset()
+        }
         _binding = null
     }
 
@@ -300,6 +307,7 @@ class TransactionAddFragment : Fragment() {
     private fun setupClickListeners() {
         with(binding) {
             btnGoBack.setOnClickListener {
+                transactionAddViewModel.setScreenModeBusy(false)
                 findNavController().popBackStack()
             }
 
