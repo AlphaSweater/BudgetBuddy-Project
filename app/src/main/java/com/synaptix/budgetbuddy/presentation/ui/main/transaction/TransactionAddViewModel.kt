@@ -373,21 +373,6 @@ class TransactionAddViewModel @Inject constructor(
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-    fun reset() {
-        _amount.value = null
-        _date.value = getCurrentDate()
-        _note.value = null
-        _category.value = null
-        _wallet.value = null
-        _imageBytes.value = null
-        _recurrenceData.value = RecurrenceData.DEFAULT
-        _selectedLabels.value = emptyList()
-        _validationState.value = ValidationState(shouldShowErrors = false)
-        _savingUiState.value = SavingUiState.Idle
-        _hasUnsavedChanges.value = false
-    }
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private fun getCurrentDate(): String =
         SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date())
 
@@ -441,6 +426,21 @@ class TransactionAddViewModel @Inject constructor(
         _validationState.value = ValidationState(shouldShowErrors = false)
         
         // Reset unsaved changes flag
+        _hasUnsavedChanges.value = false
+    }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    fun reset() {
+        _amount.value = null
+        _date.value = getCurrentDate()
+        _note.value = null
+        _category.value = null
+        _wallet.value = null
+        _imageBytes.value = null
+        _recurrenceData.value = RecurrenceData.DEFAULT
+        _selectedLabels.value = emptyList()
+        _validationState.value = ValidationState(shouldShowErrors = false)
+        _savingUiState.value = SavingUiState.Idle
         _hasUnsavedChanges.value = false
     }
 }

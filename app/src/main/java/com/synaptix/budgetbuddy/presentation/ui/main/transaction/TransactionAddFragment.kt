@@ -45,7 +45,9 @@ import java.math.BigDecimal
 import java.math.RoundingMode
 import java.text.DecimalFormat
 import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.core.content.ContextCompat
 import androidx.core.view.updateLayoutParams
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 @AndroidEntryPoint
 class TransactionAddFragment : Fragment() {
@@ -827,32 +829,47 @@ class TransactionAddFragment : Fragment() {
     }
 
     private fun showDiscardChangesDialog() {
-        AlertDialog.Builder(requireContext())
+        val dialog = MaterialAlertDialogBuilder(requireContext(), R.style.MaterialAlertDialog_Rounded)
             .setTitle("Discard Changes?")
             .setMessage("You have unsaved changes. Are you sure you want to discard them?")
             .setPositiveButton("Discard") { _, _ ->
                 // Temporarily remove text watchers
                 binding.edtTextAmount.removeTextChangedListener(binding.edtTextAmount.tag as? TextWatcher)
                 binding.edtTextNote.removeTextChangedListener(binding.edtTextNote.tag as? TextWatcher)
-                
+
                 // Revert changes in ViewModel
                 transactionAddViewModel.revertChanges()
-                
+
                 // Update text fields with reverted values
                 val amount = transactionAddViewModel.amount.value
                 val formattedAmount = if (amount == 0.0) "" else DecimalFormat("#,##0.00").format(amount)
                 binding.edtTextAmount.setText(formattedAmount)
                 binding.edtTextNote.setText(transactionAddViewModel.note.value)
-                
+
                 // Reattach text watchers
                 setupAmountWatcher()
                 setupNoteWatcher()
-                
+
                 // Switch to view mode
                 switchToViewMode()
             }
             .setNegativeButton("Cancel", null)
-            .show()
+            .create() // Get the dialog instance
+
+        dialog.setOnShowListener {
+            // Set button colors here
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE)?.setTextColor(
+                ContextCompat.getColor(requireContext(), R.color.expense_red)
+            )
+            dialog.getButton(AlertDialog.BUTTON_NEGATIVE)?.setTextColor(
+                ContextCompat.getColor(requireContext(), R.color.profit_green)
+            )
+
+            val background = ContextCompat.getDrawable(requireContext(), R.drawable.bg_dialog_rounded)
+            dialog.window?.setBackgroundDrawable(background)
+        }
+
+        dialog.show()
     }
 
     private fun switchToViewMode() {
