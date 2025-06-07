@@ -106,10 +106,25 @@ class TransactionAddFragment : Fragment() {
     }
 
     private fun setupTextWatchers() {
+        var isUpdating = false
+        
         binding.edtTextAmount.doAfterTextChanged { text ->
-            val amount = text.toString().toDoubleOrNull()
+            if (isUpdating) return@doAfterTextChanged
+            
+            isUpdating = true
+            val currentText = text.toString()
+            val formattedText = formatInputAmount(currentText)
+            
+            // Only update if the text has actually changed
+            if (currentText != formattedText) {
+                binding.edtTextAmount.setText(formattedText)
+                binding.edtTextAmount.setSelection(formattedText.length)
+            }
+            
+            val amount = parseFormattedAmount(formattedText)
             transactionAddViewModel.setAmount(amount)
             updateAmountAppearance(amount)
+            isUpdating = false
         }
 
         binding.edtTextNote.doAfterTextChanged { text ->
@@ -538,8 +553,41 @@ class TransactionAddFragment : Fragment() {
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private fun formatAmount(amount: Double?): String {
         return amount?.let {
-            String.format("%.2f", it)
+            String.format("%,.2f", it)
         } ?: "0.00"
+    }
+
+    private fun formatInputAmount(input: String): String {
+        // Remove any non-digit characters except decimal point
+        val cleanInput = input.replace(Regex("[^0-9.]"), "")
+        
+        // Handle empty or invalid input
+        if (cleanInput.isEmpty() || cleanInput == ".") return "0.00"
+        
+        // Split into whole and decimal parts
+        val parts = cleanInput.split(".")
+        val wholePart = parts[0]
+        val decimalPart = if (parts.size > 1) parts[1] else ""
+        
+        // Format whole part with thousand separators
+        val formattedWhole = wholePart.toLongOrNull()?.let {
+            String.format("%,d", it)
+        } ?: "0"
+        
+        // Handle decimal part
+        return when {
+            decimalPart.isEmpty() -> "$formattedWhole.00"
+            decimalPart.length == 1 -> "$formattedWhole.${decimalPart}0"
+            else -> "$formattedWhole.${decimalPart.take(2)}"
+        }
+    }
+
+    private fun parseFormattedAmount(formattedAmount: String): Double? {
+        return try {
+            formattedAmount.replace(",", "").toDoubleOrNull()
+        } catch (e: Exception) {
+            null
+        }
     }
 
     private fun updateAmountAppearance(amount: Double?) {
