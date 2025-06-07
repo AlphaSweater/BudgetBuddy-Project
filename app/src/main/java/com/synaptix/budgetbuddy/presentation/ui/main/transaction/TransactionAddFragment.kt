@@ -32,11 +32,13 @@ import com.synaptix.budgetbuddy.core.model.Category
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import android.widget.ImageView
+import androidx.navigation.fragment.navArgs
 import com.synaptix.budgetbuddy.core.model.RecurrenceData
 import com.synaptix.budgetbuddy.core.model.Wallet
 import com.synaptix.budgetbuddy.extentions.getThemeColor
 import kotlin.toString
 import com.synaptix.budgetbuddy.core.model.Label
+import com.synaptix.budgetbuddy.presentation.ui.main.transaction.TransactionAddViewModel.ScreenMode
 import kotlinx.coroutines.delay
 
 @AndroidEntryPoint
@@ -46,6 +48,9 @@ class TransactionAddFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val viewModel: TransactionAddViewModel by activityViewModels()
+
+    private val args: TransactionAddFragmentArgs by navArgs()
+    private lateinit var screenMode: ScreenMode
 
     private lateinit var takePictureLauncher: ActivityResultLauncher<Uri>
     private lateinit var pickImageLauncher: ActivityResultLauncher<String>
@@ -66,9 +71,16 @@ class TransactionAddFragment : Fragment() {
     // --- Fragment Lifecycle ---
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        // Initialize screen mode based on arguments
+        screenMode = args.screenMode
+
         setupViews()
         setupImagePickers()
         observeViewModel()
+
+        // Apply screen mode specific settings
+        applyScreenMode(screenMode)
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
@@ -93,7 +105,7 @@ class TransactionAddFragment : Fragment() {
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private fun restoreState() {
-        if (!viewModel.saveState.value!!) {
+        if (!viewModel.saveState.value) {
             reset()
             return
         }
@@ -104,6 +116,41 @@ class TransactionAddFragment : Fragment() {
             showImagePreview(viewModel.imageBytes.value)
         }
     }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    private fun applyScreenMode(mode: ScreenMode) {
+        when (mode) {
+            ScreenMode.VIEW -> {
+                binding.btnSave.visibility = View.GONE
+                binding.btnClear.visibility = View.GONE
+
+                // Disable inputs
+                binding.edtTextAmount.isEnabled = false
+                binding.edtTextNote.isEnabled = false
+                binding.spinnerCurrency.isEnabled = false
+                binding.rowSelectCategory.isEnabled = false
+                binding.rowSelectWallet.isEnabled = false
+                binding.rowSelectLabels.isEnabled = false
+                binding.rowSelectDate.isEnabled = false
+                binding.rowSelectRecurrenceRate.isEnabled = false
+                binding.rowSelectPhoto.isEnabled = false
+                binding.btnRemovePhoto.visibility = View.GONE
+            }
+
+            ScreenMode.EDIT -> {
+                binding.btnSave.text = "Update"
+                binding.btnSave.visibility = View.VISIBLE
+                binding.btnClear.visibility = View.GONE
+            }
+
+            ScreenMode.CREATE -> {
+                binding.btnSave.text = "Save"
+                binding.btnSave.visibility = View.VISIBLE
+                binding.btnClear.visibility = View.VISIBLE
+            }
+        }
+    }
+
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     //Handles the setup of the currency spinner.

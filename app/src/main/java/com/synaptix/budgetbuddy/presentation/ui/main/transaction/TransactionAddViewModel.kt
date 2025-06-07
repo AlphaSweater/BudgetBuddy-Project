@@ -20,6 +20,7 @@ import com.synaptix.budgetbuddy.core.model.User
 import com.synaptix.budgetbuddy.core.usecase.main.transaction.AddTransactionUseCase
 import com.synaptix.budgetbuddy.core.usecase.main.transaction.AddTransactionUseCase.AddTransactionResult
 import com.synaptix.budgetbuddy.core.usecase.main.transaction.UploadImageUseCase
+import java.io.Serializable
 
 @HiltViewModel
 class TransactionAddViewModel @Inject constructor(
@@ -35,7 +36,7 @@ class TransactionAddViewModel @Inject constructor(
         data class Error(val message: String) : UiState()
     }
 
-    enum class ScreenMode {
+    enum class ScreenMode : Serializable {
         VIEW, EDIT, CREATE
     }
 
