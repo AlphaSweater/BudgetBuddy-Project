@@ -35,6 +35,10 @@ class TransactionAddViewModel @Inject constructor(
         data class Error(val message: String) : UiState()
     }
 
+    enum class ScreenMode {
+        VIEW, EDIT, CREATE
+    }
+
     data class ValidationState(
         val isAmountValid: Boolean = false,
         val isCurrencyValid: Boolean = false,
@@ -55,6 +59,18 @@ class TransactionAddViewModel @Inject constructor(
     val uiState: StateFlow<UiState> = _uiState
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // Screen Mode
+    private val _screenMode = MutableStateFlow<ScreenMode>(ScreenMode.CREATE)
+    val screenMode: StateFlow<ScreenMode> = _screenMode
+
+    fun setScreenMode(mode: ScreenMode) {
+        _screenMode.value = mode
+        if (mode == ScreenMode.CREATE) {
+            reset()
+        }
+    }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     // Validation State
     private val _validationState = MutableStateFlow(ValidationState())
     val validationState: StateFlow<ValidationState> = _validationState
@@ -64,6 +80,11 @@ class TransactionAddViewModel @Inject constructor(
     private val _category = MutableStateFlow<Category?>(null)
     val category: StateFlow<Category?> = _category
 
+    fun setCategory(category: Category?) {
+        _category.value = category
+        validateForm()
+    }
+
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private val _wallet = MutableStateFlow<Wallet?>(null)
     val wallet: StateFlow<Wallet?> = _wallet
@@ -72,90 +93,70 @@ class TransactionAddViewModel @Inject constructor(
     private val _currency = MutableStateFlow("ZAR")
     val currency: StateFlow<String> = _currency
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-    private val _amount = MutableStateFlow<Double?>(null)
-    val amount: StateFlow<Double?> = _amount
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-    private val _date = MutableStateFlow(getCurrentDate())
-    val date: StateFlow<String> = _date
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-    private val _note = MutableStateFlow<String?>(null)
-    val note: StateFlow<String?> = _note
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-    private val _imageBytes = MutableStateFlow<ByteArray?>(null)
-    val imageBytes: StateFlow<ByteArray?> = _imageBytes
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-    private val _recurrenceData = MutableStateFlow(RecurrenceData.DEFAULT)
-    val recurrenceData: StateFlow<RecurrenceData> = _recurrenceData
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-    private val _selectedLabels = MutableStateFlow<List<Label>>(emptyList())
-    val selectedLabels: StateFlow<List<Label>> = _selectedLabels
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-    private val _saveState = MutableStateFlow(false)
-    val saveState: StateFlow<Boolean> = _saveState
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-    fun setCategory(category: Category?) {
-        _category.value = category
-        validateForm()
-    }
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-    fun setLabels(labels: List<Label>) {
-        _selectedLabels.value = labels
-    }
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-    fun setWallet(wallet: Wallet?) {
-        _wallet.value = wallet
-        validateForm()
-    }
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     fun setCurrency(currency: String) {
         _currency.value = currency
         validateForm()
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    private val _amount = MutableStateFlow<Double?>(null)
+    val amount: StateFlow<Double?> = _amount
+
     fun setAmount(amount: Double?) {
         _amount.value = amount
         validateForm()
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    private val _date = MutableStateFlow(getCurrentDate())
+    val date: StateFlow<String> = _date
+
     fun setDate(date: String) {
         _date.value = date
         validateForm()
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    private val _note = MutableStateFlow<String?>(null)
+    val note: StateFlow<String?> = _note
+
     fun setNote(note: String) {
         _note.value = note
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-    fun setRecurrenceData(data: RecurrenceData) {
-        _recurrenceData.value = data
-    }
+    private val _imageBytes = MutableStateFlow<ByteArray?>(null)
+    val imageBytes: StateFlow<ByteArray?> = _imageBytes
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     fun setImageBytes(bytes: ByteArray?) {
         _imageBytes.value = bytes
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    private val _recurrenceData = MutableStateFlow(RecurrenceData.DEFAULT)
+    val recurrenceData: StateFlow<RecurrenceData> = _recurrenceData
+
+    fun setRecurrenceData(data: RecurrenceData) {
+        _recurrenceData.value = data
+    }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    private val _selectedLabels = MutableStateFlow<List<Label>>(emptyList())
+    val selectedLabels: StateFlow<List<Label>> = _selectedLabels
+
+    fun setLabels(labels: List<Label>) {
+        _selectedLabels.value = labels
+    }
+
     fun removeLabel(label: Label) {
         val currentLabels = _selectedLabels.value.toMutableList()
         currentLabels.remove(label)
         _selectedLabels.value = currentLabels
     }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    private val _saveState = MutableStateFlow(false)
+    val saveState: StateFlow<Boolean> = _saveState
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     // Function to validate the form inputs
