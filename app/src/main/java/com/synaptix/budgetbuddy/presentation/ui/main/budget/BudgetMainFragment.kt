@@ -82,6 +82,7 @@ class BudgetMainFragment : Fragment() {
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // Collect UI state from ViewModel and update the UI accordingly
     private fun collectUiState() {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -120,6 +121,7 @@ class BudgetMainFragment : Fragment() {
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // Update the summary UI with formatted budget and spent amounts
     private fun updateSummaryUI(summary: BudgetSummary) {
         val typedValue = TypedValue()
         val theme = requireContext().theme
