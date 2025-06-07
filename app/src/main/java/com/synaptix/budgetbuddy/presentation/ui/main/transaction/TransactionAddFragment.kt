@@ -44,6 +44,8 @@ import kotlinx.coroutines.delay
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.text.DecimalFormat
+import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.core.view.updateLayoutParams
 
 @AndroidEntryPoint
 class TransactionAddFragment : Fragment() {
@@ -223,6 +225,11 @@ class TransactionAddFragment : Fragment() {
             btnSave.visibility = View.GONE
             bottomButtonContainer.visibility = View.GONE
             toolbarTitle.text = "Transaction Details"
+            
+            // Update content margin when bottom container is hidden
+            contentScrollView.updateLayoutParams<CoordinatorLayout.LayoutParams> {
+                bottomMargin = resources.getDimensionPixelSize(R.dimen.bottom_margin_no_button)
+            }
 
             disableAllInteractiveElements()
         }
@@ -238,6 +245,11 @@ class TransactionAddFragment : Fragment() {
             }
             bottomButtonContainer.visibility = View.VISIBLE
             toolbarTitle.text = "Edit Transaction"
+            
+            // Update content margin when bottom container is visible
+            contentScrollView.updateLayoutParams<CoordinatorLayout.LayoutParams> {
+                bottomMargin = resources.getDimensionPixelSize(R.dimen.bottom_margin)
+            }
 
             enableAllInteractiveElements()
             btnRemovePhoto.visibility = if (transactionAddViewModel.imageBytes.value != null) View.VISIBLE else View.GONE
@@ -255,6 +267,11 @@ class TransactionAddFragment : Fragment() {
             }
             bottomButtonContainer.visibility = View.VISIBLE
             toolbarTitle.text = "Add New Transaction"
+            
+            // Update content margin when bottom container is visible
+            contentScrollView.updateLayoutParams<CoordinatorLayout.LayoutParams> {
+                bottomMargin = resources.getDimensionPixelSize(R.dimen.bottom_margin)
+            }
 
             enableAllInteractiveElements()
             btnRemovePhoto.visibility = if (transactionAddViewModel.imageBytes.value != null) View.VISIBLE else View.GONE

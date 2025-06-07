@@ -83,7 +83,6 @@
                     android:background="?attr/selectableItemBackgroundBorderless"
                     android:contentDescription="Clear form"
                     android:src="@drawable/ic_ui_clear"
-                    android:visibility="gone"
                     app:tint="?attr/bb_primaryText" />
             </LinearLayout>
         </androidx.appcompat.widget.Toolbar>
@@ -96,7 +95,7 @@
         android:layout_height="match_parent"
         android:clipToPadding="false"
         android:fillViewport="true"
-        android:layout_marginBottom="90dp"
+        android:layout_marginBottom="@dimen/bottom_margin"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <LinearLayout
@@ -576,8 +575,7 @@
         android:layout_gravity="bottom"
         android:background="?attr/bb_background"
         android:elevation="8dp"
-        android:padding="16dp"
-        android:visibility="gone">
+        android:padding="16dp">
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnSave"
