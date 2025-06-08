@@ -21,6 +21,32 @@
 
 package com.synaptix.budgetbuddy.core.model
 
+sealed class HomeItems {
+    /**
+     * Represents a summary of transactions.
+     * Contains total income, expense, and balance information.
+     */
+    data class TransactionsSummary(
+        val totalIncome: Double,
+        val totalExpense: Double,
+        val balance: Double
+    ) : HomeItems()
+
+    /**
+     * Represents a category-specific transaction summary.
+     * Contains category details and transaction totals.
+     */
+    data class CategoryTransactionsSummary(
+        val category: Category,
+        val totalIncome: Double,
+        val totalExpense: Double,
+        val balance: Double,
+        val transactionCount: Int,
+        val lastTransactionAt: Long
+    ) : HomeItems()
+}
+
+
 /**
  * Sealed class for items used in the home screen.
  * Contains items specific to the home screen display.
@@ -46,7 +72,7 @@ sealed class HomeListItems {
     ) : HomeListItems()
 
     /**
-     * Represents a category summary in the home screen.
+     * Represents a category item in the home screen.
      * Maintains the original Category object while adding UI-specific data.
      */
     data class HomeCategoryItem(

@@ -3,11 +3,15 @@ package com.synaptix.budgetbuddy.presentation.ui.main.home
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.synaptix.budgetbuddy.core.model.Category
+import com.synaptix.budgetbuddy.core.model.HomeItems
+import com.synaptix.budgetbuddy.core.model.HomeListItems
 import com.synaptix.budgetbuddy.core.model.Transaction
+import com.synaptix.budgetbuddy.core.model.TransactionListItems
 import com.synaptix.budgetbuddy.core.model.Wallet
 import com.synaptix.budgetbuddy.core.usecase.auth.GetUserIdUseCase
 import com.synaptix.budgetbuddy.core.usecase.main.category.GetCategoriesUseCase
 import com.synaptix.budgetbuddy.core.usecase.main.transaction.GetTransactionsUseCase
+import com.synaptix.budgetbuddy.core.usecase.main.transaction.TransactionCalculationsUseCase
 import com.synaptix.budgetbuddy.core.usecase.main.wallet.GetWalletsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
@@ -66,7 +70,8 @@ class HomeMainViewModel @Inject constructor(
     private val getWalletsUseCase: GetWalletsUseCase,
     private val getTransactionsUseCase: GetTransactionsUseCase,
     private val getCategoriesUseCase: GetCategoriesUseCase,
-    private val getUserIdUseCase: GetUserIdUseCase
+    private val getUserIdUseCase: GetUserIdUseCase,
+    private val transactionCalculationsUseCase: TransactionCalculationsUseCase
 ) : ViewModel() {
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
@@ -81,14 +86,20 @@ class HomeMainViewModel @Inject constructor(
 
     sealed class TransactionState {
         object Loading : TransactionState()
-        data class Success(val transactions: List<Transaction>) : TransactionState()
+        data class Success(
+            val transactions: List<Transaction>,
+            val summary: HomeItems.TransactionsSummary
+        ) : TransactionState()
         data class Error(val message: String) : TransactionState()
         object Empty : TransactionState()
     }
 
     sealed class CategoryState {
         object Loading : CategoryState()
-        data class Success(val categories: List<Category>) : CategoryState()
+        data class Success(
+            val categories: List<Category>,
+            val categorySummaries: Map<String, HomeItems.CategoryTransactionsSummary>
+        ) : CategoryState()
         data class Error(val message: String) : CategoryState()
         object Empty : CategoryState()
     }
@@ -193,8 +204,22 @@ class HomeMainViewModel @Inject constructor(
                 when (result) {
                     is GetTransactionsUseCase.GetTransactionsResult.Success -> {
                         val filtered = filterTransactions(result.transactions)
-                        _transactionsState.value = if (filtered.isEmpty()) TransactionState.Empty
-                        else TransactionState.Success(filtered)
+                        if (filtered.isEmpty()) {
+                            _transactionsState.value = TransactionState.Empty
+                        } else {
+                            val summary = transactionCalculationsUseCase.calculateTotalTransactionsSummary(userId)
+                            when (summary) {
+                                is com.synaptix.budgetbuddy.core.model.Result.Success -> {
+                                    _transactionsState.value = TransactionState.Success(
+                                        transactions = filtered,
+                                        summary = summary.data
+                                    )
+                                }
+                                is com.synaptix.budgetbuddy.core.model.Result.Error -> {
+                                    _transactionsState.value = TransactionState.Error(summary.exception.message ?: "Unknown error")
+                                }
+                            }
+                        }
                     }
                     is GetTransactionsUseCase.GetTransactionsResult.Error -> {
                         _transactionsState.value = TransactionState.Empty
@@ -212,7 +237,23 @@ class HomeMainViewModel @Inject constructor(
                 _categoriesState.value = when (result) {
                     is GetCategoriesUseCase.GetCategoriesResult.Success -> {
                         if (result.categories.isEmpty()) CategoryState.Empty
-                        else CategoryState.Success(result.categories)
+                        else {
+                            val categorySummaries = transactionCalculationsUseCase.calculateCategoryTransactionsSummary(
+                                userId = userId,
+                                categories = result.categories
+                            )
+                            when (categorySummaries) {
+                                is com.synaptix.budgetbuddy.core.model.Result.Success -> {
+                                    CategoryState.Success(
+                                        categories = result.categories,
+                                        categorySummaries = categorySummaries.data
+                                    )
+                                }
+                                is com.synaptix.budgetbuddy.core.model.Result.Error -> {
+                                    CategoryState.Error(categorySummaries.exception.message ?: "Unknown error")
+                                }
+                            }
+                        }
                     }
                     is GetCategoriesUseCase.GetCategoriesResult.Error -> CategoryState.Empty
                 }

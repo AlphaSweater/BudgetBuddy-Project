@@ -423,7 +423,9 @@ class HomeMainFragment : Fragment() {
                         emptyText = txtEmptyTransactions
                     )
 
-                    updateTransactionTotals(state.transactions)
+                    // Update transaction totals from the summary
+                    totalIncome = state.summary.totalIncome
+                    totalExpense = state.summary.totalExpense
                     setupBarChart()
 
                     val transactionItems = state.transactions.take(MAX_ITEMS).map { transaction ->
@@ -447,7 +449,7 @@ class HomeMainFragment : Fragment() {
                     showEmptyState(
                         recyclerView = recyclerViewHomeTransactionOverview,
                         emptyText = txtEmptyTransactions,
-                        message = getString(R.string.no_transactions_found)
+                        message = state.message
                     )
                 }
             }
@@ -475,23 +477,17 @@ class HomeMainFragment : Fragment() {
                         emptyText = txtEmptyCategories
                     )
 
-                    val currentTransactions = when (val transactionState = homeViewModel.transactionsState.value) {
-                        is HomeMainViewModel.TransactionState.Success -> transactionState.transactions
-                        else -> emptyList()
-                    }
-
                     val categoryItems = state.categories.take(MAX_ITEMS).map { category ->
-                        val categoryTransactions = currentTransactions.filter { it.category.id == category.id }
-                        val transactionCount = categoryTransactions.size
-                        val totalAmount = categoryTransactions.sumOf { it.amount }
-                        val formattedAmount = String.format("R %.2f", totalAmount)
-                        val mostRecentDate = categoryTransactions.maxOfOrNull { it.date } ?: System.currentTimeMillis()
+                        val categorySummary = state.categorySummaries[category.id]
+                        val formattedAmount = categorySummary?.let {
+                            String.format("R %.2f", it.totalExpense)
+                        } ?: "R 0.00"
 
                         HomeListItems.HomeCategoryItem(
                             category = category,
-                            transactionCount = transactionCount,
+                            transactionCount = categorySummary?.transactionCount ?: 0,
                             amount = formattedAmount,
-                            relativeDate = category.formatDate(mostRecentDate)
+                            relativeDate = category.formatDate(categorySummary?.lastTransactionAt)
                         )
                     }
                     categoryAdapter.submitList(categoryItems)
@@ -509,7 +505,7 @@ class HomeMainFragment : Fragment() {
                     showEmptyState(
                         recyclerView = recyclerViewHomeCategoryOverview,
                         emptyText = txtEmptyCategories,
-                        message = getString(R.string.no_categories_found)
+                        message = state.message
                     )
                 }
             }
@@ -641,13 +637,6 @@ class HomeMainFragment : Fragment() {
         val typedValue = TypedValue()
         theme.resolveAttribute(attrRes, typedValue, true)
         return typedValue.data
-    }
-
-    private fun updateTransactionTotals(transactions: List<Transaction>) {
-        totalIncome = transactions.filter { it.category.type == "income" }
-            .sumOf { it.amount.toDouble() }
-        totalExpense = transactions.filter { it.category.type == "expense" }
-            .sumOf { it.amount.toDouble() }
     }
 
     //================================================================================
