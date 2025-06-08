@@ -90,7 +90,7 @@
 
         <action
             android:id="@+id/action_walletMainFragment_to_addWalletFragment"
-            app:destination="@id/navigation_wallet_add"
+            app:destination="@id/ind_wallet_navigation_graph"
             app:enterAnim="@anim/slide_in_up"
             app:exitAnim="@anim/fade_out"
             app:popEnterAnim="@anim/fade_in"
@@ -105,12 +105,13 @@
             app:popExitAnim="@anim/slide_out_down"/>
     </fragment>
 
-    <fragment
-        android:id="@+id/navigation_wallet_add"
-        android:name="com.synaptix.budgetbuddy.presentation.ui.main.wallet.walletAdd.WalletAddFragment"
-        android:label="Add Wallet"
-        tools:layout="@layout/fragment_wallet_add">
-    </fragment>
+    <!-- Include Wallet Navigation Graph -->
+    <include
+        app:graph="@navigation/ind_wallet_navigation_graph"
+        app:enterAnim="@anim/slide_in_up"
+        app:exitAnim="@anim/fade_out"
+        app:popEnterAnim="@anim/fade_in"
+        app:popExitAnim="@anim/slide_out_down"/>
 
     <fragment
         android:id="@+id/navigation_wallet_report"
