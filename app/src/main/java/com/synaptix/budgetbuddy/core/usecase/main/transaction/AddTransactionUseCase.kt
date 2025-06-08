@@ -25,6 +25,7 @@ import android.util.Log
 import com.synaptix.budgetbuddy.core.model.Transaction
 import com.synaptix.budgetbuddy.core.model.Result
 import com.synaptix.budgetbuddy.data.firebase.mapper.FirebaseMapper.toDTO
+import com.synaptix.budgetbuddy.data.firebase.repository.FirestoreBudgetRepository
 import com.synaptix.budgetbuddy.data.firebase.repository.FirestoreTransactionRepository
 import com.synaptix.budgetbuddy.data.firebase.repository.FirestoreWalletRepository
 import kotlinx.coroutines.flow.Flow
@@ -36,7 +37,8 @@ import javax.inject.Inject
 class AddTransactionUseCase @Inject constructor(
     // Injecting the FirestoreTransactionRepository to handle transaction-related operations
     private val transactionRepository: FirestoreTransactionRepository,
-    private val walletRepository: FirestoreWalletRepository
+    private val walletRepository: FirestoreWalletRepository,
+    private val budgetRepository: FirestoreBudgetRepository
 ) {
     sealed class AddTransactionResult {
         data class Success(val transactionId: String) : AddTransactionResult()
@@ -91,6 +93,13 @@ class AddTransactionUseCase @Inject constructor(
                 Log.e("AddTransactionUseCase", "Error updating wallet balance: ${result.exception.message}")
             }
         }
+    }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // Executes the operation to add a new budget transaction
+    private fun updateBudgetSpent(transaction: Transaction) {
+        val budgetCategory = transaction.category
+
     }
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~EOF~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
