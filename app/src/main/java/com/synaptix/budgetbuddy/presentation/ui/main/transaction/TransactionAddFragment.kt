@@ -84,7 +84,6 @@ class TransactionAddFragment : Fragment() {
         observeViewModel()
 
         applyScreenMode(transactionAddViewModel.screenMode.value)
-        populateInitialFormValues()
     }
 
     override fun onDestroyView() {
@@ -93,12 +92,13 @@ class TransactionAddFragment : Fragment() {
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-    // Initial Setup Methods
+    // View Setup
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private fun setupViews() {
         setupCurrencySpinner()
         setupClickListeners()
         setupTextWatchers()
+        setupImagePickers()
     }
 
     private fun setupCurrencySpinner() {
@@ -139,18 +139,15 @@ class TransactionAddFragment : Fragment() {
                     }
 
                     if (parsed.compareTo(BigDecimal.ZERO) == 0) {
-                        // Reset everything if value is exactly zero
                         current = ""
                         binding.edtTextAmount.setText("")
                         transactionAddViewModel.setAmount(0.0)
                         updateAmountAppearance(0.0)
                     } else {
                         val formatted = DecimalFormat("#,##0.00").format(parsed)
-
                         current = formatted
                         binding.edtTextAmount.setText(formatted)
                         binding.edtTextAmount.setSelection(formatted.length)
-
                         transactionAddViewModel.setAmount(parsed.toDouble())
                         updateAmountAppearance(parsed.toDouble())
                     }
@@ -189,26 +186,6 @@ class TransactionAddFragment : Fragment() {
             removePhoto()
         }
     }
-
-    private fun populateInitialFormValues() {
-        val amount = transactionAddViewModel.amount.value ?: 0.0
-        val note = transactionAddViewModel.note.value.orEmpty()
-
-        // Format the amount without triggering the TextWatcher
-        val formattedAmount = if (amount == 0.0) "" else DecimalFormat("#,##0.00").format(amount)
-
-        // Set values manually
-        binding.edtTextAmount.setText(formattedAmount)
-        binding.edtTextNote.setText(note)
-
-        // Re-attach TextWatchers
-        setupAmountWatcher()
-        setupNoteWatcher()
-
-        // Update appearance
-        updateAmountAppearance(amount)
-    }
-
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     // Screen Mode Handling
@@ -257,7 +234,6 @@ class TransactionAddFragment : Fragment() {
             enableAllInteractiveElements()
             btnRemovePhoto.visibility = if (transactionAddViewModel.imageBytes.value != null) View.VISIBLE else View.GONE
         }
-        setupClickListeners()
     }
 
     private fun applyCreateMode() {
@@ -279,26 +255,6 @@ class TransactionAddFragment : Fragment() {
             enableAllInteractiveElements()
             btnRemovePhoto.visibility = if (transactionAddViewModel.imageBytes.value != null) View.VISIBLE else View.GONE
         }
-        setupClickListeners()
-    }
-
-    private fun findCrocIcons(): List<ImageView> {
-        val crocIcons = mutableListOf<ImageView>()
-        
-        // Find all ImageViews in the root view
-        fun findImageViews(view: View) {
-            if (view is ImageView && view.drawable?.constantState == resources.getDrawable(R.drawable.ic_ui_croc_right, null).constantState) {
-                crocIcons.add(view)
-            }
-            if (view is ViewGroup) {
-                for (i in 0 until view.childCount) {
-                    findImageViews(view.getChildAt(i))
-                }
-            }
-        }
-        
-        findImageViews(binding.root)
-        return crocIcons
     }
 
     private fun disableAllInteractiveElements() {
@@ -641,12 +597,18 @@ class TransactionAddFragment : Fragment() {
                 binding.loadingOverlay.visibility = View.VISIBLE
                 binding.progressBar.visibility = View.VISIBLE
                 binding.successCheckmark.visibility = View.GONE
-                binding.loadingText.text = "Saving transaction..."
+                binding.loadingText.text = when (transactionAddViewModel.screenMode.value) {
+                    TransactionAddViewModel.ScreenMode.EDIT -> "Updating transaction..."
+                    else -> "Saving transaction..."
+                }
             }
             is TransactionAddViewModel.SavingUiState.Success -> {
                 binding.progressBar.visibility = View.GONE
                 binding.successCheckmark.visibility = View.VISIBLE
-                binding.loadingText.text = "Transaction saved successfully!"
+                binding.loadingText.text = when (transactionAddViewModel.screenMode.value) {
+                    TransactionAddViewModel.ScreenMode.EDIT -> "Transaction updated successfully!"
+                    else -> "Transaction saved successfully!"
+                }
                 
                 viewLifecycleOwner.lifecycleScope.launch {
                     delay(1000)
@@ -902,6 +864,30 @@ class TransactionAddFragment : Fragment() {
                 }}
             }
         }
+    }
+
+    private fun populateInitialFormValues() {
+        val amount = transactionAddViewModel.amount.value ?: 0.0
+        val note = transactionAddViewModel.note.value.orEmpty()
+
+        // Format the amount without triggering the TextWatcher
+        val formattedAmount = if (amount == 0.0) "" else DecimalFormat("#,##0.00").format(amount)
+
+        // Set values manually
+        binding.edtTextAmount.setText(formattedAmount)
+        binding.edtTextNote.setText(note)
+
+        // Re-attach TextWatchers
+        setupAmountWatcher()
+        setupNoteWatcher()
+
+        // Update appearance
+        updateAmountAppearance(amount)
+        updateCategoryAppearance(transactionAddViewModel.category.value)
+        updateWalletAppearance(transactionAddViewModel.wallet.value)
+        updateDateAppearance(transactionAddViewModel.date.value)
+        updateRecurrenceAppearance(transactionAddViewModel.recurrenceData.value)
+        updateLabelsAppearance(transactionAddViewModel.selectedLabels.value)
     }
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~EOF~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\

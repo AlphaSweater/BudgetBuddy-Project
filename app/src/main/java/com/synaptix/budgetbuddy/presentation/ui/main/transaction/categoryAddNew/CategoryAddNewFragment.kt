@@ -24,6 +24,9 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.delay
+import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.core.view.updateLayoutParams
+import com.synaptix.budgetbuddy.extentions.getThemeColor
 
 /**
  * Fragment for adding a new category.
@@ -60,6 +63,9 @@ class CategoryAddNewFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setupViews()
         observeViewModel()
+
+        applyScreenMode(viewModel.screenMode.value)
+        populateInitialFormValues()
     }
 
     override fun onDestroyView() {
@@ -126,6 +132,11 @@ class CategoryAddNewFragment : Fragment() {
             }
             toolbarTitle.text = "Edit Category"
             
+            // Update content margin when bottom container is visible
+            contentScrollView.updateLayoutParams<CoordinatorLayout.LayoutParams> {
+                bottomMargin = resources.getDimensionPixelSize(R.dimen.bottom_margin)
+            }
+            
             enableAllInteractiveElements()
         }
     }
@@ -139,6 +150,11 @@ class CategoryAddNewFragment : Fragment() {
                 visibility = View.VISIBLE
             }
             toolbarTitle.text = "Add New Category"
+            
+            // Update content margin when bottom container is visible
+            contentScrollView.updateLayoutParams<CoordinatorLayout.LayoutParams> {
+                bottomMargin = resources.getDimensionPixelSize(R.dimen.bottom_margin)
+            }
             
             enableAllInteractiveElements()
         }
@@ -359,6 +375,33 @@ class CategoryAddNewFragment : Fragment() {
         Snackbar.make(binding.root, message, Snackbar.LENGTH_SHORT)
             .setBackgroundTint(resources.getColor(R.color.success, null))
             .show()
+    }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // Form Handling
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    private fun populateInitialFormValues() {
+        val name = viewModel.categoryName.value
+
+        // Set values manually
+        binding.categoryNameInput.setText(name)
+
+        // Update appearance
+        updateCategoryAppearance()
+    }
+
+    private fun updateCategoryAppearance() {
+        binding.apply {
+            val selectedColor = viewModel.selectedColor.value
+            val selectedIcon = viewModel.selectedIcon.value
+
+            if (selectedColor == null || selectedIcon == null) {
+                previewIcon.setColorFilter(requireContext().getThemeColor(R.attr.bb_accent))
+            } else {
+                previewIcon.setColorFilter(requireContext().getColor(selectedColor.colorResourceId))
+                previewIcon.setImageResource(selectedIcon.iconResourceId)
+            }
+        }
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
