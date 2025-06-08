@@ -9,9 +9,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.navGraphViewModels
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.snackbar.Snackbar
 import com.synaptix.budgetbuddy.R
@@ -30,7 +30,7 @@ class TransactionSelectRecurrenceFragment : Fragment() {
     private var _binding: FragmentTransactionSelectRecurrenceBinding? = null
     private val binding get() = _binding!!
 
-    private val viewModel: TransactionAddViewModel by activityViewModels()
+    private val sharedViewModel: TransactionAddViewModel by navGraphViewModels(R.id.ind_transaction_navigation_graph) {defaultViewModelProviderFactory}
     private val recurrenceViewModel: TransactionSelectRecurrenceViewModel by viewModels()
     private val calendar = Calendar.getInstance()
     private val dateFormatter = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
@@ -315,7 +315,7 @@ class TransactionSelectRecurrenceFragment : Fragment() {
         }
 
         recurrenceViewModel.eventSave.observe(viewLifecycleOwner) { recurrenceData ->
-            viewModel.setRecurrenceData(recurrenceData)
+            sharedViewModel.setRecurrenceData(recurrenceData)
             findNavController().popBackStack()
         }
     }
@@ -329,7 +329,7 @@ class TransactionSelectRecurrenceFragment : Fragment() {
     private fun restorePreviousState() {
         Log.d("RecurrenceFragment", "Starting state restoration")
         // Get the current recurrence data from the parent view model
-        val currentRecurrenceData = viewModel.recurrenceData.value
+        val currentRecurrenceData = sharedViewModel.recurrenceData.value
         
         if (currentRecurrenceData != null && currentRecurrenceData != RecurrenceData.DEFAULT) {
             Log.d("RecurrenceFragment", "Found existing recurrence data: $currentRecurrenceData")

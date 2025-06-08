@@ -24,7 +24,7 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/mobile_navigation"
+    android:id="@+id/main_navigation_graph"
     app:startDestination="@+id/navigation_home">
 
     <!-- ====================================================================================== -->
@@ -59,70 +59,12 @@
     <!-- ====================================================================================== -->
     <!-- TRANSACTION MANAGEMENT SECTION -->
     <!-- ====================================================================================== -->
-    <!-- Main Transaction Add Fragment -->
-    <fragment
-        android:id="@+id/navigation_transaction_add"
-        android:name="com.synaptix.budgetbuddy.presentation.ui.main.transaction.TransactionAddFragment"
-        android:label="@string/title_transaction"
-        tools:layout="@layout/fragment_transaction_add">
-
-        <action
-            android:id="@+id/action_transactionAddFragment_to_transactionSelectWalletFragment"
-            app:destination="@id/navigation_transaction_select_wallet"
-            app:enterAnim="@anim/slide_in_up"
-            app:exitAnim="@anim/fade_out"
-            app:popEnterAnim="@anim/fade_in"
-            app:popExitAnim="@anim/slide_out_down" />
-
-        <action
-            android:id="@+id/action_transactionAddFragment_to_transactionSelectCategoryFragment"
-            app:destination="@id/navigation_transaction_select_category"
-            app:enterAnim="@anim/slide_in_up"
-            app:exitAnim="@anim/fade_out"
-            app:popEnterAnim="@anim/fade_in"
-            app:popExitAnim="@anim/slide_out_down" />
-
-        <action
-            android:id="@+id/action_transactionAddFragment_to_transactionSelectLabelFragment"
-            app:destination="@id/navigation_transaction_select_label"
-            app:enterAnim="@anim/slide_in_up"
-            app:exitAnim="@anim/fade_out"
-            app:popEnterAnim="@anim/fade_in"
-            app:popExitAnim="@anim/slide_out_down" />
-
-        <action
-            android:id="@+id/action_transactionAddFragment_to_transactionSelectRecurrenceFragment"
-            app:destination="@id/navigation_transaction_select_recurrence"
-            app:enterAnim="@anim/slide_in_up"
-            app:exitAnim="@anim/fade_out"
-            app:popEnterAnim="@anim/fade_in"
-            app:popExitAnim="@anim/slide_out_down" />
-    </fragment>
-
-    <!-- Transaction Selection Fragments -->
-    <fragment
-        android:id="@+id/navigation_transaction_select_category"
-        android:name="com.synaptix.budgetbuddy.presentation.ui.main.transaction.transactionSelectCategoryPopUp.TransactionSelectCategoryFragment"
-        android:label="Select Category"
-        tools:layout="@layout/fragment_transaction_select_category" />
-
-    <fragment
-        android:id="@+id/navigation_transaction_select_wallet"
-        android:name="com.synaptix.budgetbuddy.presentation.ui.main.transaction.transactionSelectWalletPopUp.TransactionSelectWalletFragment"
-        android:label="Select Wallet"
-        tools:layout="@layout/fragment_transaction_select_wallet" />
-
-    <fragment
-        android:id="@+id/navigation_transaction_select_label"
-        android:name="com.synaptix.budgetbuddy.presentation.ui.main.transaction.transactionSelectLabelPopUp.TransactionSelectLabelFragment"
-        android:label="Select Labels"
-        tools:layout="@layout/fragment_transaction_select_label" />
-
-    <fragment
-        android:id="@+id/navigation_transaction_select_recurrence"
-        android:name="com.synaptix.budgetbuddy.presentation.ui.main.transaction.transactionSelectRecurrencePopUp.TransactionSelectRecurrenceFragment"
-        android:label="Select Recurrence"
-        tools:layout="@layout/fragment_transaction_select_recurrence" />
+    <include
+        app:graph="@navigation/ind_transaction_navigation_graph"
+        app:enterAnim="@anim/slide_in_up"
+        app:exitAnim="@anim/fade_out"
+        app:popEnterAnim="@anim/fade_in"
+        app:popExitAnim="@anim/slide_out_down"/>
 
     <!-- Category Management -->
     <fragment
@@ -142,9 +84,13 @@
         android:label="Wallet"
         tools:layout="@layout/fragment_wallet_main">
 
+        <argument
+            android:name="walletId"
+            app:argType="string" />
+
         <action
             android:id="@+id/action_walletMainFragment_to_addWalletFragment"
-            app:destination="@id/navigation_wallet_add"
+            app:destination="@id/ind_wallet_navigation_graph"
             app:enterAnim="@anim/slide_in_up"
             app:exitAnim="@anim/fade_out"
             app:popEnterAnim="@anim/fade_in"
@@ -159,13 +105,13 @@
             app:popExitAnim="@anim/slide_out_down"/>
     </fragment>
 
-    <!-- Wallet Add Flow -->
-    <fragment
-        android:id="@+id/navigation_wallet_add"
-        android:name="com.synaptix.budgetbuddy.presentation.ui.main.wallet.walletAdd.WalletAddFragment"
-        android:label="Add Wallet"
-        tools:layout="@layout/fragment_wallet_add">
-    </fragment>
+    <!-- Include Wallet Navigation Graph -->
+    <include
+        app:graph="@navigation/ind_wallet_navigation_graph"
+        app:enterAnim="@anim/slide_in_up"
+        app:exitAnim="@anim/fade_out"
+        app:popEnterAnim="@anim/fade_in"
+        app:popExitAnim="@anim/slide_out_down"/>
 
     <fragment
         android:id="@+id/navigation_wallet_report"
@@ -181,6 +127,12 @@
         android:name="com.synaptix.budgetbuddy.presentation.ui.main.general.generalTransactions.GeneralTransactionsFragment"
         android:label="General Reports"
         tools:layout="@layout/fragment_general_transactions"/>
+
+    <fragment
+        android:id="@+id/generalIndividualTransactionFragment"
+        android:name="com.synaptix.budgetbuddy.presentation.ui.main.general.generalIndividualTransaction.GeneralIndividualTransactionFragment"
+        android:label="Transaction Details"
+        tools:layout="@layout/fragment_general_individual_transaction" />
 
     <fragment
         android:id="@+id/navigation_general_reports"
@@ -208,65 +160,20 @@
 
         <action
             android:id="@+id/action_budgetMainFragment_to_budgetAddFragment"
-            app:destination="@id/navigation_budget_add"
-            app:enterAnim="@anim/slide_in_up"
-            app:exitAnim="@anim/fade_out"
-            app:popEnterAnim="@anim/fade_in"
-            app:popExitAnim="@anim/slide_out_down" />
-
-<!--        <action-->
-<!--            android:id="@+id/action_budgetMainFragment_to_budgetGoalsFragment"-->
-<!--            app:destination="@id/navigation_budget_goals"-->
-<!--            app:enterAnim="@anim/slide_in_up"-->
-<!--            app:exitAnim="@anim/fade_out"-->
-<!--            app:popEnterAnim="@anim/fade_in"-->
-<!--            app:popExitAnim="@anim/slide_out_down"/>-->
-    </fragment>
-
-    <!-- Budget Goals -->
-<!--    <fragment-->
-<!--        android:id="@+id/navigation_budget_goals"-->
-<!--        android:name="com.synaptix.budgetbuddy.presentation.ui.main.budget.budgetGoals.BudgetGoalsFragment"-->
-<!--        android:label="Budget Goals"-->
-<!--        tools:layout="@layout/fragment_budget_main">-->
-<!--    </fragment>-->
-
-    <!-- Budget Add Flow -->
-    <fragment
-        android:id="@+id/navigation_budget_add"
-        android:name="com.synaptix.budgetbuddy.presentation.ui.main.budget.budgetAdd.BudgetAddFragment"
-        android:label="Add Budget"
-        tools:layout="@layout/fragment_budget_add">
-
-        <action
-            android:id="@+id/action_budgetAddFragment_to_budgetSelectCategoryFragment"
-            app:destination="@id/navigation_budget_select_category"
-            app:enterAnim="@anim/slide_in_up"
-            app:exitAnim="@anim/fade_out"
-            app:popEnterAnim="@anim/fade_in"
-            app:popExitAnim="@anim/slide_out_down" />
-
-        <action
-            android:id="@+id/action_budgetAddFragment_to_budgetSelectWalletFragment"
-            app:destination="@id/navigation_budget_select_wallet"
+            app:destination="@id/ind_budget_navigation_graph"
             app:enterAnim="@anim/slide_in_up"
             app:exitAnim="@anim/fade_out"
             app:popEnterAnim="@anim/fade_in"
             app:popExitAnim="@anim/slide_out_down" />
     </fragment>
 
-    <!-- Budget Selection Fragments -->
-    <fragment
-        android:id="@+id/navigation_budget_select_category"
-        android:name="com.synaptix.budgetbuddy.presentation.ui.main.budget.budgetAdd.budgetSelectCategoryPopUp.BudgetSelectCategoryFragment"
-        android:label="Select Category"
-        tools:layout="@layout/fragment_budget_select_category" />
-
-    <fragment
-        android:id="@+id/navigation_budget_select_wallet"
-        android:name="com.synaptix.budgetbuddy.presentation.ui.main.budget.budgetAdd.budgetSelectWalletPopUp.BudgetSelectWalletFragment"
-        android:label="Select Wallet"
-        tools:layout="@layout/fragment_budget_select_wallet" />
+    <!-- Include Budget Navigation Graph -->
+    <include
+        app:graph="@navigation/ind_budget_navigation_graph"
+        app:enterAnim="@anim/slide_in_up"
+        app:exitAnim="@anim/fade_out"
+        app:popEnterAnim="@anim/fade_in"
+        app:popExitAnim="@anim/slide_out_down"/>
 
     <fragment
         android:id="@+id/navigation_budget_report"

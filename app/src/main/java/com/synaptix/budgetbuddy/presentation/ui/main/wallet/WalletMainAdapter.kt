@@ -49,6 +49,7 @@ class WalletMainAdapter(
         private val walletName: TextView = itemView.findViewById(R.id.walletName)
         private val walletBalance: TextView = itemView.findViewById(R.id.walletBalance)
 
+
         /**
          * Binds wallet data to the view.
          * Sets the wallet icon, name, and balance.

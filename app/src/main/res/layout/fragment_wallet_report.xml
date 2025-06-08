@@ -120,60 +120,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/headerContainer">
 
-        <!-- Wallet Selection Dropdown -->
-        <androidx.cardview.widget.CardView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginEnd="8dp"
-            app:cardBackgroundColor="?attr/bb_background"
-            app:cardCornerRadius="25dp"
-            app:cardElevation="4dp">
-
-            <RelativeLayout
-                android:layout_width="130dp"
-                android:layout_height="40dp"
-                android:background="?attr/bb_surface"
-                android:gravity="center_vertical"
-                android:paddingStart="8dp"
-                android:paddingEnd="8dp">
-
-                <!-- Wallet Icon -->
-                <ImageView
-                    android:id="@+id/ivWalletIcon"
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:layout_alignParentStart="true"
-                    android:layout_centerVertical="true"
-                    android:src="@drawable/ic_wallet_24"
-                    app:tint="@color/cat_light_brown" />
-
-                <!-- Wallet Spinner Dropdown -->
-                <Spinner
-                    android:id="@+id/spinnerWallet"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginEnd="8dp"
-                    android:layout_toStartOf="@id/arrowIcon1"
-                    android:layout_toEndOf="@id/ivWalletIcon"
-                    android:backgroundTint="?attr/bb_surface"
-                    android:gravity="center_vertical"
-                    android:popupBackground="?attr/bb_surface"
-                    android:spinnerMode="dropdown"
-                    android:text="?attr/bb_expense" />
-
-                <!-- Arrow Icon for Wallet Dropdown -->
-                <ImageView
-                    android:id="@+id/arrowIcon1"
-                    android:layout_width="18dp"
-                    android:layout_height="18dp"
-                    android:layout_alignParentEnd="true"
-                    android:layout_centerVertical="true"
-                    android:src="@android:drawable/arrow_down_float"
-                    app:tint="?attr/bb_primaryText" />
-            </RelativeLayout>
-        </androidx.cardview.widget.CardView>
 
         <!-- Time Period Selection Dropdown -->
         <androidx.cardview.widget.CardView
@@ -190,8 +136,8 @@
                 android:layout_height="40dp">
 
                 <!-- Time Period Spinner Dropdown -->
-                <Spinner
-                    android:id="@+id/spinnerTimePeriod"
+                <Button
+                    android:id="@+id/btnTimePeriod"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:background="?attr/bb_surface"
@@ -201,7 +147,7 @@
                     android:paddingStart="16dp"
                     android:paddingEnd="36dp"
                     android:popupBackground="?attr/bb_surface"
-                    android:spinnerMode="dropdown" />
+                    />
 
                 <!-- Arrow Icon for Time Period Dropdown -->
                 <ImageView
@@ -245,70 +191,4 @@
     </ScrollView>
 
     <!-- CardView for Spending Overview -->
-    <androidx.cardview.widget.CardView
-        android:id="@+id/cardView_overview"
-        android:layout_width="200dp"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="16dp"
-        android:layout_marginTop="600dp"
-        android:backgroundTint="?attr/bb_surface"
-        android:padding="12dp"
-        app:cardCornerRadius="16dp"
-        app:cardElevation="4dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/headerContainer">
-
-        <!-- Inner ConstraintLayout inside CardView -->
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <!-- Icon: Pie chart image -->
-            <ImageView
-                android:id="@+id/spendingIcon"
-                android:layout_width="26dp"
-                android:layout_height="26dp"
-                android:layout_marginStart="5dp"
-                android:paddingTop="5dp"
-                android:paddingBottom="5dp"
-                android:src="@drawable/ic_pie_chart_24"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:tint="?attr/bb_primaryText" />
-
-            <!-- Text: Spending Overview title -->
-            <TextView
-                android:id="@+id/tvSpendingOverview"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingTop="5dp"
-                android:paddingBottom="5dp"
-                android:text="Spending Overview"
-                android:textColor="?attr/bb_primaryText"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/arrowIcon3"
-                app:layout_constraintStart_toEndOf="@+id/spendingIcon"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.0" />
-
-            <!-- Arrow icon -->
-            <ImageView
-                android:id="@+id/arrowIcon3"
-                android:layout_width="22dp"
-                android:layout_height="22dp"
-                android:layout_marginEnd="4dp"
-                android:paddingTop="5dp"
-                android:paddingBottom="5dp"
-                android:rotation="270"
-                android:src="@android:drawable/arrow_down_float"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:tint="?attr/bb_primaryText" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
-    </androidx.cardview.widget.CardView>
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -14,19 +14,18 @@
         android:layout_height="match_parent">
 
         <ImageView
-            android:id="@+id/iconView"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:padding="12dp"
+            android:id="@+id/itemView"
+            style="@style/IconButtonLarge"
+            android:layout_gravity="center"
+            android:src="@drawable/ic_circle_24"
             app:tint="?attr/bb_primaryText"/>
 
         <ImageView
             android:id="@+id/selectedIndicator"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
+            style="@style/IconButton"
             android:layout_gravity="center"
-            android:src="@drawable/ic_add_circle_40"
-            android:visibility="gone"
+            android:src="@drawable/ic_ui_circle_check"
+            android:visibility="visible"
             app:tint="?attr/bb_button"/>
 
     </FrameLayout>

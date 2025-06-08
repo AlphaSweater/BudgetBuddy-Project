@@ -86,7 +86,7 @@ class GetTransactionsUseCase @Inject constructor(
 
         return combine(
             userRepository.observeUserProfile(userId),
-            transactionRepository.observeTransactionsInDateRange(userId, startDate, endDate)
+            transactionRepository.observeTransactionsForUserInDateRange(userId, startDate, endDate)
         ) { user, transactions ->
             when (user) {
                 null -> GetTransactionsResult.Error("User not found")

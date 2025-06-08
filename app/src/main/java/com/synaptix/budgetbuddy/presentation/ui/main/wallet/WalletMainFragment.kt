@@ -20,8 +20,6 @@ import com.github.mikephil.charting.animation.Easing
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineDataSet
 import com.github.mikephil.charting.formatter.ValueFormatter
-import com.github.mikephil.charting.charts.LineChart
-import com.github.mikephil.charting.components.Legend
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
@@ -38,6 +36,7 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
+import kotlin.math.abs
 
 @AndroidEntryPoint
 class WalletMainFragment : Fragment() {
@@ -49,6 +48,10 @@ class WalletMainFragment : Fragment() {
         WalletMainAdapter { walletItem ->
             onWalletClicked(walletItem)
         }
+    }
+
+    private val walletId: String? by lazy {
+        arguments?.getString("walletId")
     }
 
     override fun onCreateView(
@@ -64,6 +67,8 @@ class WalletMainFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setupViews()
         observeViewModel()
+
+
     }
 
     private fun setupViews() {
@@ -85,9 +90,14 @@ class WalletMainFragment : Fragment() {
         }
     }
 
+
     private fun setupLineChart(transactions: List<Transaction>) {
         val lineChart = binding.lineChart
         val context = lineChart.context
+
+        lineChart.clear()
+        lineChart.setNoDataText("No transaction data available")
+        lineChart.setNoDataTextColor(context.getThemeColor(R.attr.bb_primaryText))
 
         if (transactions.isEmpty()) {
             lineChart.visibility = View.GONE
@@ -95,138 +105,142 @@ class WalletMainFragment : Fragment() {
         }
 
         lineChart.visibility = View.VISIBLE
-        lineChart.clear()
 
-        // Get theme colors
-        val typedValue = TypedValue()
-        context.theme.resolveAttribute(R.attr.bb_button, typedValue, true)
-        val lineColor = ContextCompat.getColor(context, typedValue.resourceId)
-        context.theme.resolveAttribute(R.attr.bb_primaryText, typedValue, true)
-        val primaryTextColor = ContextCompat.getColor(context, typedValue.resourceId)
-
-        // Sort transactions by date
+        // Sort transactions by date (oldest first)
         val sortedTransactions = transactions.sortedBy { it.date }
 
-        // Get date range (from first transaction to today)
-        val calendar = Calendar.getInstance()
-        val today = calendar.apply {
-            set(Calendar.HOUR_OF_DAY, 0)
-            set(Calendar.MINUTE, 0)
-            set(Calendar.SECOND, 0)
-            set(Calendar.MILLISECOND, 0)
-        }.timeInMillis
+        // Track transaction types
+        var hasIncome = false
+        var hasExpenses = false
 
-        val firstTransactionDate = sortedTransactions.firstOrNull()?.date ?: run {
+        // Get unique transaction dates
+        val transactionDates = sortedTransactions.map {
+            // Check transaction type
+            if (it.category.type.equals("income", true)) {
+                hasIncome = true
+            } else {
+                hasExpenses = true
+            }
+
+            val cal = Calendar.getInstance().apply { timeInMillis = it.date }
+            cal.set(Calendar.HOUR_OF_DAY, 0)
+            cal.set(Calendar.MINUTE, 0)
+            cal.set(Calendar.SECOND, 0)
+            cal.set(Calendar.MILLISECOND, 0)
+            cal.timeInMillis
+        }.distinct().sorted()
+
+        if (transactionDates.isEmpty()) {
             lineChart.visibility = View.GONE
             return
         }
 
-        // Group transactions by date
-        val transactionsByDate = sortedTransactions
-            .groupBy { transaction ->
-                calendar.timeInMillis = transaction.date
-                calendar.set(Calendar.HOUR_OF_DAY, 0)
-                calendar.set(Calendar.MINUTE, 0)
-                calendar.set(Calendar.SECOND, 0)
-                calendar.set(Calendar.MILLISECOND, 0)
-                calendar.timeInMillis
-            }
+        // Group transactions by day
+        val dailyTransactions = sortedTransactions.groupBy { transaction ->
+            val cal = Calendar.getInstance().apply { timeInMillis = transaction.date }
+            cal.set(Calendar.HOUR_OF_DAY, 0)
+            cal.set(Calendar.MINUTE, 0)
+            cal.set(Calendar.SECOND, 0)
+            cal.set(Calendar.MILLISECOND, 0)
+            cal.timeInMillis
+        }
 
-        // Get all transaction dates
-        val transactionDates = transactionsByDate.keys.sorted()
-
+        // Prepare data entries and x-axis labels
         val entries = mutableListOf<Entry>()
         val xLabels = mutableListOf<String>()
         var runningBalance = 0.0
-        val dateFormat = SimpleDateFormat("MMM d", Locale.getDefault())
 
-        // Skip the initial zero point and start from first transaction
-        var firstTransaction = true
+        // Add initial point at 0
+        entries.add(Entry(0f, runningBalance.toFloat()))
+        xLabels.add("")
 
-        // Process each transaction date
+        // Calculate running balance for each transaction date
         transactionDates.forEachIndexed { index, date ->
-            // Get transactions for this day
-            val dailyTransactions = transactionsByDate[date] ?: return@forEachIndexed
-            val dailyNet = dailyTransactions.sumOf { it.amount }
+            val dailyNet = dailyTransactions[date]?.sumOf {
+                if (it.category.type.equals("income", true)) {
+                    it.amount.toDouble()  // Income adds to balance
+                } else {
+                    -it.amount.toDouble() // Expenses subtract from balance
+                }
+            } ?: 0.0
 
-            // Update running balance
             runningBalance += dailyNet
-
-            // Add entry for this day (skip the first point if it's zero)
-            if (!firstTransaction || runningBalance != 0.0) {
-                entries.add(Entry(index.toFloat(), runningBalance.toFloat()))
-                xLabels.add(if (index % 3 == 0) dateFormat.format(Date(date)) else "")
-                firstTransaction = false
-            }
+            entries.add(Entry((index + 1).toFloat(), runningBalance.toFloat()))
+            xLabels.add(SimpleDateFormat("MMM d", Locale.getDefault()).format(Date(date)))
         }
 
-        // If no valid entries, hide the chart
-        if (entries.isEmpty()) {
-            lineChart.visibility = View.GONE
-            return
+        // Determine line and gradient colors based on transaction types
+        val (lineColorResId, gradientResId) = when {
+            hasIncome && hasExpenses -> Pair(R.color.button, R.drawable.gradient_wallet)
+            hasIncome -> Pair(R.color.profit_green, R.drawable.gradient_income)
+            else -> Pair(R.color.expense_red, R.drawable.gradient_expense)
         }
 
-        // Create dataset with curved line
+        val lineColor = ContextCompat.getColor(context, lineColorResId)
+        val typedValue = TypedValue()
+        context.theme.resolveAttribute(R.attr.bb_primaryText, typedValue, true)
+        val primaryTextColor = ContextCompat.getColor(context, typedValue.resourceId)
+
+        // Create dataset
         val dataSet = LineDataSet(entries, "Balance").apply {
             color = lineColor
             lineWidth = 2.5f
             setCircleColor(lineColor)
-            circleRadius = 4f
+            circleRadius = 3f
             setDrawCircleHole(false)
-            mode = LineDataSet.Mode.CUBIC_BEZIER
-            cubicIntensity = 0.2f
-            setDrawFilled(true)
-            fillDrawable = ContextCompat.getDrawable(context, R.drawable.gradient_wallet)
+            mode = LineDataSet.Mode.LINEAR
             setDrawValues(false)
-            setDrawCircles(true)
+            setDrawCircles(entries.size <= 15)
             circleHoleRadius = 2f
             setDrawHorizontalHighlightIndicator(false)
             setDrawVerticalHighlightIndicator(false)
+
+            // Set gradient fill
+            fillDrawable = ContextCompat.getDrawable(context, gradientResId)
+            setDrawFilled(true)
             fillAlpha = 80
         }
 
         val lineData = LineData(dataSet).apply {
             setValueFormatter(object : ValueFormatter() {
                 override fun getFormattedValue(value: Float): String {
-                    return "R${value.toInt()}"
+                    return if (value >= 0) {
+                        "R${"%,.0f".format(value.toDouble())}"
+                    } else {
+                        "-R${"%,.0f".format(abs(value.toDouble()))}"
+                    }
                 }
             })
         }
 
         lineChart.apply {
-            clear()
             data = lineData
 
-            // Configure x-axis (bottom)
+            // Configure x-axis
             xAxis.apply {
-                position = XAxis.XAxisPosition.BOTTOM
+                valueFormatter = IndexAxisValueFormatter(xLabels)
                 granularity = 1f
                 textColor = primaryTextColor
+                position = XAxis.XAxisPosition.BOTTOM
                 setDrawGridLines(false)
-                axisLineColor = Color.argb(50,
-                    Color.red(primaryTextColor),
-                    Color.green(primaryTextColor),
-                    Color.blue(primaryTextColor)
-                )
-                axisLineWidth = 1f
                 labelRotationAngle = -45f
-                valueFormatter = object : ValueFormatter() {
-                    override fun getFormattedValue(value: Float): String {
-                        val index = value.toInt()
-                        return if (index in xLabels.indices) xLabels[index] else ""
-                    }
-                }
-                // Only show some labels to avoid crowding
-                setLabelCount(minOf(7, xLabels.size), true)
                 setAvoidFirstLastClipping(true)
-                // Remove first label
-                setAxisMinimum(-0.5f)
+                setCenterAxisLabels(false)
+                axisMinimum = 0f
+                axisMaximum = (xLabels.size - 1).toFloat()
+                setLabelCount(minOf(xLabels.size, 10), true)
             }
 
-            // Configure y-axis (left)
+            // Configure y-axis
             axisLeft.apply {
                 textColor = primaryTextColor
-                setDrawGridLines(false)
+                setDrawGridLines(true)
+                gridColor = Color.argb(50,
+                    Color.red(primaryTextColor),
+                    Color.green(primaryTextColor),
+                    Color.blue(primaryTextColor)
+                )
+                gridLineWidth = 0.5f
                 axisLineColor = Color.argb(50,
                     Color.red(primaryTextColor),
                     Color.green(primaryTextColor),
@@ -235,45 +249,82 @@ class WalletMainFragment : Fragment() {
                 axisLineWidth = 1f
                 valueFormatter = object : ValueFormatter() {
                     override fun getFormattedValue(value: Float): String {
-                        return "R${value.toInt()}"
+                        return if (value >= 0) {
+                            "R${"%,.0f".format(value.toDouble())}"
+                        } else {
+                            "-R${"%,.0f".format(abs(value.toDouble()))}"
+                        }
                     }
                 }
-                // Calculate nice axis range
-                val minY = entries.minOfOrNull { it.y } ?: 0f
-                val maxY = entries.maxOfOrNull { it.y } ?: 0f
-                val padding = maxOf(10f, (maxY - minY) * 0.1f)
-                axisMinimum = (minY - padding).coerceAtLeast(0f)
+
+                // Calculate min and max values with some padding
+                val minY = entries.minByOrNull { it.y }?.y ?: 0f
+                val maxY = entries.maxByOrNull { it.y }?.y ?: 0f
+                val range = maxY - minY
+                val padding = if (range > 0) range * 0.1f else 10f
+
+                // Always include 0 in the y-axis range
+                axisMinimum = minOf(minY - padding, 0f)
                 axisMaximum = maxY + padding
+
+                // Add zero line
+                setDrawZeroLine(true)
+                zeroLineColor = Color.argb(100,
+                    Color.red(primaryTextColor),
+                    Color.green(primaryTextColor),
+                    Color.blue(primaryTextColor)
+                )
+                zeroLineWidth = 1f
             }
 
-            // Disable right axis
+            // Configure chart appearance
+            setExtraOffsets(24f, 24f, 24f, 40f)
             axisRight.isEnabled = false
-
-            // Disable legend
+            description.isEnabled = false
             legend.isEnabled = false
 
-            // Disable description
-            description.isEnabled = false
-
-            // Enable touch interaction
-            setTouchEnabled(true)
-            isDragEnabled = true
+            // Configure viewport
             setScaleEnabled(true)
+            isDragEnabled = true
             setPinchZoom(true)
-            setDoubleTapToZoomEnabled(true)
 
-            // Set extra offsets for better display
-            setExtraOffsets(10f, 20f, 10f, 30f)
+            // Set viewport to show all data
+            setVisibleXRange(0f, minOf(7f, transactionDates.size.toFloat()))
+            moveViewToX(0f)
 
-            // Set transparent background
-            setBackgroundColor(Color.TRANSPARENT)
+            // Add nice animation
+            animateX(1200, Easing.EaseInOutQuad)
+            animateY(1200, Easing.EaseInOutQuad)
 
-            // Animation
-            animateY(1000, Easing.EaseInOutCubic)
-
-            // Refresh the chart
+            // Refresh
             invalidate()
         }
+    }
+
+    private fun generateDateRange(startDate: Long, endDate: Long): List<Long> {
+        val dates = mutableListOf<Long>()
+        val calendar = Calendar.getInstance().apply {
+            timeInMillis = startDate
+            set(Calendar.HOUR_OF_DAY, 0)
+            set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
+        }
+
+        val endCal = Calendar.getInstance().apply {
+            timeInMillis = endDate
+            set(Calendar.HOUR_OF_DAY, 23)
+            set(Calendar.MINUTE, 59)
+            set(Calendar.SECOND, 59)
+            set(Calendar.MILLISECOND, 999)
+        }
+
+        while (calendar.timeInMillis <= endCal.timeInMillis) {
+            dates.add(calendar.timeInMillis)
+            calendar.add(Calendar.DAY_OF_MONTH, 1)
+        }
+
+        return dates
     }
 
     private fun observeViewModel() {
@@ -407,8 +458,11 @@ class WalletMainFragment : Fragment() {
     }
 
     private fun onWalletClicked(wallet: BudgetListItems.BudgetWalletItem) {
-        // TODO: Navigate to wallet details
-        // findNavController().navigate(R.id.action_walletMainFragment_to_walletDetailsFragment)
+        println("WalletMainFragment: Navigating to wallet report for wallet ID: ${wallet.wallet.id}")
+        val bundle = Bundle().apply {
+            putString("walletId", wallet.wallet.id)
+        }
+        findNavController().navigate(R.id.action_walletMainFragment_to_walletReportFragment, bundle)
     }
 
     override fun onDestroyView() {

@@ -19,6 +19,7 @@ import android.text.Editable
 import android.text.TextWatcher
 import androidx.core.widget.doAfterTextChanged
 import com.google.android.material.snackbar.Snackbar
+import androidx.navigation.navGraphViewModels
 
 @AndroidEntryPoint
 class WalletAddFragment : Fragment() {
@@ -26,7 +27,7 @@ class WalletAddFragment : Fragment() {
     private var _binding: FragmentWalletAddBinding? = null
     private val binding get() = _binding!!
 
-    private val viewModel: WalletAddViewModel by viewModels()
+    private val sharedViewModel: WalletAddViewModel by navGraphViewModels(R.id.ind_wallet_navigation_graph) { defaultViewModelProviderFactory }
 
     // --- Lifecycle ---
     override fun onCreateView(
@@ -73,11 +74,11 @@ class WalletAddFragment : Fragment() {
             }
 
             switchNotifications.setOnCheckedChangeListener { _, isChecked ->
-                viewModel.updateEnableNotifications(isChecked)
+                sharedViewModel.updateEnableNotifications(isChecked)
             }
 
             switchExcludeTotal.setOnCheckedChangeListener { _, isChecked ->
-                viewModel.updateExcludeFromTotal(isChecked)
+                sharedViewModel.updateExcludeFromTotal(isChecked)
             }
 
             btnSave.setOnClickListener {
@@ -89,11 +90,11 @@ class WalletAddFragment : Fragment() {
     private fun setupTextWatchers() {
         with(binding){
             binding.edtWalletName.doAfterTextChanged { text ->
-                viewModel.setWalletName(text.toString())
+                sharedViewModel.setWalletName(text.toString())
             }
 
-            binding.edtInitialAmount.doAfterTextChanged { text ->
-                viewModel.setWalletAmount(text.toString())
+            binding.edtTextAmount.doAfterTextChanged { text ->
+                sharedViewModel.setWalletAmount(text.toString())
             }
         }
     }
@@ -101,23 +102,29 @@ class WalletAddFragment : Fragment() {
     // --- Save Logic ---
     private fun saveWallet() {
         val walletName = binding.edtWalletName.text.toString()
-        viewModel.setWalletName(walletName)
+        sharedViewModel.setWalletName(walletName)
 
-        val walletAmount = binding.edtInitialAmount.text.toString()
-        viewModel.setWalletAmount(walletAmount)
+        val walletAmount = binding.edtTextAmount.text.toString()
+        sharedViewModel.setWalletAmount(walletAmount)
+
+        val walletMinGoal = binding.edtMinAmount.text.toString()
+        sharedViewModel.setWalletMinGoal(walletMinGoal)
+
+        val walletMaxGoal = binding.edtMaxAmount.text.toString()
+        sharedViewModel.setWalletMaxGoal(walletMaxGoal)
 
         val walletCurrency = binding.spinnerCurrency.selectedItem.toString()
-        viewModel.setWalletCurrency(walletCurrency)
+        sharedViewModel.setWalletCurrency(walletCurrency)
 
         // Show validation errors if any
-        viewModel.showValidationErrors()
+        sharedViewModel.showValidationErrors()
 
         // Check if form is valid before proceeding
-        if (!viewModel.validateForm()) return
+        if (!sharedViewModel.validateForm()) return
 
         viewLifecycleOwner.lifecycleScope.launch {
             try {
-                viewModel.addWallet()
+                sharedViewModel.addWallet()
             } catch (e: Exception) {
                 showError("Failed to save wallet: ${e.message}")
             }
@@ -130,14 +137,14 @@ class WalletAddFragment : Fragment() {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 // Collect UI state
                 launch {
-                    viewModel.uiState.collect { state ->
+                    sharedViewModel.uiState.collect { state ->
                         handleUiState(state)
                     }
                 }
                 
                 // Collect validation state
                 launch {
-                    viewModel.validationState.collect { state ->
+                    sharedViewModel.validationState.collect { state ->
                         handleValidationState(state)
                     }
                 }
@@ -177,10 +184,10 @@ class WalletAddFragment : Fragment() {
                 visibility = if (state.shouldShowErrors && state.walletAmountError != null) View.VISIBLE else View.GONE
             }
 
-            textCurrencyError.apply {
-                text = state.walletCurrencyError
-                visibility = if (state.shouldShowErrors && state.walletCurrencyError != null) View.VISIBLE else View.GONE
-            }
+//            textCurrencyError.apply {
+//                text = state.walletCurrencyError
+//                visibility = if (state.shouldShowErrors && state.walletCurrencyError != null) View.VISIBLE else View.GONE
+//            }
         }
     }
 

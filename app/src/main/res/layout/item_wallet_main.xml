@@ -93,10 +93,11 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
+                    android:includeFontPadding="false"
+                    android:paddingTop="3dp"
                     android:textColor="?attr/bb_secondaryText"
                     android:textSize="11sp"
-                    tools:text="• Today"
-                    android:includeFontPadding="false"/>
+                    tools:text="• Today" />
 
             </LinearLayout>
 

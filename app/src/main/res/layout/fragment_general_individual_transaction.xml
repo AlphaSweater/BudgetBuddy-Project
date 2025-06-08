@@ -21,249 +21,323 @@
 <!--    * https://www.youtube.com/watch?v=A_tPafV23DM&list=PLPgs125_L-X9H6J7x4beRU-AxJ4mXe5vX-->
 <!--    ======================================================================================-->
 
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="?attr/bb_background"
     tools:context=".presentation.ui.main.general.generalIndividualTransaction.GeneralIndividualTransactionFragment">
 
-
-    <!-- Top Bar (no padding) -->
-    <LinearLayout
-        android:id="@+id/top_bar"
+    <!-- Top App Bar -->
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
-        android:layout_height="70dp"
-        android:orientation="vertical"
-        android:gravity="center"
-        android:background="?attr/bb_expense"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        android:layout_height="wrap_content"
+        android:background="@android:color/transparent"
+        app:elevation="0dp">
 
-        <!-- Title Text -->
-        <TextView
-            android:id="@+id/individualCategoryName"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Transaction Name"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:textColor="?attr/bb_primaryText"
-            android:layout_marginStart="16dp"/>
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@android:color/transparent">
 
-        <!-- Amount Text -->
-        <TextView
-            android:id="@+id/amount"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Amount"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:textColor="?attr/bb_primaryText"
-            android:layout_marginStart="16dp"/>
-    </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingHorizontal="4dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp">
 
-    <!-- For example -->
-    <ImageButton
-        android:id="@+id/btnGoBack"
-        android:layout_width="44dp"
-        android:layout_height="44dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:background="@null"
-        android:contentDescription="@string/back"
-        android:src="?attr/actionModeCloseDrawable"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:tint="?attr/bb_primaryText" />
-    <!-- Everything else inside this padded container -->
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/contentContainer"
+                <ImageButton
+                    android:id="@+id/btnGoBack"
+                    style="@style/ToolButtonIcon"
+                    android:contentDescription="@string/back"
+                    android:src="@drawable/ic_ui_arrow_back" />
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_weight="1" />
+            </LinearLayout>
+        </androidx.appcompat.widget.Toolbar>
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <!-- Main Content -->
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:padding="16dp"
-        app:layout_constraintTop_toBottomOf="@id/top_bar"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent">
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:fillViewport="true"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <!-- Move all other views here (ImageButton, Rows, ImageView, etc.) -->
-
-        <!-- Include rest of your rows and ImageView inside this container -->
-
-        <!-- Wallet Row -->
         <LinearLayout
-            android:id="@+id/rowSelectWallet"
-            style="@style/RowStyle"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
 
-            <ImageView
-                style="@style/RowIconStyle"
-                android:src="@drawable/ic_wallet_24"
-                app:tint="?attr/bb_expense" />
-
-            <TextView
-                android:layout_width="0dp"
+            <!-- Amount Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="12dp"
-                android:layout_weight="1"
-                android:gravity="center_vertical"
-                android:text="@string/wallet"
-                android:textColor="?attr/bb_primaryText"
-                android:textSize="18sp" />
+                android:layout_marginBottom="16dp"
+                app:cardBackgroundColor="?attr/bb_surface"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0dp">
 
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:id="@+id/amount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="R 0.00"
+                        android:textSize="40sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Details Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardBackgroundColor="?attr/bb_surface"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <!-- Category Row -->
+                    <LinearLayout
+                        android:id="@+id/rowSelectCategory"
+                        style="@style/RowStyle">
+
+                        <ImageView
+                            style="@style/RowIconStyle"
+                            android:src="@drawable/ic_ui_categories"
+                            app:tint="?attr/bb_accent" />
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:layout_marginStart="12dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/category"
+                                android:textColor="?attr/bb_primaryText"
+                                android:textSize="16sp" />
+
+                            <TextView
+                                android:id="@+id/individualCategoryName"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textColor="?attr/bb_secondaryText"
+                                android:textSize="14sp" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <!-- Wallet Row -->
+                    <LinearLayout
+                        android:id="@+id/rowSelectWallet"
+                        style="@style/RowStyle">
+
+                        <ImageView
+                            style="@style/RowIconStyle"
+                            android:src="@drawable/ic_ui_wallet"
+                            app:tint="?attr/bb_accent" />
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:layout_marginStart="12dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/wallet"
+                                android:textColor="?attr/bb_primaryText"
+                                android:textSize="16sp" />
+
+                            <TextView
+                                android:id="@+id/walletName"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textColor="?attr/bb_secondaryText"
+                                android:textSize="14sp" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <!-- Note Row -->
+                    <LinearLayout
+                        android:id="@+id/rowNoteRow"
+                        style="@style/RowStyle">
+
+                        <ImageView
+                            style="@style/RowIconStyle"
+                            android:src="@drawable/ic_ui_notebook"
+                            app:tint="?attr/bb_accent" />
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:layout_marginStart="12dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/note"
+                                android:textColor="?attr/bb_primaryText"
+                                android:textSize="16sp" />
+
+                            <TextView
+                                android:id="@+id/textNote"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textColor="?attr/bb_secondaryText"
+                                android:textSize="14sp" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <!-- Date Row -->
+                    <LinearLayout
+                        android:id="@+id/rowStartRow"
+                        style="@style/RowStyle">
+
+                        <ImageView
+                            style="@style/RowIconStyle"
+                            android:src="@drawable/ic_ui_calendar"
+                            app:tint="?attr/bb_accent" />
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:layout_marginStart="12dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/start_date"
+                                android:textColor="?attr/bb_primaryText"
+                                android:textSize="16sp" />
+
+                            <TextView
+                                android:id="@+id/textStartDate"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textColor="?attr/bb_secondaryText"
+                                android:textSize="14sp" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <!-- Recurrence Row -->
+                    <LinearLayout
+                        android:id="@+id/rowRecurrenceRow"
+                        style="@style/RowStyle">
+
+                        <ImageView
+                            style="@style/RowIconStyle"
+                            android:src="@drawable/ic_ui_recurrence"
+                            app:tint="?attr/bb_accent" />
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:layout_marginStart="12dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/recurrence"
+                                android:textColor="?attr/bb_primaryText"
+                                android:textSize="16sp" />
+
+                            <TextView
+                                android:id="@+id/textRecurrence"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textColor="?attr/bb_secondaryText"
+                                android:textSize="14sp" />
+                        </LinearLayout>
+                    </LinearLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Photo Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/photoCard"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardBackgroundColor="?attr/bb_surface"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <!-- Photo Row -->
+                    <LinearLayout
+                        android:id="@+id/rowPhotoRow"
+                        style="@style/RowStyle">
+
+                        <ImageView
+                            style="@style/RowIconStyle"
+                            android:src="@drawable/ic_ui_image_add"
+                            app:tint="?attr/bb_accent" />
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="12dp"
+                            android:layout_weight="1"
+                            android:text="@string/picture"
+                            android:textColor="?attr/bb_primaryText"
+                            android:textSize="16sp" />
+                    </LinearLayout>
+
+                    <!-- Image Preview -->
+                    <com.google.android.material.imageview.ShapeableImageView
+                        android:id="@+id/imageView3"
+                        android:layout_width="match_parent"
+                        android:layout_height="200dp"
+                        android:layout_margin="16dp"
+                        android:adjustViewBounds="true"
+                        android:scaleType="centerCrop"
+                        android:visibility="gone"
+                        app:shapeAppearanceOverlay="@style/RoundedImageView"
+                        tools:src="@tools:sample/avatars"
+                        tools:visibility="visible" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
         </LinearLayout>
-
-        <!-- Amount Row -->
-        <LinearLayout
-            android:id="@+id/rowAmountRow"
-            style="@style/RowStyle"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/rowSelectWallet">
-
-            <ImageView
-                style="@style/RowIconStyle"
-                android:src="@drawable/baseline_savings_24"
-                app:tint="?attr/bb_expense" />
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="12dp"
-                android:layout_weight="1"
-                android:gravity="center_vertical"
-                android:text="@string/amount"
-                android:textColor="?attr/bb_primaryText"
-                android:textSize="18sp" />
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="12dp"
-                android:layout_weight="1"
-                android:gravity="right"
-                android:text="R XXX"
-                android:textColor="?attr/bb_expense"
-                android:textSize="18sp" />
-        </LinearLayout>
-
-        <!-- Note Row -->
-        <LinearLayout
-            android:id="@+id/rowNoteRow"
-            style="@style/RowStyle"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/rowAmountRow">
-
-            <ImageView
-                style="@style/RowIconStyle"
-                android:src="@drawable/ic_edit_note_24"
-                app:tint="?attr/bb_expense" />
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="12dp"
-                android:layout_weight="1"
-                android:gravity="center_vertical"
-                android:text="Here the users note will be displayed"
-                android:textColor="?attr/bb_primaryText"
-                android:textSize="18sp" />
-        </LinearLayout>
-
-        <!-- Note Row -->
-        <LinearLayout
-            android:id="@+id/rowStartRow"
-            style="@style/RowStyle"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/rowNoteRow">
-
-            <ImageView
-                style="@style/RowIconStyle"
-                android:src="@drawable/ic_calendar_month_24"
-                app:tint="?attr/bb_expense" />
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="12dp"
-                android:layout_weight="1"
-                android:gravity="center_vertical"
-                android:text="@string/start_date"
-                android:textColor="?attr/bb_primaryText"
-                android:textSize="18sp" />
-        </LinearLayout>
-
-        <!-- Recurrence Row -->
-        <LinearLayout
-            android:id="@+id/rowRecurrenceRow"
-            style="@style/RowStyle"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/rowStartRow">
-
-            <ImageView
-                style="@style/RowIconStyle"
-                android:src="@drawable/ic_autorenew_24"
-                app:tint="?attr/bb_expense" />
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="12dp"
-                android:layout_weight="1"
-                android:gravity="center_vertical"
-                android:text="@string/recurrence"
-                android:textColor="?attr/bb_primaryText"
-                android:textSize="18sp" />
-        </LinearLayout>
-
-        <!-- Recurrence Row -->
-        <LinearLayout
-            android:id="@+id/rowPhotoRow"
-            style="@style/RowStyle"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/rowRecurrenceRow">
-
-            <ImageView
-                style="@style/RowIconStyle"
-                android:src="@drawable/ic_add_photo_alternate_24"
-                app:tint="?attr/bb_expense" />
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="12dp"
-                android:layout_weight="1"
-                android:gravity="center_vertical"
-                android:text="@string/picture"
-                android:textColor="?attr/bb_primaryText"
-                android:textSize="18sp" />
-        </LinearLayout>
-
-        <ImageView
-            android:id="@+id/imageView3"
-            android:layout_width="343dp"
-            android:layout_height="304dp"
-            android:layout_marginTop="32dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/rowPhotoRow"
-            tools:src="@tools:sample/avatars" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.core.widget.NestedScrollView>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
 
 
