@@ -10,7 +10,6 @@ data class BudgetDTO(
     val userId: String = "", // Firestore user ID
     val name: String = "",
     val amount: Double = 0.0,
-    val spent: Double = 0.0,
     val categoryIds: List<String> = emptyList(), // List of category IDs associated with this budget
     val createdAt: Long = System.currentTimeMillis(),
     val updatedAt: Long = System.currentTimeMillis(),
@@ -22,14 +21,6 @@ data class BudgetDTO(
     @get:Exclude
     val isActive: Boolean
         get() = endDate == null || endDate > System.currentTimeMillis()
-
-    @get:Exclude
-    val isOverBudget: Boolean
-        get() = spent > amount
-
-    @get:Exclude
-    val remainingAmount: Double
-        get() = amount - spent
 
     @get:Exclude
     val isRecurringMonthly: Boolean

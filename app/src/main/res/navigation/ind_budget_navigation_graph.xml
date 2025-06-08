@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/ind_budget_navigation_graph"
+    app:startDestination="@id/navigation_budget_add">
+
+    <!-- Main Budget Add Fragment -->
+    <fragment
+        android:id="@+id/navigation_budget_add"
+        android:name="com.synaptix.budgetbuddy.presentation.ui.main.budget.budgetAdd.BudgetAddFragment"
+        android:label="Add Budget"
+        tools:layout="@layout/fragment_budget_add">
+
+        <action
+            android:id="@+id/action_budgetAddFragment_to_budgetSelectCategoryFragment"
+            app:destination="@id/navigation_budget_select_category"
+            app:enterAnim="@anim/slide_in_up"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/slide_out_down" />
+    </fragment>
+
+    <!-- Budget Selection Fragments -->
+    <fragment
+        android:id="@+id/navigation_budget_select_category"
+        android:name="com.synaptix.budgetbuddy.presentation.ui.main.budget.budgetAdd.budgetSelectCategoryPopUp.BudgetSelectCategoryFragment"
+        android:label="Select Category"
+        tools:layout="@layout/fragment_budget_select_category" />
+</navigation> 

@@ -19,7 +19,9 @@ class CategoryAddNewViewModel @Inject constructor(
     private val getUserIdUseCase: GetUserIdUseCase
 ) : ViewModel() {
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     // UI State
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     sealed class UiState {
         object Initial : UiState()
         object Loading : UiState()
@@ -45,58 +47,71 @@ class CategoryAddNewViewModel @Inject constructor(
     private val _validationState = MutableStateFlow(ValidationState())
     val validationState: StateFlow<ValidationState> = _validationState
 
-    // Form state
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // Form State
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private val _categoryName = MutableStateFlow("")
     val categoryName: StateFlow<String> = _categoryName
 
     private val _categoryType = MutableStateFlow("Expense")
     val categoryType: StateFlow<String> = _categoryType
 
-    // Selection state
-    private val _selectedColor = MutableStateFlow<ColorItem?>(null)
-    val selectedColor: StateFlow<ColorItem?> = _selectedColor
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // Selection State
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    private val _selectedColor = MutableStateFlow<CategoryItem.ColorItem?>(null)
+    val selectedColor: StateFlow<CategoryItem.ColorItem?> = _selectedColor
 
-    private val _selectedIcon = MutableStateFlow<IconItem?>(null)
-    val selectedIcon: StateFlow<IconItem?> = _selectedIcon
+    private val _selectedIcon = MutableStateFlow<CategoryItem.IconItem?>(null)
+    val selectedIcon: StateFlow<CategoryItem.IconItem?> = _selectedIcon
 
-    // Available colors
-    private val _colors = MutableStateFlow<List<ColorItem>>(listOf(
-        ColorItem(R.color.cat_dark_pink, "Pink"),
-        ColorItem(R.color.cat_yellow, "Yellow"),
-        ColorItem(R.color.cat_gold, "Gold"),
-        ColorItem(R.color.cat_dark_purple, "Purple"),
-        ColorItem(R.color.cat_light_green, "Green"),
-        ColorItem(R.color.cat_light_purple, "Light Purple"),
-        ColorItem(R.color.cat_dark_blue, "Dark Blue"),
-        ColorItem(R.color.cat_light_blue, "Light Blue")
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // Available Options
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    private val _colors = MutableStateFlow<List<CategoryItem.ColorItem>>(listOf(
+        CategoryItem.ColorItem(R.color.cat_dark_pink, "Pink"),
+        CategoryItem.ColorItem(R.color.cat_yellow, "Yellow"),
+        CategoryItem.ColorItem(R.color.cat_gold, "Gold"),
+        CategoryItem.ColorItem(R.color.cat_dark_purple, "Purple"),
+        CategoryItem.ColorItem(R.color.cat_light_green, "Green"),
+        CategoryItem.ColorItem(R.color.cat_light_purple, "Light Purple"),
+        CategoryItem.ColorItem(R.color.cat_dark_blue, "Dark Blue"),
+        CategoryItem.ColorItem(R.color.cat_light_blue, "Light Blue")
     ))
-    val colors: StateFlow<List<ColorItem>> = _colors
+    val colors: StateFlow<List<CategoryItem.ColorItem>> = _colors
 
-    // Available icons
-    private val _icons = MutableStateFlow<List<IconItem>>(listOf(
-        IconItem(R.drawable.baseline_fastfood_24, "Food"),
-        IconItem(R.drawable.baseline_local_gas_station_24, "Transport"),
-        IconItem(R.drawable.ic_add_alert_24, "Alert"),
-        IconItem(R.drawable.baseline_palette_24, "Beauty"),
-        IconItem(R.drawable.baseline_savings_24, "Savings"),
-        IconItem(R.drawable.baseline_school_24, "Education"),
-        IconItem(R.drawable.baseline_theater_comedy_24, "Entertainment"),
-        IconItem(R.drawable.baseline_escalator_warning_24, "Family"),
-        IconItem(R.drawable.baseline_shopping_bag_24, "Shopping")
+    private val _icons = MutableStateFlow<List<CategoryItem.IconItem>>(listOf(
+        CategoryItem.IconItem(R.drawable.ic_cat_food, "Food"),
+        CategoryItem.IconItem(R.drawable.baseline_local_gas_station_24, "Transport"),
+        CategoryItem.IconItem(R.drawable.ic_ui_notification, "Alert"),
+        CategoryItem.IconItem(R.drawable.ic_cat_art, "Beauty"),
+        CategoryItem.IconItem(R.drawable.ic_ui_budget, "Savings"),
+        CategoryItem.IconItem(R.drawable.ic_cat_education, "Education"),
+        CategoryItem.IconItem(R.drawable.baseline_theater_comedy_24, "Entertainment"),
+        CategoryItem.IconItem(R.drawable.baseline_escalator_warning_24, "Family"),
+        CategoryItem.IconItem(R.drawable.baseline_shopping_bag_24, "Shopping"),
+        CategoryItem.IconItem(R.drawable.ic_cat_pet, "Pets"),
+        CategoryItem.IconItem(R.drawable.ic_cat_electronics, "Electronics"),
+        CategoryItem.IconItem(R.drawable.ic_cat_medical, "Mecical"),
+        CategoryItem.IconItem(R.drawable.ic_cat_vehicle, "Vehicle"),
+        CategoryItem.IconItem(R.drawable.ic_cat_income, "Income")
     ))
-    val icons: StateFlow<List<IconItem>> = _icons
+    val icons: StateFlow<List<CategoryItem.IconItem>> = _icons
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // Form Actions
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     fun setCategoryName(name: String) {
         _categoryName.value = name
         validateForm()
     }
 
-    fun setSelectedColor(color: ColorItem) {
+    fun setSelectedColor(color: CategoryItem.ColorItem) {
         _selectedColor.value = color
         validateForm()
     }
 
-    fun setSelectedIcon(icon: IconItem) {
+    fun setSelectedIcon(icon: CategoryItem.IconItem) {
         _selectedIcon.value = icon
         validateForm()
     }
@@ -111,6 +126,9 @@ class CategoryAddNewViewModel @Inject constructor(
         validateForm()
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // Validation
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     fun validateForm(): Boolean {
         val name = _categoryName.value
         val type = _categoryType.value
@@ -148,18 +166,21 @@ class CategoryAddNewViewModel @Inject constructor(
         return Pair(isValid, error)
     }
 
-    private fun validateColor(color: ColorItem?): Pair<Boolean, String?> {
+    private fun validateColor(color: CategoryItem.ColorItem?): Pair<Boolean, String?> {
         val isValid = color != null
         val error = if (isValid) null else "Please select a color"
         return Pair(isValid, error)
     }
 
-    private fun validateIcon(icon: IconItem?): Pair<Boolean, String?> {
+    private fun validateIcon(icon: CategoryItem.IconItem?): Pair<Boolean, String?> {
         val isValid = icon != null
         val error = if (isValid) null else "Please select an icon"
         return Pair(isValid, error)
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // Category Creation
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     fun createCategory() {
         if (!validateForm()) {
             showValidationErrors()
@@ -215,6 +236,9 @@ class CategoryAddNewViewModel @Inject constructor(
         }
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // Reset
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     fun reset() {
         _categoryName.value = ""
         _categoryType.value = "Expense"
@@ -225,12 +249,14 @@ class CategoryAddNewViewModel @Inject constructor(
     }
 }
 
-data class ColorItem(
-    val colorResourceId: Int,
-    val name: String
-)
+sealed class CategoryItem {
+    data class ColorItem(
+        val colorResourceId: Int,
+        val name: String
+    ) : CategoryItem()
 
-data class IconItem(
-    val iconResourceId: Int,
-    val name: String
-)
+    data class IconItem(
+        val iconResourceId: Int,
+        val name: String
+    ) : CategoryItem()
+}

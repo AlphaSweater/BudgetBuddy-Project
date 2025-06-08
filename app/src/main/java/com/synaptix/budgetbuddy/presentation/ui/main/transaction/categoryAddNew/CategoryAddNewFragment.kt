@@ -12,6 +12,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import com.synaptix.budgetbuddy.R
 import com.synaptix.budgetbuddy.databinding.FragmentCategoryAddNewBinding
@@ -19,18 +20,28 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 
+/**
+ * Fragment for adding a new category.
+ * Handles user input for category name, type, color, and icon selection.
+ */
 @AndroidEntryPoint
 class CategoryAddNewFragment : Fragment() {
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // Properties
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private var _binding: FragmentCategoryAddNewBinding? = null
     private val binding get() = _binding!!
 
     private val viewModel: CategoryAddNewViewModel by viewModels()
-    private lateinit var colorAdapter: ColorAdapter
-    private lateinit var iconAdapter: IconAdapter
+    private lateinit var colorAdapter: CategoryItemAdapter
+    private lateinit var iconAdapter: CategoryItemAdapter
 
     private var isUpdatingFromUser = false
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // Fragment Lifecycle
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -42,30 +53,58 @@ class CategoryAddNewFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setupAdapters()
-        setupListeners()
+        setupViews()
         observeViewModel()
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // View Setup
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    private fun setupViews() {
+        setupAdapters()
+        setupListeners()
+    }
+
+    /**
+     * Sets up the RecyclerView adapters for colors and icons.
+     * Configures horizontal scrolling for both lists.
+     */
     private fun setupAdapters() {
-        colorAdapter = ColorAdapter { color ->
-            viewModel.setSelectedColor(color)
+        // Color adapter setup
+        colorAdapter = CategoryItemAdapter { item ->
+            if (item is CategoryItem.ColorItem) {
+                viewModel.setSelectedColor(item)
+            }
         }
         binding.recyclerViewColors.apply {
-            layoutManager = GridLayoutManager(requireContext(), 4)
+            layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
             adapter = colorAdapter
         }
 
-        iconAdapter = IconAdapter { icon ->
-            viewModel.setSelectedIcon(icon)
+        // Icon adapter setup
+        iconAdapter = CategoryItemAdapter { item ->
+            if (item is CategoryItem.IconItem) {
+                viewModel.setSelectedIcon(item)
+            }
         }
         binding.recyclerViewIcons.apply {
-            layoutManager = GridLayoutManager(requireContext(), 4)
+            layoutManager = GridLayoutManager(requireContext(), 2).apply {
+                orientation = LinearLayoutManager.HORIZONTAL
+            }
             adapter = iconAdapter
         }
     }
 
+    /**
+     * Sets up click listeners for all interactive elements.
+     */
     private fun setupListeners() {
+        // Category name input
         binding.categoryNameInput.doAfterTextChanged { text ->
             if (!isUpdatingFromUser) {
                 isUpdatingFromUser = true
@@ -74,6 +113,7 @@ class CategoryAddNewFragment : Fragment() {
             }
         }
 
+        // Category type selection
         binding.btnExpenseToggle.setOnClickListener {
             viewModel.setCategoryType("Expense")
         }
@@ -82,8 +122,13 @@ class CategoryAddNewFragment : Fragment() {
             viewModel.setCategoryType("Income")
         }
 
+        // Navigation and actions
         binding.btnGoBack.setOnClickListener {
             findNavController().navigateUp()
+        }
+
+        binding.btnClear.setOnClickListener {
+            viewModel.reset()
         }
 
         binding.btnCreate.setOnClickListener {
@@ -91,93 +136,40 @@ class CategoryAddNewFragment : Fragment() {
         }
     }
 
-    private fun observeViewModel() {
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                // Collect UI state
-                launch {
-                    viewModel.uiState.collect { state ->
-                        handleUiState(state)
-                    }
-                }
-                
-                // Collect validation state
-                launch {
-                    viewModel.validationState.collect { state ->
-                        handleValidationState(state)
-                    }
-                }
-
-                // Collect form state
-                launch {
-                    viewModel.categoryName.collect { name ->
-                        if (!isUpdatingFromUser && binding.categoryNameInput.text.toString() != name) {
-                            binding.categoryNameInput.setText(name)
-                            }
-                        }
-                }
-
-                launch {
-                    viewModel.categoryType.collect { type ->
-                        binding.btnExpenseToggle.isSelected = type == "Expense"
-                        binding.btnIncomeToggle.isSelected = type == "Income"
-                    }
-                }
-
-                launch {
-                    viewModel.selectedColor.collect { color ->
-                        color?.let {
-                            binding.previewIcon.setColorFilter(requireContext().getColor(it.colorResourceId))
-                        }
-                    }
-                }
-
-                launch {
-                    viewModel.selectedIcon.collect { icon ->
-                        icon?.let {
-                            binding.previewIcon.setImageResource(it.iconResourceId)
-                        }
-                    }
-                }
-
-                // Collect available options
-                launch {
-                    viewModel.colors.collect { colors ->
-                        colorAdapter.submitList(colors)
-                    }
-                }
-
-                launch {
-                    viewModel.icons.collect { icons ->
-                        iconAdapter.submitList(icons)
-                    }
-                }
-            }
-        }
-    }
-
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // State Handlers
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    /**
+     * Handles the UI state changes from the ViewModel.
+     */
     private fun handleUiState(state: CategoryAddNewViewModel.UiState) {
         when (state) {
             is CategoryAddNewViewModel.UiState.Loading -> {
                 binding.btnCreate.isEnabled = false
+                showLoading(true)
             }
             is CategoryAddNewViewModel.UiState.Success -> {
+                showLoading(false)
                 showSuccess("Category added successfully")
                 findNavController().popBackStack()
             }
             is CategoryAddNewViewModel.UiState.Error -> {
                 binding.btnCreate.isEnabled = false
+                showLoading(false)
                 showError(state.message)
             }
             else -> {
                 binding.btnCreate.isEnabled = true
+                showLoading(false)
             }
         }
     }
 
+    /**
+     * Handles validation state changes and updates error messages.
+     */
     private fun handleValidationState(state: CategoryAddNewViewModel.ValidationState) {
         with(binding) {
-            // Show/hide error messages for each field
             textNameError.apply {
                 text = state.nameError
                 visibility = if (state.shouldShowErrors && state.nameError != null) View.VISIBLE else View.GONE
@@ -200,20 +192,98 @@ class CategoryAddNewFragment : Fragment() {
         }
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // UI Helpers
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    private fun showLoading(show: Boolean) {
+        binding.loadingOverlay.visibility = if (show) View.VISIBLE else View.GONE
+        binding.progressBar.visibility = if (show) View.VISIBLE else View.GONE
+        binding.successCheckmark.visibility = View.GONE
+        binding.loadingText.text = "Creating category..."
+    }
+
+    private fun showSuccess(message: String) {
+        binding.loadingOverlay.visibility = View.VISIBLE
+        binding.progressBar.visibility = View.GONE
+        binding.successCheckmark.visibility = View.VISIBLE
+        binding.loadingText.text = message
+    }
+
     private fun showError(message: String) {
         Snackbar.make(binding.root, message, Snackbar.LENGTH_SHORT)
             .setBackgroundTint(resources.getColor(R.color.error, null))
             .show()
     }
 
-    private fun showSuccess(message: String) {
-        Snackbar.make(binding.root, message, Snackbar.LENGTH_SHORT)
-            .setBackgroundTint(resources.getColor(R.color.success, null))
-            .show()
-    }
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // ViewModel Observers
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    /**
+     * Sets up observers for all ViewModel state flows.
+     */
+    private fun observeViewModel() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                // UI State
+                launch {
+                    viewModel.uiState.collect { state ->
+                        handleUiState(state)
+                    }
+                }
+                
+                // Validation State
+                launch {
+                    viewModel.validationState.collect { state ->
+                        handleValidationState(state)
+                    }
+                }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
+                // Form State
+                launch {
+                    viewModel.categoryName.collect { name ->
+                        if (!isUpdatingFromUser && binding.categoryNameInput.text.toString() != name) {
+                            binding.categoryNameInput.setText(name)
+                        }
+                    }
+                }
+
+                launch {
+                    viewModel.categoryType.collect { type ->
+                        binding.btnExpenseToggle.isSelected = type == "Expense"
+                        binding.btnIncomeToggle.isSelected = type == "Income"
+                    }
+                }
+
+                // Selection State
+                launch {
+                    viewModel.selectedColor.collect { color ->
+                        color?.let {
+                            binding.previewIcon.setColorFilter(requireContext().getColor(it.colorResourceId))
+                        }
+                    }
+                }
+
+                launch {
+                    viewModel.selectedIcon.collect { icon ->
+                        icon?.let {
+                            binding.previewIcon.setImageResource(it.iconResourceId)
+                        }
+                    }
+                }
+
+                // Available Options
+                launch {
+                    viewModel.colors.collect { colors ->
+                        colorAdapter.submitList(colors.map { CategoryItem.ColorItem(it.colorResourceId, it.name) })
+                    }
+                }
+
+                launch {
+                    viewModel.icons.collect { icons ->
+                        iconAdapter.submitList(icons.map { CategoryItem.IconItem(it.iconResourceId, it.name) })
+                    }
+                }
+            }
+        }
     }
 }

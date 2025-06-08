@@ -74,6 +74,9 @@ class BudgetAddViewModel @Inject constructor(
     private val _selectedCategories = MutableStateFlow<List<Category>>(emptyList())
     val selectedCategories: StateFlow<List<Category>> = _selectedCategories
 
+    private val _allCategories = MutableStateFlow<List<Category>>(emptyList())
+    val allCategories: StateFlow<List<Category>> = _allCategories
+
     fun setBudgetName(name: String) {
         _budgetName.value = name
         validateForm()
@@ -93,6 +96,14 @@ class BudgetAddViewModel @Inject constructor(
         _selectedCategories.value = categories
         setCategory(categories.firstOrNull())
         validateForm()
+    }
+
+    fun getAllCategories(): List<Category> {
+        return _allCategories.value
+    }
+
+    fun setAllCategories(categories: List<Category>) {
+        _allCategories.value = categories
     }
 
     fun validateForm(): Boolean {
@@ -130,7 +141,6 @@ class BudgetAddViewModel @Inject constructor(
                     userId = userId,
                     name = _budgetName.value ?: "",
                     amount = _budgetAmount.value ?: 0.0,
-                    spent = 0.0,
                     categoryIds = _selectedCategories.value.map { it.id },
                     startDate = System.currentTimeMillis()
                 )
