@@ -28,11 +28,11 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.navGraphViewModels
 import com.synaptix.budgetbuddy.R
 import com.synaptix.budgetbuddy.core.model.Category
 import com.synaptix.budgetbuddy.databinding.FragmentBudgetAddBinding
@@ -46,7 +46,8 @@ class BudgetAddFragment : Fragment() {
 
     private var _binding: FragmentBudgetAddBinding? = null
     private val binding get() = _binding!!
-    private val viewModel: BudgetAddViewModel by activityViewModels()
+    
+    private val viewModel: BudgetAddViewModel by navGraphViewModels(R.id.ind_budget_navigation_graph) { defaultViewModelProviderFactory }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -59,46 +60,13 @@ class BudgetAddFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         setupUI()
-
-
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                launch {
-                    collectUiState()
-                }
-                launch {
-                    collectValidationState()
-                }
-                launch {
-                    collectSelectedCategories()
-                }
-            }
-        }
-
+        observeViewModel()
     }
 
     private fun setupUI() {
         setupCurrencySpinner()
-
-        binding.btnSave.setOnClickListener {
-            viewModel.setBudgetName(binding.budgetName.text.toString())
-            viewModel.setBudgetAmount(binding.amount.text.toString().toDoubleOrNull())
-            viewModel.showValidationErrors()
-
-            if (viewModel.validateForm()) {
-                viewModel.addBudget()
-            }
-        }
-
-        binding.btnGoBack.setOnClickListener {
-            findNavController().popBackStack()
-        }
-
-        binding.rowSelectCategory.setOnClickListener {
-            findNavController().navigate(R.id.action_budgetAddFragment_to_budgetSelectCategoryFragment)
-        }
+        setupClickListeners()
     }
 
     private fun setupCurrencySpinner() {
@@ -108,59 +76,100 @@ class BudgetAddFragment : Fragment() {
         binding.currencySpinner.adapter = adapter
     }
 
+    private fun setupClickListeners() {
+        binding.btnSave.setOnClickListener {
+            saveBudget()
+        }
 
+        binding.btnGoBack.setOnClickListener {
+            findNavController().popBackStack()
+        }
 
-    private suspend fun collectUiState() {
-        viewModel.uiState.collectLatest { state ->
-            when (state) {
-                is BudgetAddViewModel.UiState.Loading -> {
-                    binding.btnSave.isEnabled = false
+        binding.rowSelectCategory.setOnClickListener {
+            findNavController().navigate(R.id.action_budgetAddFragment_to_budgetSelectCategoryFragment)
+        }
+
+    }
+
+    private fun saveBudget() {
+        viewModel.setBudgetName(binding.budgetName.text.toString())
+        viewModel.setBudgetAmount(binding.amount.text.toString().toDoubleOrNull())
+        viewModel.showValidationErrors()
+
+        if (viewModel.validateForm()) {
+            viewModel.addBudget()
+        }
+    }
+
+    private fun observeViewModel() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                launch {
+                    viewModel.uiState.collectLatest { state ->
+                        handleUiState(state)
+                    }
                 }
-                is BudgetAddViewModel.UiState.Success -> {
-                    Toast.makeText(requireContext(), "Budget added successfully!", Toast.LENGTH_SHORT).show()
-                    findNavController().popBackStack()
-                    viewModel.reset()
+                launch {
+                    viewModel.validationState.collectLatest { state ->
+                        handleValidationState(state)
+                    }
                 }
-                is BudgetAddViewModel.UiState.Error -> {
-                    binding.btnSave.isEnabled = true
-                    Toast.makeText(requireContext(), state.message, Toast.LENGTH_SHORT).show()
-                }
-                else -> {
-                    binding.btnSave.isEnabled = true
+                launch {
+                    viewModel.selectedCategories.collectLatest { categories ->
+                        updateSelectedCategories(categories)
+                    }
                 }
             }
         }
     }
 
-    private suspend fun collectValidationState() {
-        viewModel.validationState.collectLatest { state ->
-            binding.textSelectedCategoryName.error = state.categoryError
-        }
-    }
-
-    private suspend fun collectSelectedCategories() {
-        viewModel.selectedCategories.collectLatest { selected ->
-            if (selected.isEmpty()) {
-                updateSelectedCategory(null)
-                binding.textSelectedCategoryName.text = "No categories selected"
-            } else {
-                updateSelectedCategory(selected.first())
-                binding.textSelectedCategoryName.text = selected.joinToString(", ") { it.name }
+    private fun handleUiState(state: BudgetAddViewModel.UiState) {
+        when (state) {
+            is BudgetAddViewModel.UiState.Loading -> {
+                binding.btnSave.isEnabled = false
+            }
+            is BudgetAddViewModel.UiState.Success -> {
+                Toast.makeText(requireContext(), "Budget added successfully!", Toast.LENGTH_SHORT).show()
+                findNavController().popBackStack()
+                viewModel.reset()
+            }
+            is BudgetAddViewModel.UiState.Error -> {
+                binding.btnSave.isEnabled = true
+                Toast.makeText(requireContext(), state.message, Toast.LENGTH_SHORT).show()
+            }
+            else -> {
+                binding.btnSave.isEnabled = true
             }
         }
     }
 
-    private fun updateSelectedCategory(category: Category?) {
-        if (category == null) {
-            binding.textSelectedCategoryName.text = "Select category"
+    private fun handleValidationState(state: BudgetAddViewModel.ValidationState) {
+        binding.textNameError.apply {
+            text = state.nameError
+            visibility = if (state.shouldShowErrors && state.nameError != null) View.VISIBLE else View.GONE
+        }
+
+        binding.textCategoryError.apply {
+            text = state.categoryError
+            visibility = if (state.shouldShowErrors && state.categoryError != null) View.VISIBLE else View.GONE
+        }
+
+        binding.textAmountError.apply {
+            text = state.amountError
+            visibility = if (state.shouldShowErrors && state.amountError != null) View.VISIBLE else View.GONE
+        }
+    }
+
+    private fun updateSelectedCategories(categories: List<Category>) {
+        if (categories.isEmpty()) {
+            binding.textSelectedCategoryName.text = "No categories selected"
             binding.imgSelectedCategoryIcon.setImageResource(R.drawable.ic_ui_categories)
             binding.imgSelectedCategoryIcon.setColorFilter(requireContext().getThemeColor(R.attr.bb_accent))
-            return
+        } else {
+            binding.textSelectedCategoryName.text = categories.joinToString(", ") { it.name }
+            binding.imgSelectedCategoryIcon.setImageResource(categories.first().icon)
+            binding.imgSelectedCategoryIcon.setColorFilter(requireContext().getColor(categories.first().color))
         }
-
-        binding.textSelectedCategoryName.text = category.name
-        binding.imgSelectedCategoryIcon.setImageResource(category.icon)
-        binding.imgSelectedCategoryIcon.setColorFilter(requireContext().getColor(category.color))
     }
 
     override fun onDestroyView() {
