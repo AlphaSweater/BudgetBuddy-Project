@@ -35,7 +35,6 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.navGraphViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import com.synaptix.budgetbuddy.R
 import com.synaptix.budgetbuddy.databinding.FragmentBudgetSelectCategoryBinding
@@ -48,7 +47,7 @@ class BudgetSelectCategoryFragment : Fragment() {
     private var _binding: FragmentBudgetSelectCategoryBinding? = null
     private val binding get() = _binding!!
 
-    private val addBudgetViewModel: BudgetAddViewModel by navGraphViewModels(R.id.ind_budget_navigation_graph) { defaultViewModelProviderFactory }
+    private val sharedViewModel: BudgetAddViewModel by navGraphViewModels(R.id.ind_budget_navigation_graph) { defaultViewModelProviderFactory }
     private val selectCategoryViewModel: BudgetSelectCategoryViewModel by viewModels()
 
     private val expenseAdapter by lazy {
@@ -72,7 +71,7 @@ class BudgetSelectCategoryFragment : Fragment() {
         setupViews()
         setupSearch()
         observeViewModel()
-        selectCategoryViewModel.loadCategories(addBudgetViewModel.selectedCategories.value)
+        selectCategoryViewModel.loadCategories(sharedViewModel.selectedCategories.value)
     }
 
     private fun setupViews() {
@@ -83,7 +82,7 @@ class BudgetSelectCategoryFragment : Fragment() {
 
             btnSave.setOnClickListener {
                 val selectedCategories = expenseAdapter.getSelectedCategories()
-                addBudgetViewModel.setSelectedCategories(selectedCategories)
+                sharedViewModel.setSelectedCategories(selectedCategories)
                 findNavController().popBackStack()
             }
 

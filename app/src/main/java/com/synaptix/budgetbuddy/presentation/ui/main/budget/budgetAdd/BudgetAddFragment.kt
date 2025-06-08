@@ -47,7 +47,7 @@ class BudgetAddFragment : Fragment() {
     private var _binding: FragmentBudgetAddBinding? = null
     private val binding get() = _binding!!
     
-    private val viewModel: BudgetAddViewModel by navGraphViewModels(R.id.ind_budget_navigation_graph) { defaultViewModelProviderFactory }
+    private val sharedViewModel: BudgetAddViewModel by navGraphViewModels(R.id.ind_budget_navigation_graph) { defaultViewModelProviderFactory }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -92,12 +92,12 @@ class BudgetAddFragment : Fragment() {
     }
 
     private fun saveBudget() {
-        viewModel.setBudgetName(binding.budgetName.text.toString())
-        viewModel.setBudgetAmount(binding.amount.text.toString().toDoubleOrNull())
-        viewModel.showValidationErrors()
+        sharedViewModel.setBudgetName(binding.budgetName.text.toString())
+        sharedViewModel.setBudgetAmount(binding.amount.text.toString().toDoubleOrNull())
+        sharedViewModel.showValidationErrors()
 
-        if (viewModel.validateForm()) {
-            viewModel.addBudget()
+        if (sharedViewModel.validateForm()) {
+            sharedViewModel.addBudget()
         }
     }
 
@@ -105,17 +105,17 @@ class BudgetAddFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
-                    viewModel.uiState.collectLatest { state ->
+                    sharedViewModel.uiState.collectLatest { state ->
                         handleUiState(state)
                     }
                 }
                 launch {
-                    viewModel.validationState.collectLatest { state ->
+                    sharedViewModel.validationState.collectLatest { state ->
                         handleValidationState(state)
                     }
                 }
                 launch {
-                    viewModel.selectedCategories.collectLatest { categories ->
+                    sharedViewModel.selectedCategories.collectLatest { categories ->
                         updateSelectedCategories(categories)
                     }
                 }
@@ -131,7 +131,7 @@ class BudgetAddFragment : Fragment() {
             is BudgetAddViewModel.UiState.Success -> {
                 Toast.makeText(requireContext(), "Budget added successfully!", Toast.LENGTH_SHORT).show()
                 findNavController().popBackStack()
-                viewModel.reset()
+                sharedViewModel.reset()
             }
             is BudgetAddViewModel.UiState.Error -> {
                 binding.btnSave.isEnabled = true
