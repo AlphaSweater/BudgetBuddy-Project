@@ -654,7 +654,26 @@ class HomeMainFragment : Fragment() {
                 launch { homeViewModel.categoriesState.collect { state ->
                     handleCategoriesState(state)
                 } }
+                launch { homeViewModel.totalWalletBalance.collect { balance ->
+                    updateTotalBalance(balance)
+                } }
             }
+        }
+    }
+
+    private fun updateTotalBalance(balance: Double?) {
+        binding.apply {
+            textViewCurrencyTotal.text = balance?.let {
+                String.format("%,.2f", it)
+            } ?: "0.00"
+            
+            // Set text color based on balance
+            val colorRes = if (balance != null && balance >= 0) {
+                R.attr.bb_profit
+            } else {
+                R.attr.bb_expense
+            }
+            textViewCurrencyTotal.setTextColor(context?.getThemeColor(colorRes) ?: R.color.profit_green)
         }
     }
 }

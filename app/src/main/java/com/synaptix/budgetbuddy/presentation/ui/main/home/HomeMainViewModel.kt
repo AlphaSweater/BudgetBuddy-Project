@@ -180,10 +180,22 @@ class HomeMainViewModel @Inject constructor(
             .collect { result ->
                 _walletsState.value = when (result) {
                     is GetWalletsUseCase.GetWalletResult.Success -> {
-                        if (result.wallets.isEmpty()) WalletState.Empty
-                        else WalletState.Success(result.wallets)
+                        if (result.wallets.isEmpty()) {
+                            _totalWalletBalance.value = 0.0
+                            WalletState.Empty
+                        } else {
+                            // Calculate total balance directly from wallets
+                            val totalBalance = result.wallets
+                                .filter { !it.excludeFromTotal }
+                                .sumOf { it.balance }
+                            _totalWalletBalance.value = totalBalance
+                            WalletState.Success(result.wallets)
+                        }
                     }
-                    is GetWalletsUseCase.GetWalletResult.Error -> WalletState.Empty
+                    is GetWalletsUseCase.GetWalletResult.Error -> {
+                        _totalWalletBalance.value = 0.0
+                        WalletState.Empty
+                    }
                 }
             }
     }
