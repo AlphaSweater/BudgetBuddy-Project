@@ -4,28 +4,49 @@
     android:viewportWidth="24"
     android:viewportHeight="24">
   <path
-      android:pathData="M11,4m-2,0a2,2 0,1 1,4 0a2,2 0,1 1,-4 0"
+      android:pathData="m15,11 l-1,9"
       android:strokeLineJoin="round"
       android:strokeWidth="2"
       android:fillColor="#00000000"
       android:strokeColor="?attr/bb_primaryText"
       android:strokeLineCap="round"/>
   <path
-      android:pathData="M18,8m-2,0a2,2 0,1 1,4 0a2,2 0,1 1,-4 0"
+      android:pathData="m19,11 l-4,-7"
       android:strokeLineJoin="round"
       android:strokeWidth="2"
       android:fillColor="#00000000"
       android:strokeColor="?attr/bb_primaryText"
       android:strokeLineCap="round"/>
   <path
-      android:pathData="M20,16m-2,0a2,2 0,1 1,4 0a2,2 0,1 1,-4 0"
+      android:pathData="M2,11h20"
       android:strokeLineJoin="round"
       android:strokeWidth="2"
       android:fillColor="#00000000"
       android:strokeColor="?attr/bb_primaryText"
       android:strokeLineCap="round"/>
   <path
-      android:pathData="M9,10a5,5 0,0 1,5 5v3.5a3.5,3.5 0,0 1,-6.84 1.045Q6.52,17.48 4.46,16.84A3.5,3.5 0,0 1,5.5 10Z"
+      android:pathData="m3.5,11 l1.6,7.4a2,2 0,0 0,2 1.6h9.8a2,2 0,0 0,2 -1.6l1.7,-7.4"
+      android:strokeLineJoin="round"
+      android:strokeWidth="2"
+      android:fillColor="#00000000"
+      android:strokeColor="?attr/bb_primaryText"
+      android:strokeLineCap="round"/>
+  <path
+      android:pathData="M4.5,15.5h15"
+      android:strokeLineJoin="round"
+      android:strokeWidth="2"
+      android:fillColor="#00000000"
+      android:strokeColor="?attr/bb_primaryText"
+      android:strokeLineCap="round"/>
+  <path
+      android:pathData="m5,11 l4,-7"
+      android:strokeLineJoin="round"
+      android:strokeWidth="2"
+      android:fillColor="#00000000"
+      android:strokeColor="?attr/bb_primaryText"
+      android:strokeLineCap="round"/>
+  <path
+      android:pathData="m9,11 l1,9"
       android:strokeLineJoin="round"
       android:strokeWidth="2"
       android:fillColor="#00000000"
