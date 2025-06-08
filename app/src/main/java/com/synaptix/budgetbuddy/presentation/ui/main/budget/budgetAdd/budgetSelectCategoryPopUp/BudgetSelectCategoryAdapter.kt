@@ -93,6 +93,24 @@ class BudgetSelectCategoryAdapter(
     }
 
     /**
+     * Toggles selection state for all categories
+     * @param selectAll If true, selects all categories; if false, deselects all
+     */
+    fun toggleSelectAll(selectAll: Boolean) {
+        val updatedCategories = items.map { it.copy(isSelected = selectAll) }
+        submitList(updatedCategories)
+        onSelectionChanged(getSelectedCategories())
+    }
+
+    /**
+     * Checks if all items are currently selected
+     * @return true if all items are selected, false otherwise
+     */
+    fun areAllItemsSelected(): Boolean {
+        return items.isNotEmpty() && items.all { it.isSelected }
+    }
+
+    /**
      * ViewHolder class for category items.
      * Responsible for binding category data to the view and handling selection events.
      */

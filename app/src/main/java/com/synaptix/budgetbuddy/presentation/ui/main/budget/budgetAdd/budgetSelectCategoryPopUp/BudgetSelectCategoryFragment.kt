@@ -21,7 +21,6 @@
 
 package com.synaptix.budgetbuddy.presentation.ui.main.budget.budgetAdd.budgetSelectCategoryPopUp
 
-import android.graphics.Rect
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -35,7 +34,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import com.synaptix.budgetbuddy.R
@@ -55,6 +54,7 @@ class BudgetSelectCategoryFragment : Fragment() {
     private val expenseAdapter by lazy {
         BudgetSelectCategoryAdapter { selectedCategories ->
             selectCategoryViewModel.updateSelectedCategories(selectedCategories)
+            updateSelectAllState()
         }
     }
 
@@ -91,17 +91,25 @@ class BudgetSelectCategoryFragment : Fragment() {
                 }
             }
 
+            // Setup Select All functionality
+            selectAllContainer.setOnClickListener {
+                val isAllSelected = checkSelectAll.isChecked
+                expenseAdapter.toggleSelectAll(!isAllSelected)
+                checkSelectAll.isChecked = !isAllSelected
+            }
+
+            checkSelectAll.setOnClickListener {
+                expenseAdapter.toggleSelectAll(checkSelectAll.isChecked)
+            }
+
             setupRecyclerViews()
         }
     }
 
     private fun setupRecyclerViews() {
-        val gridSpacing = GridSpacingItemDecoration(2, 8, true)
-
         binding.recyclerViewExpenseCategory.apply {
-            layoutManager = GridLayoutManager(context, 2)
+            layoutManager = LinearLayoutManager(context)
             adapter = expenseAdapter
-            addItemDecoration(gridSpacing)
         }
     }
 
@@ -127,6 +135,7 @@ class BudgetSelectCategoryFragment : Fragment() {
                         val expenseCategories = categories.filter { it.type == "expense" }
                         expenseAdapter.submitList(expenseCategories, selectCategoryViewModel.getSelectedCategories())
                         updateEmptyState()
+                        updateSelectAllState()
                     }
                 }
             }
@@ -163,6 +172,11 @@ class BudgetSelectCategoryFragment : Fragment() {
         }
     }
 
+    private fun updateSelectAllState() {
+        val allSelected = expenseAdapter.areAllItemsSelected()
+        binding.checkSelectAll.isChecked = allSelected
+    }
+
     private fun showError(message: String) {
         Snackbar.make(binding.root, message, Snackbar.LENGTH_SHORT)
             .setBackgroundTint(resources.getColor(R.color.error, null))
@@ -172,34 +186,6 @@ class BudgetSelectCategoryFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
-    }
-
-    private class GridSpacingItemDecoration(
-        private val spanCount: Int,
-        private val spacing: Int,
-        private val includeEdge: Boolean
-    ) : RecyclerView.ItemDecoration() {
-
-        override fun getItemOffsets(
-            outRect: Rect,
-            view: View,
-            parent: RecyclerView,
-            state: RecyclerView.State
-        ) {
-            val position = parent.getChildAdapterPosition(view)
-            val column = position % spanCount
-
-            if (includeEdge) {
-                outRect.left = spacing - column * spacing / spanCount
-                outRect.right = (column + 1) * spacing / spanCount
-                if (position < spanCount) outRect.top = spacing
-                outRect.bottom = spacing
-            } else {
-                outRect.left = column * spacing / spanCount
-                outRect.right = spacing - (column + 1) * spacing / spanCount
-                if (position >= spanCount) outRect.top = spacing
-            }
-        }
     }
 }
 
