@@ -2,12 +2,14 @@
 ![Logo](https://i.postimg.cc/VN8BpwF0/Synaptix-Logo.png)
 
 
-# BudgetBuddy App - PROG7313
+<h1 align="center">📊 BUDGETBUDDY-PROJECT</h1>
 
-BudgetBuddy is a user-friendly personal budget tracker app designed to help individuals take control of their finances with ease. Whether you're looking to manage your daily expenses, track multiple sources of income, or simply gain better insights into your spending habits, BudgetBuddy makes the process effective and simple. The app allows users to easily track their income and expenses, categorize transactions, and monitor their finances through easy-to-read summaries and reports. With its clean and modern interface, BudgetBuddy offers an intuitive experience suitable for both beginners and experienced users alike. By providing monthly breakdowns, income vs. expense comparisons, and insightful summaries, the app incourages users to make informed financial decisions and develop better money management habits over time. Whether your goal is to save more, reduce unnecessary spending, or plan for the future. BudgetBuddy is your companion on your journey to financial stability and success.
+BudgetBuddy is a sleek, user-friendly budgeting app designed to help users take control of their personal finances. Whether you're tracking daily expenses, managing multiple income streams, or aiming to understand your financial habits better — BudgetBuddy is here to guide you.
+
+With intuitive tools and insightful financial summaries, BudgetBuddy empowers users to make smarter money decisions. From categorizing expenses to setting spending goals, our app provides everything you need for effective financial management.
 
 
-## Features
+## 🌟 Features
 
 - SignUp and Login: Users can securely create an account and log in to access their personal budget data from anywhere. This ensures that all financial information is protected and personalized for each user.
 
@@ -27,7 +29,7 @@ BudgetBuddy is a user-friendly personal budget tracker app designed to help indi
 - Multi-Wallet support: Application allows for multiple different wallets to be created and used by one profile, each wallet has its own transactions and balance as well as their own individual minimum and maximum goals that gets added together to create a global minimum and maximum goal for the user.
 
 - Advanced multi-Budget Support: 
-## Prerequisites 
+## 🛠️ Prerequisites 
 
 1. **Ensure that you have Android Studio downloaded or you won't be able to run the project.**
 Ensure that you have Android Studio installed on your computer.
@@ -40,7 +42,7 @@ Ensure that you have Android Studio installed on your computer.
 - Gradle 8.0+
 
 4. Install an Android emulator or use a real device for testing.
-## How to Compile and Run The Application
+## 🚀 How to Compile and Run The Application
 
 1. Download and install Android Studio (Giraffe or newer) from the official site:
 https://developer.android.com/studio
@@ -73,12 +75,12 @@ https://github.com/AlphaSweater/BudgetBuddy-Project.git
 6. The app will install and launch on your selected device, showing the BudgetBuddy application.
 
 
-## YouTube Video Demonstration
+## 🎥 YouTube Video Demonstration
 
 Below is the link for our YouTube video:
 
 - https://www.youtube.com/watch?v=SFQ90baMvlU
-## Tech Stack
+## 🔧 Tech Stack
 ### Core
 
 - 100% [Kotlin](https://kotlinlang.org/)
@@ -99,15 +101,15 @@ Below is the link for our YouTube video:
 
 
 
-## Screenshots
+## 📸 Screenshots
 
 ![App Screenshot](https://via.placeholder.com/468x300?text=App+Screenshot+Here)
 
 
-## Database Implementation
+## 🗄️ Database Implementation
 
 ![App Screenshot](https://via.placeholder.com/468x300?text=App+Screenshot+Here)
-## contributors
+## 👥 contributors
 <a href="https://github.com/AlphaSweater/BudgetBuddy-Project/graphs/contributors">
   <img src="https://contrib.rocks/image?repo=AlphaSweater/BudgetBuddy-Project" />
 </a>
@@ -120,7 +122,7 @@ Below is the link for our YouTube video:
 - Nathan Teixeira ST10249266
 
 
-## References
+## 📚 References
 
 - https://www.youtube.com/watch?v=A_tPafV23DM&list=PLPgs125_L-X9H6J7x4beRU-AxJ4mXe5vX
 - https://www.geeksforgeeks.org/kotlin-android-tutorial/
