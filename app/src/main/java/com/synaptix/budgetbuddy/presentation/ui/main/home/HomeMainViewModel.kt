@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.synaptix.budgetbuddy.core.model.Category
 import com.synaptix.budgetbuddy.core.model.HomeItems
 import com.synaptix.budgetbuddy.core.model.HomeListItems
+import com.synaptix.budgetbuddy.core.model.Result
 import com.synaptix.budgetbuddy.core.model.Transaction
 import com.synaptix.budgetbuddy.core.model.TransactionListItems
 import com.synaptix.budgetbuddy.core.model.Wallet
@@ -238,25 +239,42 @@ class HomeMainViewModel @Inject constructor(
                     is GetCategoriesUseCase.GetCategoriesResult.Success -> {
                         if (result.categories.isEmpty()) CategoryState.Empty
                         else {
-                            val categorySummaries = transactionCalculationsUseCase.calculateCategoryTransactionsSummary(
-                                userId = userId,
-                                categories = result.categories
-                            )
-                            when (categorySummaries) {
-                                is com.synaptix.budgetbuddy.core.model.Result.Success -> {
-                                    CategoryState.Success(
-                                        categories = result.categories,
-                                        categorySummaries = categorySummaries.data
-                                    )
+                            // Observe transactions instead of getting a single value
+                            getTransactionsUseCase.execute(userId)
+                                .catch { e ->
+                                    _categoriesState.value = CategoryState.Empty
                                 }
-                                is com.synaptix.budgetbuddy.core.model.Result.Error -> {
-                                    CategoryState.Error(categorySummaries.exception.message ?: "Unknown error")
+                                .collect { transactionsResult ->
+                                    when (transactionsResult) {
+                                        is GetTransactionsUseCase.GetTransactionsResult.Success -> {
+                                            val categorySummaries = transactionCalculationsUseCase.calculateCategoryTransactionsSummary(
+                                                userId = userId,
+                                                categories = result.categories
+                                            )
+                                            when (categorySummaries) {
+                                                is Result.Success -> {
+                                                    _categoriesState.value = CategoryState.Success(
+                                                        categories = result.categories,
+                                                        categorySummaries = categorySummaries.data
+                                                    )
+                                                }
+
+                                                is Result.Error -> {
+                                                    _categoriesState.value = CategoryState.Error(categorySummaries.exception.message ?: "Unknown error")
+                                                }
+                                            }
+                                        }
+
+                                        is GetTransactionsUseCase.GetTransactionsResult.Error -> {
+                                            _categoriesState.value = CategoryState.Empty
+                                        }
+                                    }
                                 }
-                            }
                         }
                     }
+
                     is GetCategoriesUseCase.GetCategoriesResult.Error -> CategoryState.Empty
-                }
+                } as CategoryState
             }
     }
 
