@@ -105,4 +105,22 @@ class FirestoreCategoryRepository @Inject constructor(
     fun observeCategory(userId: String, categoryId: String): Flow<CategoryDTO?> {
         return observeDocument(userId, categoryId)
     }
+
+    /**
+     * Gets only the type field for a specific category.
+     * This is a lightweight operation that only fetches the type field.
+     * 
+     * @param userId The ID of the user who owns the category
+     * @param categoryId The ID of the category to fetch
+     * @return Result containing the type of the category ("income" or "expense")
+     */
+    suspend fun getCategoryType(userId: String, categoryId: String): Result<String> {
+        return try {
+            val targetCollection = getSubCollection(userId) ?: collection
+            val doc = targetCollection.document(categoryId).get().await()
+            Result.Success(doc.getString("type") ?: "expense")
+        } catch (e: Exception) {
+            Result.Error(e)
+        }
+    }
 }

@@ -27,15 +27,14 @@ import com.synaptix.budgetbuddy.R
 import com.synaptix.budgetbuddy.core.model.BudgetListItems
 import com.synaptix.budgetbuddy.core.model.Transaction
 import com.synaptix.budgetbuddy.core.model.Wallet
+import com.synaptix.budgetbuddy.core.util.CurrencyUtil
+import com.synaptix.budgetbuddy.core.util.DateUtil
 import com.synaptix.budgetbuddy.databinding.FragmentWalletMainBinding
 import com.synaptix.budgetbuddy.extentions.getThemeColor
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
 import java.util.Calendar
-import java.util.Date
-import java.util.Locale
 import kotlin.math.abs
 
 @AndroidEntryPoint
@@ -166,7 +165,7 @@ class WalletMainFragment : Fragment() {
 
             runningBalance += dailyNet
             entries.add(Entry((index + 1).toFloat(), runningBalance.toFloat()))
-            xLabels.add(SimpleDateFormat("MMM d", Locale.getDefault()).format(Date(date)))
+            xLabels.add(DateUtil.formatDate(date, true))
         }
 
         // Determine line and gradient colors based on transaction types
@@ -355,7 +354,7 @@ class WalletMainFragment : Fragment() {
                 launch {
                     walletViewModel.totalBalance.collectLatest { total ->
                         if (walletViewModel.isBalanceVisible.value) {
-                            binding.tvCurrencyTotal.text = total.toString()
+                            binding.tvCurrencyTotal.text = CurrencyUtil.formatWithoutSymbol(total)
                         }
                     }
                 }
@@ -410,7 +409,7 @@ class WalletMainFragment : Fragment() {
                 walletName = wallet.name,
                 walletIcon = R.drawable.ic_ui_wallet,
                 walletBalance = wallet.balance,
-                relativeDate = wallet.formatDate(wallet.lastTransactionAt)
+                relativeDate = DateUtil.formatDate(wallet.lastTransactionAt)
             )
         }
         walletAdapter.submitList(budgetWalletItems)
@@ -418,7 +417,7 @@ class WalletMainFragment : Fragment() {
 
     private fun updateBalanceVisibility(isVisible: Boolean) {
         binding.tvCurrencyTotal.text = if (isVisible) {
-            walletViewModel.totalBalance.value.toString()
+            CurrencyUtil.formatWithSymbol(walletViewModel.totalBalance.value)
         } else {
             "****"
         }

@@ -2,6 +2,7 @@ package com.synaptix.budgetbuddy.presentation.ui.main.transaction.transactionSel
 
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageButton
 import android.widget.TextView
 import com.synaptix.budgetbuddy.R
 import com.synaptix.budgetbuddy.core.model.Wallet
@@ -16,9 +17,11 @@ import com.synaptix.budgetbuddy.presentation.ui.common.BaseAdapter
  * 4. Formats currency values consistently
  *
  * @param onWalletClick Callback function that is triggered when a wallet item is clicked
+ * @param onEditClick Callback function that is triggered when the edit menu item is clicked
  */
 class TransactionSelectWalletAdapter(
-    private val onWalletClick: (Wallet) -> Unit
+    private val onWalletClick: (Wallet) -> Unit,
+    private val onEditClick: (Wallet) -> Unit
 ) : BaseAdapter<Wallet, TransactionSelectWalletAdapter.WalletViewHolder>() {
 
     /**
@@ -39,6 +42,7 @@ class TransactionSelectWalletAdapter(
     inner class WalletViewHolder(itemView: View) : BaseViewHolder<Wallet>(itemView) {
         private val name: TextView = itemView.findViewById(R.id.txtWalletName)
         private val balance: TextView = itemView.findViewById(R.id.txtWalletBalance)
+        private val menuButton: ImageButton = itemView.findViewById(R.id.btnMenu)
 
         /**
          * Binds wallet data to the view.
@@ -51,6 +55,27 @@ class TransactionSelectWalletAdapter(
             itemView.setOnClickListener {
                 onWalletClick(item)
             }
+
+            menuButton.setOnClickListener { view ->
+                showMenu(view, item)
+            }
+        }
+
+        private fun showMenu(view: View, wallet: Wallet) {
+            val popup = android.widget.PopupMenu(view.context, view)
+            popup.menuInflater.inflate(R.menu.menu_wallet_item, popup.menu)
+            
+            popup.setOnMenuItemClickListener { menuItem ->
+                when (menuItem.itemId) {
+                    R.id.action_edit -> {
+                        onEditClick(wallet)
+                        true
+                    }
+                    else -> false
+                }
+            }
+            
+            popup.show()
         }
     }
 }

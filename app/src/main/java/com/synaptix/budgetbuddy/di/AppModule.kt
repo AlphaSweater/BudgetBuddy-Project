@@ -33,6 +33,7 @@ import com.synaptix.budgetbuddy.core.usecase.main.transaction.AddTransactionUseC
 import com.synaptix.budgetbuddy.core.usecase.main.category.GetCategoriesUseCase
 import com.synaptix.budgetbuddy.core.usecase.main.transaction.GetTransactionsUseCase
 import com.synaptix.budgetbuddy.core.usecase.main.transaction.UploadImageUseCase
+import com.synaptix.budgetbuddy.core.usecase.main.wallet.GetWalletsUseCase
 import com.synaptix.budgetbuddy.data.firebase.repository.FirestoreBudgetRepository
 import com.synaptix.budgetbuddy.data.firebase.repository.FirestoreCategoryRepository
 import com.synaptix.budgetbuddy.data.firebase.repository.FirestoreLabelRepository
@@ -169,8 +170,14 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideGetBudgetsUseCase(budgetRepository: FirestoreBudgetRepository, userRepository: FirestoreUserRepository, categoryRepository: FirestoreCategoryRepository): com.synaptix.budgetbuddy.core.usecase.main.budget.GetBudgetsUseCase {
+    fun provideGetBudgetsUseCase(budgetRepository: FirestoreBudgetRepository, userRepository: FirestoreUserRepository, categoryRepository: FirestoreCategoryRepository): GetBudgetsUseCase {
         return GetBudgetsUseCase(budgetRepository, userRepository, categoryRepository)
+    }
+
+    @Provides
+    @Singleton
+    fun provideGetWalletsUseCase(walletRepository: FirestoreWalletRepository, userRepository: FirestoreUserRepository): GetWalletsUseCase {
+        return GetWalletsUseCase(walletRepository, userRepository)
     }
 
     @Provides

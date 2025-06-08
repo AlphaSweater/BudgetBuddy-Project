@@ -2,6 +2,7 @@ package com.synaptix.budgetbuddy.presentation.ui.main.transaction.transactionSel
 
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
@@ -18,9 +19,11 @@ import com.synaptix.budgetbuddy.presentation.ui.common.BaseAdapter
  * 4. Handles category icon and color display
  *
  * @param onCategoryClick Callback function that is triggered when a category item is clicked
+ * @param onEditClick Callback function that is triggered when the edit menu item is clicked
  */
 class TransactionSelectCategoryAdapter(
-    private val onCategoryClick: (Category) -> Unit
+    private val onCategoryClick: (Category) -> Unit,
+    private val onEditClick: (Category) -> Unit
 ) : BaseAdapter<Category, TransactionSelectCategoryAdapter.CategoryViewHolder>() {
 
     /**
@@ -41,6 +44,7 @@ class TransactionSelectCategoryAdapter(
     inner class CategoryViewHolder(itemView: View) : BaseViewHolder<Category>(itemView) {
         private val categoryIcon: ImageView = itemView.findViewById(R.id.imgCategoryIcon)
         private val categoryName: TextView = itemView.findViewById(R.id.txtCategoryName)
+        private val menuButton: ImageButton = itemView.findViewById(R.id.btnMenu)
 
         /**
          * Binds category data to the view.
@@ -54,9 +58,31 @@ class TransactionSelectCategoryAdapter(
             val colorInt = ContextCompat.getColor(context, item.color)
             categoryIcon.setColorFilter(colorInt)
 
+            // Set click listeners
             itemView.setOnClickListener {
                 onCategoryClick(item)
             }
+
+            menuButton.setOnClickListener { view ->
+                showMenu(view, item)
+            }
+        }
+
+        private fun showMenu(view: View, category: Category) {
+            val popup = android.widget.PopupMenu(view.context, view)
+            popup.menuInflater.inflate(R.menu.menu_category_item, popup.menu)
+            
+            popup.setOnMenuItemClickListener { menuItem ->
+                when (menuItem.itemId) {
+                    R.id.action_edit -> {
+                        onEditClick(category)
+                        true
+                    }
+                    else -> false
+                }
+            }
+            
+            popup.show()
         }
     }
 }

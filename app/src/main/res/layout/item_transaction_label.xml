@@ -21,51 +21,73 @@
 <!--    * https://www.youtube.com/watch?v=A_tPafV23DM&list=PLPgs125_L-X9H6J7x4beRU-AxJ4mXe5vX-->
 <!--    ======================================================================================-->
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal"
-    android:paddingVertical="12dp"
-    android:paddingHorizontal="16dp"
-    android:gravity="center_vertical"
-    android:background="?attr/bb_background">
+    android:layout_marginHorizontal="8dp"
+    android:layout_marginVertical="4dp"
+    app:cardBackgroundColor="?attr/bb_background"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="2dp">
 
-    <!-- Texts Column -->
     <LinearLayout
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:orientation="vertical">
+        android:orientation="horizontal"
+        android:padding="12dp"
+        android:gravity="center_vertical"
+        android:background="?attr/selectableItemBackground">
 
-        <TextView
-            android:id="@+id/textLabelTitle"
+        <!-- CheckBox styled as a pill -->
+        <CheckBox
+            android:id="@+id/checkSelect"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Label Name"
-            android:textColor="?attr/bb_primaryText"
-            android:textSize="16sp"
-            android:textStyle="bold" />
+            android:buttonTint="?attr/bb_primaryText"
+            android:layout_marginEnd="12dp"
+            android:background="@null"
+            android:focusable="false"
+            android:focusableInTouchMode="false"
+            android:text=""
+            android:padding="4dp" />
 
-        <TextView
-            android:id="@+id/textLabelDescription"
-            android:layout_width="wrap_content"
+        <!-- Texts Column -->
+        <LinearLayout
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="0 transactions in 0 wallets"
-            android:textColor="?attr/bb_secondaryText"
-            android:textSize="14sp"
-            android:layout_marginTop="2dp" />
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/textLabelTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Label Name"
+                android:textColor="?attr/bb_primaryText"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/textLabelDescription"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0 transactions in 0 wallets"
+                android:textColor="?attr/bb_secondaryText"
+                android:textSize="14sp"
+                android:layout_marginTop="2dp" />
+        </LinearLayout>
+
+        <ImageButton
+            android:id="@+id/btnMenu"
+            style="@style/IconButtonSmall"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_ui_ellipsis_menu"
+            android:contentDescription="More options"
+            app:tint="?attr/bb_secondaryText"
+            android:visibility="invisible"/>
+
     </LinearLayout>
-
-    <!-- CheckBox styled as a pill -->
-    <CheckBox
-        android:id="@+id/checkSelect"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:buttonTint="?attr/bb_primaryText"
-        android:layout_marginStart="12dp"
-        android:background="@null"
-        android:focusable="false"
-        android:focusableInTouchMode="false"
-        android:text=""
-        android:padding="4dp" />
-</LinearLayout>
+</com.google.android.material.card.MaterialCardView>

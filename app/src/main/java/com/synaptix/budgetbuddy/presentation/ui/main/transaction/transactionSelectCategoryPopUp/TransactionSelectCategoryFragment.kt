@@ -2,9 +2,11 @@ package com.synaptix.budgetbuddy.presentation.ui.main.transaction.transactionSel
 
 import android.graphics.Rect
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.os.bundleOf
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -22,6 +24,9 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import androidx.core.view.isVisible
 import androidx.navigation.navGraphViewModels
+import com.synaptix.budgetbuddy.core.model.Category
+import com.synaptix.budgetbuddy.core.model.Transaction
+import com.synaptix.budgetbuddy.presentation.ui.main.transaction.categoryAddNew.CategoryAddNewViewModel
 
 @AndroidEntryPoint
 class TransactionSelectCategoryFragment : Fragment() {
@@ -33,17 +38,27 @@ class TransactionSelectCategoryFragment : Fragment() {
     private val categoryViewModel: TransactionSelectCategoryViewModel by viewModels()
 
     private val expenseAdapter by lazy {
-        TransactionSelectCategoryAdapter { category ->
-            sharedViewModel.setCategory(category)
-            findNavController().popBackStack()
-        }
+        TransactionSelectCategoryAdapter(
+            onCategoryClick = { category ->
+                sharedViewModel.setCategory(category)
+                findNavController().popBackStack()
+            },
+            onEditClick = { category ->
+                navigateToEditCategory(category)
+            }
+        )
     }
 
     private val incomeAdapter by lazy {
-        TransactionSelectCategoryAdapter { category ->
-            sharedViewModel.setCategory(category)
-            findNavController().popBackStack()
-        }
+        TransactionSelectCategoryAdapter(
+            onCategoryClick = { category ->
+                sharedViewModel.setCategory(category)
+                findNavController().popBackStack()
+            },
+            onEditClick = { category ->
+                navigateToEditCategory(category)
+            }
+        )
     }
 
     override fun onCreateView(
@@ -69,8 +84,8 @@ class TransactionSelectCategoryFragment : Fragment() {
                 findNavController().popBackStack()
             }
 
-            btnAddCategory.setOnClickListener { showAddCategory() }
-            btnAddCategoryEmpty.setOnClickListener { showAddCategory() }
+            btnAddCategory.setOnClickListener { navigateToAddCategory() }
+            btnAddCategoryEmpty.setOnClickListener { navigateToAddCategory() }
 
             btnExpenseToggle.setOnClickListener { showExpenseCategories() }
             btnIncomeToggle.setOnClickListener { showIncomeCategories() }
@@ -80,16 +95,16 @@ class TransactionSelectCategoryFragment : Fragment() {
     }
 
     private fun setupRecyclerViews() {
-        val gridSpacing = GridSpacingItemDecoration(2, 8, true)
+        val gridSpacing = GridSpacingItemDecoration(1, 8, true)
         
         binding.recyclerViewExpenseCategory.apply {
-            layoutManager = GridLayoutManager(context, 2)
+            layoutManager = GridLayoutManager(context, 1)
             adapter = expenseAdapter
             addItemDecoration(gridSpacing)
         }
 
         binding.recyclerViewIncomeCategory.apply {
-            layoutManager = GridLayoutManager(context, 2)
+            layoutManager = GridLayoutManager(context, 1)
             adapter = incomeAdapter
             addItemDecoration(gridSpacing)
         }
@@ -174,9 +189,43 @@ class TransactionSelectCategoryFragment : Fragment() {
         }
     }
 
-    private fun showAddCategory() {
-        findNavController().navigate(R.id.navigation_category_add_new)
+    private fun navigateToAddCategory() {
+        val bundle = bundleOf(
+            "screenMode" to CategoryAddNewViewModel.ScreenMode.CREATE
+        )
+        findNavController().navigate(
+            R.id.ind_category_navigation_graph,
+            bundle
+        )
     }
+
+    private fun navigateToEditCategory(category: Category) {
+        // Create a bundle with the necessary arguments
+        val bundle = bundleOf(
+            "screenMode" to CategoryAddNewViewModel.ScreenMode.EDIT,
+            "categoryId" to category.id
+        )
+
+        findNavController().navigate(
+            R.id.ind_category_navigation_graph,
+            bundle
+        )
+    }
+
+//    private fun navigateToTransactionDetails(transaction: Transaction) {
+//        Log.d("HomeFragment", "Navigating to transaction details: ${transaction.id}")
+//
+//        // Create a bundle with the necessary arguments
+//        val bundle = bundleOf(
+//            "screenMode" to TransactionAddViewModel.ScreenMode.VIEW,
+//            "transactionId" to transaction.id
+//        )
+//
+//        findNavController().navigate(
+//            R.id.ind_category_navigation_graph,
+//            bundle
+//        )
+//    }
 
     private fun showError(message: String) {
         Snackbar.make(binding.root, message, Snackbar.LENGTH_SHORT)
