@@ -30,7 +30,6 @@ data class Budget(
     val user: User,
     val name: String,
     val amount: Double,
-    val spent: Double = 0.0,
     val categories: List<Category>,
     val startDate: Long = System.currentTimeMillis(),
     val endDate: Long? = null,
