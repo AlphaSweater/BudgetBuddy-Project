@@ -116,7 +116,7 @@ class HomeAdapter(
             val balanceFormatted = String.format("R %.2f", item.wallet.balance)
             balanceText.text = balanceFormatted
 
-            dateText.text = "• ${item.relativeDate}"
+            dateText.text = "• ${item.wallet.formatDate(item.wallet.lastTransactionAt)}"
 
             itemView.setOnClickListener { onClick?.invoke(item.wallet) }
         }
@@ -220,7 +220,7 @@ class HomeAdapter(
             nameText.text = item.category.name
             transactionsText.text = "${item.transactionCount} transactions"
             amountText.text = item.amount
-            dateText.text = item.relativeDate
+            dateText.text = item.category.formatDate(item.lastActivityAt)
 
             itemView.setOnClickListener { onClick?.invoke(item.category) }
         }

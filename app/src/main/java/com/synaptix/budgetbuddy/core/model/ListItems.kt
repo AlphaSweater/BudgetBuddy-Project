@@ -59,7 +59,6 @@ sealed class HomeListItems {
     data class HomeWalletItem(
         val wallet: Wallet,
         val walletIcon: Int,
-        val relativeDate: String = wallet.formatDate(wallet.lastTransactionAt)
     ) : HomeListItems()
 
     /**
@@ -79,7 +78,7 @@ sealed class HomeListItems {
         val category: Category,
         val transactionCount: Int,
         val amount: String,
-        val relativeDate: String
+        val lastActivityAt: Long
     ) : HomeListItems()
 }
 

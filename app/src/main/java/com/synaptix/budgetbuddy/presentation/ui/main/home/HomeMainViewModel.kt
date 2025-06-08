@@ -189,7 +189,8 @@ class HomeMainViewModel @Inject constructor(
                                 .filter { !it.excludeFromTotal }
                                 .sumOf { it.balance }
                             _totalWalletBalance.value = totalBalance
-                            WalletState.Success(result.wallets)
+                            // filter the list of wallets in descending order by lastTransactionAt
+                            WalletState.Success(result.wallets.sortedByDescending { it.lastTransactionAt })
                         }
                     }
                     is GetWalletsUseCase.GetWalletResult.Error -> {

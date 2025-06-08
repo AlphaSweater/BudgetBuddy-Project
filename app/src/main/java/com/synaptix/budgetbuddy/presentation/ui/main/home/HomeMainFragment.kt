@@ -376,8 +376,7 @@ class HomeMainFragment : Fragment() {
                     val walletItems = state.wallets.take(MAX_ITEMS).map { wallet ->
                         HomeListItems.HomeWalletItem(
                             wallet = wallet,
-                            walletIcon = R.drawable.ic_ui_wallet,
-                            relativeDate = wallet.formatDate(wallet.lastTransactionAt)
+                            walletIcon = R.drawable.ic_ui_wallet
                         )
                     }
                     walletAdapter.submitList(walletItems)
@@ -487,7 +486,7 @@ class HomeMainFragment : Fragment() {
                             category = category,
                             transactionCount = categorySummary?.transactionCount ?: 0,
                             amount = formattedAmount,
-                            relativeDate = category.formatDate(categorySummary?.lastTransactionAt)
+                            lastActivityAt = categorySummary?.lastTransactionAt ?: 0L
                         )
                     }
                     categoryAdapter.submitList(categoryItems)
