@@ -67,10 +67,11 @@ class BudgetSelectCategoryViewModel @Inject constructor(
             combine(_searchQuery, _uiState) { query, state ->
                 when (state) {
                     is UiState.Success -> {
+                        val categories = state.categories
                         if (query.isEmpty()) {
-                            state.categories
+                            categories
                         } else {
-                            state.categories.filter {
+                            categories.filter {
                                 it.name.contains(query, ignoreCase = true)
                             }
                         }
@@ -86,10 +87,12 @@ class BudgetSelectCategoryViewModel @Inject constructor(
     /**
      * Loads categories for the current user and updates both original and filtered lists.
      * This should be called when the screen is first created.
+     * @param initialSelectedCategories Optional list of categories that should be pre-selected
      */
-    fun loadCategories() {
+    fun loadCategories(initialSelectedCategories: List<Category> = emptyList()) {
         viewModelScope.launch {
             _uiState.value = UiState.Loading
+            _selectedCategories.value = initialSelectedCategories
 
             try {
                 val userId = getUserIdUseCase.execute()
@@ -107,7 +110,12 @@ class BudgetSelectCategoryViewModel @Inject constructor(
                         when (result) {
                             is GetCategoriesUseCase.GetCategoriesResult.Success -> {
                                 Log.d("BudgetSelectCategoryViewModel", "Categories loaded successfully: ${result.categories.size}")
-                                _uiState.value = UiState.Success(result.categories)
+                                // Preserve selection state when updating categories
+                                val selectedIds = _selectedCategories.value.map { it.id }.toSet()
+                                val categoriesWithSelection = result.categories.map { category ->
+                                    category.copy(isSelected = selectedIds.contains(category.id))
+                                }
+                                _uiState.value = UiState.Success(categoriesWithSelection)
                             }
                             is GetCategoriesUseCase.GetCategoriesResult.Error -> {
                                 Log.e("BudgetSelectCategoryViewModel", "Error loading categories: ${result.message}")
@@ -131,10 +139,26 @@ class BudgetSelectCategoryViewModel @Inject constructor(
         _searchQuery.value = query
     }
 
+    /**
+     * Updates the selected categories and preserves the selection state
+     * @param selectedCategories The new list of selected categories
+     */
     fun updateSelectedCategories(selectedCategories: List<Category>) {
         _selectedCategories.value = selectedCategories
+        // Update the selection state in the current UI state if it's a Success state
+        if (_uiState.value is UiState.Success) {
+            val currentCategories = (_uiState.value as UiState.Success).categories
+            val selectedIds = selectedCategories.map { it.id }.toSet()
+            val updatedCategories = currentCategories.map { category ->
+                category.copy(isSelected = selectedIds.contains(category.id))
+            }
+            _uiState.value = UiState.Success(updatedCategories)
+        }
     }
 
+    /**
+     * Returns the currently selected categories
+     */
     fun getSelectedCategories(): List<Category> {
         return _selectedCategories.value
     }

@@ -72,7 +72,7 @@ class BudgetSelectCategoryFragment : Fragment() {
         setupViews()
         setupSearch()
         observeViewModel()
-        selectCategoryViewModel.loadCategories()
+        selectCategoryViewModel.loadCategories(addBudgetViewModel.selectedCategories.value)
     }
 
     private fun setupViews() {
@@ -83,12 +83,8 @@ class BudgetSelectCategoryFragment : Fragment() {
 
             btnSave.setOnClickListener {
                 val selectedCategories = expenseAdapter.getSelectedCategories()
-                if (selectedCategories.isNotEmpty()) {
-                    addBudgetViewModel.setSelectedCategories(selectedCategories)
-                    findNavController().popBackStack()
-                } else {
-                    showError("Please select at least one category")
-                }
+                addBudgetViewModel.setSelectedCategories(selectedCategories)
+                findNavController().popBackStack()
             }
 
             // Setup Select All functionality
