@@ -126,6 +126,10 @@ class GeneralReportsViewModel @Inject constructor(
 
     private val _selectedWallet = MutableStateFlow<Wallet?>(null)
     val selectedWallet: StateFlow<Wallet?> = _selectedWallet.asStateFlow()
+
+    // In GeneralReportsViewModel.kt
+    private val _expenseGoal = MutableStateFlow<Pair<Double, Double>?>(null)
+    val expenseGoal: StateFlow<Pair<Double, Double>?> = _expenseGoal.asStateFlow()
     /**
      * Loads all required data for the reports screen.
      *
@@ -162,6 +166,7 @@ class GeneralReportsViewModel @Inject constructor(
                 _categoriesState.value = CategoryState.Empty
                 return@launch
             }
+
 
             // Load transactions
             launch {
@@ -216,9 +221,25 @@ class GeneralReportsViewModel @Inject constructor(
                             }
                         }
                     }
+                launch {
+                    selectedWallet.collect { wallet ->
+                        wallet?.let {
+                            // Check what properties are available in the Wallet class
+                            // For example, if the properties are called minGoal and maxGoal:
+                            val minGoal = wallet.minGoal?.toDouble() ?: 0.0
+                            val maxGoal = wallet.maxGoal?.toDouble() ?: 0.0
+                            _expenseGoal.value = minGoal to maxGoal
+                        } ?: run {
+                            // If no wallet is selected, clear the goals
+                            _expenseGoal.value = null
+                        }
+                    }
+                }
             }
         }
     }
+
+
 
     /**
      * Gets transactions filtered by type (income/expense).
@@ -300,7 +321,27 @@ class GeneralReportsViewModel @Inject constructor(
     // Update your selectWallet function to also filter transactions
     fun selectWallet(wallet: Wallet?) {
         _selectedWallet.value = wallet
+        updateExpenseGoals(wallet)
         filterTransactions()
+    }
+
+    private fun updateExpenseGoals(wallet: Wallet?) {
+        Log.d("ExpenseGoals", "Updating goals for wallet: ${wallet?.name ?: "null"}")
+
+        wallet?.let { w ->
+            // Log all properties of the wallet for debugging
+            Log.d("ExpenseGoals", "Wallet properties: ${w.javaClass.declaredFields.joinToString { it.name }}")
+            Log.d("ExpenseGoals", "Min goal: ${w.minGoal}, Max goal: ${w.maxGoal}")
+
+            val minGoal = w.minGoal?.toDouble() ?: 0.0
+            val maxGoal = w.maxGoal?.toDouble() ?: 0.0
+
+            Log.d("ExpenseGoals", "Setting goals - Min: $minGoal, Max: $maxGoal")
+            _expenseGoal.value = minGoal to maxGoal
+        } ?: run {
+            Log.d("ExpenseGoals", "No wallet selected, clearing goals")
+            _expenseGoal.value = null
+        }
     }
 
     fun setDateRange(startDate: Long, endDate: Long) {
@@ -323,6 +364,10 @@ class GeneralReportsViewModel @Inject constructor(
 
         _dateRange.value = startCal.timeInMillis..endCal.timeInMillis
         filterTransactions()
+    }
+
+    fun setExpenseGoal(min: Double, max: Double) {
+        _expenseGoal.value = min to max
     }
 
     fun clearDateRange() {

@@ -26,12 +26,10 @@ class WalletReportAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TransactionViewHolder {
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.item_home_wallet, parent, false)
-        println("WalletReportAdapter: Creating new ViewHolder")
         return TransactionViewHolder(view, onTransactionClick)
     }
 
     override fun onBindViewHolder(holder: TransactionViewHolder, position: Int) {
-        println("WalletReportAdapter: Binding view at position $position")
         holder.bind(getItem(position))
     }
 
@@ -47,6 +45,8 @@ class WalletReportAdapter(
 
         fun bind(item: ReportListItems.ReportTransactionItem) {
             val transaction = item.transaction
+            icon.setImageResource(transaction.category.icon)
+            icon.setColorFilter(ContextCompat.getColor(itemView.context, transaction.category.color))
             tvTitle.text = transaction.category.name
             tvDate.text = item.relativeDate
             tvAmount.text = String.format("R %.2f", transaction.amount)

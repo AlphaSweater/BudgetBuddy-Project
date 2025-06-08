@@ -24,6 +24,8 @@ import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.charts.PieChart
 import com.github.mikephil.charting.components.XAxis
 import android.text.format.DateFormat
+import com.github.mikephil.charting.components.LimitLine
+import com.github.mikephil.charting.components.YAxis
 import com.google.android.material.datepicker.MaterialDatePicker
 import java.util.*
 import androidx.core.util.Pair as UtilPair
@@ -42,6 +44,7 @@ import com.synaptix.budgetbuddy.core.model.Transaction
 import com.synaptix.budgetbuddy.databinding.FragmentGeneralReportsBinding
 import com.synaptix.budgetbuddy.extentions.getThemeColor
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -98,6 +101,8 @@ class GeneralReportsFragment : Fragment() {
 
     private lateinit var lineChartExpense: LineChart
     private lateinit var lineChartIncome: LineChart
+
+    private var expenseGoalJob: Job? = null
 
     /**
      * Adapter for displaying expense-related items.
@@ -276,6 +281,21 @@ class GeneralReportsFragment : Fragment() {
                                 updateCategoryLists(state.categories)
                             }
                             else -> {}
+                        }
+                    }
+                }
+                launch {
+                    viewModel.expenseGoal.collect { goals ->
+                        goals?.let { (minGoal, maxGoal) ->
+                            Log.d("ExpenseGoal", "Received goals - Min: $minGoal, Max: $maxGoal")
+                            // Only update if the expense chart is visible
+                            if (lineChartExpense.visibility == View.VISIBLE) {
+                                updateExpenseGoalLines(minGoal, maxGoal)
+                            }
+                        } ?: run {
+                            // Clear the lines if goals are null
+                            lineChartExpense.axisLeft.removeAllLimitLines()
+                            lineChartExpense.invalidate()
                         }
                     }
                 }
@@ -502,7 +522,7 @@ class GeneralReportsFragment : Fragment() {
         val sortedTransactions = transactions.sortedBy { it.date }
 
         // Set line color based on chart type
-        val lineColor = when (chartType) {
+        var lineColor = when (chartType) {
             "income" -> ContextCompat.getColor(context, R.color.profit_green)
             else -> ContextCompat.getColor(context, R.color.expense_red)
         }
@@ -559,7 +579,7 @@ class GeneralReportsFragment : Fragment() {
             xAxisLabels.add(dateFormat.format(Date(date)))
         }
 
-        // Rest of the function remains the same...
+        // Create dataset
         val dataSet = LineDataSet(entries, chartType.capitalize()).apply {
             color = lineColor
             lineWidth = 2f
@@ -603,12 +623,14 @@ class GeneralReportsFragment : Fragment() {
 
                 // Calculate min and max values with some padding
                 val minY = entries.minByOrNull { it.y }?.y ?: 0f
-                val maxY = entries.maxByOrNull { it.y }?.y ?: 1000f
+                val maxY = entries.maxByOrNull { it.y }?.y ?: 0f
                 val padding = maxOf(Math.abs(maxY - minY) * 0.1f, 100f)
 
-                axisMinimum = minOf(minY - padding, 0f) // Allow negative values for expenses
+                // Set initial axis range
+                axisMinimum = minOf(minY - padding, 0f)
                 axisMaximum = maxY + padding
             }
+
 
             // Configure chart appearance
             setExtraOffsets(16f, 16f, 16f, 30f)
@@ -632,6 +654,72 @@ class GeneralReportsFragment : Fragment() {
 
             // Refresh
             invalidate()
+        }
+
+        // Handle expense goal lines if this is the expense chart
+        if (chartType == "expense") {
+            // Cancel any existing job to prevent leaks
+            expenseGoalJob?.cancel()
+
+            expenseGoalJob = viewLifecycleOwner.lifecycleScope.launch {
+                viewModel.expenseGoal.collect { goals ->
+                    goals?.let { (minGoal, maxGoal) ->
+                        // Remove existing limit lines
+                        chart.axisLeft.removeAllLimitLines()
+
+                        // Only add goal lines if they have valid values
+                        if (minGoal > 0) {
+                            val minLine = LimitLine(minGoal.toFloat(), "Min Goal").apply {
+                                lineColor = ContextCompat.getColor(context, R.color.min_graph)
+                                lineWidth = 1f
+                                enableDashedLine(10f, 10f, 0f)
+                                textColor = ContextCompat.getColor(context, R.color.min_graph)
+                                textSize = 10f
+                            }
+                            chart.axisLeft.addLimitLine(minLine)
+                        }
+
+                        if (maxGoal > 0) {
+                            val maxLine = LimitLine(maxGoal.toFloat(), "Max Goal").apply {
+                                lineColor = ContextCompat.getColor(context, R.color.max_graph)
+                                lineWidth = 1f
+                                enableDashedLine(10f, 10f, 0f)
+                                textColor = ContextCompat.getColor(context, R.color.max_graph)
+                                textSize = 10f
+                            }
+                            chart.axisLeft.addLimitLine(maxLine)
+                        }
+
+                        // Get the current chart data
+                        val entries = (chart.data?.dataSets?.firstOrNull() as? LineDataSet)?.values ?: return@collect
+
+                        // Adjust y-axis to include the goal lines and data
+                        val minY = entries.minByOrNull { it.y }?.y ?: 0f
+                        val maxY = entries.maxByOrNull { it.y }?.y ?: 0f
+                        val padding = maxOf(Math.abs(maxY - minY) * 0.1f, 100f)
+
+                        // Include goal lines in axis range if they exist
+                        val minAxis = minOf(
+                            minY - padding,
+                            if (minGoal > 0) minGoal.toFloat() - padding else minY - padding,
+                            0f
+                        )
+                        val maxAxis = maxOf(
+                            maxY + padding,
+                            if (maxGoal > 0) maxGoal.toFloat() + padding else maxY + padding
+                        )
+
+                        // Apply the new axis range
+                        chart.axisLeft.axisMinimum = minAxis
+                        chart.axisLeft.axisMaximum = maxAxis
+
+                        val (minGoal, maxGoal) = viewModel.expenseGoal.value ?: (0.0 to 0.0)
+                        updateExpenseGoalLines(minGoal, maxGoal)
+                        // Make sure to refresh the chart
+                        chart.invalidate()
+                    }
+                }
+            }
         }
     }
 
@@ -841,6 +929,121 @@ class GeneralReportsFragment : Fragment() {
         }
     }
 
+    private fun updateExpenseGoalLines(minGoal: Double, maxGoal: Double) {
+        Log.d("ExpenseGoalLines", "Updating goal lines - Min: $minGoal, Max: $maxGoal")
+
+        // Only update if we're showing the expense chart
+        if (lineChartExpense.visibility != View.VISIBLE) {
+            Log.d("ExpenseGoalLines", "Expense chart not visible, skipping update")
+            return
+        }
+
+        // Remove existing limit lines
+        lineChartExpense.axisLeft.removeAllLimitLines()
+
+        // Get the current chart data
+        val entries = (lineChartExpense.data?.dataSets?.firstOrNull() as? LineDataSet)?.values ?: run {
+            Log.d("ExpenseGoalLines", "No chart data available")
+            lineChartExpense.invalidate()
+            return
+        }
+
+        // Calculate min and max Y values from data
+        val minY = entries.minByOrNull { it.y }?.y ?: 0f
+        val maxY = entries.maxByOrNull { it.y }?.y ?: 0f
+
+        Log.d("ExpenseGoalLines", "Chart data range - MinY: $minY, MaxY: $maxY")
+
+        // Calculate padding (20% of the range or 100, whichever is larger)
+        val dataRange = maxY - minY
+        val padding = maxOf(dataRange * 0.2f, 100f)
+
+        // Calculate the minimum and maximum values to show, including goal lines
+        val valuesToConsider = mutableListOf<Float>().apply {
+            add(minY)
+            add(maxY)
+            if (minGoal > 0) add(minGoal.toFloat())
+            if (maxGoal > 0) add(maxGoal.toFloat())
+        }
+
+        val minValue = valuesToConsider.minOrNull() ?: 0f
+        val maxValue = valuesToConsider.maxOrNull() ?: 0f
+
+        // Calculate extra space needed for the max goal label (50% more padding at the top)
+        val extraTopSpace = padding * 0.5f
+
+        // Apply padding to the range with extra space at the top
+        val minAxis = minValue - padding
+        val maxAxis = maxValue + padding + extraTopSpace
+
+        // Store limit lines to add them in the correct order
+        val limitLines = mutableListOf<LimitLine>()
+
+        // Add min goal line if valid
+        if (minGoal > 0) {
+            val minLine = LimitLine(minGoal.toFloat(), "Min Goal").apply {
+                lineColor = ContextCompat.getColor(requireContext(), R.color.min_graph)
+                lineWidth = 2f
+                enableDashedLine(10f, 10f, 0f)
+                textColor = ContextCompat.getColor(requireContext(), R.color.min_graph)
+                textSize = 12f
+                labelPosition = LimitLine.LimitLabelPosition.RIGHT_TOP
+                xOffset = 12f
+                yOffset = 0f
+            }
+            limitLines.add(minLine)
+        }
+
+        // Add max goal line if valid
+        if (maxGoal > 0) {
+            val maxLine = LimitLine(maxGoal.toFloat(), "Max Goal").apply {
+                lineColor = ContextCompat.getColor(requireContext(), R.color.max_graph)
+                lineWidth = 2f
+                enableDashedLine(10f, 10f, 0f)
+                textColor = ContextCompat.getColor(requireContext(), R.color.max_graph)
+                textSize = 12f
+                labelPosition = LimitLine.LimitLabelPosition.RIGHT_TOP
+                xOffset = 12f
+                yOffset = -20f  // Negative offset to move the label down
+            }
+            limitLines.add(maxLine)
+        }
+
+        // Add limit lines in the correct order (min first, then max)
+        limitLines.forEach { lineChartExpense.axisLeft.addLimitLine(it) }
+
+        // Set chart offsets to ensure labels are visible
+        // Parameters: left, top, right, bottom
+        lineChartExpense.setExtraOffsets(16f, 40f, 32f, 30f)
+
+        Log.d("ExpenseGoalLines", "Setting axis range - Min: $minAxis, Max: $maxAxis")
+
+        // Apply the new axis range
+        lineChartExpense.axisLeft.apply {
+            axisMinimum = minAxis
+            axisMaximum = maxAxis
+            setDrawLimitLinesBehindData(true)
+            setDrawLabels(true)
+            setDrawAxisLine(true)
+            setPosition(YAxis.YAxisLabelPosition.OUTSIDE_CHART)
+            xOffset = 12f
+            setLabelCount(5, true)
+            // Ensure the axis is recalculated
+            setStartAtZero(false)
+        }
+
+        // Force a complete redraw with the new settings
+        lineChartExpense.setVisibleXRangeMaximum(entries.size.toFloat())
+        lineChartExpense.moveViewToX(0f)
+        lineChartExpense.setExtraTopOffset(40f)  // Additional top offset
+        lineChartExpense.setExtraBottomOffset(20f)
+        lineChartExpense.setExtraLeftOffset(16f)
+        lineChartExpense.setExtraRightOffset(32f)
+        lineChartExpense.invalidate()
+        lineChartExpense.requestLayout()
+
+        Log.d("ExpenseGoalLines", "Chart updated with goal lines")
+    }
     /**
      * Navigates to transaction details screen.
      * To be implemented when the details screen is ready.
@@ -858,7 +1061,9 @@ class GeneralReportsFragment : Fragment() {
     }
 
     override fun onDestroyView() {
-        super.onDestroyView()
+        expenseGoalJob?.cancel()
+        expenseGoalJob = null
         _binding = null
+        super.onDestroyView()
     }
 }
