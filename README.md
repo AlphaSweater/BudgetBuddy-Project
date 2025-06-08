@@ -1,56 +1,55 @@
-# BUDGETBUDDY-PROJECT
 
-> **Master Your Money. Empower Your Future.**  
-> A Kotlin app with the world at your budget.
+![Logo](https://i.postimg.cc/VN8BpwF0/Synaptix-Logo.png)
 
-![Kotlin](https://img.shields.io/badge/Kotlin-1.9-blueviolet)
-![Room](https://img.shields.io/badge/Room-Database-orange)
-![Hilt](https://img.shields.io/badge/Hilt-DI-blue)
-![Android](https://img.shields.io/badge/Android-SDK-green)
-![Jetpack](https://img.shields.io/badge/Jetpack-Compose-lightgrey)
 
----
+# BudgetBuddy App - PROG7313
 
-## Table of Contents
+A brief description of what this project does and who it's for
 
-- [Overview](#overview)
-- [Getting Started](#getting-started)
-- [Installation](#installation)
-- [Usage](#usage)
-- [Testing](#testing)
 
----
+## Features
 
-## Overview
+- SignUp and Login: Users can securely create an account and log in to access their personal budget data from anywhere. This ensures that all financial information is protected and personalized for each user.
 
-**BudgetBuddy** is a powerful personal budget tracking tool designed to empower users in managing their financial lives.
+- Create Categories and Entries: Users can easily organize their finances by creating custom categories (e.g., Food, Transport, Entertainment) and adding income or expense entries under each category. This helps users track where their money is going in a structured way.
 
-The app provides a comprehensive solution for effective financial management. The core features include:
+- Take and Store Photos: Users can capture and attach photos of receipts, invoices, or any related documents to your entries. This feature helps users keep a visual record of their transactions for better tracking and accountability.
 
-- ✅ **Comprehensive Tracking**: Easily monitor income and expenses in an organized and user-friendly interface.
-- 🎨 **Intuitive Interface**: Enjoy a sleek, modern design that encourages better money management practices.
-- 🧩 **Categorization**: Simplify financial tracking by organizing transactions into customizable categories.
-- 🎯 **Goal Setting**: Set and achieve financial goals with a unique goal tracking strategy.
-- 🛠 **Continuous Improvement**: Actively maintained and evolving to maintain high-quality and innovative development.
+- Set Minimum and Maximum Goals: Set financial goals by setting minimum and maximum spending limits. This allows users to stick to their budget and avoid overspending.
 
----
+- View List of Entries in a Period: View a detailed list of all income and expense entries within a selected date range. This makes it easy to review and analyze user financial activity over days, weeks, or months.
 
-## Getting Started
+- View Category Totals in a Period: Get a clear summary of total spending and earnings per category within a specific time period. This feature provides insights into user's spending habits and helps adjust their budget as needed.
 
-### Prerequisites
 
-This project requires the following dependencies:
+## Own features
 
-- **Programming Language**: Kotlin  
-- **Package Manager**: Gradle
+- Multi-Wallet support: Application allows for multiple different wallets to be created and used by one profile, each wallet has its own transactions and balance as well as their own individual minimum and maximum goals that gets added together to create a global minimum and maximum goal for the user.
 
----
+- Advanced multi-Budget Support: 
+## Tech Stack
+### Core
 
-## Installation
+- 100% [Kotlin](https://kotlinlang.org/)
+- 100% [Jetpack Compose](https://developer.android.com/jetpack/compose)
+- [Material3 design](https://m3.material.io/) (UI components)
+- [Kotlin Coroutines](https://kotlinlang.org/docs/coroutines-overview.html) (structured concurrency)
+- [Kotlin Flow](https://kotlinlang.org/docs/flow.html) (reactive data stream)
+- [Hilt](https://dagger.dev/hilt/) (DI)
 
-Build BudgetBuddy locally from the source and install dependencies:
+### Database
+- [Firebase](https://console.firebase.google.com)
+- [Firestore](https://console.firebase.google.com)
+- [Imgur API](https://console.firebase.google.com) (Image uploading and storage)
 
-### 1. Clone the repository:
+### Build & CI
+- [Gradle KTS](https://docs.gradle.org/current/userguide/kotlin_dsl.html)
+- [Gradle version catalogs](https://developer.android.com/build/migrate-to-catalogs) (dependencies versions)
+- [GitHub Actions](https://github.com/Ivy-Apps/ivy-wallet/actions)
 
-```bash
-git clone https://github.com/YourUsername/BudgetBuddy-Project
+
+
+## Screenshots
+
+![App Screenshot](https://via.placeholder.com/468x300?text=App+Screenshot+Here)
+
