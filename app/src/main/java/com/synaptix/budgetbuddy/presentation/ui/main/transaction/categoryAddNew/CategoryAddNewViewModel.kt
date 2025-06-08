@@ -1,6 +1,7 @@
 package com.synaptix.budgetbuddy.presentation.ui.main.transaction.categoryAddNew
 
 import android.util.Log
+import androidx.compose.material3.Icon
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.synaptix.budgetbuddy.R
@@ -74,15 +75,20 @@ class CategoryAddNewViewModel @Inject constructor(
 
     // Available icons
     private val _icons = MutableStateFlow<List<IconItem>>(listOf(
-        IconItem(R.drawable.baseline_fastfood_24, "Food"),
+        IconItem(R.drawable.ic_cat_food, "Food"),
         IconItem(R.drawable.baseline_local_gas_station_24, "Transport"),
-        IconItem(R.drawable.ic_add_alert_24, "Alert"),
-        IconItem(R.drawable.baseline_palette_24, "Beauty"),
-        IconItem(R.drawable.baseline_savings_24, "Savings"),
-        IconItem(R.drawable.baseline_school_24, "Education"),
+        IconItem(R.drawable.ic_ui_notification, "Alert"),
+        IconItem(R.drawable.ic_cat_art, "Beauty"),
+        IconItem(R.drawable.ic_ui_budget, "Savings"),
+        IconItem(R.drawable.ic_cat_education, "Education"),
         IconItem(R.drawable.baseline_theater_comedy_24, "Entertainment"),
         IconItem(R.drawable.baseline_escalator_warning_24, "Family"),
-        IconItem(R.drawable.baseline_shopping_bag_24, "Shopping")
+        IconItem(R.drawable.baseline_shopping_bag_24, "Shopping"),
+        IconItem(R.drawable.ic_cat_pet, "Pets"),
+        IconItem(R.drawable.ic_cat_electronics, "Electronics"),
+        IconItem(R.drawable.ic_cat_medical, "Mecical"),
+        IconItem(R.drawable.ic_cat_vehicle, "Vehicle"),
+        IconItem(R.drawable.ic_cat_income, "Income")
     ))
     val icons: StateFlow<List<IconItem>> = _icons
 
