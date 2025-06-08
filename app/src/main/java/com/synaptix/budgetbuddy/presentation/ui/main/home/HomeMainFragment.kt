@@ -35,6 +35,8 @@ import com.synaptix.budgetbuddy.core.model.Category
 import com.synaptix.budgetbuddy.core.model.HomeListItems
 import com.synaptix.budgetbuddy.core.model.Transaction
 import com.synaptix.budgetbuddy.core.model.Wallet
+import com.synaptix.budgetbuddy.core.util.CurrencyUtil
+import com.synaptix.budgetbuddy.core.util.DateUtil
 import com.synaptix.budgetbuddy.databinding.FragmentHomeBinding
 import com.synaptix.budgetbuddy.presentation.ui.main.transaction.TransactionAddViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -237,7 +239,7 @@ class HomeMainFragment : Fragment() {
             valueTextSize = 12f
             valueFormatter = object : ValueFormatter() {
                 override fun getFormattedValue(value: Float): String {
-                    return "R ${String.format("%.2f", value)}"
+                    return CurrencyUtil.formatWithSymbol(value.toDouble())
                 }
             }
         }
@@ -248,7 +250,7 @@ class HomeMainFragment : Fragment() {
             valueTextSize = 12f
             valueFormatter = object : ValueFormatter() {
                 override fun getFormattedValue(value: Float): String {
-                    return "R ${String.format("%.2f", value)}"
+                    return CurrencyUtil.formatWithSymbol(value.toDouble())
                 }
             }
         }
@@ -310,7 +312,7 @@ class HomeMainFragment : Fragment() {
             axisLineColor = primaryTextColor
             valueFormatter = object : ValueFormatter() {
                 override fun getFormattedValue(value: Float): String {
-                    return "R ${String.format("%.0f", value)}"
+                    return CurrencyUtil.formatWithSymbol(value.toDouble())
                 }
             }
         }
@@ -430,7 +432,7 @@ class HomeMainFragment : Fragment() {
                     val transactionItems = state.transactions.take(MAX_ITEMS).map { transaction ->
                         HomeListItems.HomeTransactionItem(
                             transaction = transaction,
-                            relativeDate = transaction.formatDate(transaction.date)
+                            relativeDate = DateUtil.formatDate(transaction.date)
                         )
                     }
                     transactionAdapter.submitList(transactionItems)
@@ -479,8 +481,8 @@ class HomeMainFragment : Fragment() {
                     val categoryItems = state.categories.take(MAX_ITEMS).map { category ->
                         val categorySummary = state.categorySummaries[category.id]
                         val formattedAmount = categorySummary?.let {
-                            String.format("R %.2f", it.totalExpense)
-                        } ?: "R 0.00"
+                            CurrencyUtil.formatWithSymbol(it.totalExpense)
+                        } ?: CurrencyUtil.formatWithSymbol(0.0)
 
                         HomeListItems.HomeCategoryItem(
                             category = category,
@@ -662,9 +664,7 @@ class HomeMainFragment : Fragment() {
 
     private fun updateTotalBalance(balance: Double?) {
         binding.apply {
-            textViewCurrencyTotal.text = balance?.let {
-                String.format("%,.2f", it)
-            } ?: "0.00"
+            textViewCurrencyTotal.text = CurrencyUtil.formatWithoutSymbol(balance)
             
             // Set text color based on balance
             val colorRes = if (balance != null && balance >= 0) {

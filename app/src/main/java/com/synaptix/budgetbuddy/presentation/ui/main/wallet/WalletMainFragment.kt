@@ -27,6 +27,7 @@ import com.synaptix.budgetbuddy.R
 import com.synaptix.budgetbuddy.core.model.BudgetListItems
 import com.synaptix.budgetbuddy.core.model.Transaction
 import com.synaptix.budgetbuddy.core.model.Wallet
+import com.synaptix.budgetbuddy.core.util.DateUtil
 import com.synaptix.budgetbuddy.databinding.FragmentWalletMainBinding
 import com.synaptix.budgetbuddy.extentions.getThemeColor
 import dagger.hilt.android.AndroidEntryPoint
@@ -410,7 +411,7 @@ class WalletMainFragment : Fragment() {
                 walletName = wallet.name,
                 walletIcon = R.drawable.ic_ui_wallet,
                 walletBalance = wallet.balance,
-                relativeDate = wallet.formatDate(wallet.lastTransactionAt)
+                relativeDate = DateUtil.formatDate(wallet.lastTransactionAt)
             )
         }
         walletAdapter.submitList(budgetWalletItems)
