@@ -11,8 +11,7 @@ import com.synaptix.budgetbuddy.core.model.User
 import com.synaptix.budgetbuddy.core.usecase.auth.GetUserIdUseCase
 import com.synaptix.budgetbuddy.core.usecase.main.category.AddCategoryUseCase
 import com.synaptix.budgetbuddy.core.usecase.main.category.GetCategoryUseCase
-import com.synaptix.budgetbuddy.presentation.ui.main.transaction.TransactionAddViewModel
-import com.synaptix.budgetbuddy.presentation.ui.main.transaction.TransactionAddViewModel.ValidationState
+import com.synaptix.budgetbuddy.core.usecase.main.category.UpdateCategoryUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -22,6 +21,7 @@ import javax.inject.Inject
 @HiltViewModel
 class CategoryAddNewViewModel @Inject constructor(
     private val addCategoryUseCase: AddCategoryUseCase,
+    private val updateCategoryUseCase: UpdateCategoryUseCase,
     private val getUserIdUseCase: GetUserIdUseCase,
     private val getCategoryUseCase: GetCategoryUseCase,
     private val savedStateHandle: SavedStateHandle
@@ -288,7 +288,7 @@ class CategoryAddNewViewModel @Inject constructor(
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-    // Category Creation
+    // Category Creation/Update
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     fun createCategory() {
         if (!validateForm()) {
@@ -321,34 +321,57 @@ class CategoryAddNewViewModel @Inject constructor(
                     color = _selectedColor.value?.colorResourceId ?: R.color.cat_dark_pink
                 )
 
-                // If we're in edit mode, we need to update the existing category
-                if (screenMode.value == ScreenMode.EDIT && categoryId != null) {
-                    // TODO: Add UpdateCategoryUseCase and implement updating
-                    _savingUiState.value = SavingUiState.Error("Category updating not implemented yet")
-                    return@launch
+                when (screenMode.value) {
+                    ScreenMode.EDIT -> {
+                        // Update existing category
+                        val originalCategory = _category.value ?: return@launch
+                        updateCategoryUseCase.execute(newCategory)
+                            .catch { e ->
+                                Log.e("CategoryAddNewViewModel", "Error in category update flow: ${e.message}")
+                                _savingUiState.value = SavingUiState.Error(e.message ?: "Failed to update category")
+                            }
+                            .collect { result ->
+                                when (result) {
+                                    is UpdateCategoryUseCase.UpdateCategoryResult.Success -> {
+                                        Log.d("CategoryAddNewViewModel", "Category updated successfully: ${result.categoryId}")
+                                        reset()
+                                        _savingUiState.value = SavingUiState.Success
+                                    }
+                                    is UpdateCategoryUseCase.UpdateCategoryResult.Error -> {
+                                        Log.e("CategoryAddNewViewModel", "Error updating category: ${result.message}")
+                                        _savingUiState.value = SavingUiState.Error(result.message)
+                                    }
+                                }
+                            }
+                    }
+                    ScreenMode.CREATE -> {
+                        // Create new category
+                        addCategoryUseCase.execute(newCategory)
+                            .catch { e ->
+                                Log.e("CategoryAddNewViewModel", "Error in category creation flow: ${e.message}")
+                                _savingUiState.value = SavingUiState.Error(e.message ?: "Failed to add category")
+                            }
+                            .collect { result ->
+                                when (result) {
+                                    is AddCategoryUseCase.AddCategoryResult.Success -> {
+                                        Log.d("CategoryAddNewViewModel", "Category added successfully: ${result.categoryId}")
+                                        reset()
+                                        _savingUiState.value = SavingUiState.Success
+                                    }
+                                    is AddCategoryUseCase.AddCategoryResult.Error -> {
+                                        Log.e("CategoryAddNewViewModel", "Error adding category: ${result.message}")
+                                        _savingUiState.value = SavingUiState.Error(result.message)
+                                    }
+                                }
+                            }
+                    }
+                    else -> {
+                        _savingUiState.value = SavingUiState.Error("Invalid screen mode for category operation")
+                    }
                 }
-
-                // Proceed with adding the new category
-                addCategoryUseCase.execute(newCategory)
-                    .catch { e ->
-                        Log.e("CategoryAddNewViewModel", "Error in category creation flow: ${e.message}")
-                        _savingUiState.value = SavingUiState.Error(e.message ?: "Failed to add category")
-                    }
-                    .collect { result ->
-                        when (result) {
-                            is AddCategoryUseCase.AddCategoryResult.Success -> {
-                                Log.d("CategoryAddNewViewModel", "Category added successfully: ${result.categoryId}")
-                                _savingUiState.value = SavingUiState.Success
-                            }
-                            is AddCategoryUseCase.AddCategoryResult.Error -> {
-                                Log.e("CategoryAddNewViewModel", "Error adding category: ${result.message}")
-                                _savingUiState.value = SavingUiState.Error(result.message)
-                            }
-                        }
-                    }
             } catch (e: Exception) {
-                Log.e("CategoryAddNewViewModel", "Exception adding category: ${e.message}")
-                _savingUiState.value = SavingUiState.Error(e.message ?: "Failed to add category")
+                Log.e("CategoryAddNewViewModel", "Exception in category operation: ${e.message}")
+                _savingUiState.value = SavingUiState.Error(e.message ?: "Failed to process category")
             }
         }
     }
