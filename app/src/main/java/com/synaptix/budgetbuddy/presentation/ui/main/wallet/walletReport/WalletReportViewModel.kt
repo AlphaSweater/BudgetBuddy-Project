@@ -3,22 +3,24 @@ package com.synaptix.budgetbuddy.presentation.ui.main.wallet.walletReport
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
+import com.synaptix.budgetbuddy.core.model.BudgetListItems
 import com.synaptix.budgetbuddy.core.model.Transaction
 import com.synaptix.budgetbuddy.core.model.Wallet
 import com.synaptix.budgetbuddy.core.usecase.main.transaction.GetTransactionsUseCase
-import com.synaptix.budgetbuddy.core.usecase.main.wallet.GetWalletsUseCase
+import com.synaptix.budgetbuddy.core.usecase.main.wallet.GetWalletUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import java.util.Calendar
 import javax.inject.Inject
 
 // WalletReportViewModel.kt
 @HiltViewModel
 class WalletReportViewModel @Inject constructor(
     private val getTransactionsUseCase: GetTransactionsUseCase,
-    private val getWalletsUseCase: GetWalletsUseCase,
-    private val auth: FirebaseAuth  // Add this line
+    private val getWalletUseCase: GetWalletUseCase,
+    private val auth: FirebaseAuth
 ) : ViewModel() {
 
     private val _transactionsState = MutableStateFlow<TransactionState>(TransactionState.Loading)
@@ -27,12 +29,14 @@ class WalletReportViewModel @Inject constructor(
     private val _wallet = MutableStateFlow<Wallet?>(null)
     val wallet: StateFlow<Wallet?> = _wallet
 
+    private val _dateRange = MutableStateFlow<ClosedRange<Long>?>(null)
+    val dateRange: StateFlow<ClosedRange<Long>?> = _dateRange
+
     fun loadWalletTransactions(walletId: String) {
         viewModelScope.launch {
             _transactionsState.value = TransactionState.Loading
             println("WalletReportViewModel: Loading wallet: $walletId")
 
-            // Get current user
             val currentUser = auth.currentUser
             if (currentUser == null) {
                 println("WalletReportViewModel: User not authenticated")
@@ -44,25 +48,22 @@ class WalletReportViewModel @Inject constructor(
             println("WalletReportViewModel: Using user ID: $userId")
 
             try {
-                // Pass the user ID to the use case
-                getWalletsUseCase.execute(userId).collect { walletResult ->
+                getWalletUseCase.execute(userId).collect { walletResult ->
                     when (walletResult) {
-                        is GetWalletsUseCase.GetWalletResult.Success -> {
+                        is GetWalletUseCase.GetWalletResult.Success -> {
                             println("WalletReportViewModel: Found ${walletResult.wallets.size} wallets")
                             val wallet = walletResult.wallets.find { it.id == walletId }
 
                             if (wallet != null) {
                                 _wallet.value = wallet
                                 println("WalletReportViewModel: Found wallet: ${wallet.name} (${wallet.id})")
-
-                                // Now get transactions with the user ID
                                 loadWalletTransactionsInternal(walletId, userId)
                             } else {
                                 println("WalletReportViewModel: Wallet $walletId not found")
                                 _transactionsState.value = TransactionState.Error("Wallet not found")
                             }
                         }
-                        is GetWalletsUseCase.GetWalletResult.Error -> {
+                        is GetWalletUseCase.GetWalletResult.Error -> {
                             println("WalletReportViewModel: Error loading wallets: ${walletResult.message}")
                             _transactionsState.value = TransactionState.Error(
                                 walletResult.message ?: "Error loading wallet"
@@ -83,9 +84,32 @@ class WalletReportViewModel @Inject constructor(
         getTransactionsUseCase.execute(userId).collect { transactionResult ->
             when (transactionResult) {
                 is GetTransactionsUseCase.GetTransactionsResult.Success -> {
-                    val walletTransactions = transactionResult.transactions
+                    var walletTransactions = transactionResult.transactions
                         .filter { it.wallet.id == walletId }
                         .sortedByDescending { it.date }
+
+                    // Apply date range filter if set
+                    _dateRange.value?.let { range ->
+                        val calendar = Calendar.getInstance().apply {
+                            timeInMillis = range.start
+                            set(Calendar.HOUR_OF_DAY, 0)
+                            set(Calendar.MINUTE, 0)
+                            set(Calendar.SECOND, 0)
+                            set(Calendar.MILLISECOND, 0)
+                        }
+                        val startOfStartDate = calendar.timeInMillis
+
+                        calendar.timeInMillis = range.endInclusive
+                        calendar.set(Calendar.HOUR_OF_DAY, 23)
+                        calendar.set(Calendar.MINUTE, 59)
+                        calendar.set(Calendar.SECOND, 59)
+                        calendar.set(Calendar.MILLISECOND, 999)
+                        val endOfEndDate = calendar.timeInMillis
+
+                        walletTransactions = walletTransactions.filter { transaction ->
+                            transaction.date in startOfStartDate..endOfEndDate
+                        }
+                    }
 
                     println("WalletReportViewModel: Found ${walletTransactions.size} transactions for wallet $walletId")
 
@@ -104,7 +128,19 @@ class WalletReportViewModel @Inject constructor(
             }
         }
     }
+    fun setDateRange(startDate: Long, endDate: Long) {
+        _dateRange.value = startDate..endDate
+        wallet.value?.let { wallet ->
+            loadWalletTransactions(wallet.id)
+        }
+    }
 
+    fun clearDateRange() {
+        _dateRange.value = null
+        wallet.value?.let { wallet ->
+            loadWalletTransactions(wallet.id)
+        }
+    }
 
     sealed class TransactionState {
         object Loading : TransactionState()
