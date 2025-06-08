@@ -3,6 +3,7 @@ package com.synaptix.budgetbuddy.core.usecase.main.display
 import com.synaptix.budgetbuddy.core.model.Budget
 import com.synaptix.budgetbuddy.core.model.Result
 import com.synaptix.budgetbuddy.data.firebase.mapper.FirebaseMapper.toDomain
+import com.synaptix.budgetbuddy.data.firebase.model.TransactionDTO
 import com.synaptix.budgetbuddy.data.firebase.repository.FirestoreBudgetRepository
 import com.synaptix.budgetbuddy.data.firebase.repository.FirestoreCategoryRepository
 import com.synaptix.budgetbuddy.data.firebase.repository.FirestoreTransactionRepository

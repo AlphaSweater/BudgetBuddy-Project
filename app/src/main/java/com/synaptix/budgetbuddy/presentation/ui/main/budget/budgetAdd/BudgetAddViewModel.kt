@@ -130,7 +130,6 @@ class BudgetAddViewModel @Inject constructor(
                     userId = userId,
                     name = _budgetName.value ?: "",
                     amount = _budgetAmount.value ?: 0.0,
-                    spent = 0.0,
                     categoryIds = _selectedCategories.value.map { it.id },
                     startDate = System.currentTimeMillis()
                 )

@@ -69,21 +69,18 @@ class CalculateBudgetSpentUseCase @Inject constructor(
             userId = budget.user.id,
             startDate = startOfMonth,
             endDate = endOfMonth
-        ).map { transactionsResult ->
-            when (transactionsResult) {
-                is Result.Success -> {
-                    val transactions = transactionsResult.data
-                    
-                    // Filter transactions by category
-                    val relevantTransactions = transactions.filter { transaction ->
-                        budget.categories.any { it.id == transaction.categoryId }
-                    }
-                    
-                    // Sum up the amounts
-                    val totalSpent = relevantTransactions.sumOf { it.amount }
-                    Result.Success(totalSpent)
+        ).map { transactions ->
+            try {
+                // Filter transactions by category
+                val relevantTransactions = transactions.filter { transaction ->
+                    budget.categories.any { it.id == transaction.categoryId }
                 }
-                is Result.Error -> Result.Error(transactionsResult.exception)
+                
+                // Sum up the amounts
+                val totalSpent = relevantTransactions.sumOf { it.amount }
+                Result.Success(totalSpent)
+            } catch (e: Exception) {
+                Result.Error(e)
             }
         }
     }

@@ -101,7 +101,8 @@ class BudgetMainFragment : Fragment() {
                                 val budgetItems = state.budgets.map { budget ->
                                     BudgetListItems.BudgetBudgetItem(
                                         budget = budget,
-                                        spent = 0.0 // Initial value, will be updated by observeBudgetSpent
+                                        spent = 0.0,
+                                        status = "Active"
                                     )
                                 }
                                 budgetAdapter.submitList(budgetItems)
@@ -110,7 +111,7 @@ class BudgetMainFragment : Fragment() {
                                 state.budgets.forEach { budget ->
                                     launch {
                                         viewModel.observeBudgetSpent(budget).collectLatest { spent ->
-                                            val updatedItems = budgetAdapter.currentList.map { item ->
+                                            val updatedItems = budgetAdapter.getCurrentList().map { item ->
                                                 if (item.budget.id == budget.id) {
                                                     item.copy(spent = spent)
                                                 } else {

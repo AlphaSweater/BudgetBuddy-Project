@@ -123,6 +123,8 @@ sealed class BudgetListItems {
         // The original Budget object
         val budget: Budget,
 
+        val spent: Double,
+
         // The status of the budget (e.g., 'Completed', 'Pending')
         val status: String,
     ) : BudgetListItems()
