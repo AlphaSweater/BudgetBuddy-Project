@@ -9,8 +9,7 @@ import com.synaptix.budgetbuddy.core.model.Wallet
 import com.synaptix.budgetbuddy.core.usecase.auth.GetUserIdUseCase
 import com.synaptix.budgetbuddy.core.usecase.main.category.GetCategoriesUseCase
 import com.synaptix.budgetbuddy.core.usecase.main.transaction.GetTransactionsUseCase
-import com.synaptix.budgetbuddy.core.usecase.main.wallet.GetWalletUseCase
-import com.synaptix.budgetbuddy.presentation.ui.main.general.generalTransactions.GeneralTransactionsViewModel.TransactionState
+import com.synaptix.budgetbuddy.core.usecase.main.wallet.GetWalletsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -67,7 +66,7 @@ class GeneralReportsViewModel @Inject constructor(
     private val getTransactionsUseCase: GetTransactionsUseCase,
     private val getCategoriesUseCase: GetCategoriesUseCase,
     private val getUserIdUseCase: GetUserIdUseCase,
-    private val getWalletsUseCase: GetWalletUseCase
+    private val getWalletsUseCase: GetWalletsUseCase
 
 ) : ViewModel() {
 
@@ -213,10 +212,10 @@ class GeneralReportsViewModel @Inject constructor(
                     }
                     .collect { result ->
                         when (result) {
-                            is GetWalletUseCase.GetWalletResult.Success -> {
+                            is GetWalletsUseCase.GetWalletResult.Success -> {
                                 _walletState.value = result.wallets
                             }
-                            is GetWalletUseCase.GetWalletResult.Error -> {
+                            is GetWalletsUseCase.GetWalletResult.Error -> {
                                 Log.e("WalletLoad", "Error: ${result.message}")
                             }
                         }

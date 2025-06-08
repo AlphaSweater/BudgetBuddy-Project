@@ -11,7 +11,7 @@ import com.synaptix.budgetbuddy.core.model.Wallet
 import com.synaptix.budgetbuddy.core.usecase.auth.GetUserIdUseCase
 import com.synaptix.budgetbuddy.core.usecase.main.category.GetCategoriesUseCase
 import com.synaptix.budgetbuddy.core.usecase.main.transaction.GetTransactionsUseCase
-import com.synaptix.budgetbuddy.core.usecase.main.wallet.GetWalletUseCase
+import com.synaptix.budgetbuddy.core.usecase.main.wallet.GetWalletsUseCase
 import com.synaptix.budgetbuddy.data.firebase.model.TransactionDTO
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -69,7 +69,7 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class HomeMainViewModel @Inject constructor(
-    private val getWalletUseCase: GetWalletUseCase,
+    private val getWalletsUseCase: GetWalletsUseCase,
     private val getTransactionsUseCase: GetTransactionsUseCase,
     private val getCategoriesUseCase: GetCategoriesUseCase,
     private val getUserIdUseCase: GetUserIdUseCase
@@ -256,17 +256,17 @@ class HomeMainViewModel @Inject constructor(
 
             launch {
                 // Wallet Flow Collection
-                getWalletUseCase.execute(userId)
+                getWalletsUseCase.execute(userId)
                     .catch { e ->
                         _walletsState.value = WalletState.Empty
                     }
                     .collect { result ->
                         _walletsState.value = when (result) {
-                            is GetWalletUseCase.GetWalletResult.Success -> {
+                            is GetWalletsUseCase.GetWalletResult.Success -> {
                                 if (result.wallets.isEmpty()) WalletState.Empty
                                 else WalletState.Success(result.wallets)
                             }
-                            is GetWalletUseCase.GetWalletResult.Error -> WalletState.Empty
+                            is GetWalletsUseCase.GetWalletResult.Error -> WalletState.Empty
                         }
                     }
             }

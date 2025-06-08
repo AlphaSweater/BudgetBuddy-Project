@@ -6,7 +6,7 @@ import com.synaptix.budgetbuddy.core.model.Transaction
 import com.synaptix.budgetbuddy.core.model.Wallet
 import com.synaptix.budgetbuddy.core.usecase.auth.GetUserIdUseCase
 import com.synaptix.budgetbuddy.core.usecase.main.transaction.GetTransactionsUseCase
-import com.synaptix.budgetbuddy.core.usecase.main.wallet.GetWalletUseCase
+import com.synaptix.budgetbuddy.core.usecase.main.wallet.GetWalletsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.*
@@ -15,7 +15,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class WalletMainViewModel @Inject constructor(
-    private val getWalletUseCase: GetWalletUseCase,
+    private val getWalletsUseCase: GetWalletsUseCase,
     private val getUserIdUseCase: GetUserIdUseCase,
     private val getTransactionsUseCase: GetTransactionsUseCase // Add this line
 ) : ViewModel() {
@@ -56,14 +56,14 @@ class WalletMainViewModel @Inject constructor(
                 return@launch
             }
 
-            getWalletUseCase.execute(userId)
+            getWalletsUseCase.execute(userId)
                 .catch { e ->
                     _walletState.value = WalletState.Error(e.message ?: "Unknown error occurred")
                     _totalBalance.value = 0.0
                 }
                 .collect { result ->
                     when (result) {
-                        is GetWalletUseCase.GetWalletResult.Success -> {
+                        is GetWalletsUseCase.GetWalletResult.Success -> {
                             val walletsList = result.wallets
                             if (walletsList.isEmpty()) {
                                 _walletState.value = WalletState.Empty
@@ -72,7 +72,7 @@ class WalletMainViewModel @Inject constructor(
                             }
                             calculateTotalBalance(walletsList)
                         }
-                        is GetWalletUseCase.GetWalletResult.Error -> {
+                        is GetWalletsUseCase.GetWalletResult.Error -> {
                             _walletState.value = WalletState.Error(result.message)
                             _totalBalance.value = 0.0
                         }

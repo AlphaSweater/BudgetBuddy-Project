@@ -1,6 +1,7 @@
 package com.synaptix.budgetbuddy.presentation.ui.main.transaction.categoryAddNew
 
 import android.util.Log
+import androidx.compose.ui.text.intl.Locale
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -9,6 +10,9 @@ import com.synaptix.budgetbuddy.core.model.Category
 import com.synaptix.budgetbuddy.core.model.User
 import com.synaptix.budgetbuddy.core.usecase.auth.GetUserIdUseCase
 import com.synaptix.budgetbuddy.core.usecase.main.category.AddCategoryUseCase
+import com.synaptix.budgetbuddy.core.usecase.main.category.GetCategoryUseCase
+import com.synaptix.budgetbuddy.presentation.ui.main.transaction.TransactionAddViewModel
+import com.synaptix.budgetbuddy.presentation.ui.main.transaction.TransactionAddViewModel.ValidationState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -19,12 +23,48 @@ import javax.inject.Inject
 class CategoryAddNewViewModel @Inject constructor(
     private val addCategoryUseCase: AddCategoryUseCase,
     private val getUserIdUseCase: GetUserIdUseCase,
+    private val getCategoryUseCase: GetCategoryUseCase,
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
+
+    sealed class LoadingUiState {
+        object Idle : LoadingUiState()
+        object Loading : LoadingUiState()
+        object Loaded : LoadingUiState()
+        data class Error(val message: String) : LoadingUiState()
+    }
+
+    sealed class SavingUiState {
+        object Idle : SavingUiState()
+        object Saving : SavingUiState()
+        object Success : SavingUiState()
+        data class Error(val message: String) : SavingUiState()
+    }
 
     enum class ScreenMode : Serializable {
         EDIT, CREATE
     }
+
+    data class ValidationState(
+        val isNameValid: Boolean = false,
+        val isTypeValid: Boolean = false,
+        val isColorValid: Boolean = false,
+        val isIconValid: Boolean = false,
+        val nameError: String? = null,
+        val typeError: String? = null,
+        val colorError: String? = null,
+        val iconError: String? = null,
+        val shouldShowErrors: Boolean = false
+    )
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // UI State
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    private val _savingUiState = MutableStateFlow<SavingUiState>(SavingUiState.Idle)
+    val savingUiState: StateFlow<SavingUiState> = _savingUiState
+
+    private val _loadingUiState = MutableStateFlow<LoadingUiState>(LoadingUiState.Idle)
+    val loadingUiState: StateFlow<LoadingUiState> = _loadingUiState
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     // Screen Mode
@@ -61,74 +101,144 @@ class CategoryAddNewViewModel @Inject constructor(
 
     private fun populateCategoryData(category: Category) {
         _categoryName.value = category.name
-        _categoryType.value = category.type.capitalize()
+        _categoryType.value = category.type.capitalize(java.util.Locale.ROOT)
         _selectedColor.value = _colors.value.find { it.colorResourceId == category.color }
         _selectedIcon.value = _icons.value.find { it.iconResourceId == category.icon }
     }
 
     private fun loadCategory(id: String) {
         viewModelScope.launch {
-            _uiState.value = UiState.Loading
+            _loadingUiState.value = LoadingUiState.Loading
 
             val currentUserId = getUserIdUseCase.execute()
             if (currentUserId.isEmpty()) {
-                _uiState.value = UiState.Error("User ID is empty")
+                _loadingUiState.value = LoadingUiState.Error("User ID is empty")
                 return@launch
             }
 
             Log.d("CategoryAddNewViewModel", "Loading Category: $id")
 
-            // TODO: Add GetCategoryUseCase and implement loading
-            // For now, we'll just show an error
-            _uiState.value = UiState.Error("Category loading not implemented yet")
+            val result = getCategoryUseCase.execute(currentUserId, id)
+            when (result) {
+                is GetCategoryUseCase.GetCategoryResult.Success -> {
+                    Log.d("CategoryAddNewViewModel", "Category loaded successfully: ${result.category.id}")
+                    setCategory(result.category)
+                    _loadingUiState.value = LoadingUiState.Loaded
+                }
+                is GetCategoryUseCase.GetCategoryResult.Error -> {
+                    Log.e("CategoryAddNewViewModel", "Error loading category: ${result.message}")
+                    _loadingUiState.value = LoadingUiState.Error(result.message)
+                }
+            }
         }
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-    // UI State
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-    sealed class UiState {
-        object Initial : UiState()
-        object Loading : UiState()
-        object Success : UiState()
-        data class Error(val message: String) : UiState()
-    }
-
-    data class ValidationState(
-        val isNameValid: Boolean = false,
-        val isTypeValid: Boolean = false,
-        val isColorValid: Boolean = false,
-        val isIconValid: Boolean = false,
-        val nameError: String? = null,
-        val typeError: String? = null,
-        val colorError: String? = null,
-        val iconError: String? = null,
-        val shouldShowErrors: Boolean = false
-    )
-
-    private val _uiState = MutableStateFlow<UiState>(UiState.Initial)
-    val uiState: StateFlow<UiState> = _uiState
-
-    private val _validationState = MutableStateFlow(ValidationState())
-    val validationState: StateFlow<ValidationState> = _validationState
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-    // Form State
+    // Form Fields
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private val _categoryName = MutableStateFlow("")
     val categoryName: StateFlow<String> = _categoryName
 
+    fun setCategoryName(name: String) {
+        _categoryName.value = name
+        validateForm()
+        checkForChanges()
+    }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private val _categoryType = MutableStateFlow("Expense")
     val categoryType: StateFlow<String> = _categoryType
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-    // Selection State
+    fun setCategoryType(type: String) {
+        _categoryType.value = type
+        validateForm()
+        checkForChanges()
+    }
+
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private val _selectedColor = MutableStateFlow<CategoryItem.ColorItem?>(null)
     val selectedColor: StateFlow<CategoryItem.ColorItem?> = _selectedColor
 
+    fun setSelectedColor(color: CategoryItem.ColorItem) {
+        _selectedColor.value = color
+        validateForm()
+        checkForChanges()
+    }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private val _selectedIcon = MutableStateFlow<CategoryItem.IconItem?>(null)
     val selectedIcon: StateFlow<CategoryItem.IconItem?> = _selectedIcon
+
+    fun setSelectedIcon(icon: CategoryItem.IconItem) {
+        _selectedIcon.value = icon
+        validateForm()
+        checkForChanges()
+    }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // Validation
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // Validation State
+    private val _validationState = MutableStateFlow(ValidationState())
+    val validationState: StateFlow<ValidationState> = _validationState
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // Validate the form fields and update validation state
+    fun validateForm(): Boolean {
+        val name = _categoryName.value
+        val type = _categoryType.value
+        val color = _selectedColor.value
+        val icon = _selectedIcon.value
+
+        val (isNameValid, nameError) = validateName(name)
+        val (isTypeValid, typeError) = validateType(type)
+        val (isColorValid, colorError) = validateColor(color)
+        val (isIconValid, iconError) = validateIcon(icon)
+
+        _validationState.value = _validationState.value.copy(
+            isNameValid = isNameValid,
+            isTypeValid = isTypeValid,
+            isColorValid = isColorValid,
+            isIconValid = isIconValid,
+            nameError = nameError,
+            typeError = typeError,
+            colorError = colorError,
+            iconError = iconError
+        )
+
+        return isNameValid && isTypeValid && isColorValid && isIconValid
+    }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // Validation Actions
+    fun showValidationErrors() {
+        _validationState.value = _validationState.value.copy(shouldShowErrors = true)
+        validateForm()
+    }
+
+    private fun validateName(name: String): Pair<Boolean, String?> {
+        val isValid = name.isNotEmpty()
+        val error = if (isValid) null else "Category name cannot be empty"
+        return Pair(isValid, error)
+    }
+
+    private fun validateType(type: String): Pair<Boolean, String?> {
+        val isValid = type.isNotEmpty()
+        val error = if (isValid) null else "Category type must be selected"
+        return Pair(isValid, error)
+    }
+
+    private fun validateColor(color: CategoryItem.ColorItem?): Pair<Boolean, String?> {
+        val isValid = color != null
+        val error = if (isValid) null else "Please select a color"
+        return Pair(isValid, error)
+    }
+
+    private fun validateIcon(icon: CategoryItem.IconItem?): Pair<Boolean, String?> {
+        val isValid = icon != null
+        val error = if (isValid) null else "Please select an icon"
+        return Pair(isValid, error)
+    }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     // Available Options
@@ -164,91 +274,7 @@ class CategoryAddNewViewModel @Inject constructor(
     val icons: StateFlow<List<CategoryItem.IconItem>> = _icons
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-    // Form Actions
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-    fun setCategoryName(name: String) {
-        _categoryName.value = name
-        validateForm()
-        checkForChanges()
-    }
-
-    fun setSelectedColor(color: CategoryItem.ColorItem) {
-        _selectedColor.value = color
-        validateForm()
-        checkForChanges()
-    }
-
-    fun setSelectedIcon(icon: CategoryItem.IconItem) {
-        _selectedIcon.value = icon
-        validateForm()
-        checkForChanges()
-    }
-
-    fun setCategoryType(type: String) {
-        _categoryType.value = type
-        validateForm()
-        checkForChanges()
-    }
-
-    fun showValidationErrors() {
-        _validationState.value = _validationState.value.copy(shouldShowErrors = true)
-        validateForm()
-    }
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-    // Validation
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-    fun validateForm(): Boolean {
-        val name = _categoryName.value
-        val type = _categoryType.value
-        val color = _selectedColor.value
-        val icon = _selectedIcon.value
-
-        val (isNameValid, nameError) = validateName(name)
-        val (isTypeValid, typeError) = validateType(type)
-        val (isColorValid, colorError) = validateColor(color)
-        val (isIconValid, iconError) = validateIcon(icon)
-
-        _validationState.value = _validationState.value.copy(
-            isNameValid = isNameValid,
-            isTypeValid = isTypeValid,
-            isColorValid = isColorValid,
-            isIconValid = isIconValid,
-            nameError = nameError,
-            typeError = typeError,
-            colorError = colorError,
-            iconError = iconError
-        )
-
-        return isNameValid && isTypeValid && isColorValid && isIconValid
-    }
-
-    private fun validateName(name: String): Pair<Boolean, String?> {
-        val isValid = name.isNotEmpty()
-        val error = if (isValid) null else "Category name cannot be empty"
-        return Pair(isValid, error)
-    }
-
-    private fun validateType(type: String): Pair<Boolean, String?> {
-        val isValid = type.isNotEmpty()
-        val error = if (isValid) null else "Category type must be selected"
-        return Pair(isValid, error)
-    }
-
-    private fun validateColor(color: CategoryItem.ColorItem?): Pair<Boolean, String?> {
-        val isValid = color != null
-        val error = if (isValid) null else "Please select a color"
-        return Pair(isValid, error)
-    }
-
-    private fun validateIcon(icon: CategoryItem.IconItem?): Pair<Boolean, String?> {
-        val isValid = icon != null
-        val error = if (isValid) null else "Please select an icon"
-        return Pair(isValid, error)
-    }
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-    // Initialize
+    // Initialize ViewModel
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     init {
         when (screenMode.value) {
@@ -271,12 +297,12 @@ class CategoryAddNewViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            _uiState.value = UiState.Loading
+            _savingUiState.value = SavingUiState.Saving
             
             try {
                 val userId = getUserIdUseCase.execute()
                 if (userId.isEmpty()) {
-                    _uiState.value = UiState.Error("User ID is empty")
+                    _savingUiState.value = SavingUiState.Error("User ID is empty")
                     return@launch
                 }
 
@@ -298,30 +324,31 @@ class CategoryAddNewViewModel @Inject constructor(
                 // If we're in edit mode, we need to update the existing category
                 if (screenMode.value == ScreenMode.EDIT && categoryId != null) {
                     // TODO: Add UpdateCategoryUseCase and implement updating
-                    _uiState.value = UiState.Error("Category updating not implemented yet")
+                    _savingUiState.value = SavingUiState.Error("Category updating not implemented yet")
                     return@launch
                 }
 
+                // Proceed with adding the new category
                 addCategoryUseCase.execute(newCategory)
                     .catch { e ->
                         Log.e("CategoryAddNewViewModel", "Error in category creation flow: ${e.message}")
-                        _uiState.value = UiState.Error(e.message ?: "Failed to add category")
+                        _savingUiState.value = SavingUiState.Error(e.message ?: "Failed to add category")
                     }
                     .collect { result ->
                         when (result) {
                             is AddCategoryUseCase.AddCategoryResult.Success -> {
                                 Log.d("CategoryAddNewViewModel", "Category added successfully: ${result.categoryId}")
-                                _uiState.value = UiState.Success
+                                _savingUiState.value = SavingUiState.Success
                             }
                             is AddCategoryUseCase.AddCategoryResult.Error -> {
                                 Log.e("CategoryAddNewViewModel", "Error adding category: ${result.message}")
-                                _uiState.value = UiState.Error(result.message)
+                                _savingUiState.value = SavingUiState.Error(result.message)
                             }
                         }
                     }
             } catch (e: Exception) {
                 Log.e("CategoryAddNewViewModel", "Exception adding category: ${e.message}")
-                _uiState.value = UiState.Error(e.message ?: "Failed to add category")
+                _savingUiState.value = SavingUiState.Error(e.message ?: "Failed to add category")
             }
         }
     }
@@ -335,9 +362,12 @@ class CategoryAddNewViewModel @Inject constructor(
         _selectedColor.value = null
         _selectedIcon.value = null
         _validationState.value = ValidationState(shouldShowErrors = false)
-        _uiState.value = UiState.Initial
+        _savingUiState.value = SavingUiState.Idle
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // Saved Changes Check
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private val _hasUnsavedChanges = MutableStateFlow(false)
     val hasUnsavedChanges: StateFlow<Boolean> = _hasUnsavedChanges
 
@@ -361,7 +391,7 @@ class CategoryAddNewViewModel @Inject constructor(
 
         // Restore all values from the original category
         _categoryName.value = originalCategory.name
-        _categoryType.value = originalCategory.type.capitalize()
+        _categoryType.value = originalCategory.type.capitalize(java.util.Locale.ROOT)
         _selectedColor.value = _colors.value.find { it.colorResourceId == originalCategory.color }
         _selectedIcon.value = _icons.value.find { it.iconResourceId == originalCategory.icon }
 
@@ -384,3 +414,4 @@ sealed class CategoryItem {
         val name: String
     ) : CategoryItem()
 }
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~EOF~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\

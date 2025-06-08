@@ -3,11 +3,10 @@ package com.synaptix.budgetbuddy.presentation.ui.main.wallet.walletReport
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
-import com.synaptix.budgetbuddy.core.model.BudgetListItems
 import com.synaptix.budgetbuddy.core.model.Transaction
 import com.synaptix.budgetbuddy.core.model.Wallet
 import com.synaptix.budgetbuddy.core.usecase.main.transaction.GetTransactionsUseCase
-import com.synaptix.budgetbuddy.core.usecase.main.wallet.GetWalletUseCase
+import com.synaptix.budgetbuddy.core.usecase.main.wallet.GetWalletsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -18,7 +17,7 @@ import javax.inject.Inject
 @HiltViewModel
 class WalletReportViewModel @Inject constructor(
     private val getTransactionsUseCase: GetTransactionsUseCase,
-    private val getWalletUseCase: GetWalletUseCase,
+    private val getWalletsUseCase: GetWalletsUseCase,
     private val auth: FirebaseAuth  // Add this line
 ) : ViewModel() {
 
@@ -46,9 +45,9 @@ class WalletReportViewModel @Inject constructor(
 
             try {
                 // Pass the user ID to the use case
-                getWalletUseCase.execute(userId).collect { walletResult ->
+                getWalletsUseCase.execute(userId).collect { walletResult ->
                     when (walletResult) {
-                        is GetWalletUseCase.GetWalletResult.Success -> {
+                        is GetWalletsUseCase.GetWalletResult.Success -> {
                             println("WalletReportViewModel: Found ${walletResult.wallets.size} wallets")
                             val wallet = walletResult.wallets.find { it.id == walletId }
 
@@ -63,7 +62,7 @@ class WalletReportViewModel @Inject constructor(
                                 _transactionsState.value = TransactionState.Error("Wallet not found")
                             }
                         }
-                        is GetWalletUseCase.GetWalletResult.Error -> {
+                        is GetWalletsUseCase.GetWalletResult.Error -> {
                             println("WalletReportViewModel: Error loading wallets: ${walletResult.message}")
                             _transactionsState.value = TransactionState.Error(
                                 walletResult.message ?: "Error loading wallet"

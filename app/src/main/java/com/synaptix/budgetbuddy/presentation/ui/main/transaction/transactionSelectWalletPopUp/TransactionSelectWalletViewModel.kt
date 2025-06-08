@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.synaptix.budgetbuddy.core.model.Wallet
 import com.synaptix.budgetbuddy.core.usecase.auth.GetUserIdUseCase
-import com.synaptix.budgetbuddy.core.usecase.main.wallet.GetWalletUseCase
+import com.synaptix.budgetbuddy.core.usecase.main.wallet.GetWalletsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -14,7 +14,7 @@ import javax.inject.Inject
 @HiltViewModel
 class TransactionSelectWalletViewModel @Inject constructor(
     private val getUserIdUseCase: GetUserIdUseCase,
-    private val getWalletUseCase: GetWalletUseCase
+    private val getWalletsUseCase: GetWalletsUseCase
 ) : ViewModel() {
 
     sealed class UiState {
@@ -64,19 +64,19 @@ class TransactionSelectWalletViewModel @Inject constructor(
                     return@launch
                 }
 
-                getWalletUseCase.execute(userId)
+                getWalletsUseCase.execute(userId)
                     .catch { e ->
                         Log.e("TransactionSelectWalletViewModel", "Error in wallets flow: ${e.message}")
                         _uiState.value = UiState.Error(e.message ?: "Failed to load wallets")
                     }
                     .collect { result ->
                         when (result) {
-                            is GetWalletUseCase.GetWalletResult.Success -> {
+                            is GetWalletsUseCase.GetWalletResult.Success -> {
                                 Log.d("TransactionSelectWalletViewModel", "Wallets loaded successfully: ${result.wallets.size}")
                                 _uiState.value = UiState.Success(result.wallets)
                                 _wallets.value = result.wallets
                             }
-                            is GetWalletUseCase.GetWalletResult.Error -> {
+                            is GetWalletsUseCase.GetWalletResult.Error -> {
                                 Log.e("TransactionSelectWalletViewModel", "Error loading wallets: ${result.message}")
                                 _uiState.value = UiState.Error(result.message)
                             }
