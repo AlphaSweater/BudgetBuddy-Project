@@ -163,12 +163,23 @@ class BudgetAddFragment : Fragment() {
     private fun updateSelectedCategories(categories: List<Category>) {
         if (categories.isEmpty()) {
             binding.textSelectedCategoryName.text = "No categories selected"
-            binding.imgSelectedCategoryIcon.setImageResource(R.drawable.ic_ui_categories)
-            binding.imgSelectedCategoryIcon.setColorFilter(requireContext().getThemeColor(R.attr.bb_accent))
         } else {
-            binding.textSelectedCategoryName.text = categories.joinToString(", ") { it.name }
-            binding.imgSelectedCategoryIcon.setImageResource(categories.first().icon)
-            binding.imgSelectedCategoryIcon.setColorFilter(requireContext().getColor(categories.first().color))
+            // Get all categories from the ViewModel to check if all are selected
+            val allCategories = sharedViewModel.getAllCategories()
+            val isAllSelected = allCategories.isNotEmpty() && categories.size == allCategories.size
+
+            if (isAllSelected) {
+                binding.textSelectedCategoryName.text = "All Categories selected"
+            } else {
+                // For individual selections, show a summary
+                val summary = when {
+                    categories.size == 1 -> categories.first().name
+                    categories.size == 2 -> "${categories[0].name} & ${categories[1].name}"
+                    categories.size > 2 -> "${categories.size} Categories selected"
+                    else -> "No categories selected"
+                }
+                binding.textSelectedCategoryName.text = summary
+            }
         }
     }
 

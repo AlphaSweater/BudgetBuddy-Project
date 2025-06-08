@@ -121,6 +121,11 @@ class BudgetSelectCategoryFragment : Fragment() {
                 launch {
                     selectCategoryViewModel.uiState.collect { state ->
                         handleUiState(state)
+                        // Set all categories when we get the initial success state
+                        if (state is BudgetSelectCategoryViewModel.UiState.Success) {
+                            val allExpenseCategories = state.categories.filter { it.type == "expense" }
+                            sharedViewModel.setAllCategories(allExpenseCategories)
+                        }
                     }
                 }
 
