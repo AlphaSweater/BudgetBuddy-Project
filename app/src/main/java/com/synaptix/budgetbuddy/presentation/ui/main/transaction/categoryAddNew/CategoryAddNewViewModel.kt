@@ -325,7 +325,15 @@ class CategoryAddNewViewModel @Inject constructor(
                     ScreenMode.EDIT -> {
                         // Update existing category
                         val originalCategory = _category.value ?: return@launch
-                        updateCategoryUseCase.execute(newCategory)
+
+                        val updatedCategory = originalCategory.copy(
+                            name = newCategory.name,
+                            type = newCategory.type,
+                            icon = newCategory.icon,
+                            color = newCategory.color
+                        )
+
+                        updateCategoryUseCase.execute(updatedCategory)
                             .catch { e ->
                                 Log.e("CategoryAddNewViewModel", "Error in category update flow: ${e.message}")
                                 _savingUiState.value = SavingUiState.Error(e.message ?: "Failed to update category")

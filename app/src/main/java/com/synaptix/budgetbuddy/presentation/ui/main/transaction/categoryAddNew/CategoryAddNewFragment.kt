@@ -5,8 +5,10 @@ import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
 import androidx.appcompat.app.AlertDialog
+import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.core.content.ContextCompat
+import androidx.core.view.updateLayoutParams
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -20,13 +22,10 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import com.synaptix.budgetbuddy.R
 import com.synaptix.budgetbuddy.databinding.FragmentCategoryAddNewBinding
-import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.delay
-import androidx.coordinatorlayout.widget.CoordinatorLayout
-import androidx.core.view.updateLayoutParams
 import com.synaptix.budgetbuddy.extentions.getThemeColor
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 /**
  * Fragment for adding a new category.
@@ -65,7 +64,6 @@ class CategoryAddNewFragment : Fragment() {
         observeViewModel()
 
         applyScreenMode(viewModel.screenMode.value)
-        populateInitialFormValues()
     }
 
     override fun onDestroyView() {
@@ -79,13 +77,8 @@ class CategoryAddNewFragment : Fragment() {
     private fun setupViews() {
         setupAdapters()
         setupListeners()
-        applyScreenMode(viewModel.screenMode.value)
     }
 
-    /**
-     * Sets up the RecyclerView adapters for colors and icons.
-     * Configures horizontal scrolling for both lists.
-     */
     private fun setupAdapters() {
         // Color adapter setup
         colorAdapter = CategoryItemAdapter { item ->
@@ -109,6 +102,55 @@ class CategoryAddNewFragment : Fragment() {
                 orientation = LinearLayoutManager.HORIZONTAL
             }
             adapter = iconAdapter
+        }
+    }
+
+    private fun setupListeners() {
+        // Category name input
+        binding.categoryNameInput.doAfterTextChanged { text ->
+            if (!isUpdatingFromUser) {
+                isUpdatingFromUser = true
+                viewModel.setCategoryName(text?.toString() ?: "")
+                isUpdatingFromUser = false
+            }
+        }
+
+        // Category type selection
+        binding.btnExpenseToggle.setOnClickListener {
+            viewModel.setCategoryType("Expense")
+        }
+
+        binding.btnIncomeToggle.setOnClickListener {
+            viewModel.setCategoryType("Income")
+        }
+
+        // Navigation and actions
+        binding.btnGoBack.setOnClickListener {
+            when (viewModel.screenMode.value) {
+                CategoryAddNewViewModel.ScreenMode.EDIT -> {
+                    if (viewModel.hasUnsavedChanges.value) {
+                        showDiscardChangesDialog()
+                    } else {
+                        findNavController().popBackStack()
+                    }
+                }
+                CategoryAddNewViewModel.ScreenMode.CREATE -> {
+                    findNavController().popBackStack()
+                }
+            }
+        }
+
+        binding.btnClear.setOnClickListener {
+            viewModel.reset()
+        }
+
+        binding.btnEdit.setOnClickListener {
+            viewModel.setScreenMode(CategoryAddNewViewModel.ScreenMode.EDIT)
+            applyScreenMode(CategoryAddNewViewModel.ScreenMode.EDIT)
+        }
+
+        binding.btnCreate.setOnClickListener {
+            viewModel.createCategory()
         }
     }
 
@@ -178,97 +220,6 @@ class CategoryAddNewFragment : Fragment() {
             recyclerViewColors.isEnabled = true
             recyclerViewIcons.isEnabled = true
         }
-    }
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-    // Click Listeners
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-    private fun setupListeners() {
-        // Category name input
-        binding.categoryNameInput.doAfterTextChanged { text ->
-            if (!isUpdatingFromUser) {
-                isUpdatingFromUser = true
-                viewModel.setCategoryName(text?.toString() ?: "")
-                isUpdatingFromUser = false
-            }
-        }
-
-        // Category type selection
-        binding.btnExpenseToggle.setOnClickListener {
-            viewModel.setCategoryType("Expense")
-        }
-
-        binding.btnIncomeToggle.setOnClickListener {
-            viewModel.setCategoryType("Income")
-        }
-
-        // Navigation and actions
-        binding.btnGoBack.setOnClickListener {
-            when (viewModel.screenMode.value) {
-                CategoryAddNewViewModel.ScreenMode.EDIT -> {
-                    if (viewModel.hasUnsavedChanges.value) {
-                        showDiscardChangesDialog()
-                    } else {
-                        findNavController().popBackStack()
-                    }
-                }
-                CategoryAddNewViewModel.ScreenMode.CREATE -> {
-                    findNavController().popBackStack()
-                }
-            }
-        }
-
-        binding.btnClear.setOnClickListener {
-            viewModel.reset()
-        }
-
-        binding.btnEdit.setOnClickListener {
-            viewModel.setScreenMode(CategoryAddNewViewModel.ScreenMode.EDIT)
-            applyScreenMode(CategoryAddNewViewModel.ScreenMode.EDIT)
-        }
-
-        binding.btnCreate.setOnClickListener {
-            viewModel.createCategory()
-        }
-    }
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-    // Dialog Helpers
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-    private fun showDiscardChangesDialog() {
-        val dialog = MaterialAlertDialogBuilder(requireContext(), R.style.MaterialAlertDialog_Rounded)
-            .setTitle("Discard Changes?")
-            .setMessage("You have unsaved changes. Are you sure you want to discard them?")
-            .setPositiveButton("Discard") { _, _ ->
-                // Temporarily remove text watchers
-                binding.categoryNameInput.removeTextChangedListener(binding.categoryNameInput.tag as? TextWatcher)
-
-                // Revert changes in ViewModel
-                viewModel.revertChanges()
-
-                // Update text fields with reverted values
-                binding.categoryNameInput.setText(viewModel.categoryName.value)
-
-                // Navigate back
-                findNavController().popBackStack()
-            }
-            .setNegativeButton("Cancel", null)
-            .create()
-
-        dialog.setOnShowListener {
-            // Set button colors
-            dialog.getButton(AlertDialog.BUTTON_POSITIVE)?.setTextColor(
-                ContextCompat.getColor(requireContext(), R.color.expense_red)
-            )
-            dialog.getButton(AlertDialog.BUTTON_NEGATIVE)?.setTextColor(
-                ContextCompat.getColor(requireContext(), R.color.profit_green)
-            )
-
-            val background = ContextCompat.getDrawable(requireContext(), R.drawable.bg_dialog_rounded)
-            dialog.window?.setBackgroundDrawable(background)
-        }
-
-        dialog.show()
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
@@ -377,6 +328,42 @@ class CategoryAddNewFragment : Fragment() {
             .show()
     }
 
+    private fun showDiscardChangesDialog() {
+        val dialog = MaterialAlertDialogBuilder(requireContext(), R.style.MaterialAlertDialog_Rounded)
+            .setTitle("Discard Changes?")
+            .setMessage("You have unsaved changes. Are you sure you want to discard them?")
+            .setPositiveButton("Discard") { _, _ ->
+                // Temporarily remove text watchers
+                binding.categoryNameInput.removeTextChangedListener(binding.categoryNameInput.tag as? TextWatcher)
+
+                // Revert changes in ViewModel
+                viewModel.revertChanges()
+
+                // Update text fields with reverted values
+                binding.categoryNameInput.setText(viewModel.categoryName.value)
+
+                // Navigate back
+                findNavController().popBackStack()
+            }
+            .setNegativeButton("Cancel", null)
+            .create()
+
+        dialog.setOnShowListener {
+            // Set button colors
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE)?.setTextColor(
+                ContextCompat.getColor(requireContext(), R.color.expense_red)
+            )
+            dialog.getButton(AlertDialog.BUTTON_NEGATIVE)?.setTextColor(
+                ContextCompat.getColor(requireContext(), R.color.profit_green)
+            )
+
+            val background = ContextCompat.getDrawable(requireContext(), R.drawable.bg_dialog_rounded)
+            dialog.window?.setBackgroundDrawable(background)
+        }
+
+        dialog.show()
+    }
+
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     // Form Handling
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
@@ -388,18 +375,19 @@ class CategoryAddNewFragment : Fragment() {
 
         // Update appearance
         updateCategoryAppearance()
+        //TODO Updated selected color and icon
     }
 
     private fun updateCategoryAppearance() {
         binding.apply {
-            val selectedColor = viewModel.selectedColor.value
-            val selectedIcon = viewModel.selectedIcon.value
+            val selectedColor = viewModel.category.value?.color
+            val selectedIcon = viewModel.category.value?.icon
 
             if (selectedColor == null || selectedIcon == null) {
                 previewIcon.setColorFilter(requireContext().getThemeColor(R.attr.bb_accent))
             } else {
-                previewIcon.setColorFilter(requireContext().getColor(selectedColor.colorResourceId))
-                previewIcon.setImageResource(selectedIcon.iconResourceId)
+                previewIcon.setColorFilter(requireContext().getColor(selectedColor))
+                previewIcon.setImageResource(selectedIcon)
             }
         }
     }
@@ -410,85 +398,48 @@ class CategoryAddNewFragment : Fragment() {
     private fun observeViewModel() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                // Screen Mode
-                launch {
-                    viewModel.screenMode.collect { mode ->
-                        applyScreenMode(mode)
+                launch { viewModel.screenMode.collect { mode ->
+                    applyScreenMode(mode)
+                } }
+                launch { viewModel.loadingUiState.collect { state ->
+                    handleLoadingUiState(state)
+                } }
+                launch { viewModel.savingUiState.collect { state ->
+                    handleSavingUiState(state)
+                } }
+                launch { viewModel.validationState.collect { state ->
+                    handleValidationState(state)
+                } }
+                launch { viewModel.categoryName.collect { name ->
+                    if (!isUpdatingFromUser && binding.categoryNameInput.text.toString() != name) {
+                        binding.categoryNameInput.setText(name)
                     }
-                }
-
-                // UI States
-                launch {
-                    viewModel.loadingUiState.collect { state ->
-                        handleLoadingUiState(state)
+                } }
+                launch { viewModel.categoryType.collect { type ->
+                    binding.btnExpenseToggle.isSelected = type == "Expense"
+                    binding.btnIncomeToggle.isSelected = type == "Income"
+                } }
+                launch { viewModel.selectedColor.collect { color ->
+                    color?.let {
+                        binding.previewIcon.setColorFilter(requireContext().getColor(it.colorResourceId))
                     }
-                }
-
-                launch {
-                    viewModel.savingUiState.collect { state ->
-                        handleSavingUiState(state)
+                } }
+                launch { viewModel.selectedIcon.collect { icon ->
+                    icon?.let {
+                        binding.previewIcon.setImageResource(it.iconResourceId)
                     }
-                }
-                
-                // Validation State
-                launch {
-                    viewModel.validationState.collect { state ->
-                        handleValidationState(state)
-                    }
-                }
-
-                // Form State
-                launch {
-                    viewModel.categoryName.collect { name ->
-                        if (!isUpdatingFromUser && binding.categoryNameInput.text.toString() != name) {
-                            binding.categoryNameInput.setText(name)
-                        }
-                    }
-                }
-
-                launch {
-                    viewModel.categoryType.collect { type ->
-                        binding.btnExpenseToggle.isSelected = type == "Expense"
-                        binding.btnIncomeToggle.isSelected = type == "Income"
-                    }
-                }
-
-                // Selection State
-                launch {
-                    viewModel.selectedColor.collect { color ->
-                        color?.let {
-                            binding.previewIcon.setColorFilter(requireContext().getColor(it.colorResourceId))
-                        }
-                    }
-                }
-
-                launch {
-                    viewModel.selectedIcon.collect { icon ->
-                        icon?.let {
-                            binding.previewIcon.setImageResource(it.iconResourceId)
-                        }
-                    }
-                }
-
+                } }
                 // Available Options
-                launch {
-                    viewModel.colors.collect { colors ->
-                        colorAdapter.submitList(colors.map { CategoryItem.ColorItem(it.colorResourceId, it.name) })
-                    }
-                }
-
-                launch {
-                    viewModel.icons.collect { icons ->
-                        iconAdapter.submitList(icons.map { CategoryItem.IconItem(it.iconResourceId, it.name) })
-                    }
-                }
-
+                launch { viewModel.colors.collect { colors ->
+                    colorAdapter.submitList(colors.map { CategoryItem.ColorItem(it.colorResourceId, it.name) })
+                } }
+                launch { viewModel.icons.collect { icons ->
+                    iconAdapter.submitList(icons.map { CategoryItem.IconItem(it.iconResourceId, it.name) })
+                } }
                 // Unsaved Changes
-                launch {
-                    viewModel.hasUnsavedChanges.collect { hasChanges ->
-                        binding.btnClear.isEnabled = hasChanges
-                    }
-                }
+                launch { viewModel.hasUnsavedChanges.collect { hasChanges ->
+                    binding.btnClear.isEnabled = hasChanges
+                } }
             }
         }
     }
