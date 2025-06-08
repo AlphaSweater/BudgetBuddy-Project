@@ -1,0 +1,476 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--    ======================================================================================-->
+<!--    Group 2 - Group Members:-->
+<!--    ======================================================================================-->
+<!--    * Chad Fairlie ST10269509-->
+<!--    * Dhiren Ruthenavelu ST10256859-->
+<!--    * Kayla Ferreira ST10259527-->
+<!--    * Nathan Teixeira ST10249266-->
+<!--    ======================================================================================-->
+<!--    Declaration:-->
+<!--    ======================================================================================-->
+<!--    We declare that this work is our own original work and that no part of it has been-->
+<!--    copied from any other source, except where explicitly acknowledged.-->
+<!--    ======================================================================================-->
+<!--    References:-->
+<!--    ======================================================================================-->
+<!--    * ChatGPT was used to help with the design and planning. As well as assisted with-->
+<!--    finding and fixing errors in the code.-->
+<!--    * ChatGPT also helped with the forming of comments for the code.-->
+<!--    * https://www.youtube.com/watch?v=A_tPafV23DM&list=PLPgs125_L-X9H6J7x4beRU-AxJ4mXe5vX-->
+<!--    ======================================================================================-->
+
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/bb_background"
+    tools:context=".presentation.ui.main.wallet.WalletAddFragment">
+<!-- Top App Bar -->
+<com.google.android.material.appbar.AppBarLayout
+    android:id="@+id/appBarLayout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@android:color/transparent"
+    app:elevation="0dp">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@android:color/transparent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingHorizontal="4dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp">
+
+            <ImageButton
+                android:id="@+id/btnGoBack"
+                style="@style/ToolButtonIcon"
+                android:contentDescription="@string/back"
+                android:src="@drawable/ic_ui_arrow_back" />
+
+            <TextView
+                android:id="@+id/toolbarTitle"
+                style="@style/ToolBarTitle"
+                android:text="Add New Wallet" />
+
+            <ImageButton
+                android:id="@+id/btnClear"
+                style="@style/ToolButtonIcon"
+                android:contentDescription="Clear form"
+                android:src="@drawable/ic_ui_clear" />
+        </LinearLayout>
+    </androidx.appcompat.widget.Toolbar>
+</com.google.android.material.appbar.AppBarLayout>
+
+    <!-- Main Content -->
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/contentScrollView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:fillViewport="true"
+        android:layout_marginBottom="90dp"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <!-- Wallet Details Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardBackgroundColor="?attr/bb_surface"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <!-- Wallet Name Row -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                            <ImageView
+                                style="@style/RowIconStyle"
+                                android:src="@drawable/ic_wallet_24"
+                                app:tint="?attr/bb_accent" />
+
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginStart="12dp"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Wallet Name"
+                                android:textColor="?attr/bb_secondaryText"
+                                android:textSize="14sp" />
+
+                            <EditText
+                                android:id="@+id/edtWalletName"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:background="@null"
+                                android:hint="Enter wallet name"
+                                android:inputType="text"
+                                android:textColor="?attr/bb_primaryText"
+                                android:textColorHint="?attr/bb_secondaryText"
+                                android:textSize="20sp" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <!-- Error for wallet name -->
+                    <TextView
+                        android:id="@+id/textNameError"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@android:color/holo_red_light"
+                        android:textSize="12sp"
+                        android:visibility="gone"
+                        android:layout_marginStart="60dp"
+                        android:layout_marginTop="4dp"/>
+
+                    <!-- Currency Row -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginTop="16dp">
+
+                        <ImageView
+                            style="@style/RowIconStyle"
+                            android:src="@drawable/ic_money_24"
+                            app:tint="?attr/bb_accent" />
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginStart="12dp"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Amount"
+                                android:textColor="?attr/bb_secondaryText"
+                                android:textSize="14sp" />
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:orientation="horizontal"
+                                android:gravity="center_vertical">
+
+                                <Spinner
+                                    android:id="@+id/spinnerCurrency"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:background="@null"
+                                    android:minWidth="80dp"
+                                    android:spinnerMode="dropdown" />
+
+                                <EditText
+                                    android:id="@+id/edtTextAmount"
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:layout_marginStart="8dp"
+                                    android:background="@null"
+                                    android:hint="0.00"
+                                    android:inputType="numberDecimal"
+                                    android:textColor="?attr/bb_primaryText"
+                                    android:textColorHint="?attr/bb_secondaryText"
+                                    android:textSize="20sp" />
+                            </LinearLayout>
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <!-- Error for amount -->
+                    <TextView
+                        android:id="@+id/textAmountError"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="60dp"
+                        android:layout_marginTop="4dp"
+                        android:textColor="@android:color/holo_red_light"
+                        android:textSize="12sp"
+                        android:visibility="gone"/>
+
+
+                    <!-- Error for initial amount -->
+                    <TextView
+                        android:id="@+id/textinitAmountError"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@android:color/holo_red_light"
+                        android:textSize="12sp"
+                        android:visibility="gone"
+                        android:layout_marginStart="60dp"
+                        android:layout_marginTop="4dp"/>
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Spending Goals Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardBackgroundColor="?attr/bb_surface"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <!-- Minimum Amount Row -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <ImageView
+                            style="@style/RowIconStyle"
+                            android:src="@drawable/ic_ui_minimum"
+                            app:tint="?attr/bb_accent" />
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginStart="12dp"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Minimum Spending Goal"
+                                android:textColor="?attr/bb_secondaryText"
+                                android:textSize="14sp" />
+
+                            <EditText
+                                android:id="@+id/edtMinAmount"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:background="@null"
+                                android:hint="0.00"
+                                android:inputType="numberDecimal"
+                                android:textColor="?attr/bb_primaryText"
+                                android:textColorHint="?attr/bb_secondaryText"
+                                android:textSize="20sp" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <!-- Error for min amount -->
+                    <TextView
+                        android:id="@+id/textMinAmountError"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@android:color/holo_red_light"
+                        android:textSize="12sp"
+                        android:visibility="gone"
+                        android:layout_marginStart="60dp"
+                        android:layout_marginTop="4dp"/>
+
+                    <!-- Maximum Amount Row -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <ImageView
+                            style="@style/RowIconStyle"
+                            android:src="@drawable/ic_ui_maximum"
+                            app:tint="?attr/bb_accent" />
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginStart="12dp"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Maximum Spending Goal"
+                                android:textColor="?attr/bb_secondaryText"
+                                android:textSize="14sp" />
+
+                            <EditText
+                                android:id="@+id/edtMaxAmount"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:background="@null"
+                                android:hint="0.00"
+                                android:inputType="numberDecimal"
+                                android:textColor="?attr/bb_primaryText"
+                                android:textColorHint="?attr/bb_secondaryText"
+                                android:textSize="20sp" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <!-- Error for max amount -->
+                    <TextView
+                        android:id="@+id/textMaxAmountError"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@android:color/holo_red_light"
+                        android:textSize="12sp"
+                        android:visibility="gone"
+                        android:layout_marginStart="60dp"
+                        android:layout_marginTop="4dp"/>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Additional Options Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardBackgroundColor="?attr/bb_surface"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <!-- Notifications Row -->
+                    <LinearLayout
+                        android:id="@+id/rowSelectEnableNotifications"
+                        style="@style/RowStyle"
+                        android:background="?attr/selectableItemBackground">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:layout_marginStart="12dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Enable Notifications"
+                                android:textColor="?attr/bb_primaryText"
+                                android:textSize="16sp" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:text="Get notified when there are changes to this wallet's transactions"
+                                android:textColor="?attr/bb_secondaryText"
+                                android:textSize="14sp" />
+                        </LinearLayout>
+
+                        <Switch
+                            android:id="@+id/switchNotifications"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:checked="true" />
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginHorizontal="16dp"
+                        android:background="?attr/bb_secondaryText" />
+
+                    <!-- Exclude from Total Row -->
+                    <LinearLayout
+                        android:id="@+id/rowSelectExcludeTotal"
+                        style="@style/RowStyle"
+                        android:background="?attr/selectableItemBackground">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:layout_marginStart="12dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Exclude from Total"
+                                android:textColor="?attr/bb_primaryText"
+                                android:textSize="16sp" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:text="Ignore this wallet and its balance in the Total Balance"
+                                android:textColor="?attr/bb_secondaryText"
+                                android:textSize="14sp" />
+                        </LinearLayout>
+
+                        <Switch
+                            android:id="@+id/switchExcludeTotal"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:checked="false" />
+                    </LinearLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:background="?attr/bb_background"
+        android:elevation="8dp"
+        android:padding="16dp">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnSave"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingVertical="16dp"
+            android:text="@string/save"
+            android:textColor="@android:color/white"
+            android:textSize="16sp"
+            app:backgroundTint="?attr/bb_button"
+            app:cornerRadius="16dp" />
+    </FrameLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

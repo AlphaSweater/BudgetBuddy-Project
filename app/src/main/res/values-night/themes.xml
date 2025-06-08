@@ -1,3 +1,24 @@
+<!--    ======================================================================================-->
+<!--    Group 2 - Group Members:-->
+<!--    ======================================================================================-->
+<!--    * Chad Fairlie ST10269509-->
+<!--    * Dhiren Ruthenavelu ST10256859-->
+<!--    * Kayla Ferreira ST10259527-->
+<!--    * Nathan Teixeira ST10249266-->
+<!--    ======================================================================================-->
+<!--    Declaration:-->
+<!--    ======================================================================================-->
+<!--    We declare that this work is our own original work and that no part of it has been-->
+<!--    copied from any other source, except where explicitly acknowledged.-->
+<!--    ======================================================================================-->
+<!--    References:-->
+<!--    ======================================================================================-->
+<!--    * ChatGPT was used to help with the design and planning. As well as assisted with-->
+<!--    finding and fixing errors in the code.-->
+<!--    * ChatGPT also helped with the forming of comments for the code.-->
+<!--    * https://www.youtube.com/watch?v=A_tPafV23DM&list=PLPgs125_L-X9H6J7x4beRU-AxJ4mXe5vX-->
+<!--    ======================================================================================-->
+
 <resources xmlns:tools="http://schemas.android.com/tools">
     <style name="Theme.BudgetBuddy" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <!-- Custom attributes -->
@@ -12,6 +33,7 @@
         <item name="bb_expense">@color/expense_red</item>
         <item name="bb_profit">@color/profit_green</item>
         <item name="bb_button">@color/button</item>
+        <item name="bb_buttonText">@android:color/white</item>
         <item name="bb_buttonSelected">@color/dark_button_selected</item>
 
         <!-- Material theme compatibility (fallback) -->

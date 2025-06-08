@@ -1,4 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
+
+<!--    ======================================================================================-->
+<!--    Group 2 - Group Members:-->
+<!--    ======================================================================================-->
+<!--    * Chad Fairlie ST10269509-->
+<!--    * Dhiren Ruthenavelu ST10256859-->
+<!--    * Kayla Ferreira ST10259527-->
+<!--    * Nathan Teixeira ST10249266-->
+<!--    ======================================================================================-->
+<!--    Declaration:-->
+<!--    ======================================================================================-->
+<!--    We declare that this work is our own original work and that no part of it has been-->
+<!--    copied from any other source, except where explicitly acknowledged.-->
+<!--    ======================================================================================-->
+<!--    References:-->
+<!--    ======================================================================================-->
+<!--    * ChatGPT was used to help with the design and planning. As well as assisted with-->
+<!--    finding and fixing errors in the code.-->
+<!--    * ChatGPT also helped with the forming of comments for the code.-->
+<!--    * https://www.youtube.com/watch?v=A_tPafV23DM&list=PLPgs125_L-X9H6J7x4beRU-AxJ4mXe5vX-->
+<!--    ======================================================================================-->
+
 <resources>
 
     <!-- =========================================================================================== -->
@@ -32,7 +54,7 @@
     <!-- Text colours -->
     <color name="light_text">#05122d</color>
     <color name="light_link_blue">#67a8fb</color>
-    <color name="light_text_shaded">#040d1f</color>
+    <color name="light_text_shaded">#434343</color>
 
     <!-- Button colours -->
     <color name="light_button_selected">#59397f</color>
@@ -42,18 +64,33 @@
     <!-- Global colour -->
     <color name="profit_green">#25c290</color>
     <color name="expense_red">#fb6569</color>
+    <color name="info_blue">#3BA0FF</color>
     <color name="button">#6b509a</color>
+    <color name="error">#ff0000</color>
+    <color name="success">#28a745</color>
+
 
     <!-- =========================================================================================== -->
 
     <!-- =========================================================================================== -->
     <!-- Category colour -->
-    <color name="cat_blue">#46a9e2</color>
-    <color name="cat_green">#61c4ae</color>
-    <color name="cat_gold">#b59760</color>
-    <color name="cat_yellow">#fda62b</color>
-    <color name="cat_orange">#da8041</color>
-    <color name="cat_pink">#e16eeb</color>
+    <color name="cat_light_pink">#FFB6C1</color>
+    <color name="cat_dark_pink">#FF69B4</color>
+    <color name="cat_light_purple">#E6E6FA</color>
+    <color name="cat_dark_purple">#9370DB</color>
+    <color name="cat_light_blue">#87CEEB</color>
+    <color name="cat_dark_blue">#4169E1</color>
+    <color name="cat_light_green">#90EE90</color>
+    <color name="cat_dark_green">#228B22</color>
+    <color name="cat_yellow">#FFD700</color>
+    <color name="cat_orange">#FFA500</color>
+    <color name="cat_gold">#DAA520</color>
+    <color name="cat_dark_brown">#8D3817</color>
+    <color name="cat_light_brown">#A06C44</color>
+    <color name="cat_silver">#A7C4D2</color>
+    <color name="cat_light_bronze">#f1a66b</color>
+    <color name="cat_dark_bronze">#c57436</color>
+    <color name="cat_dark_maroon">#842352</color>
     <!-- =========================================================================================== -->
 
     <!-- =========================================================================================== -->

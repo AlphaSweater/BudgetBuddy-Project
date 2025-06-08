@@ -1,3 +1,252 @@
 <?xml version="1.0" encoding="utf-8"?>
+
+<!--    ======================================================================================-->
+<!--    Group 2 - Group Members:-->
+<!--    ======================================================================================-->
+<!--    * Chad Fairlie ST10269509-->
+<!--    * Dhiren Ruthenavelu ST10256859-->
+<!--    * Kayla Ferreira ST10259527-->
+<!--    * Nathan Teixeira ST10249266-->
+<!--    ======================================================================================-->
+<!--    Declaration:-->
+<!--    ======================================================================================-->
+<!--    We declare that this work is our own original work and that no part of it has been-->
+<!--    copied from any other source, except where explicitly acknowledged.-->
+<!--    ======================================================================================-->
+<!--    References:-->
+<!--    ======================================================================================-->
+<!--    * ChatGPT was used to help with the design and planning. As well as assisted with-->
+<!--    finding and fixing errors in the code.-->
+<!--    * ChatGPT also helped with the forming of comments for the code.-->
+<!--    * https://www.youtube.com/watch?v=A_tPafV23DM&list=PLPgs125_L-X9H6J7x4beRU-AxJ4mXe5vX-->
+<!--    ======================================================================================-->
+
 <resources>
+        <!-- Customize the DatePickerDialog -->
+        <style name="CustomDatePickerDialog" parent="Theme.AppCompat.Light.Dialog">
+            <!-- Customize the title color (top text) -->
+            <item name="android:textColorPrimary">?attr/bb_primaryText</item>
+            <!-- Customize other elements, e.g., button color -->
+            <item name="android:buttonBarNegativeButtonStyle">?attr/bb_primaryText</item>
+            <item name="android:buttonBarPositiveButtonStyle">?attr/bb_primaryText</item>
+        </style>
+
+        <!-- Row Style: Consistent look for all rows -->
+        <style name="RowStyle">
+            <!-- Layout size -->
+            <item name="android:layout_width">match_parent</item>
+            <item name="android:layout_height">wrap_content</item>
+
+            <!-- Spacing -->
+            <item name="android:paddingTop">16dp</item>
+            <item name="android:paddingBottom">16dp</item>
+            <item name="android:paddingStart">16dp</item>
+            <item name="android:paddingEnd">16dp</item>
+
+            <!-- Gravity for alignment -->
+            <item name="android:gravity">center_vertical</item>
+
+            <!-- Minimum height for touch target -->
+            <item name="android:minHeight">48dp</item>
+
+            <!-- Ripple effect when clicked -->
+            <item name="android:background">?attr/selectableItemBackground</item>
+
+            <!-- Make it clickable/focusable if needed -->
+            <item name="android:clickable">true</item>
+            <item name="android:focusable">true</item>
+
+            <!-- Added for horizontal layout -->
+            <item name="android:orientation">horizontal</item>
+        </style>
+
+        <!-- Row Style for Achievements Page: Consistent look for all rows -->
+        <style name="RowStyleAchievements">
+            <!-- Layout size -->
+            <item name="android:layout_width">match_parent</item>
+            <item name="android:layout_height">wrap_content</item>
+
+            <!-- Spacing -->
+            <item name="android:paddingTop">16dp</item>
+            <item name="android:paddingBottom">16dp</item>
+            <item name="android:paddingStart">16dp</item>
+            <item name="android:paddingEnd">16dp</item>
+
+            <!-- Gravity for alignment -->
+            <item name="android:gravity">center_vertical</item>
+
+            <!-- Minimum height for touch target -->
+            <item name="android:minHeight">48dp</item>
+
+            <!-- Ripple effect when clicked -->
+            <item name="android:background">?attr/selectableItemBackground</item>
+
+            <!-- Make it clickable/focusable if needed -->
+            <item name="android:clickable">true</item>
+            <item name="android:focusable">true</item>
+
+            <!-- Added for horizontal layout -->
+            <item name="android:orientation">horizontal</item>
+        </style>
+
+    <!-- Row Style for Achievements Page (Inverse): Consistent look for all rows -->
+    <style name="RowStyleAchievementsInverse">
+        <!-- Layout size -->
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+
+        <!-- Spacing -->
+        <item name="android:paddingTop">16dp</item>
+        <item name="android:paddingBottom">16dp</item>
+        <item name="android:paddingStart">16dp</item>
+        <item name="android:paddingEnd">16dp</item>
+
+        <!-- Gravity for alignment -->
+        <item name="android:gravity">center_vertical</item>
+
+        <!-- Minimum height for touch target -->
+        <item name="android:minHeight">48dp</item>
+
+        <!-- Ripple effect when clicked -->
+        <item name="android:background">?attr/selectableItemBackground</item>
+
+        <!-- Make it clickable/focusable if needed -->
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+
+        <!-- Added for horizontal layout -->
+        <item name="android:orientation">horizontal</item>
+    </style>
+
+    <!-- Row Icon Style -->
+        <style name="RowIconStyle">
+            <!-- Size of the icon -->
+            <item name="android:layout_width">36dp</item>
+            <item name="android:layout_height">36dp</item>
+
+            <!-- Margin to text -->
+            <item name="android:layout_marginEnd">16dp</item>
+
+            <!-- Tint color (optional) -->
+            <item name="android:tint">?attr/colorControlNormal</item>
+
+            <!-- Scale inside ImageView -->
+            <item name="android:scaleType">fitCenter</item>
+        </style>
+
+        <!-- Card  Style -->
+        <style name="CardViewStyle" parent="ShapeAppearance.Material3.MediumComponent">
+
+            <!-- Corner card -->
+            <item name="cornerFamily">rounded</item>
+
+            <!-- Size of corner -->
+            <item name="cornerSize">16dp</item>
+        </style>
+
+
+        <!-- Bottom Sheet Dialog Styles -->
+        <style name="FullScreenBottomSheetDialog" parent="Theme.Design.Light.BottomSheetDialog">
+            <item name="bottomSheetStyle">@style/FullScreenBottomSheetStyle</item>
+        </style>
+
+        <style name="FullScreenBottomSheetStyle" parent="Widget.Design.BottomSheet.Modal">
+            <item name="android:layout_height">match_parent</item>
+        </style>
+
+    <!-- Recurrence Option Style -->
+    <style name="RecurrenceOption">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:padding">16dp</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:textColor">?attr/bb_primaryText</item>
+        <item name="android:background">?attr/selectableItemBackground</item>
+    </style>
+
+    <!-- Added for rounded image corners -->
+    <style name="RoundedImageView">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">16dp</item>
+    </style>
+
+    <style name="FullScreenDialog" parent="Theme.AppCompat.Dialog">
+        <item name="android:windowIsFloating">false</item>
+        <item name="android:windowBackground">@android:color/black</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowFullscreen">true</item>
+    </style>
+
+    <style name="ToolButtonIcon">
+        <item name="android:layout_width">48dp</item>
+        <item name="android:layout_height">48dp</item>
+        <item name="android:scaleType">fitCenter</item>
+        <item name="android:padding">10dp</item>
+        <item name="android:tint">?attr/bb_primaryText</item>
+        <item name="android:background">?attr/selectableItemBackgroundBorderless</item>
+    </style>
+
+    <style name="ToolBarTitle">
+        <item name="android:textColor">?attr/bb_primaryText</item>
+        <item name="android:textSize">20sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:gravity">center</item>
+    </style>
+
+    <style name="IconButton">
+        <item name="android:layout_width">36dp</item>
+        <item name="android:layout_height">36dp</item>
+        <item name="android:scaleType">fitCenter</item>
+    </style>
+
+    <style name="IconButtonSmall">
+        <item name="android:layout_width">24dp</item>
+        <item name="android:layout_height">24dp</item>
+        <item name="android:scaleType">fitCenter</item>
+    </style>
+
+    <style name="IconButtonExtraSmall">
+        <item name="android:layout_width">12dp</item>
+        <item name="android:layout_height">12dp</item>
+        <item name="android:scaleType">fitCenter</item>
+    </style>
+
+    <style name="IconButtonLarge">
+        <item name="android:layout_width">48dp</item>
+        <item name="android:layout_height">48dp</item>
+        <item name="android:scaleType">fitCenter</item>
+    </style>
+
+    <style name="MaterialAlertDialog_Rounded" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog">
+        <item name="shapeAppearanceOverlay">@style/ShapeAppearanceOverlay.MaterialAlertDialog.Rounded</item>
+        <item name="materialAlertDialogTitleTextStyle">@style/MaterialAlertDialog_TitleText</item>
+        <item name="materialAlertDialogBodyTextStyle">@style/MaterialAlertDialog_BodyText</item>
+        <item name="buttonBarPositiveButtonStyle">@style/MaterialAlertDialog_Button</item>
+        <item name="buttonBarNegativeButtonStyle">@style/MaterialAlertDialog_Button</item>
+    </style>
+
+    <style name="ShapeAppearanceOverlay.MaterialAlertDialog.Rounded" parent="">
+        <item name="cornerSize">16dp</item>
+    </style>
+
+    <style name="MaterialAlertDialog_TitleText" parent="MaterialAlertDialog.MaterialComponents.Title.Text">
+        <item name="android:textSize">20sp</item>
+        <item name="android:textColor">?attr/bb_primaryText</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="MaterialAlertDialog_BodyText" parent="MaterialAlertDialog.MaterialComponents.Body.Text">
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">?attr/bb_secondaryText</item>
+    </style>
+
+    <style name="MaterialAlertDialog_Button" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
+        <item name="android:textSize">16sp</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:paddingStart">16dp</item>
+        <item name="android:paddingEnd">16dp</item>
+    </style>
 </resources>

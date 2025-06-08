@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--    ======================================================================================-->
+<!--    Group 2 - Group Members:-->
+<!--    ======================================================================================-->
+<!--    * Chad Fairlie ST10269509-->
+<!--    * Dhiren Ruthenavelu ST10256859-->
+<!--    * Kayla Ferreira ST10259527-->
+<!--    * Nathan Teixeira ST10249266-->
+<!--    ======================================================================================-->
+<!--    Declaration:-->
+<!--    ======================================================================================-->
+<!--    We declare that this work is our own original work and that no part of it has been-->
+<!--    copied from any other source, except where explicitly acknowledged.-->
+<!--    ======================================================================================-->
+<!--    References:-->
+<!--    ======================================================================================-->
+<!--    * ChatGPT was used to help with the design and planning. As well as assisted with-->
+<!--    finding and fixing errors in the code.-->
+<!--    * ChatGPT also helped with the forming of comments for the code.-->
+<!--    * https://www.youtube.com/watch?v=A_tPafV23DM&list=PLPgs125_L-X9H6J7x4beRU-AxJ4mXe5vX-->
+<!--    ======================================================================================-->
+
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/budgetCard"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="4dp"
+    android:layout_marginVertical="4dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="0dp"
+    app:strokeWidth="0dp"
+    android:clickable="true"
+    android:focusable="true"
+    app:rippleColor="?attr/bb_surfaceAlt"
+    android:backgroundTint="?attr/bb_surface">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/budgetItemContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="12dp">
+
+        <!-- Budget Icon -->
+        <ImageView
+            android:id="@+id/budgetIcon"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:contentDescription="Budget Icon"
+            android:src="@drawable/ic_ui_budget"
+            app:tint="?attr/bb_button"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+        <!-- Budget Text Container -->
+        <LinearLayout
+            android:id="@+id/budgetDetails"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginStart="12dp"
+            android:layout_marginEnd="12dp"
+            app:layout_constraintStart_toEndOf="@id/budgetIcon"
+            app:layout_constraintEnd_toStartOf="@id/arrowIconBudget"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent">
+
+            <!-- Budget Title -->
+            <TextView
+                android:id="@+id/budgetTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Budget Name"
+                android:textColor="?attr/bb_primaryText"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:maxLines="1"
+                android:ellipsize="end" />
+
+            <!-- Budget Status -->
+            <TextView
+                android:id="@+id/budgetStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="How much spent compared to budget total."
+                android:textColor="?attr/bb_secondaryText"
+                android:textSize="11sp"
+                android:includeFontPadding="false" />
+
+            <!-- Budget Progress Bar -->
+            <com.google.android.material.progressindicator.LinearProgressIndicator
+                android:id="@+id/budgetProgress"
+                android:layout_width="match_parent"
+                android:layout_height="6dp"
+                android:layout_marginTop="6dp"
+                android:layout_marginEnd="4dp"
+                android:layout_marginBottom="2dp"
+                android:max="100"
+                android:progress="40"
+                app:trackThickness="6dp"
+                app:indicatorColor="?attr/bb_button"
+                app:trackColor="?attr/bb_surfaceAlt"
+                style="@style/Widget.Material3.LinearProgressIndicator" />
+        </LinearLayout>
+
+        <!-- Navigation Arrow -->
+        <ImageView
+            android:id="@+id/arrowIconBudget"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:contentDescription="Navigate"
+            android:src="@drawable/ic_arrow_open_24"
+            app:tint="?attr/bb_secondaryText"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</com.google.android.material.card.MaterialCardView>

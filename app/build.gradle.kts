@@ -1,6 +1,10 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    id("kotlin-kapt")
+    id("dagger.hilt.android.plugin")
+    id("com.google.devtools.ksp") version "2.0.21-1.0.27"
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -9,10 +13,17 @@ android {
 
     defaultConfig {
         applicationId = "com.synaptix.budgetbuddy"
-        minSdk = 24
+        minSdk = 26
         targetSdk = 35
+
+        // Read from version.txt (written by GitHub Actions)
+        val versionFile = file("src/main/assets/version.txt")
+        val gitVersion = if (versionFile.exists()) versionFile.readText().trim() else "dev"
+
         versionCode = 1
-        versionName = "1.0"
+        versionName = gitVersion
+
+        buildConfigField("String", "GIT_VERSION", "\"$gitVersion\"")
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -35,11 +46,11 @@ android {
     }
     buildFeatures {
         viewBinding = true
+        buildConfig = true
     }
 }
 
 dependencies {
-
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
@@ -51,7 +62,35 @@ dependencies {
     implementation(libs.androidx.legacy.support.v4)
     implementation(libs.androidx.fragment.ktx)
     implementation(libs.androidx.activity)
+    implementation(libs.androidx.material3.android)
+
+    // Picture dependencies
+    implementation(libs.coil.kt.coil)
+    implementation(libs.androidx.activity.ktx)
+
+    // Material Components
+    implementation(libs.material)
+
+    // Hilt dependencies
+    implementation(libs.hilt.android)
+    implementation(libs.google.firebase.firestore.ktx)
+    implementation(libs.google.firebase.auth.ktx)
+    kapt(libs.dagger.hilt.compiler)
+
+    // KSP dependencies
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+
+    // Firebase dependencies
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.auth.ktx)
+    implementation(libs.firebase.storage.ktx)
+    implementation(libs.firebase.firestore.ktx)
+
+    //Graphs
+    implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
+    // Imgur dependencies
+    implementation(libs.okhttp)
+    implementation(libs.moshi)
 }

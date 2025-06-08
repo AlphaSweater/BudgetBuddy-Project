@@ -1,0 +1,635 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--    ======================================================================================-->
+<!--    Group 2 - Group Members:-->
+<!--    ======================================================================================-->
+<!--    * Chad Fairlie ST10269509-->
+<!--    * Dhiren Ruthenavelu ST10256859-->
+<!--    * Kayla Ferreira ST10259527-->
+<!--    * Nathan Teixeira ST10249266-->
+<!--    ======================================================================================-->
+<!--    Declaration:-->
+<!--    ======================================================================================-->
+<!--    We declare that this work is our own original work and that no part of it has been-->
+<!--    copied from any other source, except where explicitly acknowledged.-->
+<!--    ======================================================================================-->
+<!--    References:-->
+<!--    ======================================================================================-->
+<!--    * ChatGPT was used to help with the design and planning. As well as assisted with-->
+<!--    finding and fixing errors in the code.-->
+<!--    * ChatGPT also helped with the forming of comments for the code.-->
+<!--    * https://www.youtube.com/watch?v=A_tPafV23DM&list=PLPgs125_L-X9H6J7x4beRU-AxJ4mXe5vX-->
+<!--    ======================================================================================-->
+
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/bb_background"
+    tools:context=".presentation.ui.main.transaction.TransactionAddFragment">
+
+    <!-- Top App Bar -->
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBarLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/transparent"
+        app:elevation="0dp">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@android:color/transparent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingHorizontal="4dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp">
+
+                <ImageButton
+                    android:id="@+id/btnGoBack"
+                    style="@style/ToolButtonIcon"
+                    android:contentDescription="@string/back"
+                    android:src="@drawable/ic_ui_arrow_back" />
+
+                <TextView
+                    android:id="@+id/toolbarTitle"
+                    style="@style/ToolBarTitle"
+                    android:text="@string/add_new_transaction" />
+
+                <ImageButton
+                    android:id="@+id/btnEdit"
+                    style="@style/ToolButtonIcon"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="Edit transaction"
+                    android:src="@drawable/ic_ui_pencil"
+                    android:visibility="gone"
+                    app:tint="?attr/bb_primaryText" />
+
+                <ImageButton
+                    android:id="@+id/btnClear"
+                    style="@style/ToolButtonIcon"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="Clear form"
+                    android:src="@drawable/ic_ui_clear"
+                    app:tint="?attr/bb_primaryText" />
+            </LinearLayout>
+        </androidx.appcompat.widget.Toolbar>
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <!-- Main Content -->
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/contentScrollView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:fillViewport="true"
+        android:layout_marginBottom="@dimen/bottom_margin"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <!-- Amount Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardBackgroundColor="?attr/bb_surface"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Amount"
+                        android:textColor="?attr/bb_secondaryText"
+                        android:textSize="14sp" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <Spinner
+                            android:id="@+id/spinnerCurrency"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@null"
+                            android:minWidth="80dp"
+                            android:spinnerMode="dropdown" />
+
+                        <TextView
+                            android:id="@+id/textAmountSign"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textSize="32sp"
+                            android:textColor="?attr/bb_primaryText"
+                            android:visibility="gone" />
+
+                        <EditText
+                            android:id="@+id/edtTextAmount"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:background="@null"
+                            android:hint="0.00"
+                            android:inputType="numberDecimal"
+                            android:textColor="?attr/bb_primaryText"
+                            android:textColorHint="?attr/bb_secondaryText"
+                            android:textSize="32sp" />
+                    </LinearLayout>
+
+                    <!-- Error for amount selection -->
+                    <TextView
+                        android:id="@+id/textAmountError"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@android:color/holo_red_light"
+                        android:textSize="12sp"
+                        android:visibility="gone"
+                        android:layout_marginStart="82dp"
+                        android:layout_marginTop="0dp"/>
+
+                    <!-- Add after currency spinner -->
+                    <TextView
+                        android:id="@+id/textCurrencyError"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@android:color/holo_red_light"
+                        android:textSize="12sp"
+                        android:visibility="gone"
+                        android:layout_marginStart="6dp"
+                        android:layout_marginTop="0dp"/>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Details Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardBackgroundColor="?attr/bb_surface"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <!-- Category Row -->
+                    <LinearLayout
+                        android:id="@+id/rowSelectCategory"
+                        style="@style/RowStyle"
+                        android:background="?attr/selectableItemBackground">
+
+                        <ImageView
+                            android:id="@+id/imgSelectedCategoryIcon"
+                            style="@style/RowIconStyle"
+                            android:src="@drawable/ic_ui_categories"
+                            app:tint="?attr/bb_accent" />
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:layout_marginStart="12dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/category"
+                                android:textColor="?attr/bb_primaryText"
+                                android:textSize="16sp" />
+
+                            <TextView
+                                android:id="@+id/textSelectedCategoryName"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Select category"
+                                android:textColor="?attr/bb_secondaryText"
+                                android:textSize="14sp" />
+                        </LinearLayout>
+
+                        <ImageView
+                            android:id="@+id/imgCrocCategory"
+                            style="@style/IconButton"
+                            android:src="@drawable/ic_ui_croc_right"
+                            app:tint="?attr/bb_secondaryText" />
+
+
+                    </LinearLayout>
+
+                    <!-- Error for category selection -->
+                    <TextView
+                        android:id="@+id/textCategoryError"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@android:color/holo_red_light"
+                        android:textSize="12sp"
+                        android:visibility="gone"
+                        android:layout_marginStart="70dp"
+                        android:layout_marginTop="0dp"/>
+
+                    <!-- Wallet Row -->
+                    <LinearLayout
+                        android:id="@+id/rowSelectWallet"
+                        style="@style/RowStyle"
+                        android:background="?attr/selectableItemBackground">
+
+                        <ImageView
+                            android:id="@+id/imgSelectedWalletIcon"
+                            style="@style/RowIconStyle"
+                            android:src="@drawable/ic_ui_wallet"
+                            app:tint="?attr/bb_accent" />
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:layout_marginStart="12dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/wallet"
+                                android:textColor="?attr/bb_primaryText"
+                                android:textSize="16sp" />
+
+                            <TextView
+                                android:id="@+id/textSelectedWalletName"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Select wallet"
+                                android:textColor="?attr/bb_secondaryText"
+                                android:textSize="14sp" />
+                        </LinearLayout>
+
+                        <ImageView
+                            android:id="@+id/imgCrocWallet"
+                            style="@style/IconButton"
+                            android:src="@drawable/ic_ui_croc_right"
+                            app:tint="?attr/bb_secondaryText" />
+                    </LinearLayout>
+
+                    <!-- Error for wallet selection -->
+                    <TextView
+                        android:id="@+id/textWalletError"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@android:color/holo_red_light"
+                        android:textSize="12sp"
+                        android:visibility="gone"
+                        android:layout_marginStart="70dp"
+                        android:layout_marginTop="0dp"/>
+
+                    <!-- Date Row -->
+                    <LinearLayout
+                        android:id="@+id/rowSelectDate"
+                        style="@style/RowStyle"
+                        android:background="?attr/selectableItemBackground">
+
+                        <ImageView
+                            style="@style/RowIconStyle"
+                            android:src="@drawable/ic_ui_calendar"
+                            app:tint="?attr/bb_accent" />
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:layout_marginStart="12dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/date"
+                                android:textColor="?attr/bb_primaryText"
+                                android:textSize="16sp" />
+
+                            <TextView
+                                android:id="@+id/textSelectedDate"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Select Date"
+                                android:textColor="?attr/bb_secondaryText"
+                                android:textSize="14sp" />
+                        </LinearLayout>
+
+                        <ImageView
+                            android:id="@+id/imgCrocDate"
+                            style="@style/IconButton"
+                            android:src="@drawable/ic_ui_croc_right"
+                            app:tint="?attr/bb_secondaryText" />
+                    </LinearLayout>
+
+                    <!-- Error for date selection -->
+                    <TextView
+                        android:id="@+id/textDateError"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@android:color/holo_red_light"
+                        android:textSize="12sp"
+                        android:visibility="gone"
+                        android:layout_marginStart="70dp"
+                        android:layout_marginTop="0dp"/>
+
+                    <!-- Label Row -->
+                    <LinearLayout
+                        android:id="@+id/rowSelectLabels"
+                        style="@style/RowStyle"
+                        android:background="?attr/selectableItemBackground">
+
+                        <ImageView
+                            style="@style/RowIconStyle"
+                            android:src="@drawable/ic_ui_labels"
+                            app:tint="?attr/bb_accent" />
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:layout_marginStart="12dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/labels"
+                                android:textColor="?attr/bb_primaryText"
+                                android:textSize="16sp" />
+
+                            <TextView
+                                android:id="@+id/textSelectedLabels"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="No labels selected"
+                                android:textColor="?attr/bb_secondaryText"
+                                android:textSize="14sp" />
+
+                            <!-- Label Pills Container -->
+                            <com.google.android.material.chip.ChipGroup
+                                android:id="@+id/chipGroupLabels"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                app:singleLine="true"
+                                app:singleSelection="false" />
+
+                        </LinearLayout>
+
+                        <ImageView
+                            android:id="@+id/imgCrocLabels"
+                            style="@style/IconButton"
+                            android:src="@drawable/ic_ui_croc_right"
+                            app:tint="?attr/bb_secondaryText" />
+                    </LinearLayout>
+
+                    <!-- Error for label selection -->
+                    <TextView
+                        android:id="@+id/textLabelError"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@android:color/holo_red_light"
+                        android:textSize="12sp"
+                        android:visibility="gone"
+                        android:layout_marginStart="70dp"
+                        android:layout_marginTop="0dp"/>
+
+                    <!-- Note Row -->
+                    <LinearLayout
+                        android:id="@+id/rowSelectNote"
+                        style="@style/RowStyle">
+
+                        <ImageView
+                            style="@style/RowIconStyle"
+                            android:src="@drawable/ic_ui_notebook"
+                            app:tint="?attr/bb_accent" />
+
+                        <EditText
+                            android:id="@+id/edtTextNote"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginStart="12dp"
+                            android:background="@null"
+                            android:hint="Add note"
+                            android:inputType="textMultiLine"
+                            android:maxLines="3"
+                            android:textColor="?attr/bb_primaryText"
+                            android:textColorHint="?attr/bb_secondaryText"
+                            android:textSize="16sp" />
+                    </LinearLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Additional Options Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardBackgroundColor="?attr/bb_surface"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <!-- Recurrence Row -->
+                    <LinearLayout
+                        android:id="@+id/rowSelectRecurrenceRate"
+                        style="@style/RowStyle"
+                        android:background="?attr/selectableItemBackground">
+
+                        <ImageView
+                            style="@style/RowIconStyle"
+                            android:src="@drawable/ic_ui_recurrence"
+                            app:tint="?attr/bb_accent" />
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:layout_marginStart="12dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/recurrence"
+                                android:textColor="?attr/bb_primaryText"
+                                android:textSize="16sp" />
+
+                            <TextView
+                                android:id="@+id/textSelectedRecurrenceRate"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="One-time transaction"
+                                android:textColor="?attr/bb_secondaryText"
+                                android:textSize="14sp" />
+                        </LinearLayout>
+
+                        <ImageView
+                            android:id="@+id/imgCrocRecurrence"
+                            style="@style/IconButton"
+                            android:src="@drawable/ic_ui_croc_right"
+                            app:tint="?attr/bb_secondaryText" />
+                    </LinearLayout>
+
+                    <!-- Photo Row -->
+                    <LinearLayout
+                        android:id="@+id/rowSelectPhoto"
+                        style="@style/RowStyle"
+                        android:background="?attr/selectableItemBackground">
+
+                        <ImageView
+                            style="@style/RowIconStyle"
+                            android:src="@drawable/ic_ui_image_add"
+                            app:tint="?attr/bb_accent" />
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="12dp"
+                            android:layout_weight="1"
+                            android:text="@string/add_photo"
+                            android:textColor="?attr/bb_primaryText"
+                            android:textSize="16sp" />
+
+                        <ImageView
+                            android:id="@+id/imgCrocPhoto"
+                            style="@style/IconButton"
+                            android:src="@drawable/ic_ui_croc_right"
+                            app:tint="?attr/bb_secondaryText" />
+                    </LinearLayout>
+
+                    <!-- Image Preview Container -->
+                    <FrameLayout
+                        android:id="@+id/imagePreviewContainer"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="16dp"
+                        android:visibility="gone">
+
+                        <!-- Image Preview -->
+                        <com.google.android.material.imageview.ShapeableImageView
+                            android:id="@+id/imagePreview"
+                            android:layout_width="match_parent"
+                            android:layout_height="200dp"
+                            android:adjustViewBounds="true"
+                            android:scaleType="centerCrop"
+                            app:shapeAppearanceOverlay="@style/RoundedImageView"
+                            android:foreground="?attr/selectableItemBackground"/>
+
+                        <!-- Remove Photo Button -->
+                        <com.google.android.material.floatingactionbutton.FloatingActionButton
+                            android:id="@+id/btnRemovePhoto"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="top|end"
+                            android:layout_margin="8dp"
+                            android:contentDescription="Remove selected photo"
+                            android:src="@drawable/ic_ui_circle_x"
+                            app:fabSize="mini"
+                            app:tint="@android:color/white"
+                            app:backgroundTint="@color/expense_red" />
+                    </FrameLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <!-- Bottom Save Button -->
+    <FrameLayout
+        android:id="@+id/bottomButtonContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:background="?attr/bb_background"
+        android:elevation="8dp"
+        android:padding="16dp">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnSave"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:text="@string/save"
+            android:textColor="@android:color/white"
+            android:textSize="16sp"
+            app:cornerRadius="28dp"
+            app:backgroundTint="?attr/bb_button" />
+    </FrameLayout>
+
+    <!-- Loading Overlay -->
+    <FrameLayout
+        android:id="@+id/loadingOverlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#80000000"
+        android:clickable="true"
+        android:focusable="true"
+        android:visibility="gone">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <!-- Loading Progress -->
+            <ProgressBar
+                android:id="@+id/progressBar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:indeterminateTint="@android:color/white" />
+
+            <!-- Success Checkmark -->
+            <ImageView
+                android:id="@+id/successCheckmark"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:src="@drawable/ic_ui_circle_check"
+                android:visibility="gone"
+                app:tint="@color/success" />
+
+            <TextView
+                android:id="@+id/loadingText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="Saving transaction..."
+                android:textColor="@android:color/white"
+                android:textSize="16sp" />
+        </LinearLayout>
+    </FrameLayout>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

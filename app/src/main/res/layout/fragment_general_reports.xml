@@ -1,0 +1,569 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--    ======================================================================================-->
+<!--    Group 2 - Group Members:-->
+<!--    ======================================================================================-->
+<!--    * Chad Fairlie ST10269509-->
+<!--    * Dhiren Ruthenavelu ST10256859-->
+<!--    * Kayla Ferreira ST10259527-->
+<!--    * Nathan Teixeira ST10249266-->
+<!--    ======================================================================================-->
+<!--    Declaration:-->
+<!--    ======================================================================================-->
+<!--    We declare that this work is our own original work and that no part of it has been-->
+<!--    copied from any other source, except where explicitly acknowledged.-->
+<!--    ======================================================================================-->
+<!--    References:-->
+<!--    ======================================================================================-->
+<!--    * ChatGPT was used to help with the design and planning. As well as assisted with-->
+<!--    finding and fixing errors in the code.-->
+<!--    * ChatGPT also helped with the forming of comments for the code.-->
+<!--    * https://www.youtube.com/watch?v=A_tPafV23DM&list=PLPgs125_L-X9H6J7x4beRU-AxJ4mXe5vX-->
+<!--    ======================================================================================-->
+
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/bb_background"
+    tools:context=".presentation.ui.main.general.generalReports.GeneralReportsFragment">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/headerContainer"
+        android:layout_width="match_parent"
+        android:layout_height="155dp"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+            <ImageButton
+                android:id="@+id/btnGoBack"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:layout_marginTop="12dp"
+                android:background="@null"
+                android:src="?attr/actionModeCloseDrawable"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:tint="?attr/bb_primaryText"
+                tools:ignore="TouchTargetSizeCheck" />
+
+            <TextView
+                android:id="@+id/tvCurrency"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="105dp"
+                android:layout_marginTop="16dp"
+                android:text="ZAR"
+                android:textColor="?attr/bb_primaryText"
+                android:textSize="26sp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/tvCurrencyTotal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"
+                android:layout_marginTop="16dp"
+                android:text="12,200"
+                android:textColor="?attr/bb_profit"
+                android:textSize="26sp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toEndOf="@id/tvCurrency"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageView
+                android:id="@+id/ivEye"
+                android:layout_width="47dp"
+                android:layout_height="36dp"
+                android:layout_marginStart="6dp"
+                android:layout_marginTop="16dp"
+                android:src="@android:drawable/ic_menu_view"
+                app:layout_constraintStart_toEndOf="@id/tvCurrencyTotal"
+                app:layout_constraintTop_toTopOf="parent"
+                app:tint="?attr/bb_primaryText" />
+
+            <TextView
+                android:id="@+id/tvTotalBalance"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="@string/total_balance"
+                android:textColor="?attr/bb_secondaryText"
+                android:textSize="18sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tvCurrencyTotal" />
+
+            <LinearLayout
+                android:id="@+id/linearLayout5"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="horizontal"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tvTotalBalance">
+
+                <androidx.cardview.widget.CardView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginEnd="8dp"
+                    app:cardBackgroundColor="?attr/bb_background"
+                    app:cardCornerRadius="25dp"
+                    app:cardElevation="4dp">
+
+                    <RelativeLayout
+                        android:layout_width="130dp"
+                        android:layout_height="40dp"
+                        android:background="?attr/bb_surface"
+                        android:paddingStart="8dp"
+                        android:paddingEnd="8dp">
+
+                        <ImageView
+                            android:id="@+id/ivWalletIcon"
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:layout_alignParentStart="true"
+                            android:layout_centerVertical="true"
+                            android:src="@drawable/ic_wallet_24"
+                            app:tint="@color/cat_light_brown" />
+
+                        <Spinner
+                            android:id="@+id/spinnerWallet"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_toStartOf="@id/btnWalletArrow"
+                            android:layout_toEndOf="@id/ivWalletIcon"
+                            android:backgroundTint="?attr/bb_surface"
+                            android:gravity="center_vertical"
+                            android:popupBackground="?attr/bb_surface"
+                            android:textSize="12sp"
+                            android:spinnerMode="dropdown" />
+
+                        <ImageView
+                            android:id="@+id/btnWalletArrow"
+                            android:layout_width="18dp"
+                            android:layout_height="18dp"
+                            android:layout_alignParentEnd="true"
+                            android:layout_centerVertical="true"
+                            android:src="@android:drawable/arrow_down_float"
+                            app:tint="?attr/bb_primaryText"
+                            android:clickable="true"
+                            android:focusable="true" />
+
+
+                    </RelativeLayout>
+                </androidx.cardview.widget.CardView>
+
+                <androidx.cardview.widget.CardView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginEnd="8dp"
+                    app:cardBackgroundColor="?attr/bb_background"
+                    app:cardCornerRadius="25dp"
+                    app:cardElevation="4dp">
+
+                    <FrameLayout
+                        android:layout_width="130dp"
+                        android:layout_height="40dp">
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnTimePeriod"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:background="?attr/bb_surface"
+                            android:text="Date"
+                            android:backgroundTint="?attr/bb_surface"
+                            android:dropDownWidth="wrap_content"
+                            android:gravity="center"
+                            android:popupBackground="?attr/bb_surface" />
+                    </FrameLayout>
+                </androidx.cardview.widget.CardView>
+            </LinearLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <ScrollView
+        android:id="@+id/bodyScrollView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        app:layout_constraintTop_toBottomOf="@id/headerContainer"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingBottom="16dp"> <!-- Added padding at the bottom -->
+
+            <!-- Chart Toggle Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/chartToggle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="16dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="4dp"
+                app:cardBackgroundColor="?attr/bb_surface"
+                app:strokeWidth="0dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="4dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/toggle_background"
+                        android:gravity="center"
+                        android:orientation="horizontal"
+                        android:padding="4dp">
+
+                        <!-- Expenses Toggle -->
+                        <LinearLayout
+                            android:id="@+id/btnChartExpenseToggle"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:background="@drawable/toggle_selected"
+                            android:orientation="vertical"
+                            android:padding="8dp"
+                            android:gravity="center">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:gravity="center"
+                                android:text="@string/expenses"
+                                android:textStyle="bold"
+                                android:textColor="?attr/bb_primaryText" />
+
+                            <TextView
+                                android:id="@+id/txtChartExpenseTotal"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:gravity="center"
+                                android:textStyle="bold"
+                                android:textColor="?attr/bb_expense" />
+                        </LinearLayout>
+
+                        <!-- Income Toggle -->
+                        <LinearLayout
+                            android:id="@+id/btnChartIncomeToggle"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:padding="8dp"
+                            android:gravity="center">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:gravity="center"
+                                android:text="@string/income"
+                                android:textStyle="bold"
+                                android:textColor="?attr/bb_primaryText" />
+
+                            <TextView
+                                android:id="@+id/txtChartIncomeTotal"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:gravity="center"
+                                android:textStyle="bold"
+                                android:textColor="?attr/bb_profit" />
+                        </LinearLayout>
+                    </LinearLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Line Chart -->
+            <com.github.mikephil.charting.charts.LineChart
+                android:id="@+id/lineChartExpense"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="16dp"
+                android:visibility="visible" />
+
+            <com.github.mikephil.charting.charts.LineChart
+                android:id="@+id/lineChartIncome"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="16dp"
+                android:visibility="gone" />
+
+            <!-- Category Header -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:text="@string/category"
+                android:textColor="?attr/bb_primaryText"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <!-- Category Toggle Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/categoryToggle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="16dp"
+                app:cardBackgroundColor="?attr/bb_surface"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="4dp"
+                app:strokeWidth="0dp">
+
+                <!-- Category toggle content remains the same -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:padding="4dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/toggle_background"
+                        android:gravity="center"
+                        android:orientation="horizontal"
+                        android:padding="4dp">
+
+                        <!-- Expenses Section -->
+                        <LinearLayout
+                            android:id="@+id/btnCatExpenseToggle"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:padding="8dp"
+                            android:background="@drawable/toggle_selected"
+                            android:orientation="vertical"
+                            android:gravity="center">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:gravity="center"
+                                android:text="@string/expenses"
+                                android:textStyle="bold"
+                                android:textColor="?attr/bb_primaryText"
+                                android:background="@android:color/transparent" />
+
+                            <TextView
+                                android:id="@+id/txtExpenseTotal"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:gravity="center"
+                                android:textStyle="bold"
+                                android:text="-R 10,203"
+                                android:textColor="?attr/bb_expense"
+                                android:background="@android:color/transparent" />
+                        </LinearLayout>
+
+                        <!-- Income Section -->
+                        <LinearLayout
+                            android:id="@+id/btnCatIncomeToggle"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:padding="8dp"
+                            android:gravity="center">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:gravity="center"
+                                android:text="@string/income"
+                                android:textStyle="bold"
+                                android:textColor="?attr/bb_primaryText" />
+
+                            <TextView
+                                android:id="@+id/txtIncomeTotal"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:gravity="center"
+                                android:textStyle="bold"
+                                android:text="R 21,500"
+                                android:textColor="?attr/bb_profit" />
+
+                        </LinearLayout>
+                    </LinearLayout>
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Pie Chart -->
+            <com.github.mikephil.charting.charts.PieChart
+                android:id="@+id/pieChart"
+                android:layout_width="match_parent"
+                android:layout_height="300dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="16dp" />
+
+            <!-- Empty State Views -->
+            <TextView
+                android:id="@+id/emptyExpenseView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="16dp"
+                android:text="No expense transactions found"
+                android:textAlignment="center"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/emptyIncomeView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="16dp"
+                android:text="No income transactions found"
+                android:textAlignment="center"
+                android:visibility="gone" />
+
+            <!-- Expense Category RecyclerView -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerViewExpenseCategory"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:clipToPadding="false"
+                android:paddingHorizontal="16dp"
+                android:visibility="visible" />
+
+            <!-- Income Category RecyclerView -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerViewIncomeCategory"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:clipToPadding="false"
+                android:paddingHorizontal="16dp"
+                android:visibility="gone" />
+
+            <!-- Labels Header -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:text="@string/labels"
+                android:textColor="?attr/bb_primaryText"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <!-- Label Toggle Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/labelToggle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="16dp"
+                app:cardBackgroundColor="?attr/bb_surface"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="4dp"
+                app:strokeWidth="0dp">
+
+                <!-- Label toggle content remains the same -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="4dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/toggle_background"
+                        android:gravity="center"
+                        android:orientation="horizontal"
+                        android:padding="4dp">
+
+                        <!-- Expenses Section -->
+                        <LinearLayout
+                            android:id="@+id/btnLabelExpenseToggle"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:padding="8dp"
+                            android:background="@drawable/toggle_selected"
+                            android:orientation="vertical"
+                            android:gravity="center">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:gravity="center"
+                                android:text="@string/expenses"
+                                android:textStyle="bold"
+                                android:textColor="?attr/bb_primaryText"
+                                android:background="@android:color/transparent" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:gravity="center"
+                                android:textStyle="bold"
+                                android:text="-R 10,203"
+                                android:textColor="?attr/bb_expense"
+                                android:background="@android:color/transparent" />
+                        </LinearLayout>
+
+                        <!-- Income Section -->
+                        <LinearLayout
+                            android:id="@+id/btnLabelIncomeToggle"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:padding="8dp"
+                            android:gravity="center">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:gravity="center"
+                                android:text="@string/income"
+                                android:textStyle="bold"
+                                android:textColor="?attr/bb_primaryText" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:gravity="center"
+                                android:textStyle="bold"
+                                android:text="R 21,500"
+                                android:textColor="?attr/bb_profit" />
+
+                        </LinearLayout>
+                    </LinearLayout>
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+        </LinearLayout>
+    </ScrollView>
+</androidx.constraintlayout.widget.ConstraintLayout>

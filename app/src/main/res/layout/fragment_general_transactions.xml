@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--    ======================================================================================-->
+<!--    Group 2 - Group Members:-->
+<!--    ======================================================================================-->
+<!--    * Chad Fairlie ST10269509-->
+<!--    * Dhiren Ruthenavelu ST10256859-->
+<!--    * Kayla Ferreira ST10259527-->
+<!--    * Nathan Teixeira ST10249266-->
+<!--    ======================================================================================-->
+<!--    Declaration:-->
+<!--    ======================================================================================-->
+<!--    We declare that this work is our own original work and that no part of it has been-->
+<!--    copied from any other source, except where explicitly acknowledged.-->
+<!--    ======================================================================================-->
+<!--    References:-->
+<!--    ======================================================================================-->
+<!--    * ChatGPT was used to help with the design and planning. As well as assisted with-->
+<!--    finding and fixing errors in the code.-->
+<!--    * ChatGPT also helped with the forming of comments for the code.-->
+<!--    * https://www.youtube.com/watch?v=A_tPafV23DM&list=PLPgs125_L-X9H6J7x4beRU-AxJ4mXe5vX-->
+<!--    ======================================================================================-->
+
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/bb_background"
+    tools:context=".presentation.ui.main.general.generalReports.GeneralReportsFragment">
+
+    <!-- Header Container (Holds top balance summary and back button) -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/headerContainer"
+        android:layout_width="427dp"
+        android:layout_height="155dp"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <!-- Back Button -->
+        <ImageButton
+            android:id="@+id/btnGoBack"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:layout_marginTop="12dp"
+            android:background="@null"
+            android:src="?attr/actionModeCloseDrawable"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="?attr/bb_primaryText"
+            tools:ignore="TouchTargetSizeCheck" />
+
+        <!-- Currency Text ("ZAR" or others) -->
+        <TextView
+            android:id="@+id/tvCurrency"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="105dp"
+            android:layout_marginTop="16dp"
+            android:text="ZAR"
+            android:textColor="?attr/bb_primaryText"
+            android:textSize="26sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <!-- Total Currency Value -->
+        <TextView
+            android:id="@+id/tvCurrencyTotal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="6dp"
+            android:layout_marginTop="16dp"
+            android:text="12,200"
+            android:textColor="?attr/bb_profit"
+            android:textSize="26sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toEndOf="@+id/tvCurrency"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <!-- Eye Icon (Probably to toggle balance visibility) -->
+        <ImageView
+            android:id="@+id/ivEye"
+            android:layout_width="47dp"
+            android:layout_height="36dp"
+            android:layout_marginStart="6dp"
+            android:layout_marginTop="16dp"
+            android:src="@android:drawable/ic_menu_view"
+            app:layout_constraintStart_toEndOf="@+id/tvCurrencyTotal"
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="?attr/bb_primaryText" />
+
+        <!-- Balance Label Text -->
+        <TextView
+            android:id="@+id/tvTotalBalance"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="136dp"
+            android:layout_marginTop="4dp"
+            android:text="@string/total_balance"
+            android:textColor="?attr/bb_secondaryText"
+            android:textSize="18sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tvCurrencyTotal" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- Wallet and Time Period Spinners (Dropdown Filters) -->
+    <LinearLayout
+        android:id="@+id/linearLayout5"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="90dp"
+        android:gravity="center"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/headerContainer">
+
+        <!-- Wallet Selection Dropdown -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            app:cardBackgroundColor="?attr/bb_background"
+            app:cardCornerRadius="25dp"
+            app:cardElevation="4dp">
+
+            <RelativeLayout
+                android:layout_width="130dp"
+                android:layout_height="40dp"
+                android:background="?attr/bb_surface"
+                android:gravity="center_vertical"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp">
+
+                <!-- Wallet Icon -->
+                <ImageView
+                    android:id="@+id/ivWalletIcon"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true"
+                    android:src="@drawable/ic_wallet_24"
+                    app:tint="@color/cat_light_brown" />
+
+                <!-- Wallet Spinner Dropdown -->
+                <Spinner
+                    android:id="@+id/spinnerWallet"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_toStartOf="@id/arrowIcon1"
+                    android:layout_toEndOf="@id/ivWalletIcon"
+                    android:backgroundTint="?attr/bb_surface"
+                    android:gravity="center_vertical"
+                    android:popupBackground="?attr/bb_surface"
+                    android:spinnerMode="dropdown"
+                    android:text="?attr/bb_expense" />
+
+                <!-- Arrow Icon for Wallet Dropdown -->
+                <ImageView
+                    android:id="@+id/arrowIcon1"
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:src="@android:drawable/arrow_down_float"
+                    app:tint="?attr/bb_primaryText" />
+            </RelativeLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- Time Period Selection Dropdown -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            app:cardBackgroundColor="?attr/bb_background"
+            app:cardCornerRadius="25dp"
+            app:cardElevation="4dp">
+
+            <FrameLayout
+                android:layout_width="130dp"
+                android:layout_height="40dp">
+
+                <!-- Time Period Spinner Dropdown -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnTimePeriod"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="?attr/bb_surface"
+                    android:text="Date"
+                    android:backgroundTint="?attr/bb_surface"
+                    android:dropDownWidth="wrap_content"
+                    android:gravity="center"
+                    android:popupBackground="?attr/bb_surface" />
+            </FrameLayout>
+        </androidx.cardview.widget.CardView>
+    </LinearLayout>
+
+    <!-- Holds the transaction history of the chosen wallet -->
+    <ScrollView
+        android:id="@+id/scrollContent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@+id/headerContainer"
+        android:padding="16dp">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerViewGeneralTransactions"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginTop="16dp"
+            android:visibility="visible"
+            tools:listitem="@layout/item_home_transaction"/>
+
+    </ScrollView>
+</androidx.constraintlayout.widget.ConstraintLayout>
