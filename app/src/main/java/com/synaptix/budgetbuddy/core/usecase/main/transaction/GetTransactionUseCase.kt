@@ -11,6 +11,9 @@ import com.synaptix.budgetbuddy.data.firebase.repository.FirestoreLabelRepositor
 import com.synaptix.budgetbuddy.data.firebase.repository.FirestoreUserRepository
 import com.synaptix.budgetbuddy.data.firebase.repository.FirestoreWalletRepository
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
@@ -37,39 +40,65 @@ class GetTransactionUseCase @Inject constructor(
         }
 
         return try {
-            val user = userRepository.getUserProfile(userId).getOrReturn {
-                return GetTransactionResult.Error("Error fetching user: $it")
-            } ?: return GetTransactionResult.Error("User not found")
+            coroutineScope {
+                // Fetch user profile
+                val userDeferred = async {
+                    userRepository.getUserProfile(userId).getOrReturn {
+                        return@async null
+                    }
+                }
 
+                // Fetch transaction
+                val transactionDeferred = async {
+                    transactionRepository.getTransactionById(userId, transactionId).getOrReturn {
+                        return@async null
+                    }
+                }
 
-            val dto = transactionRepository.getTransactionById(userId, transactionId).getOrReturn {
-                return GetTransactionResult.Error("Error fetching transaction: $it")
-            } ?: return GetTransactionResult.Error("Transaction not found")
+                // Wait for both user and transaction
+                val user = userDeferred.await() ?: return@coroutineScope GetTransactionResult.Error("User not found")
+                val dto = transactionDeferred.await() ?: return@coroutineScope GetTransactionResult.Error("Transaction not found")
 
-            val wallet = walletRepository.getWalletById(userId, dto.walletId).getOrReturn {
-                return GetTransactionResult.Error("Error fetching wallet: $it")
-            } ?: return GetTransactionResult.Error("Wallet not found")
+                // Fetch wallet and category in parallel
+                val walletDeferred = async {
+                    walletRepository.getWalletById(userId, dto.walletId).getOrReturn {
+                        return@async null
+                    }
+                }
 
-            val category = categoryRepository.getCategoryById(userId, dto.categoryId).getOrReturn {
-                return GetTransactionResult.Error("Error fetching category: $it")
-            } ?: return GetTransactionResult.Error("Category not found")
+                val categoryDeferred = async {
+                    categoryRepository.getCategoryById(userId, dto.categoryId).getOrReturn {
+                        return@async null
+                    }
+                }
 
-            val labels = dto.labelIds.map { labelId ->
-                labelRepository.getLabelById(userId, labelId).getOrReturn {
-                    return GetTransactionResult.Error("Error fetching label: $it")
-                } ?: return GetTransactionResult.Error("Label not found: $labelId")
+                // Wait for wallet and category
+                val wallet = walletDeferred.await() ?: return@coroutineScope GetTransactionResult.Error("Wallet not found")
+                val category = categoryDeferred.await() ?: return@coroutineScope GetTransactionResult.Error("Category not found")
+
+                // Fetch all labels in parallel
+                val labels = dto.labelIds.map { labelId ->
+                    async {
+                        labelRepository.getLabelById(userId, labelId).getOrReturn {
+                            return@async null
+                        }
+                    }
+                }.awaitAll().filterNotNull()
+
+                if (labels.size != dto.labelIds.size) {
+                    return@coroutineScope GetTransactionResult.Error("Some labels could not be found")
+                }
+
+                val domainUser = user.toDomain()
+                val transaction = dto.toDomain(
+                    user = domainUser,
+                    wallet = wallet.toDomain(domainUser),
+                    category = category.toDomain(domainUser),
+                    labels = labels.map { it.toDomain(domainUser) }
+                )
+
+                GetTransactionResult.Success(transaction)
             }
-
-            val domainUser = user.toDomain()
-            val transaction = dto.toDomain(
-                user = domainUser,
-                wallet = wallet.toDomain(domainUser),
-                category = category.toDomain(domainUser),
-                labels = labels.map { it.toDomain(domainUser) }
-            )
-
-            GetTransactionResult.Success(transaction)
-
         } catch (e: Exception) {
             GetTransactionResult.Error("Unexpected error: ${e.message}")
         }
