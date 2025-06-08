@@ -883,7 +883,6 @@ class HomeMainFragment : Fragment() {
 
     /**
      * Navigates to transaction details screen.
-     * To be implemented when the details screen is ready.
      */
     private fun navigateToTransactionDetails(transaction: Transaction) {
         Log.d("HomeFragment", "Navigating to transaction details: ${transaction.id}")

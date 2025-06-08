@@ -1,28 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tool="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:tool="http://schemas.android.com/tools"
-    android:orientation="horizontal"
-    android:padding="16dp"
-    android:gravity="center_vertical"
-    android:background="?attr/selectableItemBackground">
+    android:layout_marginHorizontal="8dp"
+    android:layout_marginVertical="4dp"
+    app:cardBackgroundColor="?attr/bb_background"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="2dp">
 
-    <ImageView
-        android:id="@+id/imgCategoryIcon"
-        style="@style/IconButton"
-        android:layout_marginEnd="16dp"
-        app:tint="?attr/bb_button"
-        tool:src="@drawable/ic_ui_categories"/>
-
-    <TextView
-        android:id="@+id/txtCategoryName"
-        android:layout_width="0dp"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:textColor="?attr/bb_primaryText"
-        android:textSize="16sp"
-        tool:text="@string/category"/>
+        android:orientation="horizontal"
+        android:padding="12dp"
+        android:gravity="center_vertical"
+        android:background="?attr/selectableItemBackground">
 
-</LinearLayout> 
+        <ImageView
+            android:id="@+id/imgCategoryIcon"
+            style="@style/IconButton"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginEnd="12dp"
+            app:tint="?attr/bb_button"
+            tool:src="@drawable/ic_ui_categories"/>
+
+        <TextView
+            android:id="@+id/txtCategoryName"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textColor="?attr/bb_primaryText"
+            android:textSize="16sp"
+            tool:text="@string/category"/>
+
+        <ImageButton
+            android:id="@+id/btnMenu"
+            style="@style/IconButton"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_ui_ellipsis_menu"
+            android:contentDescription="More options"
+            app:tint="?attr/bb_secondaryText"/>
+
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView> 

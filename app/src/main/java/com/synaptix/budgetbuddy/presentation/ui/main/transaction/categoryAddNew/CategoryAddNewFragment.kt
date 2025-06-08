@@ -1,9 +1,12 @@
 package com.synaptix.budgetbuddy.presentation.ui.main.transaction.categoryAddNew
 
 import android.os.Bundle
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
+import androidx.appcompat.app.AlertDialog
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -13,6 +16,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import com.synaptix.budgetbuddy.R
 import com.synaptix.budgetbuddy.databinding.FragmentCategoryAddNewBinding
@@ -68,6 +72,7 @@ class CategoryAddNewFragment : Fragment() {
     private fun setupViews() {
         setupAdapters()
         setupListeners()
+        applyScreenMode(viewModel.screenMode.value)
     }
 
     /**
@@ -100,9 +105,67 @@ class CategoryAddNewFragment : Fragment() {
         }
     }
 
-    /**
-     * Sets up click listeners for all interactive elements.
-     */
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // Screen Mode Handling
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    private fun applyScreenMode(mode: CategoryAddNewViewModel.ScreenMode) {
+        when (mode) {
+            CategoryAddNewViewModel.ScreenMode.EDIT -> applyEditMode()
+            CategoryAddNewViewModel.ScreenMode.CREATE -> applyCreateMode()
+        }
+    }
+
+    private fun applyEditMode() {
+        binding.apply {
+            btnEdit.visibility = View.GONE
+            btnClear.visibility = View.VISIBLE
+            btnCreate.apply {
+                text = "Update"
+                visibility = View.VISIBLE
+            }
+            toolbarTitle.text = "Edit Category"
+            
+            enableAllInteractiveElements()
+        }
+    }
+
+    private fun applyCreateMode() {
+        binding.apply {
+            btnEdit.visibility = View.GONE
+            btnClear.visibility = View.VISIBLE
+            btnCreate.apply {
+                text = "Create"
+                visibility = View.VISIBLE
+            }
+            toolbarTitle.text = "Add New Category"
+            
+            enableAllInteractiveElements()
+        }
+    }
+
+    private fun disableAllInteractiveElements() {
+        binding.apply {
+            categoryNameInput.isEnabled = false
+            btnExpenseToggle.isEnabled = false
+            btnIncomeToggle.isEnabled = false
+            recyclerViewColors.isEnabled = false
+            recyclerViewIcons.isEnabled = false
+        }
+    }
+
+    private fun enableAllInteractiveElements() {
+        binding.apply {
+            categoryNameInput.isEnabled = true
+            btnExpenseToggle.isEnabled = true
+            btnIncomeToggle.isEnabled = true
+            recyclerViewColors.isEnabled = true
+            recyclerViewIcons.isEnabled = true
+        }
+    }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // Click Listeners
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private fun setupListeners() {
         // Category name input
         binding.categoryNameInput.doAfterTextChanged { text ->
@@ -124,16 +187,71 @@ class CategoryAddNewFragment : Fragment() {
 
         // Navigation and actions
         binding.btnGoBack.setOnClickListener {
-            findNavController().navigateUp()
+            when (viewModel.screenMode.value) {
+                CategoryAddNewViewModel.ScreenMode.EDIT -> {
+                    if (viewModel.hasUnsavedChanges.value) {
+                        showDiscardChangesDialog()
+                    } else {
+                        findNavController().popBackStack()
+                    }
+                }
+                CategoryAddNewViewModel.ScreenMode.CREATE -> {
+                    findNavController().popBackStack()
+                }
+            }
         }
 
         binding.btnClear.setOnClickListener {
             viewModel.reset()
         }
 
+        binding.btnEdit.setOnClickListener {
+            viewModel.setScreenMode(CategoryAddNewViewModel.ScreenMode.EDIT)
+            applyScreenMode(CategoryAddNewViewModel.ScreenMode.EDIT)
+        }
+
         binding.btnCreate.setOnClickListener {
             viewModel.createCategory()
         }
+    }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // Dialog Helpers
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    private fun showDiscardChangesDialog() {
+        val dialog = MaterialAlertDialogBuilder(requireContext(), R.style.MaterialAlertDialog_Rounded)
+            .setTitle("Discard Changes?")
+            .setMessage("You have unsaved changes. Are you sure you want to discard them?")
+            .setPositiveButton("Discard") { _, _ ->
+                // Temporarily remove text watchers
+                binding.categoryNameInput.removeTextChangedListener(binding.categoryNameInput.tag as? TextWatcher)
+
+                // Revert changes in ViewModel
+                viewModel.revertChanges()
+
+                // Update text fields with reverted values
+                binding.categoryNameInput.setText(viewModel.categoryName.value)
+
+                // Navigate back
+                findNavController().popBackStack()
+            }
+            .setNegativeButton("Cancel", null)
+            .create()
+
+        dialog.setOnShowListener {
+            // Set button colors
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE)?.setTextColor(
+                ContextCompat.getColor(requireContext(), R.color.expense_red)
+            )
+            dialog.getButton(AlertDialog.BUTTON_NEGATIVE)?.setTextColor(
+                ContextCompat.getColor(requireContext(), R.color.profit_green)
+            )
+
+            val background = ContextCompat.getDrawable(requireContext(), R.drawable.bg_dialog_rounded)
+            dialog.window?.setBackgroundDrawable(background)
+        }
+
+        dialog.show()
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
@@ -224,6 +342,13 @@ class CategoryAddNewFragment : Fragment() {
     private fun observeViewModel() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                // Screen Mode
+                launch {
+                    viewModel.screenMode.collect { mode ->
+                        applyScreenMode(mode)
+                    }
+                }
+
                 // UI State
                 launch {
                     viewModel.uiState.collect { state ->
@@ -281,6 +406,14 @@ class CategoryAddNewFragment : Fragment() {
                 launch {
                     viewModel.icons.collect { icons ->
                         iconAdapter.submitList(icons.map { CategoryItem.IconItem(it.iconResourceId, it.name) })
+                    }
+                }
+
+                // Unsaved Changes
+                launch {
+                    viewModel.hasUnsavedChanges.collect { hasChanges ->
+                        // You can use this to show a visual indicator if needed
+                        binding.btnClear.isEnabled = hasChanges
                     }
                 }
             }

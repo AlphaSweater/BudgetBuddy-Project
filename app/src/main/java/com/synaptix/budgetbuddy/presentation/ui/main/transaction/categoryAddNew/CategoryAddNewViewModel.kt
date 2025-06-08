@@ -1,6 +1,7 @@
 package com.synaptix.budgetbuddy.presentation.ui.main.transaction.categoryAddNew
 
 import android.util.Log
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.synaptix.budgetbuddy.R
@@ -11,13 +12,77 @@ import com.synaptix.budgetbuddy.core.usecase.main.category.AddCategoryUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import java.io.Serializable
 import javax.inject.Inject
 
 @HiltViewModel
 class CategoryAddNewViewModel @Inject constructor(
     private val addCategoryUseCase: AddCategoryUseCase,
-    private val getUserIdUseCase: GetUserIdUseCase
+    private val getUserIdUseCase: GetUserIdUseCase,
+    private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
+
+    enum class ScreenMode : Serializable {
+        EDIT, CREATE
+    }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // Screen Mode
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    private val _screenMode = MutableStateFlow(
+        savedStateHandle["screenMode"] ?: ScreenMode.CREATE
+    )
+    val screenMode: StateFlow<ScreenMode> get() = _screenMode
+
+    fun setScreenMode(mode: ScreenMode) {
+        _screenMode.value = mode
+        savedStateHandle["screenMode"] = mode
+    }
+
+    private val _screenModeBusy = MutableStateFlow(false)
+    val screenModeBusy: StateFlow<Boolean> get() = _screenModeBusy
+
+    fun setScreenModeBusy(isBusy: Boolean) {
+        _screenModeBusy.value = isBusy
+    }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // Category Data
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    private val categoryId: String? = savedStateHandle["categoryId"]
+
+    private val _category = MutableStateFlow<Category?>(null)
+    val category: StateFlow<Category?> = _category
+
+    fun setCategory(category: Category?) {
+        _category.value = category
+        category?.let { populateCategoryData(it) }
+    }
+
+    private fun populateCategoryData(category: Category) {
+        _categoryName.value = category.name
+        _categoryType.value = category.type.capitalize()
+        _selectedColor.value = _colors.value.find { it.colorResourceId == category.color }
+        _selectedIcon.value = _icons.value.find { it.iconResourceId == category.icon }
+    }
+
+    private fun loadCategory(id: String) {
+        viewModelScope.launch {
+            _uiState.value = UiState.Loading
+
+            val currentUserId = getUserIdUseCase.execute()
+            if (currentUserId.isEmpty()) {
+                _uiState.value = UiState.Error("User ID is empty")
+                return@launch
+            }
+
+            Log.d("CategoryAddNewViewModel", "Loading Category: $id")
+
+            // TODO: Add GetCategoryUseCase and implement loading
+            // For now, we'll just show an error
+            _uiState.value = UiState.Error("Category loading not implemented yet")
+        }
+    }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     // UI State
@@ -104,21 +169,25 @@ class CategoryAddNewViewModel @Inject constructor(
     fun setCategoryName(name: String) {
         _categoryName.value = name
         validateForm()
+        checkForChanges()
     }
 
     fun setSelectedColor(color: CategoryItem.ColorItem) {
         _selectedColor.value = color
         validateForm()
+        checkForChanges()
     }
 
     fun setSelectedIcon(icon: CategoryItem.IconItem) {
         _selectedIcon.value = icon
         validateForm()
+        checkForChanges()
     }
 
     fun setCategoryType(type: String) {
         _categoryType.value = type
         validateForm()
+        checkForChanges()
     }
 
     fun showValidationErrors() {
@@ -179,6 +248,20 @@ class CategoryAddNewViewModel @Inject constructor(
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // Initialize
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    init {
+        when (screenMode.value) {
+            ScreenMode.EDIT -> {
+                categoryId?.let { loadCategory(it) }
+            }
+            ScreenMode.CREATE -> {
+                reset()
+            }
+        }
+    }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     // Category Creation
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     fun createCategory() {
@@ -211,6 +294,13 @@ class CategoryAddNewViewModel @Inject constructor(
                     icon = _selectedIcon.value?.iconResourceId ?: R.drawable.ic_circle_24,
                     color = _selectedColor.value?.colorResourceId ?: R.color.cat_dark_pink
                 )
+
+                // If we're in edit mode, we need to update the existing category
+                if (screenMode.value == ScreenMode.EDIT && categoryId != null) {
+                    // TODO: Add UpdateCategoryUseCase and implement updating
+                    _uiState.value = UiState.Error("Category updating not implemented yet")
+                    return@launch
+                }
 
                 addCategoryUseCase.execute(newCategory)
                     .catch { e ->
@@ -246,6 +336,40 @@ class CategoryAddNewViewModel @Inject constructor(
         _selectedIcon.value = null
         _validationState.value = ValidationState(shouldShowErrors = false)
         _uiState.value = UiState.Initial
+    }
+
+    private val _hasUnsavedChanges = MutableStateFlow(false)
+    val hasUnsavedChanges: StateFlow<Boolean> = _hasUnsavedChanges
+
+    private fun checkForChanges() {
+        val originalCategory = _category.value
+        if (originalCategory == null) {
+            _hasUnsavedChanges.value = false
+            return
+        }
+
+        val hasChanges = originalCategory.name != _categoryName.value ||
+                originalCategory.type != _categoryType.value.lowercase() ||
+                originalCategory.icon != (_selectedIcon.value?.iconResourceId ?: R.drawable.ic_circle_24) ||
+                originalCategory.color != (_selectedColor.value?.colorResourceId ?: R.color.cat_dark_pink)
+
+        _hasUnsavedChanges.value = hasChanges
+    }
+
+    fun revertChanges() {
+        val originalCategory = _category.value ?: return
+
+        // Restore all values from the original category
+        _categoryName.value = originalCategory.name
+        _categoryType.value = originalCategory.type.capitalize()
+        _selectedColor.value = _colors.value.find { it.colorResourceId == originalCategory.color }
+        _selectedIcon.value = _icons.value.find { it.iconResourceId == originalCategory.icon }
+
+        // Reset validation state
+        _validationState.value = ValidationState(shouldShowErrors = false)
+
+        // Reset unsaved changes flag
+        _hasUnsavedChanges.value = false
     }
 }
 
