@@ -27,7 +27,6 @@ import androidx.lifecycle.viewModelScope
 import com.synaptix.budgetbuddy.core.model.Category
 import com.synaptix.budgetbuddy.core.usecase.auth.GetUserIdUseCase
 import com.synaptix.budgetbuddy.core.usecase.main.category.GetCategoriesUseCase
-import com.synaptix.budgetbuddy.core.usecase.main.category.GetCategoriesUseCase.GetCategoriesResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -59,16 +58,19 @@ class BudgetSelectCategoryViewModel @Inject constructor(
     private val _filteredCategories = MutableStateFlow<List<Category>>(emptyList())
     val filteredCategories: StateFlow<List<Category>> = _filteredCategories
 
+    private val _selectedCategories = MutableStateFlow<List<Category>>(emptyList())
+    val selectedCategories: StateFlow<List<Category>> = _selectedCategories
+
     init {
-        viewModelScope.launch { // Launch a coroutine
-            // Combine search query with UI state to filter categories
+        viewModelScope.launch {
             combine(_searchQuery, _uiState) { query, state ->
                 when (state) {
                     is UiState.Success -> {
+                        val categories = state.categories
                         if (query.isEmpty()) {
-                            state.categories
+                            categories
                         } else {
-                            state.categories.filter {
+                            categories.filter {
                                 it.name.contains(query, ignoreCase = true)
                             }
                         }
@@ -84,10 +86,12 @@ class BudgetSelectCategoryViewModel @Inject constructor(
     /**
      * Loads categories for the current user and updates both original and filtered lists.
      * This should be called when the screen is first created.
+     * @param initialSelectedCategories Optional list of categories that should be pre-selected
      */
-    fun loadCategories() {
+    fun loadCategories(initialSelectedCategories: List<Category> = emptyList()) {
         viewModelScope.launch {
             _uiState.value = UiState.Loading
+            _selectedCategories.value = initialSelectedCategories
 
             try {
                 val userId = getUserIdUseCase.execute()
@@ -98,23 +102,28 @@ class BudgetSelectCategoryViewModel @Inject constructor(
 
                 getCategoriesUseCase.execute(userId)
                     .catch { e ->
-                        Log.e("TransactionSelectCategoryViewModel", "Error in categories flow: ${e.message}")
+                        Log.e("BudgetSelectCategoryViewModel", "Error in categories flow: ${e.message}")
                         _uiState.value = UiState.Error(e.message ?: "Failed to load categories")
                     }
                     .collect { result ->
                         when (result) {
                             is GetCategoriesUseCase.GetCategoriesResult.Success -> {
-                                Log.d("TransactionSelectCategoryViewModel", "Categories loaded successfully: ${result.categories.size}")
-                                _uiState.value = UiState.Success(result.categories)
+                                Log.d("BudgetSelectCategoryViewModel", "Categories loaded successfully: ${result.categories.size}")
+                                // Preserve selection state when updating categories
+                                val selectedIds = _selectedCategories.value.map { it.id }.toSet()
+                                val categoriesWithSelection = result.categories.map { category ->
+                                    category.copy(isSelected = selectedIds.contains(category.id))
+                                }
+                                _uiState.value = UiState.Success(categoriesWithSelection)
                             }
                             is GetCategoriesUseCase.GetCategoriesResult.Error -> {
-                                Log.e("TransactionSelectCategoryViewModel", "Error loading categories: ${result.message}")
+                                Log.e("BudgetSelectCategoryViewModel", "Error loading categories: ${result.message}")
                                 _uiState.value = UiState.Error(result.message)
                             }
                         }
                     }
             } catch (e: Exception) {
-                Log.e("TransactionSelectCategoryViewModel", "Exception loading categories: ${e.message}")
+                Log.e("BudgetSelectCategoryViewModel", "Exception loading categories: ${e.message}")
                 _uiState.value = UiState.Error(e.message ?: "Failed to load categories")
             }
         }
@@ -127,5 +136,29 @@ class BudgetSelectCategoryViewModel @Inject constructor(
      */
     fun filterCategories(query: String) {
         _searchQuery.value = query
+    }
+
+    /**
+     * Updates the selected categories and preserves the selection state
+     * @param selectedCategories The new list of selected categories
+     */
+    fun updateSelectedCategories(selectedCategories: List<Category>) {
+        _selectedCategories.value = selectedCategories
+        // Update the selection state in the current UI state if it's a Success state
+        if (_uiState.value is UiState.Success) {
+            val currentCategories = (_uiState.value as UiState.Success).categories
+            val selectedIds = selectedCategories.map { it.id }.toSet()
+            val updatedCategories = currentCategories.map { category ->
+                category.copy(isSelected = selectedIds.contains(category.id))
+            }
+            _uiState.value = UiState.Success(updatedCategories)
+        }
+    }
+
+    /**
+     * Returns the currently selected categories
+     */
+    fun getSelectedCategories(): List<Category> {
+        return _selectedCategories.value
     }
 }

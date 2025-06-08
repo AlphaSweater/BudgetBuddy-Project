@@ -32,6 +32,14 @@ abstract class BaseAdapter<T, VH : BaseAdapter.BaseViewHolder<T>> : RecyclerView
     }
 
     /**
+     * Returns the current list of items
+     * @return The current list of items
+     */
+    fun getCurrentList(): List<T> {
+        return items
+    }
+
+    /**
      * Creates a ViewHolder for the adapter
      * @param parent The parent ViewGroup
      * @param layoutResId The layout resource ID for the item view

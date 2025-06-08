@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--    ======================================================================================-->
+<!--    Group 2 - Group Members:-->
+<!--    ======================================================================================-->
+<!--    * Chad Fairlie ST10269509-->
+<!--    * Dhiren Ruthenavelu ST10256859-->
+<!--    * Kayla Ferreira ST10259527-->
+<!--    * Nathan Teixeira ST10249266-->
+<!--    ======================================================================================-->
+<!--    Declaration:-->
+<!--    ======================================================================================-->
+<!--    We declare that this work is our own original work and that no part of it has been-->
+<!--    copied from any other source, except where explicitly acknowledged.-->
+<!--    ======================================================================================-->
+<!--    References:-->
+<!--    ======================================================================================-->
+<!--    * ChatGPT was used to help with the design and planning. As well as assisted with-->
+<!--    finding and fixing errors in the code.-->
+<!--    * ChatGPT also helped with the forming of comments for the code.-->
+<!--    * https://www.youtube.com/watch?v=A_tPafV23DM&list=PLPgs125_L-X9H6J7x4beRU-AxJ4mXe5vX-->
+<!--    ======================================================================================-->
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:paddingVertical="12dp"
+    android:paddingHorizontal="16dp"
+    android:gravity="center_vertical"
+    android:background="?attr/bb_background">
+
+    <!-- Icon and Text Column -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <ImageView
+            android:id="@+id/imgCategoryIcon"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginEnd="16dp"
+            app:tint="?attr/bb_button" />
+
+        <TextView
+            android:id="@+id/txtCategoryName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="?attr/bb_primaryText"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <!-- CheckBox styled as a pill -->
+    <CheckBox
+        android:id="@+id/checkSelect"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:buttonTint="?attr/bb_primaryText"
+        android:layout_marginStart="12dp"
+        android:background="@null"
+        android:focusable="false"
+        android:focusableInTouchMode="false"
+        android:text=""
+        android:padding="4dp" />
+</LinearLayout> 

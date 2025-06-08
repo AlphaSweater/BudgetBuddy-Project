@@ -33,6 +33,8 @@ import com.synaptix.budgetbuddy.R
 import com.synaptix.budgetbuddy.core.model.Budget
 import com.synaptix.budgetbuddy.core.model.BudgetListItems
 import com.synaptix.budgetbuddy.presentation.ui.common.BaseAdapter
+import java.text.NumberFormat
+import java.util.Locale
 
 /**
  * Adapter for displaying the main budget list in the budget screen.
@@ -47,6 +49,11 @@ import com.synaptix.budgetbuddy.presentation.ui.common.BaseAdapter
 class BudgetMainAdapter(
     private val onBudgetClick: (Budget) -> Unit
 ) : BaseAdapter<BudgetListItems.BudgetBudgetItem, BudgetMainAdapter.BudgetViewHolder>() {
+
+    private val currencyFormat = NumberFormat.getNumberInstance(Locale("en", "ZA")).apply {
+        maximumFractionDigits = 2
+        minimumFractionDigits = 2
+    }
 
     /**
      * Creates a new ViewHolder instance for budget items.
@@ -86,13 +93,14 @@ class BudgetMainAdapter(
             budgetTitle.text = item.budget.name
 
             val context = itemView.context
-            val spent = item.budget.spent
-            val amount = item.budget.amount
+            val spentAmount = item.spentAmount
+            val budgetedAmount = item.budgetedAmount
+            val remainingAmount = item.remainingAmount
 
             // --- Setup status text with color ---
             val statusText = SpannableStringBuilder()
 
-            val spentStr = "R %.2f".format(spent)
+            val spentStr = "R ${currencyFormat.format(spentAmount)}"
             val spentStart = statusText.length
             statusText.append(spentStr)
             statusText.setSpan(
@@ -104,7 +112,7 @@ class BudgetMainAdapter(
 
             statusText.append(" spent of ")
 
-            val amountStr = "R %.2f".format(amount)
+            val amountStr = "R ${currencyFormat.format(budgetedAmount)}"
             val amountStart = statusText.length
             statusText.append(amountStr)
             statusText.setSpan(
@@ -117,14 +125,21 @@ class BudgetMainAdapter(
             budgetStatus.setText(statusText, TextView.BufferType.SPANNABLE)
 
             // --- Set progress ---
-            val progress = if (amount > 0) {
-                ((spent / amount) * 100).coerceIn(0.0, 100.0)
+            val progress = if (budgetedAmount > 0) {
+                ((spentAmount / budgetedAmount) * 100).coerceIn(0.0, 100.0)
             } else {
                 0.0
             }
             budgetProgress.progress = progress.toInt()
 
             itemView.setOnClickListener { onBudgetClick(item.budget) }
+        }
+    }
+
+    companion object {
+        private val currencyFormat = NumberFormat.getNumberInstance(Locale("en", "ZA")).apply {
+            maximumFractionDigits = 2
+            minimumFractionDigits = 2
         }
     }
 }
