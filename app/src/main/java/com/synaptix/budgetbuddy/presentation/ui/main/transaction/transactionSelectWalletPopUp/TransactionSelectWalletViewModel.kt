@@ -27,8 +27,31 @@ class TransactionSelectWalletViewModel @Inject constructor(
     private val _uiState = MutableStateFlow<UiState>(UiState.Initial)
     val uiState: StateFlow<UiState> = _uiState
 
+    private val _searchQuery = MutableStateFlow("")
+    val searchQuery: StateFlow<String> = _searchQuery
+
     private val _wallets = MutableStateFlow<List<Wallet>>(emptyList())
     val wallets: StateFlow<List<Wallet>> = _wallets
+
+    private val _filteredWallets = MutableStateFlow<List<Wallet>>(emptyList())
+    val filteredWallets: StateFlow<List<Wallet>> = _filteredWallets
+
+    init {
+        viewModelScope.launch {
+            // Combine search query with wallets to filter results
+            combine(_searchQuery, _wallets) { query, wallets ->
+                if (query.isEmpty()) {
+                    wallets
+                } else {
+                    wallets.filter {
+                        it.name.contains(query, ignoreCase = true)
+                    }
+                }
+            }.collect { filtered ->
+                _filteredWallets.value = filtered
+            }
+        }
+    }
 
     fun loadWallets() {
         viewModelScope.launch {
@@ -64,5 +87,9 @@ class TransactionSelectWalletViewModel @Inject constructor(
                 _uiState.value = UiState.Error(e.message ?: "Failed to load wallets")
             }
         }
+    }
+
+    fun filterWallets(query: String) {
+        _searchQuery.value = query
     }
 }

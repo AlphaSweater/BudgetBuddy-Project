@@ -76,7 +76,7 @@
 
         <ImageButton
             android:id="@+id/btnMenu"
-            style="@style/IconButton"
+            style="@style/IconButtonSmall"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:src="@drawable/ic_ui_ellipsis_menu"
             android:contentDescription="More options"

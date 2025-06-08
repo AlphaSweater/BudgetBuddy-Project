@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -49,6 +50,7 @@ class TransactionSelectWalletFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setupRecyclerView()
         setupClickListeners()
+        setupSearch()
         observeViewModel()
         walletViewModel.loadWallets()
     }
@@ -66,6 +68,12 @@ class TransactionSelectWalletFragment : Fragment() {
         }
     }
 
+    private fun setupSearch() {
+        binding.searchEditText.doAfterTextChanged { text ->
+            walletViewModel.filterWallets(text?.toString() ?: "")
+        }
+    }
+
     private fun observeViewModel() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -76,9 +84,9 @@ class TransactionSelectWalletFragment : Fragment() {
                     }
                 }
 
-                // Collect wallets
+                // Collect filtered wallets
                 launch {
-                    walletViewModel.wallets.collect { wallets ->
+                    walletViewModel.filteredWallets.collect { wallets ->
                         walletAdapter.submitList(wallets)
                         updateEmptyState(wallets.isEmpty())
                     }

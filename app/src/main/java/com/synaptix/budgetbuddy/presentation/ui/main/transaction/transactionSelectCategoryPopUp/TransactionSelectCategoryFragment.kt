@@ -95,16 +95,16 @@ class TransactionSelectCategoryFragment : Fragment() {
     }
 
     private fun setupRecyclerViews() {
-        val gridSpacing = GridSpacingItemDecoration(2, 8, true)
+        val gridSpacing = GridSpacingItemDecoration(1, 8, true)
         
         binding.recyclerViewExpenseCategory.apply {
-            layoutManager = GridLayoutManager(context, 2)
+            layoutManager = GridLayoutManager(context, 1)
             adapter = expenseAdapter
             addItemDecoration(gridSpacing)
         }
 
         binding.recyclerViewIncomeCategory.apply {
-            layoutManager = GridLayoutManager(context, 2)
+            layoutManager = GridLayoutManager(context, 1)
             adapter = incomeAdapter
             addItemDecoration(gridSpacing)
         }
