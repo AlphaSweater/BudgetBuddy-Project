@@ -3,8 +3,10 @@ package com.synaptix.budgetbuddy.presentation.ui.main.budget
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.synaptix.budgetbuddy.core.model.Budget
+import com.synaptix.budgetbuddy.core.model.Result
 import com.synaptix.budgetbuddy.core.usecase.auth.GetUserIdUseCase
 import com.synaptix.budgetbuddy.core.usecase.main.budget.GetBudgetsUseCase
+import com.synaptix.budgetbuddy.core.usecase.main.budget.CalculateBudgetSpentUseCase
 import com.synaptix.budgetbuddy.core.usecase.main.display.BudgetSummary
 import com.synaptix.budgetbuddy.core.usecase.main.display.TotalBudgetUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -16,7 +18,8 @@ import javax.inject.Inject
 class BudgetMainViewModel @Inject constructor(
     private val getBudgetsUseCase: GetBudgetsUseCase,
     private val getUserIdUseCase: GetUserIdUseCase,
-    private val totalBudgetUseCase: TotalBudgetUseCase
+    private val totalBudgetUseCase: TotalBudgetUseCase,
+    private val calculateBudgetSpentUseCase: CalculateBudgetSpentUseCase
 ) : ViewModel() {
 
     // Define state classes for UI
@@ -38,7 +41,7 @@ class BudgetMainViewModel @Inject constructor(
 
     init {
         fetchBudgets()
-        fetchBudgetSummary()
+        observeBudgetSummary()
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
@@ -72,9 +75,7 @@ class BudgetMainViewModel @Inject constructor(
         }
     }
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-    // Function to fetch budget summary and update state
-    fun fetchBudgetSummary() {
+    private fun observeBudgetSummary() {
         viewModelScope.launch {
             val userId = getUserIdUseCase.execute()
             if (userId.isEmpty()) {
@@ -82,13 +83,37 @@ class BudgetMainViewModel @Inject constructor(
                 return@launch
             }
 
-            try {
-                val summary = totalBudgetUseCase.execute(userId)
-                _budgetSummary.value = summary
-            } catch (e: Exception) {
-                _error.value = e.message ?: "Error getting budget summary"
-            }
+            totalBudgetUseCase.observeBudgetSummary(userId)
+                .catch { e ->
+                    _error.value = e.message ?: "Error observing budget summary"
+                }
+                .collect { result ->
+                    when (result) {
+                        is Result.Success -> {
+                            _budgetSummary.value = result.data
+                        }
+                        is Result.Error -> {
+                            _error.value = result.exception.message
+                        }
+                    }
+                }
         }
+    }
+
+    /**
+     * Observes the spent amount for a specific budget
+     */
+    fun observeBudgetSpent(budget: Budget): Flow<Double> {
+        return calculateBudgetSpentUseCase.observeSpentAmount(budget)
+            .map { result ->
+                when (result) {
+                    is Result.Success -> result.data
+                    is Result.Error -> {
+                        _error.value = result.exception.message
+                        0.0
+                    }
+                }
+            }
     }
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~EOF~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\

@@ -33,6 +33,9 @@ import com.synaptix.budgetbuddy.R
 import com.synaptix.budgetbuddy.core.model.Budget
 import com.synaptix.budgetbuddy.core.model.BudgetListItems
 import com.synaptix.budgetbuddy.presentation.ui.common.BaseAdapter
+import kotlinx.coroutines.flow.Flow
+import java.text.NumberFormat
+import java.util.Locale
 
 /**
  * Adapter for displaying the main budget list in the budget screen.
@@ -47,6 +50,11 @@ import com.synaptix.budgetbuddy.presentation.ui.common.BaseAdapter
 class BudgetMainAdapter(
     private val onBudgetClick: (Budget) -> Unit
 ) : BaseAdapter<BudgetListItems.BudgetBudgetItem, BudgetMainAdapter.BudgetViewHolder>() {
+
+    private val currencyFormat = NumberFormat.getNumberInstance(Locale("en", "ZA")).apply {
+        maximumFractionDigits = 2
+        minimumFractionDigits = 2
+    }
 
     /**
      * Creates a new ViewHolder instance for budget items.
@@ -86,13 +94,13 @@ class BudgetMainAdapter(
             budgetTitle.text = item.budget.name
 
             val context = itemView.context
-            val spent = item.budget.spent
+            val spent = item.spent
             val amount = item.budget.amount
 
             // --- Setup status text with color ---
             val statusText = SpannableStringBuilder()
 
-            val spentStr = "R %.2f".format(spent)
+            val spentStr = "R ${currencyFormat.format(spent)}"
             val spentStart = statusText.length
             statusText.append(spentStr)
             statusText.setSpan(
@@ -104,7 +112,7 @@ class BudgetMainAdapter(
 
             statusText.append(" spent of ")
 
-            val amountStr = "R %.2f".format(amount)
+            val amountStr = "R ${currencyFormat.format(amount)}"
             val amountStart = statusText.length
             statusText.append(amountStr)
             statusText.setSpan(
@@ -125,6 +133,13 @@ class BudgetMainAdapter(
             budgetProgress.progress = progress.toInt()
 
             itemView.setOnClickListener { onBudgetClick(item.budget) }
+        }
+    }
+
+    companion object {
+        private val currencyFormat = NumberFormat.getNumberInstance(Locale("en", "ZA")).apply {
+            maximumFractionDigits = 2
+            minimumFractionDigits = 2
         }
     }
 }

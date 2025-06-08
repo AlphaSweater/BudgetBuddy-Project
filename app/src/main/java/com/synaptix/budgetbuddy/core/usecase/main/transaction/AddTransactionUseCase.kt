@@ -58,6 +58,8 @@ class AddTransactionUseCase @Inject constructor(
                     Log.d("AddTransactionUseCase", "Transaction added successfully: ${result.data}")
                     // Update wallet balance
                     updateWalletBalance(newTransaction)
+                    // Update budget spent amounts
+                    updateBudgetSpent(newTransaction)
                     emit(AddTransactionResult.Success(result.data))
                 }
                 is Result.Error -> {
@@ -97,9 +99,46 @@ class AddTransactionUseCase @Inject constructor(
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     // Executes the operation to add a new budget transaction
-    private fun updateBudgetSpent(transaction: Transaction) {
-        val budgetCategory = transaction.category
+    private suspend fun updateBudgetSpent(transaction: Transaction) {
+        // Only update budgets for expense transactions
+        if (transaction.category.type.uppercase() != "EXPENSE") {
+            return
+        }
 
+        try {
+            // Get all budgets for the user
+            when (val result = budgetRepository.getBudgetsForUser(transaction.user.id)) {
+                is Result.Success -> {
+                    val budgets = result.data
+                    // Filter budgets that contain the transaction's category
+                    val relevantBudgets = budgets.filter { budget ->
+                        budget.categoryIds.contains(transaction.category.id)
+                    }
+
+                    // Update each relevant budget's spent amount
+                    relevantBudgets.forEach { budget ->
+                        val newSpentAmount = budget.spent + transaction.amount
+                        when (val updateResult = budgetRepository.updateBudgetSpent(
+                            transaction.user.id,
+                            budget.id,
+                            newSpentAmount
+                        )) {
+                            is Result.Success -> {
+                                Log.d("AddTransactionUseCase", "Budget ${budget.name} spent amount updated successfully")
+                            }
+                            is Result.Error -> {
+                                Log.e("AddTransactionUseCase", "Error updating budget ${budget.name} spent amount: ${updateResult.exception.message}")
+                            }
+                        }
+                    }
+                }
+                is Result.Error -> {
+                    Log.e("AddTransactionUseCase", "Error fetching budgets: ${result.exception.message}")
+                }
+            }
+        } catch (e: Exception) {
+            Log.e("AddTransactionUseCase", "Exception while updating budget spent amounts: ${e.message}")
+        }
     }
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~EOF~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
