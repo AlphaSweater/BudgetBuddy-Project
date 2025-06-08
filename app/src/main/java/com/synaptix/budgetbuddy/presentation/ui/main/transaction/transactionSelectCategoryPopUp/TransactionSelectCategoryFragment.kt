@@ -190,7 +190,13 @@ class TransactionSelectCategoryFragment : Fragment() {
     }
 
     private fun navigateToAddCategory() {
-        findNavController().navigate(R.id.navigation_category_add_new)
+        val bundle = bundleOf(
+            "screenMode" to CategoryAddNewViewModel.ScreenMode.CREATE
+        )
+        findNavController().navigate(
+            R.id.ind_category_navigation_graph,
+            bundle
+        )
     }
 
     private fun navigateToEditCategory(category: Category) {
@@ -206,20 +212,20 @@ class TransactionSelectCategoryFragment : Fragment() {
         )
     }
 
-    private fun navigateToTransactionDetails(transaction: Transaction) {
-        Log.d("HomeFragment", "Navigating to transaction details: ${transaction.id}")
-
-        // Create a bundle with the necessary arguments
-        val bundle = bundleOf(
-            "screenMode" to TransactionAddViewModel.ScreenMode.VIEW,
-            "transactionId" to transaction.id
-        )
-
-        findNavController().navigate(
-            R.id.ind_category_navigation_graph,
-            bundle
-        )
-    }
+//    private fun navigateToTransactionDetails(transaction: Transaction) {
+//        Log.d("HomeFragment", "Navigating to transaction details: ${transaction.id}")
+//
+//        // Create a bundle with the necessary arguments
+//        val bundle = bundleOf(
+//            "screenMode" to TransactionAddViewModel.ScreenMode.VIEW,
+//            "transactionId" to transaction.id
+//        )
+//
+//        findNavController().navigate(
+//            R.id.ind_category_navigation_graph,
+//            bundle
+//        )
+//    }
 
     private fun showError(message: String) {
         Snackbar.make(binding.root, message, Snackbar.LENGTH_SHORT)
