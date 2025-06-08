@@ -11,6 +11,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.firebase.auth.FirebaseAuth
 import com.synaptix.budgetbuddy.R
 import com.synaptix.budgetbuddy.core.model.BudgetListItems
@@ -20,7 +21,9 @@ import com.synaptix.budgetbuddy.databinding.FragmentWalletReportBinding
 import com.synaptix.budgetbuddy.presentation.ui.main.general.generalReports.ReportListItems
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
 import java.util.Calendar
+import java.util.Date
 import java.util.Locale
 import javax.inject.Inject
 
@@ -38,14 +41,12 @@ class WalletReportFragment : Fragment() {
     @Inject
     lateinit var auth: FirebaseAuth
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
             walletId = it.getString("walletId")
         }
     }
-
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -60,29 +61,15 @@ class WalletReportFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         println("WalletReportFragment: onViewCreated")
 
-        // Log the received wallet ID
-        println("WalletReportFragment: Received wallet ID: $walletId")
-
-        val currentUser = auth.currentUser
-        if (currentUser == null) {
-            println("WalletReportFragment: User not authenticated")
-            findNavController().popBackStack()
-            return
-        }
-
-        val walletId = walletId ?: run {
+        walletId?.let { walletId ->
+            setupRecyclerView()
+            setupClickListeners()
+            observeViewModel()
+            viewModel.loadWalletTransactions(walletId)
+        } ?: run {
             println("WalletReportFragment: No wallet ID provided")
             findNavController().popBackStack()
-            return
         }
-
-        setupRecyclerView()
-        setupClickListeners()
-        observeViewModel()
-
-        // Log before calling loadWalletTransactions
-        println("WalletReportFragment: Calling loadWalletTransactions with walletId: $walletId")
-        viewModel.loadWalletTransactions(walletId!!)
     }
 
     private fun setupRecyclerView() {
@@ -100,6 +87,57 @@ class WalletReportFragment : Fragment() {
         binding.btnGoBack.setOnClickListener {
             findNavController().popBackStack()
         }
+
+        // Add date range picker button click listener
+        binding.btnTimePeriod.setOnClickListener {
+            showDateRangePicker()
+        }
+    }
+
+    private fun showDateRangePicker() {
+        val calendar = Calendar.getInstance()
+
+        // Default to last 30 days
+        val defaultEndDate = calendar.timeInMillis
+        calendar.add(Calendar.DAY_OF_MONTH, -30)
+        val defaultStartDate = calendar.timeInMillis
+
+        // Create and show the date range picker dialog
+        val dateRangePicker = MaterialDatePicker.Builder.dateRangePicker()
+            .setTitleText("Select Date Range")
+            .setSelection(
+                androidx.core.util.Pair(
+                    defaultStartDate,
+                    defaultEndDate
+                )
+            )
+            .build()
+
+        dateRangePicker.addOnPositiveButtonClickListener { selection ->
+            val startDate = selection.first ?: return@addOnPositiveButtonClickListener
+            val endDate = selection.second ?: return@addOnPositiveButtonClickListener
+            viewModel.setDateRange(startDate, endDate)
+            updateTimePeriodButtonText(startDate..endDate)
+        }
+
+        dateRangePicker.addOnNegativeButtonClickListener {
+            viewModel.clearDateRange()
+            updateTimePeriodButtonText(null)
+        }
+
+        dateRangePicker.show(childFragmentManager, "DATE_RANGE_PICKER")
+    }
+
+    private fun updateTimePeriodButtonText(dateRange: ClosedRange<Long>?) {
+        if (dateRange == null) {
+            binding.btnTimePeriod.text = "Date"
+            return
+        }
+
+        val dateFormat = SimpleDateFormat("MMM d, yyyy", Locale.getDefault())
+        val startDateStr = dateFormat.format(Date(dateRange.start))
+        val endDateStr = dateFormat.format(Date(dateRange.endInclusive))
+        binding.btnTimePeriod.text = "$startDateStr - $endDateStr"
     }
 
     private fun observeViewModel() {
@@ -130,6 +168,7 @@ class WalletReportFragment : Fragment() {
                             is WalletReportViewModel.TransactionState.Empty -> {
                                 println("WalletReportFragment: No transactions found")
                                 transactionsAdapter.submitList(emptyList())
+                                updateTotalBalance(emptyList())
                             }
                         }
                     }
