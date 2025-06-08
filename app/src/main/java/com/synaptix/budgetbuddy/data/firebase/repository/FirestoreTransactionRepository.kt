@@ -334,7 +334,7 @@ class FirestoreTransactionRepository @Inject constructor(
         return observeCollection(userId, query)
     }
 
-    fun observeTransactionsInDateRange(
+    fun observeTransactionsForUserInDateRange(
         userId: String,
         startDate: Long,
         endDate: Long
@@ -351,7 +351,7 @@ class FirestoreTransactionRepository @Inject constructor(
         startDate: Long,
         endDate: Long
     ): Flow<Double> {
-        return observeTransactionsInDateRange(userId, startDate, endDate)
+        return observeTransactionsForUserInDateRange(userId, startDate, endDate)
             .map { transactions ->
                 transactions.sumOf { it.amount }
             }

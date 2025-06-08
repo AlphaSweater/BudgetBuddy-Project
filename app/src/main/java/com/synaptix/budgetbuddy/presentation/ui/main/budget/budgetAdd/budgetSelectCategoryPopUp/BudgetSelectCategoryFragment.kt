@@ -21,7 +21,6 @@
 
 package com.synaptix.budgetbuddy.presentation.ui.main.budget.budgetAdd.budgetSelectCategoryPopUp
 
-import android.graphics.Rect
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -29,21 +28,17 @@ import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.RecyclerView
+import androidx.navigation.navGraphViewModels
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import com.synaptix.budgetbuddy.R
 import com.synaptix.budgetbuddy.databinding.FragmentBudgetSelectCategoryBinding
-import com.synaptix.budgetbuddy.databinding.FragmentTransactionSelectCategoryBinding
 import com.synaptix.budgetbuddy.presentation.ui.main.budget.budgetAdd.BudgetAddViewModel
-import com.synaptix.budgetbuddy.presentation.ui.main.transaction.transactionSelectCategoryPopUp.TransactionSelectCategoryAdapter
-import com.synaptix.budgetbuddy.presentation.ui.main.transaction.transactionSelectCategoryPopUp.TransactionSelectCategoryViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -52,16 +47,15 @@ class BudgetSelectCategoryFragment : Fragment() {
     private var _binding: FragmentBudgetSelectCategoryBinding? = null
     private val binding get() = _binding!!
 
-    private val addBudgetViewModel: BudgetAddViewModel by activityViewModels()
+    private val sharedViewModel: BudgetAddViewModel by navGraphViewModels(R.id.ind_budget_navigation_graph) { defaultViewModelProviderFactory }
     private val selectCategoryViewModel: BudgetSelectCategoryViewModel by viewModels()
 
     private val expenseAdapter by lazy {
-        BudgetSelectCategoryAdapter { category ->
-            addBudgetViewModel.setCategory(category)
-            findNavController().popBackStack()
+        BudgetSelectCategoryAdapter { selectedCategories ->
+            selectCategoryViewModel.updateSelectedCategories(selectedCategories)
+            updateSelectAllState()
         }
     }
-
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -75,9 +69,9 @@ class BudgetSelectCategoryFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupViews()
-//        setupSearch()
+        setupSearch()
         observeViewModel()
-        selectCategoryViewModel.loadCategories()
+        selectCategoryViewModel.loadCategories(sharedViewModel.selectedCategories.value)
     }
 
     private fun setupViews() {
@@ -86,31 +80,39 @@ class BudgetSelectCategoryFragment : Fragment() {
                 findNavController().popBackStack()
             }
 
-            btnAddCategory.setOnClickListener { showAddCategory() }
+            btnSave.setOnClickListener {
+                val selectedCategories = expenseAdapter.getSelectedCategories()
+                sharedViewModel.setSelectedCategories(selectedCategories)
+                findNavController().popBackStack()
+            }
 
-//            btnAddCategoryEmpty.setOnClickListener { showAddCategory() }
+            // Setup Select All functionality
+            selectAllContainer.setOnClickListener {
+                val isAllSelected = checkSelectAll.isChecked
+                expenseAdapter.toggleSelectAll(!isAllSelected)
+                checkSelectAll.isChecked = !isAllSelected
+            }
 
+            checkSelectAll.setOnClickListener {
+                expenseAdapter.toggleSelectAll(checkSelectAll.isChecked)
+            }
 
             setupRecyclerViews()
         }
     }
 
     private fun setupRecyclerViews() {
-        val gridSpacing = GridSpacingItemDecoration(2, 8, true)
-
         binding.recyclerViewExpenseCategory.apply {
-            layoutManager = GridLayoutManager(context, 2)
+            layoutManager = LinearLayoutManager(context)
             adapter = expenseAdapter
-            addItemDecoration(gridSpacing)
         }
-
     }
 
-//    private fun setupSearch() {
-//        binding.searchEditText.doAfterTextChanged { text ->
-//            selectCategoryViewModel.filterCategories(text?.toString() ?: "")
-//        }
-//    }
+    private fun setupSearch() {
+        binding.searchEditText.doAfterTextChanged { text ->
+            selectCategoryViewModel.filterCategories(text?.toString() ?: "")
+        }
+    }
 
     private fun observeViewModel() {
         viewLifecycleOwner.lifecycleScope.launch {
@@ -119,15 +121,21 @@ class BudgetSelectCategoryFragment : Fragment() {
                 launch {
                     selectCategoryViewModel.uiState.collect { state ->
                         handleUiState(state)
+                        // Set all categories when we get the initial success state
+                        if (state is BudgetSelectCategoryViewModel.UiState.Success) {
+                            val allExpenseCategories = state.categories.filter { it.type == "expense" }
+                            sharedViewModel.setAllCategories(allExpenseCategories)
+                        }
                     }
                 }
 
                 // Collect filtered categories
                 launch {
                     selectCategoryViewModel.filteredCategories.collect { categories ->
-                        val (expenseCategories, incomeCategories) = categories.partition { it.type == "expense" }
-                        expenseAdapter.submitList(expenseCategories)
+                        val expenseCategories = categories.filter { it.type == "expense" }
+                        expenseAdapter.submitList(expenseCategories, selectCategoryViewModel.getSelectedCategories())
                         updateEmptyState()
+                        updateSelectAllState()
                     }
                 }
             }
@@ -137,43 +145,36 @@ class BudgetSelectCategoryFragment : Fragment() {
     private fun handleUiState(state: BudgetSelectCategoryViewModel.UiState) {
         when (state) {
             is BudgetSelectCategoryViewModel.UiState.Loading -> {
-//                binding.progressBar.visibility = View.VISIBLE
-//                binding.contentContainer.visibility = View.GONE
+                binding.progressBar.visibility = View.VISIBLE
+                binding.contentContainer.visibility = View.GONE
             }
             is BudgetSelectCategoryViewModel.UiState.Success -> {
-//                binding.progressBar.visibility = View.GONE
-//                binding.contentContainer.visibility = View.VISIBLE
+                binding.progressBar.visibility = View.GONE
+                binding.contentContainer.visibility = View.VISIBLE
             }
             is BudgetSelectCategoryViewModel.UiState.Error -> {
-//                binding.progressBar.visibility = View.GONE
-//                binding.contentContainer.visibility = View.VISIBLE
+                binding.progressBar.visibility = View.GONE
+                binding.contentContainer.visibility = View.VISIBLE
                 showError(state.message)
             }
             else -> {
-//                binding.progressBar.visibility = View.GONE
-//                binding.contentContainer.visibility = View.VISIBLE
+                binding.progressBar.visibility = View.GONE
+                binding.contentContainer.visibility = View.VISIBLE
             }
         }
     }
-
-    private fun showExpenseCategories() {
-        with(binding) {
-            recyclerViewExpenseCategory.visibility = View.VISIBLE
-            updateEmptyState()
-        }
-    }
-
 
     private fun updateEmptyState() {
         with(binding) {
             val isExpenseVisible = recyclerViewExpenseCategory.isVisible
             val currentAdapter = if (isExpenseVisible) expenseAdapter else null
-//            emptyState.visibility = if (currentAdapter.itemCount == 0) View.VISIBLE else View.GONE
+            emptyState.visibility = if (currentAdapter?.itemCount == 0) View.VISIBLE else View.GONE
         }
     }
 
-    private fun showAddCategory() {
-        findNavController().navigate(R.id.navigation_category_add_new)
+    private fun updateSelectAllState() {
+        val allSelected = expenseAdapter.areAllItemsSelected()
+        binding.checkSelectAll.isChecked = allSelected
     }
 
     private fun showError(message: String) {
@@ -186,32 +187,5 @@ class BudgetSelectCategoryFragment : Fragment() {
         super.onDestroyView()
         _binding = null
     }
-
-    private class GridSpacingItemDecoration(
-        private val spanCount: Int,
-        private val spacing: Int,
-        private val includeEdge: Boolean
-    ) : RecyclerView.ItemDecoration() {
-
-        override fun getItemOffsets(
-            outRect: Rect,
-            view: View,
-            parent: RecyclerView,
-            state: RecyclerView.State
-        ) {
-            val position = parent.getChildAdapterPosition(view)
-            val column = position % spanCount
-
-            if (includeEdge) {
-                outRect.left = spacing - column * spacing / spanCount
-                outRect.right = (column + 1) * spacing / spanCount
-                if (position < spanCount) outRect.top = spacing
-                outRect.bottom = spacing
-            } else {
-                outRect.left = column * spacing / spanCount
-                outRect.right = spacing - (column + 1) * spacing / spanCount
-                if (position >= spanCount) outRect.top = spacing
-            }
-        }
-    }
 }
+

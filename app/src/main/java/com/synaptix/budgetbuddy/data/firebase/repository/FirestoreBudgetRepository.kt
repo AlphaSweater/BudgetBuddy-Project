@@ -91,24 +91,6 @@ class FirestoreBudgetRepository @Inject constructor(
         }
     }
 
-    // Update budget spent amount
-    suspend fun updateBudgetSpent(userId: String, budgetId: String, amount: Double): Result<Unit> {
-        return try {
-            val budget = when (val result = getBudgetById(userId, budgetId)) {
-                is Result.Success -> result.data
-                is Result.Error -> return Result.Error(result.exception)
-            }
-
-            val updatedBudget = budget!!.copy(
-                spent = amount,
-                updatedAt = System.currentTimeMillis()
-            )
-            update(userId, budgetId, updatedBudget)
-        } catch (e: Exception) {
-            Result.Error(e)
-        }
-    }
-
     // Check if a budget name already exists for a user
     suspend fun budgetNameExists(userId: String, name: String): Result<Boolean> = 
         checkNameExists(userId, name)
@@ -124,24 +106,6 @@ class FirestoreBudgetRepository @Inject constructor(
             val total = snapshot.documents
                 .mapNotNull { it.toObject(getType()) }
                 .sumOf { it.amount }
-
-            Result.Success(total)
-        } catch (e: Exception) {
-            Result.Error(e)
-        }
-    }
-
-    // Get total spent amount for a user
-    suspend fun getTotalSpentAmountForUser(userId: String): Result<Double> {
-        return try {
-            val snapshot = createBaseQuery(userId)
-                .whereEqualTo("isActive", true)
-                .get()
-                .await()
-
-            val total = snapshot.documents
-                .mapNotNull { it.toObject(getType()) }
-                .sumOf { it.spent }
 
             Result.Success(total)
         } catch (e: Exception) {
@@ -169,14 +133,6 @@ class FirestoreBudgetRepository @Inject constructor(
             .map { budgets ->
                 budgets.filter { it.isActive }
                     .sumOf { it.amount }
-            }
-    }
-
-    fun observeTotalSpentAmount(userId: String): Flow<Double> {
-        return observeCollection(userId, createBaseQuery(userId))
-            .map { budgets ->
-                budgets.filter { it.isActive }
-                    .sumOf { it.spent }
             }
     }
 } 

@@ -23,7 +23,6 @@ import android.util.TypedValue
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import com.synaptix.budgetbuddy.core.usecase.main.display.BudgetSummary
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import java.text.NumberFormat
@@ -32,6 +31,9 @@ import java.util.Locale
 @AndroidEntryPoint
 class BudgetMainFragment : Fragment() {
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // Properties
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private var _binding: FragmentBudgetMainBinding? = null
     private val binding get() = _binding!!
 
@@ -42,6 +44,13 @@ class BudgetMainFragment : Fragment() {
         }
     }
 
+    private val currencyFormat = NumberFormat.getNumberInstance(Locale("en", "ZA")).apply {
+        maximumFractionDigits = 2
+        minimumFractionDigits = 2
+    }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // Fragment Lifecycle
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -52,21 +61,25 @@ class BudgetMainFragment : Fragment() {
         return binding.root
     }
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupUI()
-        setupClickListeners()
-        collectUiState()
+        observeViewModel()
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // UI Setup
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private fun setupUI() {
         setupRecyclerView()
         setupClickListeners()
     }
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private fun setupRecyclerView() {
         binding.recyclerViewBudgetMain.apply {
             layoutManager = LinearLayoutManager(requireContext())
@@ -74,7 +87,6 @@ class BudgetMainFragment : Fragment() {
         }
     }
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private fun setupClickListeners() {
         binding.createBudgetButton.setOnClickListener {
             findNavController().navigate(R.id.action_budgetMainFragment_to_budgetAddFragment)
@@ -82,47 +94,54 @@ class BudgetMainFragment : Fragment() {
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-    // Collect UI state from ViewModel and update the UI accordingly
-    private fun collectUiState() {
+    // ViewModel Observers
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    private fun observeViewModel() {
         viewLifecycleOwner.lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
                     viewModel.budgetUiState.collect { state ->
-                        when (state) {
-                            is BudgetMainViewModel.BudgetUiState.Loading -> {
-                                // Show loading if needed
-                            }
-                            is BudgetMainViewModel.BudgetUiState.Success -> {
-                                val budgetItems = state.budgets.map { budget ->
-                                    BudgetListItems.BudgetBudgetItem(
-                                        budget = budget,
-                                        status = "R ${budget.spent} spent of R ${budget.amount}"
-                                    )
-                                }
-                                budgetAdapter.submitList(budgetItems)
-                            }
-                            is BudgetMainViewModel.BudgetUiState.Error -> {
-                                Toast.makeText(requireContext(), state.message, Toast.LENGTH_LONG).show()
-                            }
-                            is BudgetMainViewModel.BudgetUiState.Empty -> {
-                                budgetAdapter.submitList(emptyList())
-                            }
-                        }
+                        handleBudgetUiState(state)
                     }
                 }
-
                 launch {
                     viewModel.budgetSummary.collect { summary ->
                         summary?.let { updateSummaryUI(it) }
+                    }
+                }
+                launch {
+                    viewModel.error.collect { error ->
+                        error?.let { showError(it) }
                     }
                 }
             }
         }
     }
 
+    private fun handleBudgetUiState(state: BudgetMainViewModel.BudgetUiState) {
+        when (state) {
+            is BudgetMainViewModel.BudgetUiState.Loading -> {
+                // Show loading if needed
+            }
+            is BudgetMainViewModel.BudgetUiState.Success -> {
+                budgetAdapter.submitList(state.budgetItems)
+                binding.txtEmptyBudgets.visibility = View.GONE
+            }
+            is BudgetMainViewModel.BudgetUiState.Error -> {
+                showError(state.message)
+                binding.txtEmptyBudgets.visibility = View.GONE
+            }
+            is BudgetMainViewModel.BudgetUiState.Empty -> {
+                budgetAdapter.submitList(emptyList())
+                binding.txtEmptyBudgets.visibility = View.VISIBLE
+            }
+        }
+    }
+
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-    // Update the summary UI with formatted budget and spent amounts
-    private fun updateSummaryUI(summary: BudgetSummary) {
+    // UI Update Methods
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    private fun updateSummaryUI(summary: BudgetListItems.TotalBudgetsSummary) {
         val typedValue = TypedValue()
         val theme = requireContext().theme
         theme.resolveAttribute(R.attr.bb_primaryText, typedValue, true)
@@ -130,11 +149,6 @@ class BudgetMainFragment : Fragment() {
 
         val greenColor = ContextCompat.getColor(requireContext(), R.color.profit_green)
         val blueColor = ContextCompat.getColor(requireContext(), R.color.info_blue)
-
-        val currencyFormat = NumberFormat.getNumberInstance(Locale("en", "ZA")).apply {
-            maximumFractionDigits = 2
-            minimumFractionDigits = 2
-        }
 
         val formattedBudgeted = currencyFormat.format(summary.totalBudgeted)
         val formattedSpent = currencyFormat.format(summary.totalSpent)
@@ -158,15 +172,17 @@ class BudgetMainFragment : Fragment() {
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // Navigation
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private fun onBudgetClicked(budget: Budget) {
-        // TODO: Navigate to budget report or details
         findNavController().navigate(R.id.action_budgetMainFragment_to_budgetReportFragment)
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
+    // Helper Methods
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    private fun showError(message: String) {
+        Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show()
     }
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~EOF~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
