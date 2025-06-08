@@ -1,5 +1,5 @@
 
-![Logo](https://i.postimg.cc/VN8BpwF0/Synaptix-Logo.png)
+![Logo](https://i.postimg.cc/L6MYhpN8/Logo-With-Title.png)
 
 
 <h1 align="center">📊 BUDGETBUDDY-PROJECT</h1>
