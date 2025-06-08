@@ -88,7 +88,7 @@ class CategoryAddNewViewModel @Inject constructor(
         IconItem(R.drawable.ic_cat_electronics, "Electronics"),
         IconItem(R.drawable.ic_cat_medical, "Mecical"),
         IconItem(R.drawable.ic_cat_vehicle, "Vehicle"),
-        IconItem(R.drawable.ic_cat_income, "Income"),
+        IconItem(R.drawable.ic_cat_income, "Income")
     ))
     val icons: StateFlow<List<IconItem>> = _icons
 
