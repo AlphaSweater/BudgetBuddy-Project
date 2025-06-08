@@ -216,7 +216,7 @@ class TransactionSelectCategoryFragment : Fragment() {
         )
 
         findNavController().navigate(
-            R.id.ind_transaction_navigation_graph,
+            R.id.ind_category_navigation_graph,
             bundle
         )
     }
