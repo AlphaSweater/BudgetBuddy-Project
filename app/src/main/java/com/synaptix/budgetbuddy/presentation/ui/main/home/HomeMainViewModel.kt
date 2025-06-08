@@ -272,15 +272,23 @@ class HomeMainViewModel @Inject constructor(
                                                 )
                                                 when (categorySummaries) {
                                                     is Result.Success -> {
-                                                        // Sort categories by their expense values in descending order
-                                                        val sortedCategories = expenseCategories.sortedByDescending { category ->
-                                                            categorySummaries.data[category.id]?.totalExpense ?: 0.0
-                                                        }
+                                                        // Filter out categories with no transactions and sort by expense
+                                                        val categoriesWithTransactions = expenseCategories
+                                                            .filter { category ->
+                                                                categorySummaries.data[category.id]?.transactionCount ?: 0 > 0
+                                                            }
+                                                            .sortedByDescending { category ->
+                                                                categorySummaries.data[category.id]?.totalExpense ?: 0.0
+                                                            }
                                                         
-                                                        _categoriesState.value = CategoryState.Success(
-                                                            categories = sortedCategories,
-                                                            categorySummaries = categorySummaries.data
-                                                        )
+                                                        if (categoriesWithTransactions.isEmpty()) {
+                                                            _categoriesState.value = CategoryState.Empty
+                                                        } else {
+                                                            _categoriesState.value = CategoryState.Success(
+                                                                categories = categoriesWithTransactions,
+                                                                categorySummaries = categorySummaries.data
+                                                            )
+                                                        }
                                                     }
                                                     is Result.Error -> {
                                                         _categoriesState.value = CategoryState.Error(categorySummaries.exception.message ?: "Unknown error")
