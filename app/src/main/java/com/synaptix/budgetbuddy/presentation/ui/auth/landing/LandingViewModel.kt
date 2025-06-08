@@ -26,5 +26,4 @@ import androidx.lifecycle.ViewModel
 // ViewModel for the LandingFragment, currently with no data or logic.
 
 class LandingViewModel : ViewModel() {
-    // TODO: Implement the ViewModel
 }

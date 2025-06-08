@@ -3,7 +3,7 @@ package com.synaptix.budgetbuddy.core.usecase.main.budget
 import com.synaptix.budgetbuddy.core.model.Budget
 import com.synaptix.budgetbuddy.core.model.BudgetListItems
 import com.synaptix.budgetbuddy.core.model.Result
-import com.synaptix.budgetbuddy.core.util.DateRangeUtil
+import com.synaptix.budgetbuddy.core.util.DateUtil
 import com.synaptix.budgetbuddy.data.firebase.mapper.FirebaseMapper.toDomain
 import com.synaptix.budgetbuddy.data.firebase.model.TransactionDTO
 import com.synaptix.budgetbuddy.data.firebase.repository.FirestoreBudgetRepository
@@ -57,7 +57,7 @@ class BudgetCalculationUseCase @Inject constructor(
                 }
             }
 
-        val (startOfMonth, endOfMonth) = DateRangeUtil.getCurrentMonthRange()
+        val (startOfMonth, endOfMonth) = DateUtil.getCurrentMonthRange()
         val transactions = transactionRepository.getTransactionsForUserInDateRange(
             userId = userId,
             startDate = startOfMonth,
@@ -80,7 +80,7 @@ class BudgetCalculationUseCase @Inject constructor(
      * @return BudgetSpentSummary containing the budget details and spent amount
      */
     suspend fun calculateBudgetSpent(budget: Budget): Result<BudgetListItems.BudgetBudgetItem> = try {
-        val (startOfMonth, endOfMonth) = DateRangeUtil.getCurrentMonthRange()
+        val (startOfMonth, endOfMonth) = DateUtil.getCurrentMonthRange()
         
         val transactions = transactionRepository.getTransactionsForUserInDateRange(
             userId = budget.user.id,
@@ -120,7 +120,7 @@ class BudgetCalculationUseCase @Inject constructor(
             return flow { emit(Result.Error(IllegalArgumentException("Invalid user ID"))) }
         }
 
-        val (startOfMonth, endOfMonth) = DateRangeUtil.getCurrentMonthRange()
+        val (startOfMonth, endOfMonth) = DateUtil.getCurrentMonthRange()
 
         return combine(
             userRepository.observeUserProfile(userId),
@@ -161,7 +161,7 @@ class BudgetCalculationUseCase @Inject constructor(
      * @return Flow of Result<BudgetSpentSummary> that updates in real-time
      */
     fun observeBudgetSpent(budget: Budget): Flow<Result<BudgetListItems.BudgetBudgetItem>> {
-        val (startOfMonth, endOfMonth) = DateRangeUtil.getCurrentMonthRange()
+        val (startOfMonth, endOfMonth) = DateUtil.getCurrentMonthRange()
         val budgetCategoryIds = budget.categories.map { it.id }.toSet()
         
         return transactionRepository.observeTransactionsForUserInDateRange(

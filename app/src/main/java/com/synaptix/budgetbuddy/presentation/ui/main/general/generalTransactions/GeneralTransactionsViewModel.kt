@@ -1,13 +1,12 @@
 package com.synaptix.budgetbuddy.presentation.ui.main.general.generalTransactions
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.synaptix.budgetbuddy.core.model.Transaction
 import com.synaptix.budgetbuddy.core.model.Wallet
 import com.synaptix.budgetbuddy.core.usecase.auth.GetUserIdUseCase
 import com.synaptix.budgetbuddy.core.usecase.main.transaction.GetTransactionsUseCase
-import com.synaptix.budgetbuddy.core.usecase.main.wallet.GetWalletUseCase
+import com.synaptix.budgetbuddy.core.usecase.main.wallet.GetWalletsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -20,7 +19,7 @@ import javax.inject.Inject
 class GeneralTransactionsViewModel @Inject constructor(
     private val getTransactionsUseCase: GetTransactionsUseCase,
     private val getUserIdUseCase: GetUserIdUseCase,
-    private val getWalletUseCase: GetWalletUseCase
+    private val getWalletsUseCase: GetWalletsUseCase
 ) : ViewModel() {
 
     sealed class TransactionState {
@@ -71,7 +70,7 @@ class GeneralTransactionsViewModel @Inject constructor(
 
             _walletsState.value = WalletState.Loading
 
-            getWalletUseCase.execute(userId)
+            getWalletsUseCase.execute(userId)
                 .catch { e ->
                     _walletsState.value = WalletState.Error(
                         e.message ?: "Failed to load wallets"
@@ -79,10 +78,10 @@ class GeneralTransactionsViewModel @Inject constructor(
                 }
                 .collect { result ->
                     _walletsState.value = when (result) {
-                        is GetWalletUseCase.GetWalletResult.Success -> {
+                        is GetWalletsUseCase.GetWalletResult.Success -> {
                             WalletState.Success(result.wallets)
                         }
-                        is GetWalletUseCase.GetWalletResult.Error -> {
+                        is GetWalletsUseCase.GetWalletResult.Error -> {
                             WalletState.Error("Failed to load wallets")
                         }
                     }

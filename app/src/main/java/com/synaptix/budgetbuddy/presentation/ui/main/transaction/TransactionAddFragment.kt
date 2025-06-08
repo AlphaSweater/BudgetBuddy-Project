@@ -1,54 +1,52 @@
 package com.synaptix.budgetbuddy.presentation.ui.main.transaction
 
 import android.content.ContentValues
+import android.graphics.BitmapFactory
+import android.net.Uri
 import android.os.Bundle
+import android.provider.MediaStore
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
+import android.widget.ImageView
 import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AlertDialog
+import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.core.content.ContextCompat
+import androidx.core.view.updateLayoutParams
+import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.navGraphViewModels
 import com.google.android.material.datepicker.MaterialDatePicker
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import com.synaptix.budgetbuddy.R
-import com.synaptix.budgetbuddy.databinding.FragmentTransactionAddBinding
-import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
-import android.graphics.BitmapFactory
-import android.net.Uri
-import android.provider.MediaStore
-import android.text.Editable
-import android.text.TextWatcher
-import android.util.Log
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AlertDialog
-import androidx.core.widget.doAfterTextChanged
 import com.synaptix.budgetbuddy.core.model.Category
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
-import android.widget.ImageView
-import androidx.navigation.navGraphViewModels
+import com.synaptix.budgetbuddy.core.model.Label
 import com.synaptix.budgetbuddy.core.model.RecurrenceData
 import com.synaptix.budgetbuddy.core.model.Wallet
+import com.synaptix.budgetbuddy.databinding.FragmentTransactionAddBinding
 import com.synaptix.budgetbuddy.extentions.getThemeColor
-import kotlin.toString
-import com.synaptix.budgetbuddy.core.model.Label
 import com.synaptix.budgetbuddy.presentation.ui.main.transaction.TransactionAddViewModel.ScreenMode
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.text.DecimalFormat
-import androidx.coordinatorlayout.widget.CoordinatorLayout
-import androidx.core.content.ContextCompat
-import androidx.core.view.updateLayoutParams
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.util.Date
+import java.util.Locale
 
 @AndroidEntryPoint
 class TransactionAddFragment : Fragment() {
@@ -84,7 +82,6 @@ class TransactionAddFragment : Fragment() {
         observeViewModel()
 
         applyScreenMode(transactionAddViewModel.screenMode.value)
-        populateInitialFormValues()
     }
 
     override fun onDestroyView() {
@@ -93,7 +90,7 @@ class TransactionAddFragment : Fragment() {
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-    // Initial Setup Methods
+    // View Setup
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private fun setupViews() {
         setupCurrencySpinner()
@@ -139,18 +136,15 @@ class TransactionAddFragment : Fragment() {
                     }
 
                     if (parsed.compareTo(BigDecimal.ZERO) == 0) {
-                        // Reset everything if value is exactly zero
                         current = ""
                         binding.edtTextAmount.setText("")
                         transactionAddViewModel.setAmount(0.0)
                         updateAmountAppearance(0.0)
                     } else {
                         val formatted = DecimalFormat("#,##0.00").format(parsed)
-
                         current = formatted
                         binding.edtTextAmount.setText(formatted)
                         binding.edtTextAmount.setSelection(formatted.length)
-
                         transactionAddViewModel.setAmount(parsed.toDouble())
                         updateAmountAppearance(parsed.toDouble())
                     }
@@ -207,8 +201,12 @@ class TransactionAddFragment : Fragment() {
 
         // Update appearance
         updateAmountAppearance(amount)
+        updateCategoryAppearance(transactionAddViewModel.category.value)
+        updateWalletAppearance(transactionAddViewModel.wallet.value)
+        updateDateAppearance(transactionAddViewModel.date.value)
+        updateRecurrenceAppearance(transactionAddViewModel.recurrenceData.value)
+        updateLabelsAppearance(transactionAddViewModel.selectedLabels.value)
     }
-
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     // Screen Mode Handling
@@ -257,7 +255,6 @@ class TransactionAddFragment : Fragment() {
             enableAllInteractiveElements()
             btnRemovePhoto.visibility = if (transactionAddViewModel.imageBytes.value != null) View.VISIBLE else View.GONE
         }
-        setupClickListeners()
     }
 
     private fun applyCreateMode() {
@@ -279,26 +276,6 @@ class TransactionAddFragment : Fragment() {
             enableAllInteractiveElements()
             btnRemovePhoto.visibility = if (transactionAddViewModel.imageBytes.value != null) View.VISIBLE else View.GONE
         }
-        setupClickListeners()
-    }
-
-    private fun findCrocIcons(): List<ImageView> {
-        val crocIcons = mutableListOf<ImageView>()
-        
-        // Find all ImageViews in the root view
-        fun findImageViews(view: View) {
-            if (view is ImageView && view.drawable?.constantState == resources.getDrawable(R.drawable.ic_ui_croc_right, null).constantState) {
-                crocIcons.add(view)
-            }
-            if (view is ViewGroup) {
-                for (i in 0 until view.childCount) {
-                    findImageViews(view.getChildAt(i))
-                }
-            }
-        }
-        
-        findImageViews(binding.root)
-        return crocIcons
     }
 
     private fun disableAllInteractiveElements() {
@@ -641,12 +618,18 @@ class TransactionAddFragment : Fragment() {
                 binding.loadingOverlay.visibility = View.VISIBLE
                 binding.progressBar.visibility = View.VISIBLE
                 binding.successCheckmark.visibility = View.GONE
-                binding.loadingText.text = "Saving transaction..."
+                binding.loadingText.text = when (transactionAddViewModel.screenMode.value) {
+                    TransactionAddViewModel.ScreenMode.EDIT -> "Updating transaction..."
+                    else -> "Saving transaction..."
+                }
             }
             is TransactionAddViewModel.SavingUiState.Success -> {
                 binding.progressBar.visibility = View.GONE
                 binding.successCheckmark.visibility = View.VISIBLE
-                binding.loadingText.text = "Transaction saved successfully!"
+                binding.loadingText.text = when (transactionAddViewModel.screenMode.value) {
+                    TransactionAddViewModel.ScreenMode.EDIT -> "Transaction updated successfully!"
+                    else -> "Transaction saved successfully!"
+                }
                 
                 viewLifecycleOwner.lifecycleScope.launch {
                     delay(1000)
@@ -852,10 +835,10 @@ class TransactionAddFragment : Fragment() {
                 switchToViewMode()
             }
             .setNegativeButton("Cancel", null)
-            .create() // Get the dialog instance
+            .create()
 
         dialog.setOnShowListener {
-            // Set button colors here
+            // Set button colors
             dialog.getButton(AlertDialog.BUTTON_POSITIVE)?.setTextColor(
                 ContextCompat.getColor(requireContext(), R.color.expense_red)
             )
@@ -881,14 +864,33 @@ class TransactionAddFragment : Fragment() {
     private fun observeViewModel() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                launch { transactionAddViewModel.loadingUiState.collect { handleLoadingUiState(it) } }
-                launch { transactionAddViewModel.savingUiState.collect { handleSavingUiState(it) } }
-                launch { transactionAddViewModel.validationState.collect { handleValidationState(it) } }
-                launch { transactionAddViewModel.category.collect { updateSelectedCategory(it) } }
-                launch { transactionAddViewModel.wallet.collect { updateSelectedWallet(it) } }
-                launch { transactionAddViewModel.date.collect { updateSelectedDate(it) } }
-                launch { transactionAddViewModel.recurrenceData.collect { updateSelectedRecurrence(it) } }
-                launch { transactionAddViewModel.selectedLabels.collect { updateSelectedLabels(it) } }
+                launch { transactionAddViewModel.screenMode.collect { mode ->
+                    applyScreenMode(mode)
+                } }
+                launch { transactionAddViewModel.loadingUiState.collect { state ->
+                    handleLoadingUiState(state)
+                } }
+                launch { transactionAddViewModel.savingUiState.collect { state ->
+                    handleSavingUiState(state)
+                } }
+                launch { transactionAddViewModel.validationState.collect { state ->
+                    handleValidationState(state)
+                } }
+                launch { transactionAddViewModel.category.collect { category ->
+                    updateSelectedCategory(category)
+                } }
+                launch { transactionAddViewModel.wallet.collect { wallet ->
+                    updateSelectedWallet(wallet)
+                } }
+                launch { transactionAddViewModel.date.collect { date ->
+                    updateSelectedDate(date)
+                } }
+                launch { transactionAddViewModel.recurrenceData.collect { recurrence ->
+                    updateSelectedRecurrence(recurrence)
+                } }
+                launch { transactionAddViewModel.selectedLabels.collect { labels ->
+                    updateSelectedLabels(labels)
+                } }
                 launch { transactionAddViewModel.imageBytes.collect { bytes ->
                     if (bytes != null) {
                         val bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
@@ -899,7 +901,7 @@ class TransactionAddFragment : Fragment() {
                     } else {
                         binding.imagePreview.visibility = View.GONE
                     }
-                }}
+                } }
             }
         }
     }
