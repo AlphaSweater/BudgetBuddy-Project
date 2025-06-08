@@ -375,19 +375,28 @@ class CategoryAddNewFragment : Fragment() {
 
         // Update appearance
         updateCategoryAppearance()
-        //TODO Updated selected color and icon
+
+        // Set selected color and icon in adapters if in EDIT mode
+        if (viewModel.screenMode.value == CategoryAddNewViewModel.ScreenMode.EDIT) {
+            viewModel.selectedColor.value?.let { color ->
+                colorAdapter.setSelectedItem(color)
+            }
+            viewModel.selectedIcon.value?.let { icon ->
+                iconAdapter.setSelectedItem(icon)
+            }
+        }
     }
 
     private fun updateCategoryAppearance() {
         binding.apply {
-            val selectedColor = viewModel.category.value?.color
-            val selectedIcon = viewModel.category.value?.icon
+            val selectedColor = viewModel.selectedColor.value
+            val selectedIcon = viewModel.selectedIcon.value
 
             if (selectedColor == null || selectedIcon == null) {
                 previewIcon.setColorFilter(requireContext().getThemeColor(R.attr.bb_accent))
             } else {
-                previewIcon.setColorFilter(requireContext().getColor(selectedColor))
-                previewIcon.setImageResource(selectedIcon)
+                previewIcon.setColorFilter(requireContext().getColor(selectedColor.colorResourceId))
+                previewIcon.setImageResource(selectedIcon.iconResourceId)
             }
         }
     }
