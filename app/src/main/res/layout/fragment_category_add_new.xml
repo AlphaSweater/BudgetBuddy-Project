@@ -21,11 +21,11 @@
 <!--    * https://www.youtube.com/watch?v=A_tPafV23DM&list=PLPgs125_L-X9H6J7x4beRU-AxJ4mXe5vX-->
 <!--    ======================================================================================-->
 
-<androidx.coordinatorlayout.widget.CoordinatorLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
     android:background="?attr/bb_background">
 
     <!-- Top App Bar -->
@@ -217,12 +217,14 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:clipToPadding="false"
-                    android:minHeight="90dp"
-                    android:orientation="horizontal"
+                    android:minHeight="64dp"
                     android:paddingHorizontal="8dp"
-                    android:paddingVertical="16dp"
-                    app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
-                    app:spanCount="2"/>
+                    android:paddingVertical="8dp"
+                    android:overScrollMode="never"
+                    android:orientation="horizontal"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                    tools:listitem="@layout/item_category_item"/>
+
             </com.google.android.material.card.MaterialCardView>
 
             <TextView
@@ -257,11 +259,14 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:clipToPadding="false"
-                    android:minHeight="160dp"
                     android:paddingHorizontal="8dp"
-                    android:paddingVertical="16dp"
+                    android:paddingVertical="8dp"
+                    android:overScrollMode="never"
+                    android:orientation="horizontal"
                     app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
-                    app:spanCount="4"/>
+                    app:spanCount="2"
+                    tools:listitem="@layout/item_category_item"/>
+
             </com.google.android.material.card.MaterialCardView>
 
             <TextView

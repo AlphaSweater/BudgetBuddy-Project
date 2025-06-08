@@ -12,6 +12,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import com.synaptix.budgetbuddy.R
 import com.synaptix.budgetbuddy.databinding.FragmentCategoryAddNewBinding
@@ -72,7 +73,7 @@ class CategoryAddNewFragment : Fragment() {
             }
         }
         binding.recyclerViewColors.apply {
-            layoutManager = GridLayoutManager(requireContext(), 4)
+            layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
             adapter = colorAdapter
         }
 
@@ -82,7 +83,9 @@ class CategoryAddNewFragment : Fragment() {
             }
         }
         binding.recyclerViewIcons.apply {
-            layoutManager = GridLayoutManager(requireContext(), 4)
+            layoutManager = GridLayoutManager(requireContext(), 2).apply {
+                orientation = LinearLayoutManager.HORIZONTAL
+            }
             adapter = iconAdapter
         }
     }
