@@ -19,6 +19,7 @@ import android.text.Editable
 import android.text.TextWatcher
 import androidx.core.widget.doAfterTextChanged
 import com.google.android.material.snackbar.Snackbar
+import androidx.navigation.navGraphViewModels
 
 @AndroidEntryPoint
 class WalletAddFragment : Fragment() {
@@ -26,7 +27,7 @@ class WalletAddFragment : Fragment() {
     private var _binding: FragmentWalletAddBinding? = null
     private val binding get() = _binding!!
 
-    private val viewModel: WalletAddViewModel by viewModels()
+    private val sharedViewModel: WalletAddViewModel by navGraphViewModels(R.id.ind_wallet_navigation_graph) { defaultViewModelProviderFactory }
 
     // --- Lifecycle ---
     override fun onCreateView(
