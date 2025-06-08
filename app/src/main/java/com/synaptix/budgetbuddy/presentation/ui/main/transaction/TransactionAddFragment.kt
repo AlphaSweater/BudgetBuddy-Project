@@ -26,6 +26,7 @@ import android.net.Uri
 import android.provider.MediaStore
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.core.widget.doAfterTextChanged
@@ -582,9 +583,6 @@ class TransactionAddFragment : Fragment() {
     // Form Handling
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private fun saveTransaction() {
-        val amount = binding.edtTextAmount.text.toString().toDoubleOrNull()
-        transactionAddViewModel.setAmount(amount)
-
         val date = binding.textSelectedDate.text.toString()
         transactionAddViewModel.setDate(date)
 

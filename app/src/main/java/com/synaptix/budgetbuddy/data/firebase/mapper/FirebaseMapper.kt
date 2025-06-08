@@ -31,6 +31,8 @@ object FirebaseMapper {
         name = name,
         currency = currency,
         balance = balance,
+        minGoal = minGoal,
+        maxGoal = maxGoal,
         excludeFromTotal = excludeFromTotal,
         lastTransactionAt = lastTransactionAt
     )
@@ -41,6 +43,8 @@ object FirebaseMapper {
         name = name,
         currency = currency,
         balance = balance,
+        minGoal = minGoal,
+        maxGoal = maxGoal,
         excludeFromTotal = excludeFromTotal,
         lastTransactionAt = lastTransactionAt
     )
