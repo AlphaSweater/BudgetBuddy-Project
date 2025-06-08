@@ -31,6 +31,8 @@ data class Wallet(
     val name: String,
     val currency: String = "ZAR",
     val balance: Double = 0.0,
+    val minGoal: Double = 0.0,
+    val maxGoal: Double = 0.0,
     val excludeFromTotal: Boolean = false,
     val lastTransactionAt: Long? = null
 ) : Entity {
@@ -40,6 +42,8 @@ data class Wallet(
             name: String,
             currency: String = "ZAR",
             balance: Double = 0.0,
+            minGoal: Double = 0.0,
+            maxGoal: Double = 0.0,
             excludeFromTotal: Boolean = false,
             lastTransactionAt: Long? = null
         ): Wallet = Wallet(
@@ -48,6 +52,8 @@ data class Wallet(
             name = name,
             currency = currency,
             balance = balance,
+            minGoal = minGoal,
+            maxGoal = maxGoal,
             excludeFromTotal = excludeFromTotal,
             lastTransactionAt = lastTransactionAt
         )

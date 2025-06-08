@@ -106,6 +106,12 @@ class WalletAddFragment : Fragment() {
         val walletAmount = binding.edtTextAmount.text.toString()
         viewModel.setWalletAmount(walletAmount)
 
+        val walletMinGoal = binding.edtMinAmount.text.toString()
+        viewModel.setWalletMinGoal(walletMinGoal)
+
+        val walletMaxGoal = binding.edtMaxAmount.text.toString()
+        viewModel.setWalletMaxGoal(walletMaxGoal)
+
         val walletCurrency = binding.spinnerCurrency.selectedItem.toString()
         viewModel.setWalletCurrency(walletCurrency)
 

@@ -11,6 +11,8 @@ data class WalletDTO(
     val name: String = "",
     val currency: String = "ZAR", // Default to ZAR
     val balance: Double = 0.0,
+    val minGoal: Double = 0.0,
+    val maxGoal: Double = 0.0,
     val excludeFromTotal: Boolean = false,
     val createdAt: Long = System.currentTimeMillis(),
     val updatedAt: Long = System.currentTimeMillis(),

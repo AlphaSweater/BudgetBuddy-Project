@@ -30,9 +30,13 @@ class WalletAddViewModel @Inject constructor(
         val isWalletNameValid: Boolean = false,
         val isWalletCurrencyValid: Boolean = false,
         val isWalletAmountValid: Boolean = false,
+        val isWalletMinGoalValid: Boolean = false,
+        val isWalletMaxGoalValid: Boolean = false,
         val walletNameError: String? = null,
         val walletCurrencyError: String? = null,
         val walletAmountError: String? = null,
+        val walletMinGoalError: String? = null,
+        val walletMaxGoalError: String? = null,
         val shouldShowErrors: Boolean = false
     )
 
@@ -51,6 +55,12 @@ class WalletAddViewModel @Inject constructor(
 
     private val _walletAmount = MutableStateFlow(0.0)
     val walletAmount: StateFlow<Double> = _walletAmount
+
+    private val _walletMinGoal = MutableStateFlow(0.0)
+    val walletMinGoal: StateFlow<Double> = _walletMinGoal
+
+    private val _walletMaxGoal = MutableStateFlow(0.0)
+    val walletMaxGoal: StateFlow<Double> = _walletMaxGoal
 
     private val _enableNotifications = MutableStateFlow(true)
     val enableNotifications: StateFlow<Boolean> = _enableNotifications
@@ -73,6 +83,16 @@ class WalletAddViewModel @Inject constructor(
         validateForm()
     }
 
+    fun setWalletMinGoal(minGoal: String) {
+        _walletMinGoal.value = minGoal.toDoubleOrNull() ?: 0.0
+        validateForm()
+    }
+
+    fun setWalletMaxGoal(maxGoal: String) {
+        _walletMaxGoal.value = maxGoal.toDoubleOrNull() ?: 0.0
+        validateForm()
+    }
+
     fun updateEnableNotifications(enabled: Boolean) {
         _enableNotifications.value = enabled
     }
@@ -86,21 +106,30 @@ class WalletAddViewModel @Inject constructor(
         val name = _walletName.value
         val currency = _walletCurrency.value
         val amount = _walletAmount.value
+        val minGoal = _walletMinGoal.value
+        val maxGoal = _walletMaxGoal.value
 
         val (isWalletNameValid, walletNameError) = validateWalletName(name)
         val (isWalletCurrencyValid, walletCurrencyError) = validateWalletCurrency(currency)
         val (isWalletAmountValid, walletAmountError) = validateWalletAmount(amount)
+        val (isWalletMinGoalValid, walletMinGoalError) = validateWalletMinGoal(minGoal)
+        val (isWalletMaxGoalValid, walletMaxGoalError) = validateWalletMaxGoal(maxGoal)
+
 
         _validationState.value = _validationState.value.copy(
             isWalletNameValid = isWalletNameValid,
             isWalletCurrencyValid = isWalletCurrencyValid,
             isWalletAmountValid = isWalletAmountValid,
+            isWalletMinGoalValid = isWalletMinGoalValid,
+            isWalletMaxGoalValid = isWalletMaxGoalValid,
             walletNameError = walletNameError,
             walletCurrencyError = walletCurrencyError,
-            walletAmountError = walletAmountError
+            walletAmountError = walletAmountError,
+            walletMinGoalError = walletMinGoalError,
+            walletMaxGoalError = walletMaxGoalError
         )
 
-        return isWalletNameValid && isWalletCurrencyValid && isWalletAmountValid
+        return isWalletNameValid && isWalletCurrencyValid && isWalletAmountValid && isWalletMinGoalValid && isWalletMaxGoalValid
     }
 
     private fun validateWalletName(name: String) : Pair<Boolean, String?> {
@@ -118,6 +147,18 @@ class WalletAddViewModel @Inject constructor(
     private fun validateWalletAmount(amount: Double) : Pair<Boolean, String?> {
         val isValid = amount > 0
         val error = if (isValid) null else "Wallet amount must be greater than 0"
+        return Pair(isValid, error)
+    }
+
+    private fun validateWalletMinGoal(minGoal: Double) : Pair<Boolean, String?> {
+        val isValid = minGoal >= 0
+        val error = if (isValid) null else "Minimum goal must be 0 or greater"
+        return Pair(isValid, error)
+    }
+
+    private fun validateWalletMaxGoal(maxGoal: Double) : Pair<Boolean, String?> {
+        val isValid = maxGoal >= 0
+        val error = if (isValid) null else "Maximum goal must be 0 or greater"
         return Pair(isValid, error)
     }
 
@@ -149,6 +190,8 @@ class WalletAddViewModel @Inject constructor(
                     name = _walletName.value,
                     currency = _walletCurrency.value,
                     balance = _walletAmount.value,
+                    minGoal = _walletMinGoal.value,
+                    maxGoal = _walletMaxGoal.value,
                     excludeFromTotal = _excludeFromTotal.value
                 )
 
@@ -180,6 +223,8 @@ class WalletAddViewModel @Inject constructor(
         _walletName.value = ""
         _walletCurrency.value = "ZAR"
         _walletAmount.value = 0.0
+        _walletMinGoal.value = 0.0
+        _walletMaxGoal.value = 0.0
         _enableNotifications.value = true
         _excludeFromTotal.value = false
         _validationState.value = ValidationState(shouldShowErrors = false)
