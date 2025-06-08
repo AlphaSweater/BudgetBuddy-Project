@@ -260,18 +260,18 @@ class CategoryAddNewFragment : Fragment() {
     /**
      * Handles the UI state changes from the ViewModel.
      */
-    private fun handleUiState(state: CategoryAddNewViewModel.UiState) {
+    private fun handleUiState(state: CategoryAddNewViewModel.SavingUiState) {
         when (state) {
-            is CategoryAddNewViewModel.UiState.Loading -> {
+            is CategoryAddNewViewModel.SavingUiState.Saving -> {
                 binding.btnCreate.isEnabled = false
                 showLoading(true)
             }
-            is CategoryAddNewViewModel.UiState.Success -> {
+            is CategoryAddNewViewModel.SavingUiState.Success -> {
                 showLoading(false)
                 showSuccess("Category added successfully")
                 findNavController().popBackStack()
             }
-            is CategoryAddNewViewModel.UiState.Error -> {
+            is CategoryAddNewViewModel.SavingUiState.Error -> {
                 binding.btnCreate.isEnabled = false
                 showLoading(false)
                 showError(state.message)
@@ -351,7 +351,7 @@ class CategoryAddNewFragment : Fragment() {
 
                 // UI State
                 launch {
-                    viewModel.uiState.collect { state ->
+                    viewModel.savingUiState.collect { state ->
                         handleUiState(state)
                     }
                 }
