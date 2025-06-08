@@ -22,15 +22,21 @@ import kotlinx.coroutines.launch
 @AndroidEntryPoint
 class CategoryAddNewFragment : Fragment() {
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // Properties
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private var _binding: FragmentCategoryAddNewBinding? = null
     private val binding get() = _binding!!
 
     private val viewModel: CategoryAddNewViewModel by viewModels()
-    private lateinit var colorAdapter: ColorAdapter
-    private lateinit var iconAdapter: IconAdapter
+    private lateinit var colorAdapter: CategoryItemAdapter
+    private lateinit var iconAdapter: CategoryItemAdapter
 
     private var isUpdatingFromUser = false
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // Fragment Lifecycle
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -42,22 +48,38 @@ class CategoryAddNewFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setupAdapters()
-        setupListeners()
+        setupViews()
         observeViewModel()
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // Initial Setup Methods
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    private fun setupViews() {
+        setupAdapters()
+        setupListeners()
+    }
+
     private fun setupAdapters() {
-        colorAdapter = ColorAdapter { color ->
-            viewModel.setSelectedColor(color)
+        colorAdapter = CategoryItemAdapter { item ->
+            if (item is CategoryItem.ColorItem) {
+                viewModel.setSelectedColor(item)
+            }
         }
         binding.recyclerViewColors.apply {
             layoutManager = GridLayoutManager(requireContext(), 4)
             adapter = colorAdapter
         }
 
-        iconAdapter = IconAdapter { icon ->
-            viewModel.setSelectedIcon(icon)
+        iconAdapter = CategoryItemAdapter { item ->
+            if (item is CategoryItem.IconItem) {
+                viewModel.setSelectedIcon(item)
+            }
         }
         binding.recyclerViewIcons.apply {
             layoutManager = GridLayoutManager(requireContext(), 4)
@@ -91,6 +113,70 @@ class CategoryAddNewFragment : Fragment() {
         }
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // UI State Handlers
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    private fun handleUiState(state: CategoryAddNewViewModel.UiState) {
+        when (state) {
+            is CategoryAddNewViewModel.UiState.Loading -> {
+                binding.btnCreate.isEnabled = false
+            }
+            is CategoryAddNewViewModel.UiState.Success -> {
+                showSuccess("Category added successfully")
+                findNavController().popBackStack()
+            }
+            is CategoryAddNewViewModel.UiState.Error -> {
+                binding.btnCreate.isEnabled = false
+                showError(state.message)
+            }
+            else -> {
+                binding.btnCreate.isEnabled = true
+            }
+        }
+    }
+
+    private fun handleValidationState(state: CategoryAddNewViewModel.ValidationState) {
+        with(binding) {
+            textNameError.apply {
+                text = state.nameError
+                visibility = if (state.shouldShowErrors && state.nameError != null) View.VISIBLE else View.GONE
+            }
+
+            textTypeError.apply {
+                text = state.typeError
+                visibility = if (state.shouldShowErrors && state.typeError != null) View.VISIBLE else View.GONE
+            }
+
+            textColorError.apply {
+                text = state.colorError
+                visibility = if (state.shouldShowErrors && state.colorError != null) View.VISIBLE else View.GONE
+            }
+
+            textIconError.apply {
+                text = state.iconError
+                visibility = if (state.shouldShowErrors && state.iconError != null) View.VISIBLE else View.GONE
+            }
+        }
+    }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // Helper Methods
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    private fun showError(message: String) {
+        Snackbar.make(binding.root, message, Snackbar.LENGTH_SHORT)
+            .setBackgroundTint(resources.getColor(R.color.error, null))
+            .show()
+    }
+
+    private fun showSuccess(message: String) {
+        Snackbar.make(binding.root, message, Snackbar.LENGTH_SHORT)
+            .setBackgroundTint(resources.getColor(R.color.success, null))
+            .show()
+    }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // ViewModel Observers
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private fun observeViewModel() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -113,8 +199,8 @@ class CategoryAddNewFragment : Fragment() {
                     viewModel.categoryName.collect { name ->
                         if (!isUpdatingFromUser && binding.categoryNameInput.text.toString() != name) {
                             binding.categoryNameInput.setText(name)
-                            }
                         }
+                    }
                 }
 
                 launch {
@@ -143,77 +229,16 @@ class CategoryAddNewFragment : Fragment() {
                 // Collect available options
                 launch {
                     viewModel.colors.collect { colors ->
-                        colorAdapter.submitList(colors)
+                        colorAdapter.submitList(colors.map { CategoryItem.ColorItem(it.colorResourceId, it.name) })
                     }
                 }
 
                 launch {
                     viewModel.icons.collect { icons ->
-                        iconAdapter.submitList(icons)
+                        iconAdapter.submitList(icons.map { CategoryItem.IconItem(it.iconResourceId, it.name) })
                     }
                 }
             }
         }
-    }
-
-    private fun handleUiState(state: CategoryAddNewViewModel.UiState) {
-        when (state) {
-            is CategoryAddNewViewModel.UiState.Loading -> {
-                binding.btnCreate.isEnabled = false
-            }
-            is CategoryAddNewViewModel.UiState.Success -> {
-                showSuccess("Category added successfully")
-                findNavController().popBackStack()
-            }
-            is CategoryAddNewViewModel.UiState.Error -> {
-                binding.btnCreate.isEnabled = false
-                showError(state.message)
-            }
-            else -> {
-                binding.btnCreate.isEnabled = true
-            }
-        }
-    }
-
-    private fun handleValidationState(state: CategoryAddNewViewModel.ValidationState) {
-        with(binding) {
-            // Show/hide error messages for each field
-            textNameError.apply {
-                text = state.nameError
-                visibility = if (state.shouldShowErrors && state.nameError != null) View.VISIBLE else View.GONE
-            }
-
-            textTypeError.apply {
-                text = state.typeError
-                visibility = if (state.shouldShowErrors && state.typeError != null) View.VISIBLE else View.GONE
-            }
-
-            textColorError.apply {
-                text = state.colorError
-                visibility = if (state.shouldShowErrors && state.colorError != null) View.VISIBLE else View.GONE
-            }
-
-            textIconError.apply {
-                text = state.iconError
-                visibility = if (state.shouldShowErrors && state.iconError != null) View.VISIBLE else View.GONE
-            }
-        }
-    }
-
-    private fun showError(message: String) {
-        Snackbar.make(binding.root, message, Snackbar.LENGTH_SHORT)
-            .setBackgroundTint(resources.getColor(R.color.error, null))
-            .show()
-    }
-
-    private fun showSuccess(message: String) {
-        Snackbar.make(binding.root, message, Snackbar.LENGTH_SHORT)
-            .setBackgroundTint(resources.getColor(R.color.success, null))
-            .show()
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
     }
 }
