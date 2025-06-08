@@ -7,7 +7,7 @@ import java.time.temporal.TemporalAdjusters
 /**
  * Utility class for common date range calculations
  */
-object DateRangeUtil {
+object DateUtil {
     /**
      * Gets the start and end timestamps for the current month
      * @return Pair of (startOfMonth, endOfMonth) timestamps in milliseconds

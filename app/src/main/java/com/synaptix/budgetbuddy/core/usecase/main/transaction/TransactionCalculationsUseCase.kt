@@ -3,7 +3,7 @@ package com.synaptix.budgetbuddy.core.usecase.main.transaction
 import com.synaptix.budgetbuddy.core.model.Category
 import com.synaptix.budgetbuddy.core.model.HomeItems
 import com.synaptix.budgetbuddy.core.model.Result
-import com.synaptix.budgetbuddy.core.util.DateRangeUtil
+import com.synaptix.budgetbuddy.core.util.DateUtil
 import com.synaptix.budgetbuddy.data.firebase.model.TransactionDTO
 import com.synaptix.budgetbuddy.data.firebase.repository.FirestoreCategoryRepository
 import com.synaptix.budgetbuddy.data.firebase.repository.FirestoreTransactionRepository
@@ -32,7 +32,7 @@ class TransactionCalculationsUseCase @Inject constructor(
     suspend fun calculateTotalTransactionsSummary(userId: String): Result<HomeItems.TransactionsSummary> = try {
         require(userId.isNotEmpty()) { "Invalid user ID" }
 
-        val (startOfMonth, endOfMonth) = DateRangeUtil.getCurrentMonthRange()
+        val (startOfMonth, endOfMonth) = DateUtil.getCurrentMonthRange()
         val transactions = transactionRepository.getTransactionsForUserInDateRange(
             userId = userId,
             startDate = startOfMonth,
@@ -72,7 +72,7 @@ class TransactionCalculationsUseCase @Inject constructor(
     ): Result<Map<String, HomeItems.CategoryTransactionsSummary>> = try {
         require(userId.isNotEmpty()) { "Invalid user ID" }
 
-        val (startOfMonth, endOfMonth) = DateRangeUtil.getCurrentMonthRange()
+        val (startOfMonth, endOfMonth) = DateUtil.getCurrentMonthRange()
         val transactions = transactionRepository.getTransactionsForUserInDateRange(
             userId = userId,
             startDate = startOfMonth,
@@ -104,7 +104,7 @@ class TransactionCalculationsUseCase @Inject constructor(
             return flow { emit(Result.Error(IllegalArgumentException("Invalid user ID"))) }
         }
 
-        val (startOfMonth, endOfMonth) = DateRangeUtil.getCurrentMonthRange()
+        val (startOfMonth, endOfMonth) = DateUtil.getCurrentMonthRange()
 
         return transactionRepository.observeTransactionsForUserInDateRange(
             userId = userId,
@@ -151,7 +151,7 @@ class TransactionCalculationsUseCase @Inject constructor(
             return flow { emit(Result.Error(IllegalArgumentException("Invalid user ID"))) }
         }
 
-        val (startOfMonth, endOfMonth) = DateRangeUtil.getCurrentMonthRange()
+        val (startOfMonth, endOfMonth) = DateUtil.getCurrentMonthRange()
 
         return transactionRepository.observeTransactionsForUserInDateRange(
             userId = userId,
