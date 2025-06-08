@@ -122,12 +122,15 @@ class CategoryAddNewFragment : Fragment() {
             viewModel.setCategoryType("Income")
         }
 
-        // Navigation
+        // Navigation and actions
         binding.btnGoBack.setOnClickListener {
             findNavController().navigateUp()
         }
 
-        // Category creation
+        binding.btnClear.setOnClickListener {
+            viewModel.reset()
+        }
+
         binding.btnCreate.setOnClickListener {
             viewModel.createCategory()
         }
@@ -143,17 +146,21 @@ class CategoryAddNewFragment : Fragment() {
         when (state) {
             is CategoryAddNewViewModel.UiState.Loading -> {
                 binding.btnCreate.isEnabled = false
+                showLoading(true)
             }
             is CategoryAddNewViewModel.UiState.Success -> {
+                showLoading(false)
                 showSuccess("Category added successfully")
                 findNavController().popBackStack()
             }
             is CategoryAddNewViewModel.UiState.Error -> {
                 binding.btnCreate.isEnabled = false
+                showLoading(false)
                 showError(state.message)
             }
             else -> {
                 binding.btnCreate.isEnabled = true
+                showLoading(false)
             }
         }
     }
@@ -188,15 +195,23 @@ class CategoryAddNewFragment : Fragment() {
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     // UI Helpers
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-    private fun showError(message: String) {
-        Snackbar.make(binding.root, message, Snackbar.LENGTH_SHORT)
-            .setBackgroundTint(resources.getColor(R.color.error, null))
-            .show()
+    private fun showLoading(show: Boolean) {
+        binding.loadingOverlay.visibility = if (show) View.VISIBLE else View.GONE
+        binding.progressBar.visibility = if (show) View.VISIBLE else View.GONE
+        binding.successCheckmark.visibility = View.GONE
+        binding.loadingText.text = "Creating category..."
     }
 
     private fun showSuccess(message: String) {
+        binding.loadingOverlay.visibility = View.VISIBLE
+        binding.progressBar.visibility = View.GONE
+        binding.successCheckmark.visibility = View.VISIBLE
+        binding.loadingText.text = message
+    }
+
+    private fun showError(message: String) {
         Snackbar.make(binding.root, message, Snackbar.LENGTH_SHORT)
-            .setBackgroundTint(resources.getColor(R.color.success, null))
+            .setBackgroundTint(resources.getColor(R.color.error, null))
             .show()
     }
 
