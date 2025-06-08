@@ -16,8 +16,7 @@ import javax.inject.Inject
 class GetBudgetsUseCase @Inject constructor(
     private val budgetRepository: FirestoreBudgetRepository,
     private val userRepository: FirestoreUserRepository,
-    private val categoryRepository: FirestoreCategoryRepository,
-    private val calculateBudgetSpentUseCase: CalculateBudgetSpentUseCase
+    private val categoryRepository: FirestoreCategoryRepository
 ) {
     sealed class GetBudgetsResult {
         data class Success(val budgets: List<Budget>) : GetBudgetsResult()

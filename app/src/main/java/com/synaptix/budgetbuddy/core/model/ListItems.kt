@@ -62,6 +62,30 @@ sealed class HomeListItems {
  * Contains items specific to budget report display.
  */
 sealed class BudgetListItems {
+
+    /**
+     * Represents the total budgets values
+     */
+    data class TotalBudgetsSummary(
+        val totalBudgets: Int,
+        val totalBudgeted: Double,
+        val totalSpent: Double,
+        val totalRemaining: Double
+    ) :BudgetListItems()
+
+    /**
+     * Represents a budget item in the budget report.
+     * Maintains the original Budget object while adding UI-specific data.
+     */
+    data class BudgetBudgetItem(
+        // The original Budget object
+        val budget: Budget,
+
+        val budgetedAmount: Double,
+        val spentAmount: Double,
+        val remainingAmount: Double,
+    ) : BudgetListItems()
+
     /**
      * Represents a date header in the budget report.
      * Contains UI-specific date formatting and total amount.
@@ -113,20 +137,6 @@ sealed class BudgetListItems {
 
         // The relative date for the category item
         val relativeDate: String,
-    ) : BudgetListItems()
-
-    /**
-     * Represents a budget item in the budget report.
-     * Maintains the original Budget object while adding UI-specific data.
-     */
-    data class BudgetBudgetItem(
-        // The original Budget object
-        val budget: Budget,
-
-        val spent: Double,
-
-        // The status of the budget (e.g., 'Completed', 'Pending')
-        val status: String,
     ) : BudgetListItems()
 
     /**

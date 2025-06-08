@@ -33,7 +33,6 @@ import com.synaptix.budgetbuddy.R
 import com.synaptix.budgetbuddy.core.model.Budget
 import com.synaptix.budgetbuddy.core.model.BudgetListItems
 import com.synaptix.budgetbuddy.presentation.ui.common.BaseAdapter
-import kotlinx.coroutines.flow.Flow
 import java.text.NumberFormat
 import java.util.Locale
 
@@ -94,13 +93,14 @@ class BudgetMainAdapter(
             budgetTitle.text = item.budget.name
 
             val context = itemView.context
-            val spent = item.spent
-            val amount = item.budget.amount
+            val spentAmount = item.spentAmount
+            val budgetedAmount = item.budgetedAmount
+            val remainingAmount = item.remainingAmount
 
             // --- Setup status text with color ---
             val statusText = SpannableStringBuilder()
 
-            val spentStr = "R ${currencyFormat.format(spent)}"
+            val spentStr = "R ${currencyFormat.format(spentAmount)}"
             val spentStart = statusText.length
             statusText.append(spentStr)
             statusText.setSpan(
@@ -112,7 +112,7 @@ class BudgetMainAdapter(
 
             statusText.append(" spent of ")
 
-            val amountStr = "R ${currencyFormat.format(amount)}"
+            val amountStr = "R ${currencyFormat.format(budgetedAmount)}"
             val amountStart = statusText.length
             statusText.append(amountStr)
             statusText.setSpan(
@@ -125,8 +125,8 @@ class BudgetMainAdapter(
             budgetStatus.setText(statusText, TextView.BufferType.SPANNABLE)
 
             // --- Set progress ---
-            val progress = if (amount > 0) {
-                ((spent / amount) * 100).coerceIn(0.0, 100.0)
+            val progress = if (budgetedAmount > 0) {
+                ((spentAmount / budgetedAmount) * 100).coerceIn(0.0, 100.0)
             } else {
                 0.0
             }

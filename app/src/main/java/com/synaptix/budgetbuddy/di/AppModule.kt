@@ -28,11 +28,9 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.firestore
 import com.synaptix.budgetbuddy.core.usecase.auth.GetUserIdUseCase
 import com.synaptix.budgetbuddy.core.usecase.auth.LoginUserUseCase
-import com.synaptix.budgetbuddy.core.usecase.main.budget.CalculateBudgetSpentUseCase
 import com.synaptix.budgetbuddy.core.usecase.main.budget.GetBudgetsUseCase
 import com.synaptix.budgetbuddy.core.usecase.main.transaction.AddTransactionUseCase
 import com.synaptix.budgetbuddy.core.usecase.main.category.GetCategoriesUseCase
-import com.synaptix.budgetbuddy.core.usecase.main.display.TotalBudgetUseCase
 import com.synaptix.budgetbuddy.core.usecase.main.transaction.GetTransactionsUseCase
 import com.synaptix.budgetbuddy.core.usecase.main.transaction.UploadImageUseCase
 import com.synaptix.budgetbuddy.data.firebase.repository.FirestoreBudgetRepository
@@ -171,20 +169,14 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideGetBudgetsUseCase(budgetRepository: FirestoreBudgetRepository, userRepository: FirestoreUserRepository, categoryRepository: FirestoreCategoryRepository, calculateBudgetSpentUseCase: CalculateBudgetSpentUseCase): com.synaptix.budgetbuddy.core.usecase.main.budget.GetBudgetsUseCase {
-        return GetBudgetsUseCase(budgetRepository, userRepository, categoryRepository, calculateBudgetSpentUseCase)
+    fun provideGetBudgetsUseCase(budgetRepository: FirestoreBudgetRepository, userRepository: FirestoreUserRepository, categoryRepository: FirestoreCategoryRepository): com.synaptix.budgetbuddy.core.usecase.main.budget.GetBudgetsUseCase {
+        return GetBudgetsUseCase(budgetRepository, userRepository, categoryRepository)
     }
 
     @Provides
     @Singleton
     fun provideUploadImageUseCase() : UploadImageUseCase {
         return UploadImageUseCase()
-    }
-
-    @Provides
-    @Singleton
-    fun provideTotalBudgetUseCase(budgetRepository: FirestoreBudgetRepository, userRepository: FirestoreUserRepository, categoryRepository: FirestoreCategoryRepository, transactionRepository: FirestoreTransactionRepository): TotalBudgetUseCase {
-        return TotalBudgetUseCase(budgetRepository, userRepository, categoryRepository, transactionRepository)
     }
 }
 
