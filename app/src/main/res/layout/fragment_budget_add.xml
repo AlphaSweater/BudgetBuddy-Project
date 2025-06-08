@@ -21,276 +21,290 @@
 <!--    * https://www.youtube.com/watch?v=A_tPafV23DM&list=PLPgs125_L-X9H6J7x4beRU-AxJ4mXe5vX-->
 <!--    ======================================================================================-->
 
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="?attr/bb_background"
     tools:context=".presentation.ui.main.budget.budgetAdd.BudgetAddFragment">
 
-    <!-- Top Bar (Back Arrow + Title) -->
-    <LinearLayout
-        android:id="@+id/top_bar"
+    <!-- Top App Bar -->
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
-        android:layout_height="70dp"
-        android:orientation="horizontal"
-        android:gravity="center"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
-
-        <TextView
-            android:id="@+id/title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/add_new_budget"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:textColor="?attr/bb_primaryText"
-            android:layout_marginStart="16dp"/>
-    </LinearLayout>
-
-    <ImageButton
-        android:id="@+id/btnGoBack"
-        android:layout_width="44dp"
-        android:layout_height="44dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:background="@null"
-        android:contentDescription="@string/back"
-        android:src="?attr/actionModeCloseDrawable"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:tint="?attr/bb_primaryText" />
-
-    <!-- Budget Details Section -->
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/budget_details_card"
-        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        app:cardBackgroundColor="?attr/bb_surface"
-        android:layout_marginTop="16dp"
-        android:layout_marginHorizontal="16dp"
-        app:cardCornerRadius="16dp"
-        app:cardElevation="4dp"
-        app:layout_constraintTop_toBottomOf="@id/top_bar"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        android:background="@android:color/transparent"
+        app:elevation="0dp">
 
-        <!-- Budget Details Section -->
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@android:color/transparent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingHorizontal="4dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp">
+
+                <ImageButton
+                    android:id="@+id/btnGoBack"
+                    style="@style/ToolButtonIcon"
+                    android:contentDescription="@string/back"
+                    android:src="@drawable/ic_ui_arrow_back" />
+
+                <TextView
+                    android:id="@+id/toolbarTitle"
+                    style="@style/ToolBarTitle"
+                    android:text="@string/add_new_budget" />
+
+                <ImageButton
+                    android:id="@+id/btnClear"
+                    style="@style/ToolButtonIcon"
+                    android:contentDescription="Clear form"
+                    android:src="@drawable/ic_ui_clear"
+                    android:visibility="invisible"/>
+            </LinearLayout>
+        </androidx.appcompat.widget.Toolbar>
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <!-- Main Content -->
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/contentScrollView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:fillViewport="true"
+        android:layout_marginBottom="90dp"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
         <LinearLayout
-            android:id="@+id/budgetDetails"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:padding="16dp">
 
-            <!-- Budget Name -->
-            <LinearLayout
-                android:id="@+id/rowSelectBudgetName"
-                style="@style/RowStyle">
-
-                <ImageView
-                    style="@style/RowIconStyle"
-                    app:tint="?attr/bb_button"
-                    android:src="@drawable/baseline_savings_24" />
-
-                <EditText
-                    android:id="@+id/budget_name"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="@string/budget_name"
-                    android:textColor="?attr/bb_primaryText"
-                    android:textColorHint="?attr/bb_primaryText"
-                    android:textSize="16sp"/>
-            </LinearLayout>
-
-            <!-- Wallet Row -->
-<!--            <LinearLayout-->
-<!--                android:id="@+id/rowSelectWallet"-->
-<!--                style="@style/RowStyle"-->
-<!--                android:orientation="horizontal"-->
-<!--                android:gravity="center_vertical"-->
-<!--                android:paddingVertical="8dp">-->
-
-<!--                <ImageView-->
-<!--                    style="@style/RowIconStyle"-->
-<!--                    android:src="@drawable/ic_wallet_24"-->
-<!--                    app:tint="?attr/bb_button" />-->
-
-<!--                <LinearLayout-->
-<!--                    android:layout_width="0dp"-->
-<!--                    android:layout_height="wrap_content"-->
-<!--                    android:layout_weight="1"-->
-<!--                    android:orientation="vertical"-->
-<!--                    android:layout_marginStart="12dp">-->
-
-<!--                    &lt;!&ndash; Top Label &ndash;&gt;-->
-<!--                    <TextView-->
-<!--                        android:id="@+id/textWalletLabel"-->
-<!--                        android:layout_width="wrap_content"-->
-<!--                        android:layout_height="wrap_content"-->
-<!--                        android:text="@string/wallet"-->
-<!--                        android:textColor="?attr/bb_primaryText"-->
-<!--                        android:textSize="18sp" />-->
-
-<!--                    &lt;!&ndash; Selected wallet name &ndash;&gt;-->
-<!--                    <TextView-->
-<!--                        android:id="@+id/textSelectedWalletName"-->
-<!--                        android:layout_width="wrap_content"-->
-<!--                        android:layout_height="wrap_content"-->
-<!--                        android:text="No wallet selected"-->
-<!--                        android:textColor="?attr/bb_secondaryText"-->
-<!--                        android:textSize="14sp"-->
-<!--                        android:visibility="visible"-->
-<!--                        android:paddingTop="2dp" />-->
-<!--                </LinearLayout>-->
-
-<!--                <ImageView-->
-<!--                    android:layout_width="24dp"-->
-<!--                    android:layout_height="24dp"-->
-<!--                    android:layout_marginStart="8dp"-->
-<!--                    android:background="@null"-->
-<!--                    android:rotation="180"-->
-<!--                    android:src="?attr/actionModeCloseDrawable" />-->
-<!--            </LinearLayout>-->
-
-            <!-- Budget Category -->
-            <LinearLayout
-                android:id="@+id/rowSelectCategory"
-                style="@style/RowStyle"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:paddingVertical="8dp">
-
-                <ImageView
-                    android:id="@+id/imgSelectedCategoryIcon"
-                    style="@style/RowIconStyle"
-                    android:src="@drawable/ic_edit_note_24"
-                    app:tint="?attr/bb_button" />
+            <!-- Budget Details Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardBackgroundColor="?attr/bb_surface"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0dp">
 
                 <LinearLayout
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
                     android:orientation="vertical"
-                    android:layout_marginStart="12dp">
+                    android:padding="16dp">
 
-                    <!-- Top Label -->
+                    <!-- Budget Name Row -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <ImageView
+                            style="@style/RowIconStyle"
+                            android:src="@drawable/ic_ui_budget"
+                            app:tint="?attr/bb_accent" />
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginStart="12dp"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Budget Name"
+                                android:textColor="?attr/bb_secondaryText"
+                                android:textSize="14sp" />
+
+                            <EditText
+                                android:id="@+id/budget_name"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:background="@null"
+                                android:hint="@string/budget_name"
+                                android:inputType="text"
+                                android:textColor="?attr/bb_primaryText"
+                                android:textColorHint="?attr/bb_secondaryText"
+                                android:textSize="20sp" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <!-- Error for budget name -->
                     <TextView
-                        android:id="@+id/textCategoryLabel"
+                        android:id="@+id/textNameError"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Budget for"
-                        android:textColor="?attr/bb_primaryText"
-                        android:textSize="18sp" />
+                        android:textColor="@android:color/holo_red_light"
+                        android:textSize="12sp"
+                        android:visibility="gone"
+                        android:layout_marginStart="60dp"
+                        android:layout_marginTop="4dp"/>
 
-                    <!-- Selected wallet name -->
+                    <!-- Budget Category Row -->
+                    <LinearLayout
+                        android:id="@+id/rowSelectCategory"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginTop="16dp"
+                        android:background="?attr/selectableItemBackground">
+
+                        <ImageView
+                            android:id="@+id/imgSelectedCategoryIcon"
+                            style="@style/RowIconStyle"
+                            android:src="@drawable/ic_ui_categories"
+                            app:tint="?attr/bb_accent" />
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:layout_marginStart="12dp">
+
+                            <TextView
+                                android:id="@+id/textCategoryLabel"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Budget for"
+                                android:textColor="?attr/bb_secondaryText"
+                                android:textSize="14sp" />
+
+                            <TextView
+                                android:id="@+id/textSelectedCategoryName"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="No category selected"
+                                android:textColor="?attr/bb_primaryText"
+                                android:textSize="16sp"
+                                android:paddingTop="2dp" />
+                        </LinearLayout>
+
+                        <ImageView
+                            style="@style/IconButton"
+                            android:src="@drawable/ic_ui_croc_right"
+                            app:tint="?attr/bb_secondaryText" />
+                    </LinearLayout>
+
+                    <!-- Error for category -->
                     <TextView
-                        android:id="@+id/textSelectedCategoryName"
+                        android:id="@+id/textCategoryError"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="No category selected"
-                        android:textColor="?attr/bb_secondaryText"
-                        android:textSize="14sp"
-                        android:visibility="visible"
-                        android:paddingTop="2dp" />
+                        android:textColor="@android:color/holo_red_light"
+                        android:textSize="12sp"
+                        android:visibility="gone"
+                        android:layout_marginStart="60dp"
+                        android:layout_marginTop="4dp"/>
+
+                    <!-- Amount and Currency Row -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginTop="16dp">
+
+                        <ImageView
+                            style="@style/RowIconStyle"
+                            android:src="@drawable/ic_money_24"
+                            app:tint="?attr/bb_accent" />
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginStart="12dp"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Amount"
+                                android:textColor="?attr/bb_secondaryText"
+                                android:textSize="14sp" />
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:orientation="horizontal"
+                                android:gravity="center_vertical">
+
+                                <Spinner
+                                    android:id="@+id/currency_spinner"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:background="@null"
+                                    android:minWidth="80dp"
+                                    android:spinnerMode="dropdown" />
+
+                                <EditText
+                                    android:id="@+id/amount"
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:layout_marginStart="8dp"
+                                    android:background="@null"
+                                    android:hint="0.00"
+                                    android:inputType="numberDecimal"
+                                    android:textColor="?attr/bb_primaryText"
+                                    android:textColorHint="?attr/bb_secondaryText"
+                                    android:textSize="20sp" />
+                            </LinearLayout>
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <!-- Error for amount -->
+                    <TextView
+                        android:id="@+id/textAmountError"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@android:color/holo_red_light"
+                        android:textSize="12sp"
+                        android:visibility="gone"
+                        android:layout_marginStart="60dp"
+                        android:layout_marginTop="4dp"/>
                 </LinearLayout>
-
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:layout_marginStart="8dp"
-                    android:background="@null"
-                    android:rotation="180"
-                    android:src="?attr/actionModeCloseDrawable" />
-            </LinearLayout>
-
-            <!-- Amount and Currency -->
-            <LinearLayout
-                android:id="@+id/rowAmountAndCurrency"
-                style="@style/RowStyle">
-
-                <ImageView
-                    style="@style/RowIconStyle"
-                    app:tint="?attr/bb_button"
-                    android:src="@drawable/ic_money_24" />
-
-                <EditText
-                    android:id="@+id/amount"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:hint="@string/amount"
-                    android:inputType="numberDecimal"
-                    android:textColor="?attr/bb_primaryText"
-                    android:textColorHint="?attr/bb_primaryText"
-                    android:textSize="16sp" />
-
-                <Spinner
-                    android:id="@+id/currency_spinner"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingStart="16dp"
-                    android:spinnerMode="dropdown"/>
-            </LinearLayout>
-
-<!--             Recurrence -->
-<!--            <LinearLayout-->
-<!--                android:id="@+id/rowRecurrence"-->
-<!--                style="@style/RowStyle">-->
-
-<!--                <ImageView-->
-<!--                    style="@style/RowIconStyle"-->
-<!--                    app:tint="?attr/bb_button"-->
-<!--                    android:src="@drawable/ic_autorenew_24" />-->
-
-<!--                <TextView-->
-<!--                    android:id="@+id/recurrence_label"-->
-<!--                    android:layout_width="0dp"-->
-<!--                    android:layout_height="wrap_content"-->
-<!--                    android:layout_marginStart="12dp"-->
-<!--                    android:layout_weight="1"-->
-<!--                    android:text="@string/recurrence"-->
-<!--                    android:textColor="?attr/bb_primaryText"-->
-<!--                    android:textSize="16sp"/>-->
-
-<!--                <TextView-->
-<!--                    android:id="@+id/recurrence_value"-->
-<!--                    android:layout_width="wrap_content"-->
-<!--                    android:layout_height="wrap_content"-->
-<!--                    android:textColor="?attr/bb_secondaryText"-->
-<!--                    android:text="Monthly"/>-->
-
-<!--                <ImageView-->
-<!--                    android:id="@+id/recurrence_arrow"-->
-<!--                    android:layout_width="24dp"-->
-<!--                    android:layout_height="24dp"-->
-<!--                    android:src="@drawable/baseline_arrow_forward_ios_24"-->
-<!--                    app:tint="?attr/colorOnPrimary"-->
-<!--                    android:contentDescription="Arrow"/>-->
-<!--            </LinearLayout>-->
+            </com.google.android.material.card.MaterialCardView>
         </LinearLayout>
-    </com.google.android.material.card.MaterialCardView>
+    </androidx.core.widget.NestedScrollView>
 
-
-    <!-- Save Button -->
-    <Button
-        android:id="@+id/btnSave"
-        android:layout_width="wrap_content"
+    <!-- Bottom Save Button -->
+    <FrameLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="36dp"
-        android:paddingHorizontal="32dp"
-        android:paddingVertical="12dp"
-        android:text="@string/save"
-        android:textColor="@android:color/white"
-        android:textSize="18sp"
-        app:backgroundTint="?attr/bb_button"
-        app:cornerRadius="24dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/budget_details_card"
-        tools:layout_conversion_absoluteHeight="19dp"
-        tools:layout_conversion_absoluteWidth="98dp" />
-</androidx.constraintlayout.widget.ConstraintLayout>
+        android:layout_gravity="bottom"
+        android:background="?attr/bb_background"
+        android:elevation="8dp"
+        android:padding="16dp">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnSave"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingVertical="16dp"
+            android:text="@string/save"
+            android:textColor="@android:color/white"
+            android:textSize="16sp"
+            app:backgroundTint="?attr/bb_button"
+            app:cornerRadius="16dp" />
+    </FrameLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -22,10 +22,6 @@ class TransactionSelectLabelAdapter(
     private val onSelectionChanged: (List<Label>) -> Unit
 ) : BaseAdapter<Label, TransactionSelectLabelAdapter.LabelViewHolder>() {
 
-    /**
-     * Creates a new ViewHolder instance for label items.
-     * Uses the standard item_label layout resource.
-     */
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): LabelViewHolder {
         return createViewHolder(
             parent = parent,

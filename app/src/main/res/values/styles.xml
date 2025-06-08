@@ -219,4 +219,34 @@
         <item name="android:layout_height">48dp</item>
         <item name="android:scaleType">fitCenter</item>
     </style>
+
+    <style name="MaterialAlertDialog_Rounded" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog">
+        <item name="shapeAppearanceOverlay">@style/ShapeAppearanceOverlay.MaterialAlertDialog.Rounded</item>
+        <item name="materialAlertDialogTitleTextStyle">@style/MaterialAlertDialog_TitleText</item>
+        <item name="materialAlertDialogBodyTextStyle">@style/MaterialAlertDialog_BodyText</item>
+        <item name="buttonBarPositiveButtonStyle">@style/MaterialAlertDialog_Button</item>
+        <item name="buttonBarNegativeButtonStyle">@style/MaterialAlertDialog_Button</item>
+    </style>
+
+    <style name="ShapeAppearanceOverlay.MaterialAlertDialog.Rounded" parent="">
+        <item name="cornerSize">16dp</item>
+    </style>
+
+    <style name="MaterialAlertDialog_TitleText" parent="MaterialAlertDialog.MaterialComponents.Title.Text">
+        <item name="android:textSize">20sp</item>
+        <item name="android:textColor">?attr/bb_primaryText</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="MaterialAlertDialog_BodyText" parent="MaterialAlertDialog.MaterialComponents.Body.Text">
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">?attr/bb_secondaryText</item>
+    </style>
+
+    <style name="MaterialAlertDialog_Button" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
+        <item name="android:textSize">16sp</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:paddingStart">16dp</item>
+        <item name="android:paddingEnd">16dp</item>
+    </style>
 </resources>

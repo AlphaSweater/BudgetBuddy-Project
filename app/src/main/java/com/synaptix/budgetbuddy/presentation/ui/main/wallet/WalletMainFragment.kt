@@ -53,6 +53,10 @@ class WalletMainFragment : Fragment() {
         }
     }
 
+    private val walletId: String? by lazy {
+        arguments?.getString("walletId")
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -66,6 +70,8 @@ class WalletMainFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setupViews()
         observeViewModel()
+
+
     }
 
     private fun setupViews() {
@@ -86,6 +92,7 @@ class WalletMainFragment : Fragment() {
             }
         }
     }
+
 
     private fun setupLineChart(transactions: List<Transaction>) {
         val lineChart = binding.lineChart
@@ -415,9 +422,14 @@ class WalletMainFragment : Fragment() {
     }
 
     private fun onWalletClicked(wallet: BudgetListItems.BudgetWalletItem) {
-        // TODO: Navigate to wallet details
-        // findNavController().navigate(R.id.action_walletMainFragment_to_walletDetailsFragment)
+        println("WalletMainFragment: Navigating to wallet report for wallet ID: ${wallet.wallet.id}")
+        val bundle = Bundle().apply {
+            putString("walletId", wallet.wallet.id)
+        }
+        findNavController().navigate(R.id.action_walletMainFragment_to_walletReportFragment, bundle)
     }
+
+
 
     override fun onDestroyView() {
         super.onDestroyView()
