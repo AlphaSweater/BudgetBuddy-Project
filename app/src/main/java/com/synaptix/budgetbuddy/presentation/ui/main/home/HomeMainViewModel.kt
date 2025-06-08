@@ -210,13 +210,13 @@ class HomeMainViewModel @Inject constructor(
                         } else {
                             val summary = transactionCalculationsUseCase.calculateTotalTransactionsSummary(userId)
                             when (summary) {
-                                is com.synaptix.budgetbuddy.core.model.Result.Success -> {
+                                is Result.Success -> {
                                     _transactionsState.value = TransactionState.Success(
                                         transactions = filtered,
                                         summary = summary.data
                                     )
                                 }
-                                is com.synaptix.budgetbuddy.core.model.Result.Error -> {
+                                is Result.Error -> {
                                     _transactionsState.value = TransactionState.Error(summary.exception.message ?: "Unknown error")
                                 }
                             }
@@ -239,42 +239,48 @@ class HomeMainViewModel @Inject constructor(
                     is GetCategoriesUseCase.GetCategoriesResult.Success -> {
                         if (result.categories.isEmpty()) CategoryState.Empty
                         else {
-                            // Observe transactions instead of getting a single value
-                            getTransactionsUseCase.execute(userId)
-                                .catch { e ->
-                                    _categoriesState.value = CategoryState.Empty
-                                }
-                                .collect { transactionsResult ->
-                                    when (transactionsResult) {
-                                        is GetTransactionsUseCase.GetTransactionsResult.Success -> {
-                                            val categorySummaries = transactionCalculationsUseCase.calculateCategoryTransactionsSummary(
-                                                userId = userId,
-                                                categories = result.categories
-                                            )
-                                            when (categorySummaries) {
-                                                is Result.Success -> {
-                                                    _categoriesState.value = CategoryState.Success(
-                                                        categories = result.categories,
-                                                        categorySummaries = categorySummaries.data
-                                                    )
-                                                }
-
-                                                is Result.Error -> {
-                                                    _categoriesState.value = CategoryState.Error(categorySummaries.exception.message ?: "Unknown error")
+                            // Filter out income categories
+                            val expenseCategories = result.categories.filter { 
+                                !it.type.equals("INCOME", ignoreCase = true) 
+                            }
+                            
+                            if (expenseCategories.isEmpty()) {
+                                CategoryState.Empty
+                            } else {
+                                getTransactionsUseCase.execute(userId)
+                                    .catch { e ->
+                                        _categoriesState.value = CategoryState.Empty
+                                    }
+                                    .collect { transactionsResult ->
+                                        when (transactionsResult) {
+                                            is GetTransactionsUseCase.GetTransactionsResult.Success -> {
+                                                val categorySummaries = transactionCalculationsUseCase.calculateCategoryTransactionsSummary(
+                                                    userId = userId,
+                                                    categories = expenseCategories
+                                                )
+                                                when (categorySummaries) {
+                                                    is Result.Success -> {
+                                                        _categoriesState.value = CategoryState.Success(
+                                                            categories = expenseCategories,
+                                                            categorySummaries = categorySummaries.data
+                                                        )
+                                                    }
+                                                    is Result.Error -> {
+                                                        _categoriesState.value = CategoryState.Error(categorySummaries.exception.message ?: "Unknown error")
+                                                    }
                                                 }
                                             }
-                                        }
-
-                                        is GetTransactionsUseCase.GetTransactionsResult.Error -> {
-                                            _categoriesState.value = CategoryState.Empty
+                                            is GetTransactionsUseCase.GetTransactionsResult.Error -> {
+                                                _categoriesState.value = CategoryState.Empty
+                                            }
                                         }
                                     }
-                                }
+                                CategoryState.Loading // Temporary state while processing
+                            }
                         }
                     }
-
                     is GetCategoriesUseCase.GetCategoriesResult.Error -> CategoryState.Empty
-                } as CategoryState
+                }
             }
     }
 

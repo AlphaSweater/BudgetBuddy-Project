@@ -480,11 +480,7 @@ class HomeMainFragment : Fragment() {
                     val categoryItems = state.categories.take(MAX_ITEMS).map { category ->
                         val categorySummary = state.categorySummaries[category.id]
                         val formattedAmount = categorySummary?.let {
-                            if (category.type.equals("INCOME", ignoreCase = true)) {
-                                String.format("R %.2f", it.totalIncome)
-                            } else {
-                                String.format("R %.2f", it.totalExpense)
-                            }
+                            String.format("R %.2f", it.totalExpense)
                         } ?: "R 0.00"
 
                         HomeListItems.HomeCategoryItem(
@@ -501,7 +497,7 @@ class HomeMainFragment : Fragment() {
                     showEmptyState(
                         recyclerView = recyclerViewHomeCategoryOverview,
                         emptyText = txtEmptyCategories,
-                        message = getString(R.string.no_categories_found)
+                        message = getString(R.string.no_expense_categories_found)
                     )
                 }
                 is HomeMainViewModel.CategoryState.Error -> {
