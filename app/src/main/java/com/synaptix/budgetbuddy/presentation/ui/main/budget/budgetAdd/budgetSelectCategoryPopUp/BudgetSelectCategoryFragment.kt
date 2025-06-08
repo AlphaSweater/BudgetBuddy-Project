@@ -40,10 +40,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import com.synaptix.budgetbuddy.R
 import com.synaptix.budgetbuddy.databinding.FragmentBudgetSelectCategoryBinding
-import com.synaptix.budgetbuddy.databinding.FragmentTransactionSelectCategoryBinding
 import com.synaptix.budgetbuddy.presentation.ui.main.budget.budgetAdd.BudgetAddViewModel
-import com.synaptix.budgetbuddy.presentation.ui.main.transaction.transactionSelectCategoryPopUp.TransactionSelectCategoryAdapter
-import com.synaptix.budgetbuddy.presentation.ui.main.transaction.transactionSelectCategoryPopUp.TransactionSelectCategoryViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -56,12 +53,10 @@ class BudgetSelectCategoryFragment : Fragment() {
     private val selectCategoryViewModel: BudgetSelectCategoryViewModel by viewModels()
 
     private val expenseAdapter by lazy {
-        BudgetSelectCategoryAdapter { category ->
-            addBudgetViewModel.setCategory(category)
-            findNavController().popBackStack()
+        BudgetSelectCategoryAdapter { selectedCategories ->
+            selectCategoryViewModel.updateSelectedCategories(selectedCategories)
         }
     }
-
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -75,7 +70,7 @@ class BudgetSelectCategoryFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupViews()
-//        setupSearch()
+        setupSearch()
         observeViewModel()
         selectCategoryViewModel.loadCategories()
     }
@@ -86,10 +81,15 @@ class BudgetSelectCategoryFragment : Fragment() {
                 findNavController().popBackStack()
             }
 
-            btnAddCategory.setOnClickListener { showAddCategory() }
-
-//            btnAddCategoryEmpty.setOnClickListener { showAddCategory() }
-
+            btnSave.setOnClickListener {
+                val selectedCategories = expenseAdapter.getSelectedCategories()
+                if (selectedCategories.isNotEmpty()) {
+                    addBudgetViewModel.setSelectedCategories(selectedCategories)
+                    findNavController().popBackStack()
+                } else {
+                    showError("Please select at least one category")
+                }
+            }
 
             setupRecyclerViews()
         }
@@ -103,14 +103,13 @@ class BudgetSelectCategoryFragment : Fragment() {
             adapter = expenseAdapter
             addItemDecoration(gridSpacing)
         }
-
     }
 
-//    private fun setupSearch() {
-//        binding.searchEditText.doAfterTextChanged { text ->
-//            selectCategoryViewModel.filterCategories(text?.toString() ?: "")
-//        }
-//    }
+    private fun setupSearch() {
+        binding.searchEditText.doAfterTextChanged { text ->
+            selectCategoryViewModel.filterCategories(text?.toString() ?: "")
+        }
+    }
 
     private fun observeViewModel() {
         viewLifecycleOwner.lifecycleScope.launch {
@@ -125,8 +124,8 @@ class BudgetSelectCategoryFragment : Fragment() {
                 // Collect filtered categories
                 launch {
                     selectCategoryViewModel.filteredCategories.collect { categories ->
-                        val (expenseCategories, incomeCategories) = categories.partition { it.type == "expense" }
-                        expenseAdapter.submitList(expenseCategories)
+                        val expenseCategories = categories.filter { it.type == "expense" }
+                        expenseAdapter.submitList(expenseCategories, selectCategoryViewModel.getSelectedCategories())
                         updateEmptyState()
                     }
                 }
@@ -137,43 +136,31 @@ class BudgetSelectCategoryFragment : Fragment() {
     private fun handleUiState(state: BudgetSelectCategoryViewModel.UiState) {
         when (state) {
             is BudgetSelectCategoryViewModel.UiState.Loading -> {
-//                binding.progressBar.visibility = View.VISIBLE
-//                binding.contentContainer.visibility = View.GONE
+                binding.progressBar.visibility = View.VISIBLE
+                binding.contentContainer.visibility = View.GONE
             }
             is BudgetSelectCategoryViewModel.UiState.Success -> {
-//                binding.progressBar.visibility = View.GONE
-//                binding.contentContainer.visibility = View.VISIBLE
+                binding.progressBar.visibility = View.GONE
+                binding.contentContainer.visibility = View.VISIBLE
             }
             is BudgetSelectCategoryViewModel.UiState.Error -> {
-//                binding.progressBar.visibility = View.GONE
-//                binding.contentContainer.visibility = View.VISIBLE
+                binding.progressBar.visibility = View.GONE
+                binding.contentContainer.visibility = View.VISIBLE
                 showError(state.message)
             }
             else -> {
-//                binding.progressBar.visibility = View.GONE
-//                binding.contentContainer.visibility = View.VISIBLE
+                binding.progressBar.visibility = View.GONE
+                binding.contentContainer.visibility = View.VISIBLE
             }
         }
     }
-
-    private fun showExpenseCategories() {
-        with(binding) {
-            recyclerViewExpenseCategory.visibility = View.VISIBLE
-            updateEmptyState()
-        }
-    }
-
 
     private fun updateEmptyState() {
         with(binding) {
             val isExpenseVisible = recyclerViewExpenseCategory.isVisible
             val currentAdapter = if (isExpenseVisible) expenseAdapter else null
-//            emptyState.visibility = if (currentAdapter.itemCount == 0) View.VISIBLE else View.GONE
+            emptyState.visibility = if (currentAdapter?.itemCount == 0) View.VISIBLE else View.GONE
         }
-    }
-
-    private fun showAddCategory() {
-        findNavController().navigate(R.id.navigation_category_add_new)
     }
 
     private fun showError(message: String) {
@@ -215,3 +202,4 @@ class BudgetSelectCategoryFragment : Fragment() {
         }
     }
 }
+

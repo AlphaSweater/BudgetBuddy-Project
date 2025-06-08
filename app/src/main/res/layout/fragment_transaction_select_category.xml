@@ -181,7 +181,7 @@
                         android:visibility="gone"
                         app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
                         app:spanCount="1"
-                        tools:listitem="@layout/item_category"/>
+                        tools:listitem="@layout/item_budget_category"/>
 
                     <!-- Empty State -->
                     <LinearLayout

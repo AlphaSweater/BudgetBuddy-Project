@@ -59,9 +59,11 @@ class BudgetSelectCategoryViewModel @Inject constructor(
     private val _filteredCategories = MutableStateFlow<List<Category>>(emptyList())
     val filteredCategories: StateFlow<List<Category>> = _filteredCategories
 
+    private val _selectedCategories = MutableStateFlow<List<Category>>(emptyList())
+    val selectedCategories: StateFlow<List<Category>> = _selectedCategories
+
     init {
-        viewModelScope.launch { // Launch a coroutine
-            // Combine search query with UI state to filter categories
+        viewModelScope.launch {
             combine(_searchQuery, _uiState) { query, state ->
                 when (state) {
                     is UiState.Success -> {
@@ -98,23 +100,23 @@ class BudgetSelectCategoryViewModel @Inject constructor(
 
                 getCategoriesUseCase.execute(userId)
                     .catch { e ->
-                        Log.e("TransactionSelectCategoryViewModel", "Error in categories flow: ${e.message}")
+                        Log.e("BudgetSelectCategoryViewModel", "Error in categories flow: ${e.message}")
                         _uiState.value = UiState.Error(e.message ?: "Failed to load categories")
                     }
                     .collect { result ->
                         when (result) {
                             is GetCategoriesUseCase.GetCategoriesResult.Success -> {
-                                Log.d("TransactionSelectCategoryViewModel", "Categories loaded successfully: ${result.categories.size}")
+                                Log.d("BudgetSelectCategoryViewModel", "Categories loaded successfully: ${result.categories.size}")
                                 _uiState.value = UiState.Success(result.categories)
                             }
                             is GetCategoriesUseCase.GetCategoriesResult.Error -> {
-                                Log.e("TransactionSelectCategoryViewModel", "Error loading categories: ${result.message}")
+                                Log.e("BudgetSelectCategoryViewModel", "Error loading categories: ${result.message}")
                                 _uiState.value = UiState.Error(result.message)
                             }
                         }
                     }
             } catch (e: Exception) {
-                Log.e("TransactionSelectCategoryViewModel", "Exception loading categories: ${e.message}")
+                Log.e("BudgetSelectCategoryViewModel", "Exception loading categories: ${e.message}")
                 _uiState.value = UiState.Error(e.message ?: "Failed to load categories")
             }
         }
@@ -127,5 +129,13 @@ class BudgetSelectCategoryViewModel @Inject constructor(
      */
     fun filterCategories(query: String) {
         _searchQuery.value = query
+    }
+
+    fun updateSelectedCategories(selectedCategories: List<Category>) {
+        _selectedCategories.value = selectedCategories
+    }
+
+    fun getSelectedCategories(): List<Category> {
+        return _selectedCategories.value
     }
 }
