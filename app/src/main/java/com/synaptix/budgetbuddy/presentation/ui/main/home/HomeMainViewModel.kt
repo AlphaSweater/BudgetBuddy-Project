@@ -260,8 +260,13 @@ class HomeMainViewModel @Inject constructor(
                                                 )
                                                 when (categorySummaries) {
                                                     is Result.Success -> {
+                                                        // Sort categories by their expense values in descending order
+                                                        val sortedCategories = expenseCategories.sortedByDescending { category ->
+                                                            categorySummaries.data[category.id]?.totalExpense ?: 0.0
+                                                        }
+                                                        
                                                         _categoriesState.value = CategoryState.Success(
-                                                            categories = expenseCategories,
+                                                            categories = sortedCategories,
                                                             categorySummaries = categorySummaries.data
                                                         )
                                                     }
