@@ -23,6 +23,7 @@ import com.synaptix.budgetbuddy.databinding.FragmentCategoryAddNewBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.delay
 
 /**
  * Fragment for adding a new category.
@@ -255,37 +256,72 @@ class CategoryAddNewFragment : Fragment() {
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-    // State Handlers
+    // UI State Handlers
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-    /**
-     * Handles the UI state changes from the ViewModel.
-     */
-    private fun handleUiState(state: CategoryAddNewViewModel.SavingUiState) {
+    private fun handleLoadingUiState(state: CategoryAddNewViewModel.LoadingUiState) {
         when (state) {
-            is CategoryAddNewViewModel.SavingUiState.Saving -> {
-                binding.btnCreate.isEnabled = false
-                showLoading(true)
+            is CategoryAddNewViewModel.LoadingUiState.Loading -> {
+                binding.loadingOverlay.visibility = View.VISIBLE
+                binding.progressBar.visibility = View.VISIBLE
+                binding.successCheckmark.visibility = View.GONE
+                binding.loadingText.text = "Loading..."
             }
-            is CategoryAddNewViewModel.SavingUiState.Success -> {
-                showLoading(false)
-                showSuccess("Category added successfully")
-                findNavController().popBackStack()
+            is CategoryAddNewViewModel.LoadingUiState.Loaded -> {
+                binding.loadingOverlay.visibility = View.GONE
+                binding.progressBar.visibility = View.GONE
+                populateInitialFormValues()
             }
-            is CategoryAddNewViewModel.SavingUiState.Error -> {
-                binding.btnCreate.isEnabled = false
-                showLoading(false)
+            is CategoryAddNewViewModel.LoadingUiState.Error -> {
+                binding.loadingOverlay.visibility = View.GONE
+                binding.progressBar.visibility = View.GONE
                 showError(state.message)
             }
             else -> {
-                binding.btnCreate.isEnabled = true
-                showLoading(false)
+                binding.loadingOverlay.visibility = View.GONE
+                binding.progressBar.visibility = View.GONE
             }
         }
     }
 
-    /**
-     * Handles validation state changes and updates error messages.
-     */
+    private fun handleSavingUiState(state: CategoryAddNewViewModel.SavingUiState) {
+        when (state) {
+            is CategoryAddNewViewModel.SavingUiState.Saving -> {
+                binding.btnCreate.isEnabled = false
+                binding.loadingOverlay.visibility = View.VISIBLE
+                binding.progressBar.visibility = View.VISIBLE
+                binding.successCheckmark.visibility = View.GONE
+                binding.loadingText.text = when (viewModel.screenMode.value) {
+                    CategoryAddNewViewModel.ScreenMode.EDIT -> "Updating category..."
+                    else -> "Creating category..."
+                }
+            }
+            is CategoryAddNewViewModel.SavingUiState.Success -> {
+                binding.progressBar.visibility = View.GONE
+                binding.successCheckmark.visibility = View.VISIBLE
+                binding.loadingText.text = when (viewModel.screenMode.value) {
+                    CategoryAddNewViewModel.ScreenMode.EDIT -> "Category updated successfully!"
+                    else -> "Category created successfully!"
+                }
+                
+                viewLifecycleOwner.lifecycleScope.launch {
+                    delay(1000)
+                    binding.loadingOverlay.visibility = View.GONE
+                    viewModel.reset()
+                    findNavController().popBackStack()
+                }
+            }
+            is CategoryAddNewViewModel.SavingUiState.Error -> {
+                binding.btnCreate.isEnabled = true
+                binding.loadingOverlay.visibility = View.GONE
+                showError(state.message)
+            }
+            else -> {
+                binding.btnCreate.isEnabled = true
+                binding.loadingOverlay.visibility = View.GONE
+            }
+        }
+    }
+
     private fun handleValidationState(state: CategoryAddNewViewModel.ValidationState) {
         with(binding) {
             textNameError.apply {
@@ -313,32 +349,21 @@ class CategoryAddNewFragment : Fragment() {
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     // UI Helpers
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-    private fun showLoading(show: Boolean) {
-        binding.loadingOverlay.visibility = if (show) View.VISIBLE else View.GONE
-        binding.progressBar.visibility = if (show) View.VISIBLE else View.GONE
-        binding.successCheckmark.visibility = View.GONE
-        binding.loadingText.text = "Creating category..."
-    }
-
-    private fun showSuccess(message: String) {
-        binding.loadingOverlay.visibility = View.VISIBLE
-        binding.progressBar.visibility = View.GONE
-        binding.successCheckmark.visibility = View.VISIBLE
-        binding.loadingText.text = message
-    }
-
     private fun showError(message: String) {
         Snackbar.make(binding.root, message, Snackbar.LENGTH_SHORT)
             .setBackgroundTint(resources.getColor(R.color.error, null))
             .show()
     }
 
+    private fun showSuccess(message: String) {
+        Snackbar.make(binding.root, message, Snackbar.LENGTH_SHORT)
+            .setBackgroundTint(resources.getColor(R.color.success, null))
+            .show()
+    }
+
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     // ViewModel Observers
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-    /**
-     * Sets up observers for all ViewModel state flows.
-     */
     private fun observeViewModel() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -349,10 +374,16 @@ class CategoryAddNewFragment : Fragment() {
                     }
                 }
 
-                // UI State
+                // UI States
+                launch {
+                    viewModel.loadingUiState.collect { state ->
+                        handleLoadingUiState(state)
+                    }
+                }
+
                 launch {
                     viewModel.savingUiState.collect { state ->
-                        handleUiState(state)
+                        handleSavingUiState(state)
                     }
                 }
                 
@@ -412,7 +443,6 @@ class CategoryAddNewFragment : Fragment() {
                 // Unsaved Changes
                 launch {
                     viewModel.hasUnsavedChanges.collect { hasChanges ->
-                        // You can use this to show a visual indicator if needed
                         binding.btnClear.isEnabled = hasChanges
                     }
                 }
