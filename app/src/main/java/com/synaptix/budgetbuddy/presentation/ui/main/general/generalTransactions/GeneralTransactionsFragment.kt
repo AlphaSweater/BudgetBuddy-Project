@@ -33,6 +33,7 @@ class GeneralTransactionsFragment : Fragment() {
 
     private val viewModel: GeneralTransactionsViewModel by viewModels()
     private lateinit var transactionsAdapter: GeneralTransactionsAdapter
+    private var currentDateRange: Pair<Long, Long>? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -48,23 +49,27 @@ class GeneralTransactionsFragment : Fragment() {
         setupRecyclerView()
         setupClickListeners()
         setupWalletDropdown()
-        setupTimePeriodButton()  // Add this line
+        setupDateSelection()
+        setupViewSwitcher()
         observeStates()
     }
 
-    private fun setupTimePeriodButton() {
-        binding.btnTimePeriod.setOnClickListener {
-            showDateRangePicker()
-        }
+    private fun setupViewSwitcher() {
+        binding.apply {
+            // Set initial state - Transactions view is active
+            btnTransactionsView.setBackgroundResource(R.drawable.toggle_selected)
+            btnReportsView.setBackgroundResource(android.R.color.transparent)
 
-        // Update button text when date range changes
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.dateRange.collect { dateRange ->
-                updateTimePeriodButtonText(dateRange)
+            // Set up click listeners
+            btnReportsView.setOnClickListener {
+                findNavController().navigate(R.id.navigation_general_reports)
+            }
+
+            btnTransactionsView.setOnClickListener {
+                // Already in transactions view, do nothing
             }
         }
     }
-
 
     private fun setupRecyclerView() {
         transactionsAdapter = GeneralTransactionsAdapter { transaction ->
@@ -82,6 +87,99 @@ class GeneralTransactionsFragment : Fragment() {
         binding.btnGoBack.setOnClickListener {
             findNavController().popBackStack()
         }
+
+        binding.btnClearDate.setOnClickListener {
+            currentDateRange = null
+            updateDateRangeText()
+            viewModel.clearDateRange()
+        }
+    }
+
+    private fun setupWalletDropdown() {
+        lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.walletsState.collect { walletState ->
+                    when (walletState) {
+                        is GeneralTransactionsViewModel.WalletState.Success -> {
+                            val wallets = walletState.wallets
+                            if (wallets.isNotEmpty()) {
+                                // Create a list with "All Wallets" as the first item
+                                val walletNames = listOf("All Wallets") + wallets.map { it.name }
+
+                                val adapter = ArrayAdapter(
+                                    requireContext(),
+                                    R.layout.item_dropdown_item,
+                                    walletNames
+                                )
+
+                                binding.autoCompleteWallet.setAdapter(adapter)
+
+                                // Set up the item selected listener
+                                binding.autoCompleteWallet.setOnItemClickListener { _, _, position, _ ->
+                                    val selectedWallet = if (position == 0) {
+                                        null // "All Wallets" selected
+                                    } else {
+                                        wallets[position - 1] // Adjust index since we added "All Wallets" at position 0
+                                    }
+                                    viewModel.selectWallet(selectedWallet)
+                                }
+
+                                // Set default selection to "All Wallets"
+                                binding.autoCompleteWallet.setText("All Wallets", false)
+                            }
+                        }
+                        else -> {}
+                    }
+                }
+            }
+        }
+    }
+
+    private fun setupDateSelection() {
+        binding.btnSelectDate.setOnClickListener {
+            showDateRangePicker()
+        }
+    }
+
+    private fun showDateRangePicker() {
+        val calendar = Calendar.getInstance()
+        
+        // Default to last 30 days
+        val defaultEndDate = calendar.timeInMillis
+        calendar.add(Calendar.DAY_OF_MONTH, -30)
+        val defaultStartDate = calendar.timeInMillis
+
+        // Create and show the date range picker dialog
+        val dateRangePicker = MaterialDatePicker.Builder.dateRangePicker()
+            .setTitleText("Select Date Range")
+            .setSelection(
+                androidx.core.util.Pair(
+                    defaultStartDate,
+                    defaultEndDate
+                )
+            )
+            .build()
+
+        dateRangePicker.addOnPositiveButtonClickListener { selection ->
+            val startDate = selection.first ?: return@addOnPositiveButtonClickListener
+            val endDate = selection.second ?: return@addOnPositiveButtonClickListener
+            currentDateRange = startDate to endDate
+            updateDateRangeText()
+            viewModel.setDateRange(startDate, endDate)
+        }
+
+        dateRangePicker.show(childFragmentManager, "DATE_RANGE_PICKER")
+    }
+
+    private fun updateDateRangeText() {
+        binding.tvDateRange.text = if (currentDateRange != null) {
+            val startDate = Date(currentDateRange!!.first)
+            val endDate = Date(currentDateRange!!.second)
+            val dateFormat = SimpleDateFormat("MMM d, yyyy", Locale.getDefault())
+            "${dateFormat.format(startDate)} - ${dateFormat.format(endDate)}"
+        } else {
+            "Select Date"
+        }
     }
 
     private fun observeStates() {
@@ -92,7 +190,7 @@ class GeneralTransactionsFragment : Fragment() {
                     viewModel.walletsState.collect { walletState ->
                         when (walletState) {
                             is GeneralTransactionsViewModel.WalletState.Success -> {
-                                // Update wallet spinner if needed
+                                // Wallet state is handled in setupWalletDropdown
                             }
                             else -> {}
                         }
@@ -157,103 +255,6 @@ class GeneralTransactionsFragment : Fragment() {
         val totalBalance = transactions.sumOf { it.amount }
         binding.tvCurrencyTotal.text = String.format("R %.2f", totalBalance)
     }
-
-    private fun setupWalletDropdown() {
-        binding.spinnerWallet.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                if (position == AdapterView.INVALID_POSITION) return
-
-                val walletState = viewModel.walletsState.value
-                if (walletState is GeneralTransactionsViewModel.WalletState.Success) {
-                    val selectedWallet = if (position == 0) null
-                    else walletState.wallets.getOrNull(position - 1)
-                    viewModel.selectWallet(selectedWallet)
-                }
-            }
-
-            override fun onNothingSelected(parent: AdapterView<*>?) = Unit
-        }
-
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.walletsState.collect { walletState ->
-                    if (walletState is GeneralTransactionsViewModel.WalletState.Success) {
-                        updateWalletSpinner(walletState.wallets)
-                    }
-                }
-            }
-        }
-    }
-
-    private fun updateWalletSpinner(wallets: List<Wallet>) {
-        val walletNames = listOf("All Wallets") + wallets.map { it.name }
-        val adapter = ArrayAdapter(
-            requireContext(),
-            R.layout.spinner_item,
-            walletNames
-        ).apply {
-            setDropDownViewResource(R.layout.spinner_item)
-        }
-
-        binding.spinnerWallet.adapter = adapter
-
-        // Set initial selection
-        val selectedIndex = viewModel.selectedWallet.value?.let { wallet ->
-            wallets.indexOfFirst { it.id == wallet.id } + 1
-        } ?: 0
-
-        if (selectedIndex >= 0) {
-            binding.spinnerWallet.setSelection(selectedIndex, false)
-        }
-    }
-
-    private fun showDateRangePicker() {
-        val calendar = Calendar.getInstance()
-        val currentYear = calendar.get(Calendar.YEAR)
-        val currentMonth = calendar.get(Calendar.MONTH)
-        val currentDay = calendar.get(Calendar.DAY_OF_MONTH)
-
-        // Default to last 30 days
-        val defaultEndDate = calendar.timeInMillis
-        calendar.add(Calendar.DAY_OF_MONTH, -30)
-        val defaultStartDate = calendar.timeInMillis
-
-        // Create and show the date range picker dialog
-        val dateRangePicker = MaterialDatePicker.Builder.dateRangePicker()
-            .setTitleText("Select Date Range")
-            .setSelection(
-                androidx.core.util.Pair(
-                    defaultStartDate,
-                    defaultEndDate
-                )
-            )
-            .build()
-
-        dateRangePicker.addOnPositiveButtonClickListener { selection ->
-            val startDate = selection.first ?: return@addOnPositiveButtonClickListener
-            val endDate = selection.second ?: return@addOnPositiveButtonClickListener
-            viewModel.setDateRange(startDate, endDate)
-        }
-
-        dateRangePicker.addOnNegativeButtonClickListener {
-            viewModel.clearDateRange()
-        }
-
-        dateRangePicker.show(childFragmentManager, "DATE_RANGE_PICKER")
-    }
-
-    private fun updateTimePeriodButtonText(dateRange: ClosedRange<Long>?) {
-        if (dateRange == null) {
-            binding.btnTimePeriod.text = "Select Time Period"
-            return
-        }
-
-        val dateFormat = SimpleDateFormat("MMM d, yyyy", Locale.getDefault())
-        val startDateStr = dateFormat.format(Date(dateRange.start))
-        val endDateStr = dateFormat.format(Date(dateRange.endInclusive))
-        binding.btnTimePeriod.text = "$startDateStr - $endDateStr"
-    }
-
 
     private fun formatDate(timestamp: Long): String {
         val now = Calendar.getInstance()

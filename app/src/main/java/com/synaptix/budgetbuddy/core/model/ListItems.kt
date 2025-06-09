@@ -67,7 +67,6 @@ sealed class HomeListItems {
      */
     data class HomeTransactionItem(
         val transaction: Transaction,
-        val relativeDate: String
     ) : HomeListItems()
 
     /**
