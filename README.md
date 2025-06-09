@@ -4,6 +4,12 @@
 
 <h1 align="center">📊 BUDGETBUDDY-PROJECT</h1>
 
+<p align="center">
+  <img src="https://img.shields.io/github/stars/AlphaSweater/BudgetBuddy-Project?style=social">
+  <img src="https://img.shields.io/github/last-commit/AlphaSweater/BudgetBuddy-Project">
+  <img src="https://img.shields.io/badge/Made%20with-Kotlin-blue?logo=kotlin">
+</p>
+
 ## 📝 Overview
 BudgetBuddy is a sleek, user-friendly budgeting app designed to help users take control of their personal finances. Whether you're tracking daily expenses, managing multiple income streams, or aiming to understand your financial habits better — BudgetBuddy is here to guide you.
 
@@ -37,7 +43,7 @@ With intuitive tools and insightful financial summaries, BudgetBuddy empowers us
 - View Category Totals in a Period: Get a clear summary of total spending and earnings per category within a specific time period. This feature provides insights into user's spending habits and helps adjust their budget as needed.
 
 
-## Own features
+## Own Features
 
 - Multi-Wallet support: Application allows for multiple different wallets to be created and used by one profile, each wallet has its own transactions and balance as well as their own individual minimum and maximum goals that gets added together to create a global minimum and maximum goal for the user.
 
@@ -173,6 +179,4 @@ https://github.com/AlphaSweater/BudgetBuddy-Project.git
 ![App Demo](https://i.postimg.cc/HWtLyjr6/kerchoo-kachow.gif)
 ##
 
-- ![GitHub stars](https://img.shields.io/github/stars/AlphaSweater/BudgetBuddy-Project?style=social)
-![GitHub last commit](https://img.shields.io/github/last-commit/AlphaSweater/BudgetBuddy-Project)
-![Made with Kotlin](https://img.shields.io/badge/Made%20with-Kotlin-blue?logo=kotlin)
+
