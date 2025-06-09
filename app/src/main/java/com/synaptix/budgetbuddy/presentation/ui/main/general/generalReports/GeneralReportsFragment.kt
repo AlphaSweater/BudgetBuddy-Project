@@ -306,9 +306,18 @@ class GeneralReportsFragment : Fragment() {
                                     viewModel.selectWallet(selectedWallet)
                                 }
 
-                                // Set initial selection based on persisted wallet
-                                viewModel.selectedWallet.value?.let { selectedWallet ->
-                                    val position = wallets.indexOf(selectedWallet) + 1 // +1 because of "All Wallets"
+                                // Get wallet ID from bundle if present
+                                val walletId = arguments?.getString("walletId")
+                                
+                                // Set initial selection based on bundle wallet ID or persisted wallet
+                                val selectedWallet = if (walletId != null) {
+                                    wallets.find { it.id == walletId }
+                                } else {
+                                    viewModel.selectedWallet.value
+                                }
+
+                                selectedWallet?.let { wallet ->
+                                    val position = wallets.indexOf(wallet) + 1 // +1 because of "All Wallets"
                                     if (position > 0) {
                                         binding.autoCompleteWallet.setText(walletNames[position], false)
                                     } else {
