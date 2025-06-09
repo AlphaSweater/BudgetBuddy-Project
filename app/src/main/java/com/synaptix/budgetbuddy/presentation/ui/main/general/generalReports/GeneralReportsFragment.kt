@@ -184,7 +184,7 @@ class GeneralReportsFragment : Fragment() {
                 findNavController().popBackStack()
             }
 
-            btnTimePeriod.setOnClickListener(){
+            btnSelectDate.setOnClickListener {
                 showDateRangePicker()
             }
 

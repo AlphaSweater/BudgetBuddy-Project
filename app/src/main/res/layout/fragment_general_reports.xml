@@ -111,83 +111,98 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/tvTotalBalance">
 
-                <androidx.cardview.widget.CardView
+                <com.google.android.material.card.MaterialCardView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
                     android:layout_marginEnd="8dp"
-                    app:cardBackgroundColor="?attr/bb_background"
                     app:cardCornerRadius="25dp"
-                    app:cardElevation="4dp">
+                    app:cardElevation="4dp"
+                    app:cardBackgroundColor="?attr/bb_background">
 
-                    <RelativeLayout
-                        android:layout_width="130dp"
-                        android:layout_height="40dp"
-                        android:background="?attr/bb_surface"
-                        android:paddingStart="8dp"
-                        android:paddingEnd="8dp">
+                    <LinearLayout
+                        android:layout_width="160dp"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:padding="8dp"
+                        android:gravity="center_vertical"
+                        android:background="?attr/bb_surface">
 
                         <ImageView
                             android:id="@+id/ivWalletIcon"
                             android:layout_width="20dp"
                             android:layout_height="20dp"
-                            android:layout_alignParentStart="true"
-                            android:layout_centerVertical="true"
                             android:src="@drawable/ic_wallet_24"
+                            android:layout_marginEnd="8dp"
                             app:tint="@color/cat_light_brown" />
 
-                        <Spinner
-                            android:id="@+id/spinnerWallet"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:layout_toStartOf="@id/btnWalletArrow"
-                            android:layout_toEndOf="@id/ivWalletIcon"
-                            android:backgroundTint="?attr/bb_surface"
-                            android:gravity="center_vertical"
-                            android:popupBackground="?attr/bb_surface"
-                            android:textSize="12sp"
-                            android:spinnerMode="dropdown" />
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:id="@+id/walletDropdownLayout"
+                            style="@style/Widget.Material3.TextInputLayout.OutlinedBox.Dense"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:hint="Wallet"
+                            app:endIconMode="dropdown_menu"
+                            app:boxBackgroundColor="?attr/bb_surface"
+                            app:boxCornerRadiusTopStart="12dp"
+                            app:boxCornerRadiusTopEnd="12dp"
+                            app:boxCornerRadiusBottomStart="12dp"
+                            app:boxCornerRadiusBottomEnd="12dp">
 
-                        <ImageView
-                            android:id="@+id/btnWalletArrow"
-                            android:layout_width="18dp"
-                            android:layout_height="18dp"
-                            android:layout_alignParentEnd="true"
-                            android:layout_centerVertical="true"
-                            android:src="@android:drawable/arrow_down_float"
-                            app:tint="?attr/bb_primaryText"
-                            android:clickable="true"
-                            android:focusable="true" />
+                            <AutoCompleteTextView
+                                android:id="@+id/autoCompleteWallet"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:inputType="none"
+                                android:textSize="13sp"
+                                android:background="@android:color/transparent"
+                                android:padding="8dp"
+                                android:dropDownBackground="?attr/bb_surface" />
+                        </com.google.android.material.textfield.TextInputLayout>
 
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
 
-                    </RelativeLayout>
-                </androidx.cardview.widget.CardView>
-
-                <androidx.cardview.widget.CardView
+                <com.google.android.material.card.MaterialCardView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
                     android:layout_marginEnd="8dp"
-                    app:cardBackgroundColor="?attr/bb_background"
                     app:cardCornerRadius="25dp"
-                    app:cardElevation="4dp">
+                    app:cardElevation="4dp"
+                    app:cardBackgroundColor="?attr/bb_background">
 
-                    <FrameLayout
-                        android:layout_width="130dp"
-                        android:layout_height="40dp">
+                    <LinearLayout
+                        android:id="@+id/btnSelectDate"
+                        android:layout_width="160dp"
+                        android:layout_height="40dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:background="?attr/bb_surface"
+                        android:paddingHorizontal="8dp">
 
-                        <com.google.android.material.button.MaterialButton
-                            android:id="@+id/btnTimePeriod"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:background="?attr/bb_surface"
-                            android:text="Date"
-                            android:backgroundTint="?attr/bb_surface"
-                            android:dropDownWidth="wrap_content"
-                            android:gravity="center"
-                            android:popupBackground="?attr/bb_surface" />
-                    </FrameLayout>
-                </androidx.cardview.widget.CardView>
+                        <TextView
+                            android:id="@+id/tvDateRange"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Select Date"
+                            android:textSize="13sp"
+                            android:textColor="?attr/bb_primaryText" />
+
+                        <ImageView
+                            android:id="@+id/btnClearDate"
+                            android:layout_width="18dp"
+                            android:layout_height="18dp"
+                            android:src="@drawable/ic_ui_circle_x"
+                            android:contentDescription="Clear date"
+                            android:clickable="true"
+                            android:focusable="true"
+                            app:tint="?attr/bb_primaryText" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
             </LinearLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
 
