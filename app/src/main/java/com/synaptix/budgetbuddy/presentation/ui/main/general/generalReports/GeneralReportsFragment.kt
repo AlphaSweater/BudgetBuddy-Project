@@ -708,11 +708,21 @@ class GeneralReportsFragment : Fragment() {
         chart.setNoDataText("No ${chartType} data available")
         chart.setNoDataTextColor(context.getThemeColor(R.attr.bb_primaryText))
 
-        if (transactions.isEmpty()) {
-            chart.invalidate()
-            return
+        // Get the date range to display
+        val dateRange = when (val range = viewModel.dateRange.value) {
+            null -> {
+                // Default to current month if no date range is set
+                val (startDate, endDate) = DateUtil.getCurrentMonthRange()
+                startDate..endDate
+            }
+            else -> range
         }
 
+        Log.d("ChartDates", "Date range: ${Date(dateRange.start)} to ${Date(dateRange.endInclusive)}")
+
+        // Create a list of all days in the date range
+        val allDates = generateDateRange(dateRange.start, dateRange.endInclusive)
+        
         // Sort transactions by date
         val sortedTransactions = transactions.sortedBy { it.date }
 
@@ -732,20 +742,7 @@ class GeneralReportsFragment : Fragment() {
             cal.timeInMillis
         }
 
-        // Create a list of all days in the date range
-        val dateRange = if (sortedTransactions.size > 1) {
-            val startDate = sortedTransactions.first().date
-            val endDate = sortedTransactions.last().date
-            generateDateRange(startDate, endDate)
-        } else {
-            // If there's only one transaction, show it with a point before and after
-            val date = sortedTransactions.first().date
-            listOf(
-                date - 86400000, // 1 day before
-                date,
-                date + 86400000  // 1 day after
-            )
-        }
+        Log.d("ChartDates", "Transaction dates: ${dailyTransactions.keys.map { Date(it) }}")
 
         // Prepare data entries and x-axis labels
         val entries = mutableListOf<Entry>()
@@ -756,7 +753,7 @@ class GeneralReportsFragment : Fragment() {
         val dailyTotals = mutableMapOf<Long, Double>()
 
         // Initialize all days with zero
-        dateRange.forEach { date ->
+        allDates.forEach { date ->
             dailyTotals[date] = 0.0
         }
 
@@ -764,14 +761,25 @@ class GeneralReportsFragment : Fragment() {
         dailyTransactions.forEach { (date, dayTransactions) ->
             val dailyTotal = dayTransactions.sumOf { it.amount.toDouble() }
             dailyTotals[date] = dailyTotal
+            Log.d("ChartDates", "Date ${Date(date)} has total: $dailyTotal")
         }
 
-        // Calculate cumulative totals
+        // Calculate cumulative totals for all days
         var runningTotal = 0.0
-        dateRange.sorted().forEachIndexed { index, date ->
+        allDates.forEachIndexed { index, date ->
             runningTotal += dailyTotals[date] ?: 0.0
             entries.add(Entry(index.toFloat(), runningTotal.toFloat()))
-            xAxisLabels.add(dateFormat.format(Date(date)))
+            
+            // Only add label if it's the start date, end date, or has transactions
+            val hasTransactions = dailyTotals[date] != 0.0
+            val isStartDate = isSameDay(date, dateRange.start)
+            val isEndDate = isSameDay(date, dateRange.endInclusive)
+            
+            val shouldShowLabel = isStartDate || isEndDate || hasTransactions
+            
+            Log.d("ChartDates", "Date ${Date(date)} - Start: $isStartDate, End: $isEndDate, HasTransactions: $hasTransactions, ShowLabel: $shouldShowLabel")
+            
+            xAxisLabels.add(if (shouldShowLabel) dateFormat.format(Date(date)) else "")
         }
 
         // Create dataset
@@ -787,6 +795,26 @@ class GeneralReportsFragment : Fragment() {
                 else -> ContextCompat.getDrawable(context, R.drawable.gradient_expense)
             }
             setDrawValues(false)
+            
+            // Only show circles for dates with transactions or start/end dates
+            setDrawCircles(true)
+            setDrawCircleHole(false)
+            setDrawCircles(true)
+            setCircleRadius(3f)
+            
+            // Create a list of indices where we want to show circles
+            val circleIndices = entries.indices.filter { index ->
+                val date = allDates[index]
+                isSameDay(date, dateRange.start) || 
+                isSameDay(date, dateRange.endInclusive) || 
+                dailyTotals[date] != 0.0
+            }
+            
+            // Set circle colors for all points
+            val circleColors = entries.indices.map { index ->
+                if (index in circleIndices) lineColor else Color.TRANSPARENT
+            }
+            setCircleColors(circleColors)
         }
 
         val lineData = LineData(dataSet)
@@ -802,10 +830,13 @@ class GeneralReportsFragment : Fragment() {
                 position = XAxis.XAxisPosition.BOTTOM
                 setDrawGridLines(false)
                 labelRotationAngle = -45f
-                setLabelCount(minOf(7, xAxisLabels.size), true)
+                setLabelCount(xAxisLabels.count { it.isNotEmpty() }, true)  // Only count non-empty labels
                 axisMinimum = 0f
                 axisMaximum = (xAxisLabels.size - 1).coerceAtLeast(0).toFloat()
                 setAvoidFirstLastClipping(true)
+                setDrawLabels(true)
+                setDrawAxisLine(true)
+                setCenterAxisLabels(false)
             }
 
             // Configure y-axis
@@ -1048,6 +1079,14 @@ class GeneralReportsFragment : Fragment() {
         lineChartExpense.requestLayout()
 
         Log.d("ExpenseGoalLines", "Chart updated with goal lines")
+    }
+
+    // Helper function to compare dates by day (ignoring time)
+    private fun isSameDay(date1: Long, date2: Long): Boolean {
+        val cal1 = Calendar.getInstance().apply { timeInMillis = date1 }
+        val cal2 = Calendar.getInstance().apply { timeInMillis = date2 }
+        return cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR) &&
+               cal1.get(Calendar.DAY_OF_YEAR) == cal2.get(Calendar.DAY_OF_YEAR)
     }
 
     //================================================================================
