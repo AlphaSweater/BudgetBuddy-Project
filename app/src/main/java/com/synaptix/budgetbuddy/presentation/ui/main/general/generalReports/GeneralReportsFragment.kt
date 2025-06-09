@@ -94,53 +94,13 @@ class GeneralReportsFragment : Fragment() {
     //================================================================================
     // Properties
     //================================================================================
-
-    //================================================================================
-    // Lifecycle Methods
-    //================================================================================
-
-    //================================================================================
-    // Setup Methods
-    //================================================================================
-
-    //================================================================================
-    // State Observation
-    //================================================================================
-
-    //================================================================================
-    // UI Update Methods
-    //================================================================================
-
-    //================================================================================
-    // Chart Methods
-    //================================================================================
-
-    //================================================================================
-    // View Toggle Methods
-    //================================================================================
-
-    //================================================================================
-    // Utility Methods
-    //================================================================================
-
-    //================================================================================
-    // Navigation Methods
-    //================================================================================
-
     private var isBalanceVisible = true
-
-    // ViewBinding for safe view access
     private var _binding: FragmentGeneralReportsBinding? = null
     private val binding get() = _binding!!
-
     private var currentDateRange: Pair<Long, Long>? = null
-
-    // Use activityViewModels to share the ViewModel between fragments
     private val viewModel: GeneralViewModel by activityViewModels()
-
     private lateinit var lineChartExpense: LineChart
     private lateinit var lineChartIncome: LineChart
-
     private var expenseGoalJob: Job? = null
 
     // Adapters for categories
@@ -169,6 +129,9 @@ class GeneralReportsFragment : Fragment() {
         )
     }
 
+    //================================================================================
+    // Lifecycle Methods
+    //================================================================================
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -200,6 +163,16 @@ class GeneralReportsFragment : Fragment() {
         observeViewModel()
     }
 
+    override fun onDestroyView() {
+        expenseGoalJob?.cancel()
+        expenseGoalJob = null
+        _binding = null
+        super.onDestroyView()
+    }
+
+    //================================================================================
+    // Setup Methods
+    //================================================================================
     private fun setupViews() {
         setupRecyclerViews()
         setupOnClickListeners()
@@ -281,21 +254,78 @@ class GeneralReportsFragment : Fragment() {
         }
     }
 
-    /**
-     * Observes ViewModel states using coroutines.
-     * 
-     * This method:
-     * 1. Creates a coroutine scope tied to the Fragment's lifecycle
-     * 2. Uses repeatOnLifecycle to handle lifecycle changes
-     * 3. Launches separate coroutines for each data type
-     * 
-     * The coroutines will:
-     * - Start when the Fragment is started
-     * - Be cancelled when the Fragment is stopped
-     * - Restart when the Fragment is started again
-     * 
-     * This ensures efficient resource usage and prevents memory leaks.
-     */
+    private fun setupWalletDropdown() {
+        lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.walletState.collectLatest { walletState ->
+                    when (walletState) {
+                        is GeneralViewModel.WalletState.Success -> {
+                            val wallets = walletState.wallets
+                            if (wallets.isNotEmpty()) {
+                                // Create a list with "All Wallets" as the first item
+                                val walletNames = listOf("All Wallets") + wallets.map { it.name }
+
+                                val adapter = ArrayAdapter(
+                                    requireContext(),
+                                    R.layout.item_dropdown_item,
+                                    walletNames
+                                )
+
+                                binding.autoCompleteWallet.setAdapter(adapter)
+
+                                // Set up the item selected listener
+                                binding.autoCompleteWallet.setOnItemClickListener { _, _, position, _ ->
+                                    val selectedWallet = if (position == 0) {
+                                        null // "All Wallets" selected
+                                    } else {
+                                        wallets[position - 1] // Adjust index since we added "All Wallets" at position 0
+                                    }
+                                    viewModel.selectWallet(selectedWallet)
+                                }
+
+                                // Set initial selection based on persisted wallet
+                                viewModel.selectedWallet.value?.let { selectedWallet ->
+                                    val position = wallets.indexOf(selectedWallet) + 1 // +1 because of "All Wallets"
+                                    if (position > 0) {
+                                        binding.autoCompleteWallet.setText(walletNames[position], false)
+                                    } else {
+                                        binding.autoCompleteWallet.setText("All Wallets", false)
+                                    }
+                                } ?: run {
+                                    binding.autoCompleteWallet.setText("All Wallets", false)
+                                }
+                            }
+                        }
+                        else -> {}
+                    }
+                }
+            }
+        }
+    }
+
+    private fun setupViewSwitcher() {
+        binding.apply {
+            // Set initial state for reports view
+            btnReportsView.isSelected = true
+            btnTransactionsView.isSelected = false
+
+            btnReportsView.setOnClickListener {
+                // Already in reports view, do nothing
+            }
+
+            btnTransactionsView.setOnClickListener {
+                try {
+                    findNavController().navigate(R.id.action_generalReportsFragment_to_generalTransactionsFragment)
+                } catch (e: Exception) {
+                    Log.e("GeneralReportsFragment", "Navigation error: ${e.message}")
+                }
+            }
+        }
+    }
+
+    //================================================================================
+    // State Observation
+    //================================================================================
     private fun observeViewModel() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -389,6 +419,9 @@ class GeneralReportsFragment : Fragment() {
         }
     }
 
+    //================================================================================
+    // UI Update Methods
+    //================================================================================
     private fun updateUI() {
         when (viewModel.transactionsState.value) {
             is GeneralViewModel.TransactionState.Success -> {
@@ -554,106 +587,37 @@ class GeneralReportsFragment : Fragment() {
         labelIncomeAdapter.submitList(incomeLabelItems)
     }
 
-    private fun showCategoryExpenseToggle() {
+    private fun updateTotalBalance(balance: Double) {
+        viewModel.setTotalBalance(balance)
         binding.apply {
-            recyclerViewExpenseCategory.visibility = View.VISIBLE
-            recyclerViewIncomeCategory.visibility = View.GONE
-            recyclerViewLabelExpense.visibility = View.GONE
-            recyclerViewLabelIncome.visibility = View.GONE
-            setupPieChart(isExpense = true)
-            highlightToggle(btnCatExpenseToggle, btnCatIncomeToggle)
-        }
-    }
-
-    private fun showCategoryIncomeToggle() {
-        binding.apply {
-            recyclerViewExpenseCategory.visibility = View.GONE
-            recyclerViewIncomeCategory.visibility = View.VISIBLE
-            recyclerViewLabelExpense.visibility = View.GONE
-            recyclerViewLabelIncome.visibility = View.GONE
-            setupPieChart(isExpense = false)
-            highlightToggle(btnCatIncomeToggle, btnCatExpenseToggle)
-        }
-    }
-
-    private fun showLabelExpenseToggle() {
-        binding.apply {
-            recyclerViewExpenseCategory.visibility = View.GONE
-            recyclerViewIncomeCategory.visibility = View.GONE
-            recyclerViewLabelExpense.visibility = View.VISIBLE
-            recyclerViewLabelIncome.visibility = View.GONE
-            setupPieChart(isExpense = true)
-            highlightToggle(btnLabelExpenseToggle, btnLabelIncomeToggle)
-        }
-    }
-
-    private fun showLabelIncomeToggle() {
-        binding.apply {
-            recyclerViewExpenseCategory.visibility = View.GONE
-            recyclerViewIncomeCategory.visibility = View.GONE
-            recyclerViewLabelExpense.visibility = View.GONE
-            recyclerViewLabelIncome.visibility = View.VISIBLE
-            setupPieChart(isExpense = false)
-            highlightToggle(btnLabelIncomeToggle, btnLabelExpenseToggle)
-        }
-    }
-
-    private fun highlightToggle(selected: LinearLayout, unselected: LinearLayout) {
-        selected.setBackgroundResource(R.drawable.toggle_selected)
-        unselected.setBackgroundResource(android.R.color.transparent)
-    }
-
-    private fun showChartExpense() {
-        binding.apply {
-            lineChartExpense.visibility = View.VISIBLE
-            lineChartIncome.visibility = View.GONE
-            highlightChartToggle(btnChartExpenseToggle, btnChartIncomeToggle)
-            updateChartData()
-
-            // Update amounts when toggled
-            val transactions = viewModel.getTransactionsByType("expense")
-            val totalExpense = transactions.sumOf { it.amount.toDouble() }
-            txtChartExpenseTotal.text =
-                if (totalExpense > 0) CurrencyUtil.formatWithSymbol(-totalExpense)
-                else CurrencyUtil.formatWithSymbol(0.0)
-        }
-    }
-
-    private fun showChartIncome() {
-        binding.apply {
-            lineChartExpense.visibility = View.GONE
-            lineChartIncome.visibility = View.VISIBLE
-            highlightChartToggle(btnChartIncomeToggle, btnChartExpenseToggle)
-            updateChartData()
-
-            // Update amounts when toggled
-            val transactions = viewModel.getTransactionsByType("income")
-            val totalIncome = transactions.sumOf { it.amount.toDouble() }
-            txtChartIncomeTotal.text =
-                if (totalIncome > 0) CurrencyUtil.formatWithSymbol(totalIncome)
-                else CurrencyUtil.formatWithSymbol(0.0)
-        }
-    }
-
-    private fun highlightChartToggle(selected: View, unselected: View) {
-        selected.setBackgroundResource(R.drawable.toggle_selected)
-        unselected.setBackgroundResource(android.R.color.transparent)
-    }
-
-    // Update the chart data based on the visible chart
-    private fun updateChartData() {
-        when {
-            lineChartExpense.visibility == View.VISIBLE -> {
-                val expenseTransactions = viewModel.getTransactionsByType("expense")
-                setupLineChart(lineChartExpense, expenseTransactions, "expense")
+            // Update balance text with current visibility state
+            textViewCurrencyTotal.text = if (isBalanceVisible) {
+                CurrencyUtil.formatWithoutSymbol(balance)
+            } else {
+                "••••••"
             }
-            lineChartIncome.visibility == View.VISIBLE -> {
-                val incomeTransactions = viewModel.getTransactionsByType("income")
-                setupLineChart(lineChartIncome, incomeTransactions, "income")
+
+            // Set text color based on balance
+            val colorRes = if (balance >= 0) {
+                R.attr.bb_profit
+            } else {
+                R.attr.bb_expense
             }
+            textViewCurrencyTotal.setTextColor(context?.getThemeColor(colorRes) ?: R.color.profit_green)
         }
     }
 
+    private fun updateDateRangeText() {
+        binding.tvDateRange.text = if (currentDateRange != null) {
+            "${DateUtil.formatDateToDMY(currentDateRange!!.first, true)} -\n${DateUtil.formatDateToDMY(currentDateRange!!.second, true)}"
+        } else {
+            "Select Date"
+        }
+    }
+
+    //================================================================================
+    // Chart Methods
+    //================================================================================
     private fun setupLineChart(chart: LineChart, transactions: List<Transaction>, chartType: String) {
         val context = chart.context
         chart.clear()
@@ -778,7 +742,6 @@ class GeneralReportsFragment : Fragment() {
                 axisMaximum = maxY + padding
             }
 
-
             // Configure chart appearance
             setExtraOffsets(16f, 16f, 16f, 30f)
             axisRight.isEnabled = false
@@ -870,45 +833,6 @@ class GeneralReportsFragment : Fragment() {
         }
     }
 
-    private fun updateTotalBalance(balance: Double) {
-        viewModel.setTotalBalance(balance)
-        binding.apply {
-            // Update balance text with current visibility state
-            textViewCurrencyTotal.text = if (isBalanceVisible) {
-                CurrencyUtil.formatWithoutSymbol(balance)
-            } else {
-                "••••••"
-            }
-
-            // Set text color based on balance
-            val colorRes = if (balance >= 0) {
-                R.attr.bb_profit
-            } else {
-                R.attr.bb_expense
-            }
-            textViewCurrencyTotal.setTextColor(context?.getThemeColor(colorRes) ?: R.color.profit_green)
-        }
-    }
-
-    /**
-     * Sets up the pie chart showing category breakdown.
-     * 
-     * Chart Configuration:
-     * 1. Data Processing:
-     *    - Filters transactions by type
-     *    - Groups transactions by category
-     *    - Calculates percentages
-     * 
-     * 2. Visual Setup:
-     *    - Configures slice colors and labels
-     *    - Sets up center text and hole
-     *    - Adds animations and interactions
-     * 
-     * 3. Performance:
-     *    - Uses efficient data structures
-     *    - Minimizes object creation
-     *    - Optimizes drawing operations
-     */
     private fun setupPieChart(isExpense: Boolean) {
         val context = binding.root.context
         val pieChart: PieChart = binding.pieChart
@@ -973,118 +897,6 @@ class GeneralReportsFragment : Fragment() {
             legend.isEnabled = false
             animateY(1000, Easing.EaseInOutQuad)
             invalidate()
-        }
-    }
-
-    private fun setupWalletDropdown() {
-        lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.walletState.collectLatest { walletState ->
-                    when (walletState) {
-                        is GeneralViewModel.WalletState.Success -> {
-                            val wallets = walletState.wallets
-                            if (wallets.isNotEmpty()) {
-                                // Create a list with "All Wallets" as the first item
-                                val walletNames = listOf("All Wallets") + wallets.map { it.name }
-
-                                val adapter = ArrayAdapter(
-                                    requireContext(),
-                                    R.layout.item_dropdown_item,
-                                    walletNames
-                                )
-
-                                binding.autoCompleteWallet.setAdapter(adapter)
-
-                                // Set up the item selected listener
-                                binding.autoCompleteWallet.setOnItemClickListener { _, _, position, _ ->
-                                    val selectedWallet = if (position == 0) {
-                                        null // "All Wallets" selected
-                                    } else {
-                                        wallets[position - 1] // Adjust index since we added "All Wallets" at position 0
-                                    }
-                                    viewModel.selectWallet(selectedWallet)
-                                }
-
-                                // Set initial selection based on persisted wallet
-                                viewModel.selectedWallet.value?.let { selectedWallet ->
-                                    val position = wallets.indexOf(selectedWallet) + 1 // +1 because of "All Wallets"
-                                    if (position > 0) {
-                                        binding.autoCompleteWallet.setText(walletNames[position], false)
-                                    } else {
-                                        binding.autoCompleteWallet.setText("All Wallets", false)
-                                    }
-                                } ?: run {
-                                    binding.autoCompleteWallet.setText("All Wallets", false)
-                                }
-                            }
-                        }
-                        else -> {}
-                    }
-                }
-            }
-        }
-    }
-
-    private fun showDateRangePicker() {
-        val calendar = Calendar.getInstance()
-        
-        // Use persisted date range if available, otherwise default to current month
-        val (defaultStartDate, defaultEndDate) = viewModel.dateRange.value?.let { range ->
-            range.start to range.endInclusive
-        } ?: DateUtil.getCurrentMonthRange()
-
-        // Create and show the date range picker dialog
-        val dateRangePicker = MaterialDatePicker.Builder.dateRangePicker()
-            .setTitleText("Select Date Range")
-            .setSelection(
-                androidx.core.util.Pair(
-                    defaultStartDate,
-                    defaultEndDate
-                )
-            )
-            .build()
-
-        dateRangePicker.addOnPositiveButtonClickListener { selection ->
-            val startDate = selection.first ?: return@addOnPositiveButtonClickListener
-            val endDate = selection.second ?: return@addOnPositiveButtonClickListener
-            currentDateRange = startDate to endDate
-            updateDateRangeText()
-            viewModel.setDateRange(startDate, endDate)
-        }
-
-        dateRangePicker.addOnNegativeButtonClickListener {
-            currentDateRange = null
-            updateDateRangeText()
-            viewModel.clearDateRange()
-        }
-
-        dateRangePicker.show(childFragmentManager, "DATE_RANGE_PICKER")
-    }
-
-    private fun generateDateRange(startDate: Long, endDate: Long): List<Long> {
-        val dates = mutableListOf<Long>()
-        val calendar = Calendar.getInstance().apply {
-            timeInMillis = startDate
-            set(Calendar.HOUR_OF_DAY, 0)
-            set(Calendar.MINUTE, 0)
-            set(Calendar.SECOND, 0)
-            set(Calendar.MILLISECOND, 0)
-        }
-
-        while (calendar.timeInMillis <= endDate) {
-            dates.add(calendar.timeInMillis)
-            calendar.add(Calendar.DAY_OF_MONTH, 1)
-        }
-
-        return dates
-    }
-
-    // Add this function to update the button text
-    private fun updateDateRangeText() {
-        binding.tvDateRange.text = if (currentDateRange != null) {
-            "${DateUtil.formatDateToDMY(currentDateRange!!.first, true)} -\n${DateUtil.formatDateToDMY(currentDateRange!!.second, true)}"
-        } else {
-            "Select Date"
         }
     }
 
@@ -1204,50 +1016,178 @@ class GeneralReportsFragment : Fragment() {
         Log.d("ExpenseGoalLines", "Chart updated with goal lines")
     }
 
-    private fun navigateToLabelDetails(label: Label) {
-        // TODO: Implement navigation to label details
-    }
-
-    /**
-     * Navigates to transaction details screen.
-     * To be implemented when the details screen is ready.
-     */
-    private fun navigateToTransactionDetails(transaction: Transaction) {
-        // TODO: Implement navigation to transaction details
-    }
-
-    /**
-     * Navigates to category details screen.
-     * To be implemented when the details screen is ready.
-     */
-    private fun navigateToCategoryDetails(category: Category) {
-        // TODO: Implement navigation to category details
-    }
-
-    private fun setupViewSwitcher() {
+    //================================================================================
+    // View Toggle Methods
+    //================================================================================
+    private fun showCategoryExpenseToggle() {
         binding.apply {
-            // Set initial state for reports view
-            btnReportsView.isSelected = true
-            btnTransactionsView.isSelected = false
+            recyclerViewExpenseCategory.visibility = View.VISIBLE
+            recyclerViewIncomeCategory.visibility = View.GONE
+            recyclerViewLabelExpense.visibility = View.GONE
+            recyclerViewLabelIncome.visibility = View.GONE
+            setupPieChart(isExpense = true)
+            highlightToggle(btnCatExpenseToggle, btnCatIncomeToggle)
+        }
+    }
 
-            btnReportsView.setOnClickListener {
-                // Already in reports view, do nothing
+    private fun showCategoryIncomeToggle() {
+        binding.apply {
+            recyclerViewExpenseCategory.visibility = View.GONE
+            recyclerViewIncomeCategory.visibility = View.VISIBLE
+            recyclerViewLabelExpense.visibility = View.GONE
+            recyclerViewLabelIncome.visibility = View.GONE
+            setupPieChart(isExpense = false)
+            highlightToggle(btnCatIncomeToggle, btnCatExpenseToggle)
+        }
+    }
+
+    private fun showLabelExpenseToggle() {
+        binding.apply {
+            recyclerViewExpenseCategory.visibility = View.GONE
+            recyclerViewIncomeCategory.visibility = View.GONE
+            recyclerViewLabelExpense.visibility = View.VISIBLE
+            recyclerViewLabelIncome.visibility = View.GONE
+            setupPieChart(isExpense = true)
+            highlightToggle(btnLabelExpenseToggle, btnLabelIncomeToggle)
+        }
+    }
+
+    private fun showLabelIncomeToggle() {
+        binding.apply {
+            recyclerViewExpenseCategory.visibility = View.GONE
+            recyclerViewIncomeCategory.visibility = View.GONE
+            recyclerViewLabelExpense.visibility = View.GONE
+            recyclerViewLabelIncome.visibility = View.VISIBLE
+            setupPieChart(isExpense = false)
+            highlightToggle(btnLabelIncomeToggle, btnLabelExpenseToggle)
+        }
+    }
+
+    private fun highlightToggle(selected: LinearLayout, unselected: LinearLayout) {
+        selected.setBackgroundResource(R.drawable.toggle_selected)
+        unselected.setBackgroundResource(android.R.color.transparent)
+    }
+
+    private fun showChartExpense() {
+        binding.apply {
+            lineChartExpense.visibility = View.VISIBLE
+            lineChartIncome.visibility = View.GONE
+            highlightChartToggle(btnChartExpenseToggle, btnChartIncomeToggle)
+            updateChartData()
+
+            // Update amounts when toggled
+            val transactions = viewModel.getTransactionsByType("expense")
+            val totalExpense = transactions.sumOf { it.amount.toDouble() }
+            txtChartExpenseTotal.text =
+                if (totalExpense > 0) CurrencyUtil.formatWithSymbol(-totalExpense)
+                else CurrencyUtil.formatWithSymbol(0.0)
+        }
+    }
+
+    private fun showChartIncome() {
+        binding.apply {
+            lineChartExpense.visibility = View.GONE
+            lineChartIncome.visibility = View.VISIBLE
+            highlightChartToggle(btnChartIncomeToggle, btnChartExpenseToggle)
+            updateChartData()
+
+            // Update amounts when toggled
+            val transactions = viewModel.getTransactionsByType("income")
+            val totalIncome = transactions.sumOf { it.amount.toDouble() }
+            txtChartIncomeTotal.text =
+                if (totalIncome > 0) CurrencyUtil.formatWithSymbol(totalIncome)
+                else CurrencyUtil.formatWithSymbol(0.0)
+        }
+    }
+
+    private fun highlightChartToggle(selected: View, unselected: View) {
+        selected.setBackgroundResource(R.drawable.toggle_selected)
+        unselected.setBackgroundResource(android.R.color.transparent)
+    }
+
+    // Update the chart data based on the visible chart
+    private fun updateChartData() {
+        when {
+            lineChartExpense.visibility == View.VISIBLE -> {
+                val expenseTransactions = viewModel.getTransactionsByType("expense")
+                setupLineChart(lineChartExpense, expenseTransactions, "expense")
             }
-
-            btnTransactionsView.setOnClickListener {
-                try {
-                    findNavController().navigate(R.id.action_generalReportsFragment_to_generalTransactionsFragment)
-                } catch (e: Exception) {
-                    Log.e("GeneralReportsFragment", "Navigation error: ${e.message}")
-                }
+            lineChartIncome.visibility == View.VISIBLE -> {
+                val incomeTransactions = viewModel.getTransactionsByType("income")
+                setupLineChart(lineChartIncome, incomeTransactions, "income")
             }
         }
     }
 
-    override fun onDestroyView() {
-        expenseGoalJob?.cancel()
-        expenseGoalJob = null
-        _binding = null
-        super.onDestroyView()
+    //================================================================================
+    // Utility Methods
+    //================================================================================
+    private fun generateDateRange(startDate: Long, endDate: Long): List<Long> {
+        val dates = mutableListOf<Long>()
+        val calendar = Calendar.getInstance().apply {
+            timeInMillis = startDate
+            set(Calendar.HOUR_OF_DAY, 0)
+            set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
+        }
+
+        while (calendar.timeInMillis <= endDate) {
+            dates.add(calendar.timeInMillis)
+            calendar.add(Calendar.DAY_OF_MONTH, 1)
+        }
+
+        return dates
+    }
+
+    private fun showDateRangePicker() {
+        val calendar = Calendar.getInstance()
+        
+        // Use persisted date range if available, otherwise default to current month
+        val (defaultStartDate, defaultEndDate) = viewModel.dateRange.value?.let { range ->
+            range.start to range.endInclusive
+        } ?: DateUtil.getCurrentMonthRange()
+
+        // Create and show the date range picker dialog
+        val dateRangePicker = MaterialDatePicker.Builder.dateRangePicker()
+            .setTitleText("Select Date Range")
+            .setSelection(
+                androidx.core.util.Pair(
+                    defaultStartDate,
+                    defaultEndDate
+                )
+            )
+            .build()
+
+        dateRangePicker.addOnPositiveButtonClickListener { selection ->
+            val startDate = selection.first ?: return@addOnPositiveButtonClickListener
+            val endDate = selection.second ?: return@addOnPositiveButtonClickListener
+            currentDateRange = startDate to endDate
+            updateDateRangeText()
+            viewModel.setDateRange(startDate, endDate)
+        }
+
+        dateRangePicker.addOnNegativeButtonClickListener {
+            currentDateRange = null
+            updateDateRangeText()
+            viewModel.clearDateRange()
+        }
+
+        dateRangePicker.show(childFragmentManager, "DATE_RANGE_PICKER")
+    }
+
+    //================================================================================
+    // Navigation Methods
+    //================================================================================
+    private fun navigateToLabelDetails(label: Label) {
+        // TODO: Implement navigation to label details
+    }
+
+    private fun navigateToTransactionDetails(transaction: Transaction) {
+        // TODO: Implement navigation to transaction details
+    }
+
+    private fun navigateToCategoryDetails(category: Category) {
+        // TODO: Implement navigation to category details
     }
 }
