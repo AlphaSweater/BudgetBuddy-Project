@@ -1,22 +1,21 @@
 package com.synaptix.budgetbuddy.presentation.ui.main.home
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.github.mikephil.charting.data.PieEntry
 import com.synaptix.budgetbuddy.core.model.Category
+import com.synaptix.budgetbuddy.core.model.HomeItems
+import com.synaptix.budgetbuddy.core.model.HomeListItems
+import com.synaptix.budgetbuddy.core.model.Result
 import com.synaptix.budgetbuddy.core.model.Transaction
+import com.synaptix.budgetbuddy.core.model.TransactionListItems
 import com.synaptix.budgetbuddy.core.model.Wallet
 import com.synaptix.budgetbuddy.core.usecase.auth.GetUserIdUseCase
 import com.synaptix.budgetbuddy.core.usecase.main.category.GetCategoriesUseCase
 import com.synaptix.budgetbuddy.core.usecase.main.transaction.GetTransactionsUseCase
-import com.synaptix.budgetbuddy.core.usecase.main.wallet.GetWalletUseCase
-import com.synaptix.budgetbuddy.data.firebase.model.TransactionDTO
+import com.synaptix.budgetbuddy.core.usecase.main.transaction.TransactionCalculationsUseCase
+import com.synaptix.budgetbuddy.core.usecase.main.wallet.GetWalletsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -69,23 +68,16 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class HomeMainViewModel @Inject constructor(
-    private val getWalletUseCase: GetWalletUseCase,
+    private val getWalletsUseCase: GetWalletsUseCase,
     private val getTransactionsUseCase: GetTransactionsUseCase,
     private val getCategoriesUseCase: GetCategoriesUseCase,
-    private val getUserIdUseCase: GetUserIdUseCase
+    private val getUserIdUseCase: GetUserIdUseCase,
+    private val transactionCalculationsUseCase: TransactionCalculationsUseCase
 ) : ViewModel() {
 
-    /**
-     * LiveData for pie chart entries.
-     * Used to update the pie chart when data changes.
-     */
-    private val _pieEntries = MutableLiveData<List<PieEntry>>()
-    val pieEntries: LiveData<List<PieEntry>> = _pieEntries
-
-    /**
-     * Sealed class representing the possible states for wallet data.
-     * This helps in handling different UI states and error cases.
-     */
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // State Definitions
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     sealed class WalletState {
         object Loading : WalletState()
         data class Success(val wallets: List<Wallet>) : WalletState()
@@ -93,67 +85,47 @@ class HomeMainViewModel @Inject constructor(
         object Empty : WalletState()
     }
 
-    /**
-     * Sealed class representing the possible states for transaction data.
-     * Similar to WalletState, this helps in managing UI states for transactions.
-     */
     sealed class TransactionState {
         object Loading : TransactionState()
-        data class Success(val transactions: List<Transaction>) : TransactionState()
+        data class Success(
+            val transactions: List<Transaction>,
+            val summary: HomeItems.TransactionsSummary
+        ) : TransactionState()
         data class Error(val message: String) : TransactionState()
         object Empty : TransactionState()
     }
 
-    /**
-     * Sealed class representing the possible states for category data.
-     * Similar to WalletState, this helps in managing UI states for categories.
-     */
     sealed class CategoryState {
         object Loading : CategoryState()
-        data class Success(val categories: List<Category>) : CategoryState()
+        data class Success(
+            val categories: List<Category>,
+            val categorySummaries: Map<String, HomeItems.CategoryTransactionsSummary>
+        ) : CategoryState()
         data class Error(val message: String) : CategoryState()
         object Empty : CategoryState()
     }
 
-    /**
-     * StateFlow for wallet data.
-     * This is a hot flow that maintains the current state and emits updates to collectors.
-     */
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // UI State
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private val _walletsState = MutableStateFlow<WalletState>(WalletState.Loading)
     val walletsState: StateFlow<WalletState> = _walletsState
 
-    /**
-     * StateFlow for transaction data.
-     * Similar to walletsState, this maintains the current state of transactions.
-     */
     private val _transactionsState = MutableStateFlow<TransactionState>(TransactionState.Loading)
     val transactionsState: StateFlow<TransactionState> = _transactionsState
 
-    /**
-     * StateFlow for category data.
-     * Similar to walletsState, this maintains the current state of categories.
-     */
     private val _categoriesState = MutableStateFlow<CategoryState>(CategoryState.Loading)
     val categoriesState: StateFlow<CategoryState> = _categoriesState
 
-    /**
-     * StateFlow for total wallet balance.
-     * Used to display the total balance across all wallets.
-     */
     private val _totalWalletBalance = MutableStateFlow<Double?>(null)
-    val totalWalletBalance: StateFlow<Double?> get() = _totalWalletBalance
+    val totalWalletBalance: StateFlow<Double?> = _totalWalletBalance
 
-    /**
-     * Date formatter for parsing and formatting dates.
-     * Used for date range filtering.
-     */
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // Filter State
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
     private val calendar = Calendar.getInstance()
 
-    /**
-     * Selected date range for filtering transactions.
-     * These properties trigger a data refresh when changed.
-     */
     private var _selectedStartDate = ""
     var selectedStartDate: String
         get() = _selectedStartDate
@@ -170,133 +142,177 @@ class HomeMainViewModel @Inject constructor(
             refreshData()
         }
 
-    /**
-     * Current transaction filter.
-     * Used to filter transactions by time period.
-     */
     private var currentFilter: TransactionFilter = TransactionFilter.ALL
         set(value) {
             field = value
             refreshData()
         }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // Initialization
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     init {
         refreshData()
     }
 
-    /**
-     * Refreshes all data for the home screen.
-     * 
-     * Data Flow Process:
-     * 1. Get User ID:
-     *    - Synchronously get the current user's ID
-     *    - If no user ID, set all states to Empty
-     * 
-     * 2. Parallel Data Loading:
-     *    - Launch separate coroutines for each data type
-     *    - Each coroutine runs independently
-     *    - All coroutines run in parallel for better performance
-     * 
-     * 3. Flow Collection:
-     *    - Each UseCase returns a Flow
-     *    - collect() starts collecting values from the Flow
-     *    - catch() handles any errors in the Flow
-     *    - State is updated based on the result
-     * 
-     * 4. Error Handling:
-     *    - Each Flow has its own error handling
-     *    - Errors are caught and converted to Empty state
-     *    - UI can handle Empty state appropriately
-     * 
-     * Example Flow:
-     * Repository (Firebase) -> UseCase (Flow) -> ViewModel (StateFlow) -> UI (collect)
-     */
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // Data Management
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     fun refreshData() {
         viewModelScope.launch {
-            // Get user ID synchronously
             val userId = getUserIdUseCase.execute()
             if (userId.isEmpty()) {
-                _walletsState.value = WalletState.Empty
-                _transactionsState.value = TransactionState.Empty
-                _categoriesState.value = CategoryState.Empty
+                setEmptyStates()
                 return@launch
             }
 
-            // Launch parallel coroutines for each data type
-            launch {
-                // Transaction Flow Collection
-                val transactionsFlow = if (_selectedStartDate.isNotEmpty() && _selectedEndDate.isNotEmpty()) {
-                    val startDate = dateFormat.parse(_selectedStartDate)?.time ?: 0L
-                    val endDate = dateFormat.parse(_selectedEndDate)?.time ?: 0L
-                    getTransactionsUseCase.executeWithDateRange(userId, startDate, endDate)
-                } else {
-                    getTransactionsUseCase.execute(userId)
-                }
-
-                // Collect and handle transaction data
-                transactionsFlow
-                    .catch { e ->
-                        // Handle errors by setting Empty state
-                        _transactionsState.value = TransactionState.Empty
-                    }
-                    .collect { result ->
-                        // Process successful result
-                        when (result) {
-                            is GetTransactionsUseCase.GetTransactionsResult.Success -> {
-                                val filtered = filterTransactions(result.transactions)
-                                _transactionsState.value = if (filtered.isEmpty()) TransactionState.Empty
-                                else TransactionState.Success(filtered)
-                            }
-                            is GetTransactionsUseCase.GetTransactionsResult.Error -> {
-                                _transactionsState.value = TransactionState.Empty
-                            }
-                        }
-                    }
-            }
-
-            launch {
-                // Wallet Flow Collection
-                getWalletUseCase.execute(userId)
-                    .catch { e ->
-                        _walletsState.value = WalletState.Empty
-                    }
-                    .collect { result ->
-                        _walletsState.value = when (result) {
-                            is GetWalletUseCase.GetWalletResult.Success -> {
-                                if (result.wallets.isEmpty()) WalletState.Empty
-                                else WalletState.Success(result.wallets)
-                            }
-                            is GetWalletUseCase.GetWalletResult.Error -> WalletState.Empty
-                        }
-                    }
-            }
-
-            launch {
-                // Category Flow Collection
-                getCategoriesUseCase.execute(userId)
-                    .catch { e ->
-                        _categoriesState.value = CategoryState.Empty
-                    }
-                    .collect { result ->
-                        _categoriesState.value = when (result) {
-                            is GetCategoriesUseCase.GetCategoriesResult.Success -> {
-                                if (result.categories.isEmpty()) CategoryState.Empty
-                                else CategoryState.Success(result.categories)
-                            }
-                            is GetCategoriesUseCase.GetCategoriesResult.Error -> CategoryState.Empty
-                        }
-                    }
-            }
+            launch { loadWallets(userId) }
+            launch { loadTransactions(userId) }
+            launch { loadCategories(userId) }
         }
     }
 
-    /**
-     * Filters transactions based on the current filter.
-     * Supports filtering by time period (ALL, TODAY, THIS_WEEK, THIS_MONTH).
-     * 
-     * @param transactions List of transactions to filter
-     * @return Filtered list of transactions
-     */
+    private suspend fun loadWallets(userId: String) {
+        getWalletsUseCase.execute(userId)
+            .catch { e ->
+                _walletsState.value = WalletState.Empty
+            }
+            .collect { result ->
+                _walletsState.value = when (result) {
+                    is GetWalletsUseCase.GetWalletResult.Success -> {
+                        if (result.wallets.isEmpty()) {
+                            _totalWalletBalance.value = 0.0
+                            WalletState.Empty
+                        } else {
+                            // Calculate total balance directly from wallets
+                            val totalBalance = result.wallets
+                                .filter { !it.excludeFromTotal }
+                                .sumOf { it.balance }
+                            _totalWalletBalance.value = totalBalance
+                            // filter the list of wallets in descending order by lastTransactionAt
+                            WalletState.Success(result.wallets.sortedByDescending { it.lastTransactionAt })
+                        }
+                    }
+                    is GetWalletsUseCase.GetWalletResult.Error -> {
+                        _totalWalletBalance.value = 0.0
+                        WalletState.Empty
+                    }
+                }
+            }
+    }
+
+    private suspend fun loadTransactions(userId: String) {
+        val transactionsFlow = if (_selectedStartDate.isNotEmpty() && _selectedEndDate.isNotEmpty()) {
+            val startDate = dateFormat.parse(_selectedStartDate)?.time ?: 0L
+            val endDate = dateFormat.parse(_selectedEndDate)?.time ?: 0L
+            getTransactionsUseCase.executeWithDateRange(userId, startDate, endDate)
+        } else {
+            getTransactionsUseCase.execute(userId)
+        }
+
+        transactionsFlow
+            .catch { e ->
+                _transactionsState.value = TransactionState.Empty
+            }
+            .collect { result ->
+                when (result) {
+                    is GetTransactionsUseCase.GetTransactionsResult.Success -> {
+                        val filtered = filterTransactions(result.transactions)
+                        if (filtered.isEmpty()) {
+                            _transactionsState.value = TransactionState.Empty
+                        } else {
+                            val summary = transactionCalculationsUseCase.calculateTotalTransactionsSummary(userId)
+                            when (summary) {
+                                is Result.Success -> {
+                                    _transactionsState.value = TransactionState.Success(
+                                        transactions = filtered,
+                                        summary = summary.data
+                                    )
+                                }
+                                is Result.Error -> {
+                                    _transactionsState.value = TransactionState.Error(summary.exception.message ?: "Unknown error")
+                                }
+                            }
+                        }
+                    }
+                    is GetTransactionsUseCase.GetTransactionsResult.Error -> {
+                        _transactionsState.value = TransactionState.Empty
+                    }
+                }
+            }
+    }
+
+    private suspend fun loadCategories(userId: String) {
+        getCategoriesUseCase.execute(userId)
+            .catch { e ->
+                _categoriesState.value = CategoryState.Empty
+            }
+            .collect { result ->
+                _categoriesState.value = when (result) {
+                    is GetCategoriesUseCase.GetCategoriesResult.Success -> {
+                        if (result.categories.isEmpty()) CategoryState.Empty
+                        else {
+                            // Filter out income categories
+                            val expenseCategories = result.categories.filter { 
+                                !it.type.equals("INCOME", ignoreCase = true) 
+                            }
+                            
+                            if (expenseCategories.isEmpty()) {
+                                CategoryState.Empty
+                            } else {
+                                getTransactionsUseCase.execute(userId)
+                                    .catch { e ->
+                                        _categoriesState.value = CategoryState.Empty
+                                    }
+                                    .collect { transactionsResult ->
+                                        when (transactionsResult) {
+                                            is GetTransactionsUseCase.GetTransactionsResult.Success -> {
+                                                val categorySummaries = transactionCalculationsUseCase.calculateCategoryTransactionsSummary(
+                                                    userId = userId,
+                                                    categories = expenseCategories
+                                                )
+                                                when (categorySummaries) {
+                                                    is Result.Success -> {
+                                                        // Filter out categories with no transactions and sort by expense
+                                                        val categoriesWithTransactions = expenseCategories
+                                                            .filter { category ->
+                                                                categorySummaries.data[category.id]?.transactionCount ?: 0 > 0
+                                                            }
+                                                            .sortedByDescending { category ->
+                                                                categorySummaries.data[category.id]?.totalExpense ?: 0.0
+                                                            }
+                                                        
+                                                        if (categoriesWithTransactions.isEmpty()) {
+                                                            _categoriesState.value = CategoryState.Empty
+                                                        } else {
+                                                            _categoriesState.value = CategoryState.Success(
+                                                                categories = categoriesWithTransactions,
+                                                                categorySummaries = categorySummaries.data
+                                                            )
+                                                        }
+                                                    }
+                                                    is Result.Error -> {
+                                                        _categoriesState.value = CategoryState.Error(categorySummaries.exception.message ?: "Unknown error")
+                                                    }
+                                                }
+                                            }
+                                            is GetTransactionsUseCase.GetTransactionsResult.Error -> {
+                                                _categoriesState.value = CategoryState.Empty
+                                            }
+                                        }
+                                    }
+                                CategoryState.Loading // Temporary state while processing
+                            }
+                        }
+                    }
+                    is GetCategoriesUseCase.GetCategoriesResult.Error -> CategoryState.Empty
+                }
+            }
+    }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // Filter Management
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private fun filterTransactions(transactions: List<Transaction>): List<Transaction> {
         val filtered = when (currentFilter) {
             TransactionFilter.ALL -> transactions
@@ -307,13 +323,6 @@ class HomeMainViewModel @Inject constructor(
         return filtered.sortedByDescending { it.date }
     }
 
-    /**
-     * Checks if a date falls within the current time period.
-     * 
-     * @param date The timestamp to check
-     * @param calendarField The calendar field to compare (DAY_OF_YEAR, WEEK_OF_YEAR, MONTH)
-     * @return True if the date is within the current period
-     */
     private fun isDateInRange(date: Long, calendarField: Int): Boolean {
         val transactionDate = Calendar.getInstance().apply {
             time = Date(date)
@@ -324,42 +333,26 @@ class HomeMainViewModel @Inject constructor(
                today.get(calendarField) == transactionDate.get(calendarField)
     }
 
-    /**
-     * Sets the current transaction filter.
-     * This triggers a data refresh with the new filter.
-     * 
-     * @param filter The new filter to apply
-     */
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // Public Actions
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     fun setTransactionFilter(filter: TransactionFilter) {
         currentFilter = filter
     }
 
-    /**
-     * Clears the date range filter.
-     * This triggers a data refresh with no date filtering.
-     */
     fun clearDateFilter() {
         _selectedStartDate = ""
         _selectedEndDate = ""
         refreshData()
     }
 
-    /**
-     * Updates the pie chart with transaction data.
-     * Groups transactions by category and creates pie entries.
-     * 
-     * @param transactions List of transactions to process
-     * @param categoriesMap Map of category IDs to Category objects
-     */
-    fun updatePieChartWithTransactions(transactions: List<TransactionDTO>, categoriesMap: Map<String, Category>) {
-        val transactionsGroupedByCategory = transactions.groupingBy { it.categoryId }.eachCount()
-
-        val pieEntries = transactionsGroupedByCategory.mapNotNull { (categoryId, count) ->
-            val categoryName = categoriesMap[categoryId]?.name ?: return@mapNotNull null
-            PieEntry(count.toFloat(), categoryName)
-        }
-
-        _pieEntries.value = pieEntries
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // Helper Functions
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    private fun setEmptyStates() {
+        _walletsState.value = WalletState.Empty
+        _transactionsState.value = TransactionState.Empty
+        _categoriesState.value = CategoryState.Empty
     }
 }
 

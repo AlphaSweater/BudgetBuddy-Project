@@ -373,48 +373,6 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
 
-                    <!-- Notifications Row -->
-                    <LinearLayout
-                        android:id="@+id/rowSelectEnableNotifications"
-                        style="@style/RowStyle"
-                        android:background="?attr/selectableItemBackground">
-
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical"
-                            android:layout_marginStart="12dp">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Enable Notifications"
-                                android:textColor="?attr/bb_primaryText"
-                                android:textSize="16sp" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="4dp"
-                                android:text="Get notified when there are changes to this wallet's transactions"
-                                android:textColor="?attr/bb_secondaryText"
-                                android:textSize="14sp" />
-                        </LinearLayout>
-
-                        <Switch
-                            android:id="@+id/switchNotifications"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:checked="true" />
-                    </LinearLayout>
-
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:layout_marginHorizontal="16dp"
-                        android:background="?attr/bb_secondaryText" />
-
                     <!-- Exclude from Total Row -->
                     <LinearLayout
                         android:id="@+id/rowSelectExcludeTotal"

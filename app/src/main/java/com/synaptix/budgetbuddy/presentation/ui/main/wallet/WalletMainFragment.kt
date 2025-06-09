@@ -20,29 +20,47 @@ import com.github.mikephil.charting.animation.Easing
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineDataSet
 import com.github.mikephil.charting.formatter.ValueFormatter
-import com.github.mikephil.charting.charts.LineChart
-import com.github.mikephil.charting.components.AxisBase
-import com.github.mikephil.charting.components.Legend
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.LineData
-import com.github.mikephil.charting.formatter.IFillFormatter
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
 import com.synaptix.budgetbuddy.R
 import com.synaptix.budgetbuddy.core.model.BudgetListItems
 import com.synaptix.budgetbuddy.core.model.Transaction
 import com.synaptix.budgetbuddy.core.model.Wallet
+import com.synaptix.budgetbuddy.core.util.CurrencyUtil
+import com.synaptix.budgetbuddy.core.util.DateUtil
+import com.synaptix.budgetbuddy.core.util.PrivacyUtil
 import com.synaptix.budgetbuddy.databinding.FragmentWalletMainBinding
 import com.synaptix.budgetbuddy.extentions.getThemeColor
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
 import java.util.Calendar
-import java.util.Date
-import java.util.Locale
+import kotlin.math.abs
 
+/**
+ * Fragment for the main wallet screen.
+ * 
+ * This fragment is responsible for:
+ * 1. Displaying wallet details and balance
+ * 2. Showing transaction history in a line chart
+ * 3. Managing wallet list
+ * 4. Handling balance privacy toggle
+ * 
+ * The fragment uses:
+ * - ViewBinding for view access
+ * - ViewModel for data management
+ * - Coroutines for asynchronous operations
+ * - MPAndroidChart for data visualization
+ */
 @AndroidEntryPoint
 class WalletMainFragment : Fragment() {
+
+    //================================================================================
+    // Properties
+    //================================================================================
+    private var isBalanceVisible = true
+
     private var _binding: FragmentWalletMainBinding? = null
     private val binding get() = _binding!!
 
@@ -57,6 +75,9 @@ class WalletMainFragment : Fragment() {
         arguments?.getString("walletId")
     }
 
+    //================================================================================
+    // Lifecycle Methods
+    //================================================================================
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -70,30 +91,48 @@ class WalletMainFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setupViews()
         observeViewModel()
-
-
     }
 
-    private fun setupViews() {
-        binding.apply {
-            // Setup RecyclerView
-            recyclerViewWalletMain.apply {
-                layoutManager = LinearLayoutManager(requireContext())
-                adapter = walletAdapter
-            }
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
 
-            // Setup click listeners
+    //================================================================================
+    // Setup Methods
+    //================================================================================
+    private fun setupViews() {
+        setupRecyclerView()
+        setupClickListeners()
+    }
+
+    private fun setupRecyclerView() {
+        binding.recyclerViewWalletMain.apply {
+            layoutManager = LinearLayoutManager(requireContext())
+            adapter = walletAdapter
+        }
+    }
+
+    private fun setupClickListeners() {
+        binding.apply {
             btnCreateWallet.setOnClickListener {
                 findNavController().navigate(R.id.action_walletMainFragment_to_addWalletFragment)
             }
 
-            ivEye.setOnClickListener {
-                walletViewModel.toggleBalanceVisibility()
+            btnViewEye.setOnClickListener {
+                isBalanceVisible = PrivacyUtil.toggleBalanceVisibility(
+                    isVisible = isBalanceVisible,
+                    balanceView = textViewCurrencyTotal,
+                    eyeIcon = imageViewEye,
+                    balance = walletViewModel.totalBalance.value
+                )
             }
         }
     }
 
-
+    //================================================================================
+    // Chart Setup Methods
+    //================================================================================
     private fun setupLineChart(transactions: List<Transaction>) {
         val lineChart = binding.lineChart
         val context = lineChart.context
@@ -112,8 +151,19 @@ class WalletMainFragment : Fragment() {
         // Sort transactions by date (oldest first)
         val sortedTransactions = transactions.sortedBy { it.date }
 
+        // Track transaction types
+        var hasIncome = false
+        var hasExpenses = false
+
         // Get unique transaction dates
         val transactionDates = sortedTransactions.map {
+            // Check transaction type
+            if (it.category.type.equals("income", true)) {
+                hasIncome = true
+            } else {
+                hasExpenses = true
+            }
+
             val cal = Calendar.getInstance().apply { timeInMillis = it.date }
             cal.set(Calendar.HOUR_OF_DAY, 0)
             cal.set(Calendar.MINUTE, 0)
@@ -139,31 +189,37 @@ class WalletMainFragment : Fragment() {
 
         // Prepare data entries and x-axis labels
         val entries = mutableListOf<Entry>()
-        val dateFormat = SimpleDateFormat("MMM d", Locale.getDefault())
         val xLabels = mutableListOf<String>()
-
-        // Track running balance
         var runningBalance = 0.0
 
         // Add initial point at 0
-        entries.add(Entry(0f, 0f))
+        entries.add(Entry(0f, runningBalance.toFloat()))
         xLabels.add("")
 
         // Calculate running balance for each transaction date
         transactionDates.forEachIndexed { index, date ->
             val dailyNet = dailyTransactions[date]?.sumOf {
-                if (it.category.type.equals("income", true)) it.amount.toDouble() else -it.amount.toDouble()
+                if (it.category.type.equals("income", true)) {
+                    it.amount.toDouble()  // Income adds to balance
+                } else {
+                    -it.amount.toDouble() // Expenses subtract from balance
+                }
             } ?: 0.0
 
             runningBalance += dailyNet
             entries.add(Entry((index + 1).toFloat(), runningBalance.toFloat()))
-            xLabels.add(dateFormat.format(Date(date)))
+            xLabels.add(DateUtil.formatDateToDM(date, true))
         }
 
-        // Get theme colors
+        // Determine line and gradient colors based on transaction types
+        val (lineColorResId, gradientResId) = when {
+            hasIncome && hasExpenses -> Pair(R.color.button, R.drawable.gradient_wallet)
+            hasIncome -> Pair(R.color.profit_green, R.drawable.gradient_income)
+            else -> Pair(R.color.expense_red, R.drawable.gradient_expense)
+        }
+
+        val lineColor = ContextCompat.getColor(context, lineColorResId)
         val typedValue = TypedValue()
-        context.theme.resolveAttribute(R.attr.bb_button, typedValue, true)
-        val lineColor = ContextCompat.getColor(context, typedValue.resourceId)
         context.theme.resolveAttribute(R.attr.bb_primaryText, typedValue, true)
         val primaryTextColor = ContextCompat.getColor(context, typedValue.resourceId)
 
@@ -175,24 +231,39 @@ class WalletMainFragment : Fragment() {
             circleRadius = 3f
             setDrawCircleHole(false)
             mode = LineDataSet.Mode.LINEAR
-            setDrawFilled(true)
-            fillDrawable = ContextCompat.getDrawable(context, R.drawable.gradient_wallet)
             setDrawValues(false)
             setDrawCircles(entries.size <= 15)
             circleHoleRadius = 2f
             setDrawHorizontalHighlightIndicator(false)
             setDrawVerticalHighlightIndicator(false)
+
+            // Set gradient fill
+            fillDrawable = ContextCompat.getDrawable(context, gradientResId)
+            setDrawFilled(true)
             fillAlpha = 80
         }
 
         val lineData = LineData(dataSet).apply {
             setValueFormatter(object : ValueFormatter() {
                 override fun getFormattedValue(value: Float): String {
-                    return "R${"%,.2f".format(value.toDouble())}"
+                    return if (value >= 0) {
+                        "R${"%,.0f".format(value.toDouble())}"
+                    } else {
+                        "-R${"%,.0f".format(abs(value.toDouble()))}"
+                    }
                 }
             })
         }
 
+        configureLineChart(lineChart, lineData, xLabels, primaryTextColor)
+    }
+
+    private fun configureLineChart(
+        lineChart: com.github.mikephil.charting.charts.LineChart,
+        lineData: LineData,
+        xLabels: List<String>,
+        primaryTextColor: Int
+    ) {
         lineChart.apply {
             data = lineData
 
@@ -208,7 +279,7 @@ class WalletMainFragment : Fragment() {
                 setCenterAxisLabels(false)
                 axisMinimum = 0f
                 axisMaximum = (xLabels.size - 1).toFloat()
-                setLabelCount(minOf(xLabels.size, 10), true) // Show up to 10 labels
+                setLabelCount(minOf(xLabels.size, 10), true)
             }
 
             // Configure y-axis
@@ -229,20 +300,36 @@ class WalletMainFragment : Fragment() {
                 axisLineWidth = 1f
                 valueFormatter = object : ValueFormatter() {
                     override fun getFormattedValue(value: Float): String {
-                        return "R${"%,.0f".format(value.toDouble())}"
+                        return if (value >= 0) {
+                            "R${"%,.0f".format(value.toDouble())}"
+                        } else {
+                            "-R${"%,.0f".format(abs(value.toDouble()))}"
+                        }
                     }
                 }
 
                 // Calculate min and max values with some padding
-                val minY = entries.minByOrNull { it.y }?.y ?: 0f
-                val maxY = entries.maxByOrNull { it.y }?.y ?: 0f
-                val padding = maxOf(10f, (maxY - minY) * 0.1f)
-                axisMinimum = minY - padding
+                val minY = lineData.dataSets.firstOrNull()?.yMin ?: 0f
+                val maxY = lineData.dataSets.firstOrNull()?.yMax ?: 0f
+                val range = maxY - minY
+                val padding = if (range > 0) range * 0.1f else 10f
+
+                // Always include 0 in the y-axis range
+                axisMinimum = minOf(minY - padding, 0f)
                 axisMaximum = maxY + padding
+
+                // Add zero line
+                setDrawZeroLine(true)
+                zeroLineColor = Color.argb(100,
+                    Color.red(primaryTextColor),
+                    Color.green(primaryTextColor),
+                    Color.blue(primaryTextColor)
+                )
+                zeroLineWidth = 1f
             }
 
             // Configure chart appearance
-            setExtraOffsets(24f, 24f, 24f, 40f) // Increased left and right padding
+            setExtraOffsets(24f, 24f, 24f, 40f)
             axisRight.isEnabled = false
             description.isEnabled = false
             legend.isEnabled = false
@@ -253,7 +340,7 @@ class WalletMainFragment : Fragment() {
             setPinchZoom(true)
 
             // Set viewport to show all data
-            setVisibleXRange(0f, minOf(7f, transactionDates.size.toFloat())) // Show at least 7 points
+            setVisibleXRange(0f, minOf(7f, xLabels.size.toFloat()))
             moveViewToX(0f)
 
             // Add nice animation
@@ -265,69 +352,9 @@ class WalletMainFragment : Fragment() {
         }
     }
 
-    private fun generateDateRange(startDate: Long, endDate: Long): List<Long> {
-        val dates = mutableListOf<Long>()
-        val calendar = Calendar.getInstance().apply {
-            timeInMillis = startDate
-            set(Calendar.HOUR_OF_DAY, 0)
-            set(Calendar.MINUTE, 0)
-            set(Calendar.SECOND, 0)
-            set(Calendar.MILLISECOND, 0)
-        }
-
-        val endCal = Calendar.getInstance().apply {
-            timeInMillis = endDate
-            set(Calendar.HOUR_OF_DAY, 23)
-            set(Calendar.MINUTE, 59)
-            set(Calendar.SECOND, 59)
-            set(Calendar.MILLISECOND, 999)
-        }
-
-        while (calendar.timeInMillis <= endCal.timeInMillis) {
-            dates.add(calendar.timeInMillis)
-            calendar.add(Calendar.DAY_OF_MONTH, 1)
-        }
-
-        return dates
-    }
-
-    private fun observeViewModel() {
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                // Collect wallet state
-                launch {
-                    walletViewModel.walletState.collectLatest { state ->
-                        handleWalletState(state)
-                    }
-                }
-
-                // Collect balance visibility
-                launch {
-                    walletViewModel.isBalanceVisible.collectLatest { isVisible ->
-                        updateBalanceVisibility(isVisible)
-                    }
-                }
-                // Collect transactions
-                launch {
-                    walletViewModel.transactions.collect { transactions ->
-                        // Filter out any invalid transactions
-                        val validTransactions = transactions.filter { it.amount != 0.0 }
-                        setupLineChart(validTransactions)
-                    }
-                }
-                // Collect total balance
-                launch {
-                    walletViewModel.totalBalance.collectLatest { total ->
-                        if (walletViewModel.isBalanceVisible.value) {
-                            binding.tvCurrencyTotal.text = total.toString()
-                        }
-                    }
-                }
-
-            }
-        }
-    }
-
+    //================================================================================
+    // State Handlers
+    //================================================================================
     private fun handleWalletState(state: WalletMainViewModel.WalletState) {
         binding.apply {
             when (state) {
@@ -345,7 +372,6 @@ class WalletMainFragment : Fragment() {
                         emptyText = txtEmptyWallets
                     )
                     updateWalletsList(state.wallets)
-
                 }
                 is WalletMainViewModel.WalletState.Empty -> {
                     hideLoadingState(progressBarWallets)
@@ -367,28 +393,9 @@ class WalletMainFragment : Fragment() {
         }
     }
 
-    private fun updateWalletsList(wallets: List<Wallet>) {
-        val budgetWalletItems = wallets.map { wallet ->
-            BudgetListItems.BudgetWalletItem(
-                wallet = wallet,
-                walletName = wallet.name,
-                walletIcon = R.drawable.ic_ui_wallet,
-                walletBalance = wallet.balance,
-                relativeDate = wallet.formatDate(wallet.lastTransactionAt)
-            )
-        }
-        walletAdapter.submitList(budgetWalletItems)
-    }
-
-    private fun updateBalanceVisibility(isVisible: Boolean) {
-        binding.tvCurrencyTotal.text = if (isVisible) {
-            walletViewModel.totalBalance.value.toString()
-        } else {
-            "****"
-        }
-    }
-
-    // Helper functions for UI state management
+    //================================================================================
+    // UI State Helpers
+    //================================================================================
     private fun showLoadingState(
         recyclerView: androidx.recyclerview.widget.RecyclerView,
         progressBar: View,
@@ -421,18 +428,89 @@ class WalletMainFragment : Fragment() {
         emptyText.isVisible = false
     }
 
+    //================================================================================
+    // Data Updates
+    //================================================================================
+    private fun updateWalletsList(wallets: List<Wallet>) {
+        val budgetWalletItems = wallets.map { wallet ->
+            BudgetListItems.BudgetWalletItem(
+                wallet = wallet,
+                walletName = wallet.name,
+                walletIcon = R.drawable.ic_ui_wallet,
+                walletBalance = wallet.balance,
+                relativeDate = DateUtil.formatDate(wallet.lastTransactionAt)
+            )
+        }
+        walletAdapter.submitList(budgetWalletItems)
+    }
+
+    private fun updateBalanceVisibility(isVisible: Boolean) {
+        PrivacyUtil.toggleBalanceVisibility(
+            isVisible = isVisible,
+            balanceView = binding.textViewCurrencyTotal,
+            eyeIcon = binding.imageViewEye,
+            balance = walletViewModel.totalBalance.value
+        )
+    }
+
+    //================================================================================
+    // Navigation
+    //================================================================================
     private fun onWalletClicked(wallet: BudgetListItems.BudgetWalletItem) {
-        println("WalletMainFragment: Navigating to wallet report for wallet ID: ${wallet.wallet.id}")
         val bundle = Bundle().apply {
             putString("walletId", wallet.wallet.id)
         }
         findNavController().navigate(R.id.action_walletMainFragment_to_walletReportFragment, bundle)
     }
 
+    //================================================================================
+    // ViewModel Observers
+    //================================================================================
+    private fun observeViewModel() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                // Collect wallet state
+                launch {
+                    walletViewModel.walletState.collectLatest { state ->
+                        handleWalletState(state)
+                    }
+                }
 
+                // Collect transactions
+                launch {
+                    walletViewModel.transactions.collect { transactions ->
+                        // Filter out any invalid transactions
+                        val validTransactions = transactions.filter { it.amount != 0.0 }
+                        setupLineChart(validTransactions)
+                    }
+                }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
+                // Collect total balance
+                launch {
+                    walletViewModel.totalBalance.collectLatest { balance ->
+                        updateTotalBalance(balance)
+                    }
+                }
+            }
+        }
+    }
+
+    private fun updateTotalBalance(balance: Double?) {
+        binding.apply {
+            // Update balance text with current visibility state
+            textViewCurrencyTotal.text = if (isBalanceVisible) {
+                CurrencyUtil.formatWithoutSymbol(balance)
+            } else {
+                "••••••"
+            }
+
+            // Set text color based on balance
+            val colorRes = if (balance != null && balance >= 0) {
+                R.attr.bb_profit
+            } else {
+                R.attr.bb_expense
+            }
+            textViewCurrencyTotal.setTextColor(context?.getThemeColor(colorRes) ?: R.color.profit_green)
+        }
     }
 }

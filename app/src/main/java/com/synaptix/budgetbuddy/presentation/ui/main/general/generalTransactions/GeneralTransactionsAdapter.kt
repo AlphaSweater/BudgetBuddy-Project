@@ -10,16 +10,33 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.synaptix.budgetbuddy.R
+import com.synaptix.budgetbuddy.core.model.Category
+import com.synaptix.budgetbuddy.core.model.Label
 import com.synaptix.budgetbuddy.core.model.Transaction
 import com.synaptix.budgetbuddy.databinding.ItemHomeTransactionBinding
 import com.synaptix.budgetbuddy.presentation.ui.common.BaseAdapter
-import com.synaptix.budgetbuddy.presentation.ui.main.general.generalReports.ReportListItems
 import java.text.SimpleDateFormat
 import java.util.*
 
+/**
+ * Adapter for displaying transaction items in the general transactions screen.
+ * 
+ * This adapter handles transaction items with their associated metadata.
+ * Each transaction item shows:
+ * - Category icon and name
+ * - Wallet name
+ * - Transaction amount (with color based on type)
+ * - Optional note
+ * - Relative date
+ * 
+ * The adapter uses view binding for efficient view access and follows the standard
+ * pattern for RecyclerView adapters in the app.
+ * 
+ * @param onTransactionClick Callback for transaction item clicks
+ */
 class GeneralTransactionsAdapter(
     private val onTransactionClick: (Transaction) -> Unit
-) : ListAdapter<ReportListItems.ReportTransactionItem, GeneralTransactionsAdapter.TransactionViewHolder>(
+) : ListAdapter<TransactionListItems.TransactionItem, GeneralTransactionsAdapter.TransactionViewHolder>(
     TransactionDiffCallback()
 ) {
 
@@ -33,16 +50,30 @@ class GeneralTransactionsAdapter(
     }
 
     override fun onBindViewHolder(holder: TransactionViewHolder, position: Int) {
-        val item = getItem(position) as? ReportListItems.ReportTransactionItem
+        val item = getItem(position) as? TransactionListItems.TransactionItem
         item?.let { holder.bind(it) }
     }
 
+    /**
+     * ViewHolder for transaction items in the transactions screen.
+     * Displays transaction details including category, wallet, amount, and date.
+     * 
+     * @param binding The view binding for the transaction item layout
+     * @param onClick Callback for transaction item clicks
+     */
     class TransactionViewHolder(
         private val binding: ItemHomeTransactionBinding,
         private val onClick: (Transaction) -> Unit
     ) : RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(item: ReportListItems.ReportTransactionItem) {
+        /**
+         * Binds transaction data to the view.
+         * Sets the category icon and name, wallet name, amount (with color),
+         * optional note, and relative date.
+         * 
+         * @param item The TransactionListItems object containing transaction data
+         */
+        fun bind(item: TransactionListItems.TransactionItem) {
             val transaction = item.transaction
             val context = itemView.context
 
@@ -86,19 +117,40 @@ class GeneralTransactionsAdapter(
         }
     }
 
-    class TransactionDiffCallback : DiffUtil.ItemCallback<ReportListItems.ReportTransactionItem>() {
+    /**
+     * DiffUtil callback for efficient list updates.
+     * Compares transaction items based on their IDs and content.
+     */
+    class TransactionDiffCallback : DiffUtil.ItemCallback<TransactionListItems.TransactionItem>() {
         override fun areItemsTheSame(
-            oldItem: ReportListItems.ReportTransactionItem,
-            newItem: ReportListItems.ReportTransactionItem
+            oldItem: TransactionListItems.TransactionItem,
+            newItem: TransactionListItems.TransactionItem
         ): Boolean {
             return oldItem.transaction.id == newItem.transaction.id
         }
 
         override fun areContentsTheSame(
-            oldItem: ReportListItems.ReportTransactionItem,
-            newItem: ReportListItems.ReportTransactionItem
+            oldItem: TransactionListItems.TransactionItem,
+            newItem: TransactionListItems.TransactionItem
         ): Boolean {
             return oldItem == newItem
         }
     }
+}
+
+/**
+ * Sealed class representing different types of items that can be displayed
+ * in the transactions list.
+ */
+sealed class TransactionListItems {
+    /**
+     * Represents a transaction item with its associated metadata.
+     * 
+     * @param transaction The transaction data
+     * @param relativeDate The relative date string for display
+     */
+    data class TransactionItem(
+        val transaction: Transaction,
+        val relativeDate: String
+    ) : TransactionListItems()
 }

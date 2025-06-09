@@ -78,23 +78,19 @@ class WalletAddViewModel @Inject constructor(
         validateForm()
     }
 
-    fun setWalletAmount(amount: String) {
-        _walletAmount.value = amount.toDoubleOrNull() ?: 0.0
+    fun setWalletAmount(amount: Double) {
+        _walletAmount.value = amount
         validateForm()
     }
 
-    fun setWalletMinGoal(minGoal: String) {
-        _walletMinGoal.value = minGoal.toDoubleOrNull() ?: 0.0
+    fun setWalletMinGoal(minGoal: Double) {
+        _walletMinGoal.value = minGoal
         validateForm()
     }
 
-    fun setWalletMaxGoal(maxGoal: String) {
-        _walletMaxGoal.value = maxGoal.toDoubleOrNull() ?: 0.0
+    fun setWalletMaxGoal(maxGoal: Double) {
+        _walletMaxGoal.value = maxGoal
         validateForm()
-    }
-
-    fun updateEnableNotifications(enabled: Boolean) {
-        _enableNotifications.value = enabled
     }
 
     fun updateExcludeFromTotal(exclude: Boolean) {
@@ -167,6 +163,7 @@ class WalletAddViewModel @Inject constructor(
         validateForm()
     }
 
+
     // Save Function
     fun addWallet() {
         if (!validateForm()) {
@@ -218,7 +215,9 @@ class WalletAddViewModel @Inject constructor(
             }
         }
     }
-
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // Reset
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     fun reset() {
         _walletName.value = ""
         _walletCurrency.value = "ZAR"

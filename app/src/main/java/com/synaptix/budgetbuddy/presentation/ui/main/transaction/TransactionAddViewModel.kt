@@ -21,6 +21,7 @@ import com.synaptix.budgetbuddy.core.model.User
 import com.synaptix.budgetbuddy.core.usecase.main.transaction.AddTransactionUseCase
 import com.synaptix.budgetbuddy.core.usecase.main.transaction.AddTransactionUseCase.AddTransactionResult
 import com.synaptix.budgetbuddy.core.usecase.main.transaction.GetTransactionUseCase
+import com.synaptix.budgetbuddy.core.usecase.main.transaction.UpdateTransactionUseCase
 import com.synaptix.budgetbuddy.core.usecase.main.transaction.UploadImageUseCase
 import java.io.Serializable
 
@@ -28,6 +29,7 @@ import java.io.Serializable
 class TransactionAddViewModel @Inject constructor(
     private val getUserIdUseCase: GetUserIdUseCase,
     private val addTransactionUseCase: AddTransactionUseCase,
+    private val updateTransactionUseCase: UpdateTransactionUseCase,
     private val getTransactionUseCase: GetTransactionUseCase,
     private val uploadImageUseCase: UploadImageUseCase,
     private val savedStateHandle: SavedStateHandle
@@ -67,6 +69,7 @@ class TransactionAddViewModel @Inject constructor(
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     // UI State
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private val _savingUiState = MutableStateFlow<SavingUiState>(SavingUiState.Idle)
     val savingUiState: StateFlow<SavingUiState> = _savingUiState
 
@@ -75,6 +78,7 @@ class TransactionAddViewModel @Inject constructor(
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     // Screen Mode
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private val _screenMode = MutableStateFlow(
         savedStateHandle["screenMode"] ?: ScreenMode.CREATE
     )
@@ -94,8 +98,8 @@ class TransactionAddViewModel @Inject constructor(
 
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-    // Transaction Data stuff
-
+    // Transaction Data
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private val transactionId: String? = savedStateHandle["transactionId"]
 
     private val _transaction = MutableStateFlow<Transaction?>(null)
@@ -132,7 +136,6 @@ class TransactionAddViewModel @Inject constructor(
             Log.d("TransactionAddViewModel", "Loading Transaction: $id")
 
             val result = getTransactionUseCase.execute(currentUserId, id)
-
             when (result) {
                 is GetTransactionUseCase.GetTransactionResult.Success -> {
                     Log.d("TransactionAddViewModel", "Transaction loaded successfully: ${result.transaction.id}")
@@ -147,14 +150,9 @@ class TransactionAddViewModel @Inject constructor(
         }
     }
 
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-    // Validation State
-    private val _validationState = MutableStateFlow(ValidationState())
-    val validationState: StateFlow<ValidationState> = _validationState
-
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     // Form Fields
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private val _category = MutableStateFlow<Category?>(null)
     val category: StateFlow<Category?> = _category
 
@@ -247,73 +245,22 @@ class TransactionAddViewModel @Inject constructor(
         checkForChanges()
     }
 
-    private val _hasUnsavedChanges = MutableStateFlow(false)
-    val hasUnsavedChanges: StateFlow<Boolean> = _hasUnsavedChanges
-
-    private fun checkForChanges() {
-        val originalTransaction = _transaction.value
-        if (originalTransaction == null) {
-            _hasUnsavedChanges.value = false
-            return
-        }
-
-        val hasChanges = originalTransaction.amount != (_amount.value ?: 0.0) ||
-                originalTransaction.currency != _currency.value ||
-                originalTransaction.note != (_note.value ?: "") ||
-                originalTransaction.category != _category.value ||
-                originalTransaction.wallet != _wallet.value ||
-                originalTransaction.date != parseDate(_date.value) ||
-                originalTransaction.labels != _selectedLabels.value ||
-                originalTransaction.recurrenceData != _recurrenceData.value ||
-                _imageBytes.value != null // If there's a new image, consider it changed
-
-        _hasUnsavedChanges.value = hasChanges
-    }
-
-    fun revertChanges() {
-        val originalTransaction = _transaction.value ?: return
-
-        // Restore all values from the original transaction
-        _amount.value = originalTransaction.amount
-        _currency.value = originalTransaction.currency
-        _note.value = originalTransaction.note
-        _date.value = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-            .format(Date(originalTransaction.date))
-        _category.value = originalTransaction.category
-        _wallet.value = originalTransaction.wallet
-        _selectedLabels.value = originalTransaction.labels
-        _recurrenceData.value = originalTransaction.recurrenceData
-        _imageBytes.value = null // Reset image since we can't restore it from URL
-
-        // Reset validation state
-        _validationState.value = ValidationState(shouldShowErrors = false)
-
-        // Reset unsaved changes flag
-        _hasUnsavedChanges.value = false
-    }
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // Validation
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // Validation State
+    private val _validationState = MutableStateFlow(ValidationState())
+    val validationState: StateFlow<ValidationState> = _validationState
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-    // Initialize the ViewModel based on the screen mode
-    init {
-        when (screenMode.value) {
-            ScreenMode.VIEW, ScreenMode.EDIT -> {
-                transactionId?.let { loadTransaction(it) }
-            }
-            ScreenMode.CREATE -> {
-                reset()
-            }
-        }
-    }
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-    // Function to validate the form inputs
+    // Validate the form fields and update validation state
     fun validateForm(): Boolean {
         val currentState = _validationState.value
         val isAmountValid = (_amount.value ?: 0.0) > 0.0
-        val isCurrencyValid = !_currency.value.isNullOrBlank()
+        val isCurrencyValid = _currency.value.isNotBlank()
         val isCategoryValid = _category.value != null
         val isWalletValid = _wallet.value != null
-        val isDateValid = !_date.value.isNullOrBlank()
+        val isDateValid = _date.value.isNotBlank()
 
 
         _validationState.value = currentState.copy(
@@ -333,13 +280,29 @@ class TransactionAddViewModel @Inject constructor(
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // Validation Actions
     fun showValidationErrors() {
         _validationState.value = _validationState.value.copy(shouldShowErrors = true)
         validateForm()
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-    // Function to add a new transaction
+    // Initialize ViewModel
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    init {
+        when (screenMode.value) {
+            ScreenMode.VIEW, ScreenMode.EDIT -> {
+                transactionId?.let { loadTransaction(it) }
+            }
+            ScreenMode.CREATE -> {
+                reset()
+            }
+        }
+    }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // Transaction Creation/Update
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     fun addTransaction() {
         if (!validateForm()) return
 
@@ -391,28 +354,57 @@ class TransactionAddViewModel @Inject constructor(
                     newTransaction
                 }
 
-                // Save transaction
-                addTransactionUseCase.execute(finalTransaction)
-                    .catch { e ->
-                        Log.e("TransactionAddViewModel", "Error in transaction flow: ${e.message}")
-                        _savingUiState.value = SavingUiState.Error(e.message ?: "Failed to add transaction")
-                    }
-                    .collect { result ->
-                        when (result) {
-                            is AddTransactionResult.Success -> {
-                                Log.d("TransactionAddViewModel", "Transaction added successfully: ${result.transactionId}")
-                                reset()
-                                _savingUiState.value = SavingUiState.Success
+                when (screenMode.value) {
+                    ScreenMode.EDIT -> {
+                        // Update existing transaction
+                        val originalTransaction = _transaction.value ?: return@launch
+                        updateTransactionUseCase.execute(finalTransaction, originalTransaction)
+                            .catch { e ->
+                                Log.e("TransactionAddViewModel", "Error in transaction update flow: ${e.message}")
+                                _savingUiState.value = SavingUiState.Error(e.message ?: "Failed to update transaction")
                             }
-                            is AddTransactionResult.Error -> {
-                                Log.e("TransactionAddViewModel", "Error adding transaction: ${result.message}")
-                                _savingUiState.value = SavingUiState.Error(result.message)
+                            .collect { result ->
+                                when (result) {
+                                    is UpdateTransactionUseCase.UpdateTransactionResult.Success -> {
+                                        Log.d("TransactionAddViewModel", "Transaction updated successfully: ${result.transactionId}")
+                                        reset()
+                                        _savingUiState.value = SavingUiState.Success
+                                    }
+                                    is UpdateTransactionUseCase.UpdateTransactionResult.Error -> {
+                                        Log.e("TransactionAddViewModel", "Error updating transaction: ${result.message}")
+                                        _savingUiState.value = SavingUiState.Error(result.message)
+                                    }
+                                }
                             }
-                        }
                     }
+                    ScreenMode.CREATE -> {
+                        // Create new transaction
+                        addTransactionUseCase.execute(finalTransaction)
+                            .catch { e ->
+                                Log.e("TransactionAddViewModel", "Error in transaction flow: ${e.message}")
+                                _savingUiState.value = SavingUiState.Error(e.message ?: "Failed to add transaction")
+                            }
+                            .collect { result ->
+                                when (result) {
+                                    is AddTransactionResult.Success -> {
+                                        Log.d("TransactionAddViewModel", "Transaction added successfully: ${result.transactionId}")
+                                        reset()
+                                        _savingUiState.value = SavingUiState.Success
+                                    }
+                                    is AddTransactionResult.Error -> {
+                                        Log.e("TransactionAddViewModel", "Error adding transaction: ${result.message}")
+                                        _savingUiState.value = SavingUiState.Error(result.message)
+                                    }
+                                }
+                            }
+                    }
+                    else -> {
+                        _savingUiState.value = SavingUiState.Error("Invalid screen mode for transaction operation")
+                    }
+                }
             } catch (e: Exception) {
-                Log.e("TransactionAddViewModel", "Exception adding transaction: ${e.message}")
-                _savingUiState.value = SavingUiState.Error(e.message ?: "Failed to add transaction")
+                Log.e("TransactionAddViewModel", "Exception in transaction operation: ${e.message}")
+                _savingUiState.value = SavingUiState.Error(e.message ?: "Failed to process transaction")
             }
         }
     }
@@ -426,9 +418,12 @@ class TransactionAddViewModel @Inject constructor(
         SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
             .parse(dateStr)?.time ?: System.currentTimeMillis()
     } catch (e: Exception) {
+        Log.e("TransactionAddViewModel", "Error parsing date: ${e.message}")
         System.currentTimeMillis()
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // Reset
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     fun reset() {
         _amount.value = null
@@ -441,6 +436,53 @@ class TransactionAddViewModel @Inject constructor(
         _selectedLabels.value = emptyList()
         _validationState.value = ValidationState(shouldShowErrors = false)
         _savingUiState.value = SavingUiState.Idle
+    }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // Saved Changes Check
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    private val _hasUnsavedChanges = MutableStateFlow(false)
+    val hasUnsavedChanges: StateFlow<Boolean> = _hasUnsavedChanges
+
+    private fun checkForChanges() {
+        val originalTransaction = _transaction.value
+        if (originalTransaction == null) {
+            _hasUnsavedChanges.value = false
+            return
+        }
+
+        val hasChanges = originalTransaction.amount != (_amount.value ?: 0.0) ||
+                originalTransaction.currency != _currency.value ||
+                originalTransaction.note != (_note.value ?: "") ||
+                originalTransaction.category != _category.value ||
+                originalTransaction.wallet != _wallet.value ||
+                originalTransaction.date != parseDate(_date.value) ||
+                originalTransaction.labels != _selectedLabels.value ||
+                originalTransaction.recurrenceData != _recurrenceData.value ||
+                _imageBytes.value != null // If there's a new image, consider it changed
+
+        _hasUnsavedChanges.value = hasChanges
+    }
+
+    fun revertChanges() {
+        val originalTransaction = _transaction.value ?: return
+
+        // Restore all values from the original transaction
+        _amount.value = originalTransaction.amount
+        _currency.value = originalTransaction.currency
+        _note.value = originalTransaction.note
+        _date.value = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+            .format(Date(originalTransaction.date))
+        _category.value = originalTransaction.category
+        _wallet.value = originalTransaction.wallet
+        _selectedLabels.value = originalTransaction.labels
+        _recurrenceData.value = originalTransaction.recurrenceData
+        _imageBytes.value = null // Reset image since we can't restore it from URL
+
+        // Reset validation state
+        _validationState.value = ValidationState(shouldShowErrors = false)
+
+        // Reset unsaved changes flag
         _hasUnsavedChanges.value = false
     }
 }

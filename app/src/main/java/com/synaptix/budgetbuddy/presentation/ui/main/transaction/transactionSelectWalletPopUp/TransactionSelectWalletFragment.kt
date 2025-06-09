@@ -4,6 +4,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.os.bundleOf
+import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -14,6 +16,7 @@ import androidx.navigation.navGraphViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import com.synaptix.budgetbuddy.R
+import com.synaptix.budgetbuddy.core.model.Wallet
 import com.synaptix.budgetbuddy.databinding.FragmentTransactionSelectWalletBinding
 import com.synaptix.budgetbuddy.presentation.ui.main.transaction.TransactionAddViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -30,10 +33,15 @@ class TransactionSelectWalletFragment : Fragment() {
     private val walletViewModel: TransactionSelectWalletViewModel by viewModels()
 
     private val walletAdapter by lazy {
-        TransactionSelectWalletAdapter { wallet ->
-            sharedViewModel.setWallet(wallet)
-            findNavController().popBackStack()
-        }
+        TransactionSelectWalletAdapter(
+            onWalletClick = { wallet ->
+                sharedViewModel.setWallet(wallet)
+                findNavController().popBackStack()
+            },
+            onEditClick = { wallet ->
+                navigateToEditWallet(wallet)
+            }
+        )
     }
 
     override fun onCreateView(
@@ -49,6 +57,7 @@ class TransactionSelectWalletFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setupRecyclerView()
         setupClickListeners()
+        setupSearch()
         observeViewModel()
         walletViewModel.loadWallets()
     }
@@ -66,6 +75,12 @@ class TransactionSelectWalletFragment : Fragment() {
         }
     }
 
+    private fun setupSearch() {
+        binding.searchEditText.doAfterTextChanged { text ->
+            walletViewModel.filterWallets(text?.toString() ?: "")
+        }
+    }
+
     private fun observeViewModel() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -76,9 +91,9 @@ class TransactionSelectWalletFragment : Fragment() {
                     }
                 }
 
-                // Collect wallets
+                // Collect filtered wallets
                 launch {
-                    walletViewModel.wallets.collect { wallets ->
+                    walletViewModel.filteredWallets.collect { wallets ->
                         walletAdapter.submitList(wallets)
                         updateEmptyState(wallets.isEmpty())
                     }
@@ -117,6 +132,19 @@ class TransactionSelectWalletFragment : Fragment() {
         Snackbar.make(binding.root, message, Snackbar.LENGTH_SHORT)
             .setBackgroundTint(resources.getColor(R.color.error, null))
             .show()
+    }
+
+    private fun navigateToEditWallet(wallet: Wallet) {
+        // Create a bundle with the necessary arguments
+        val bundle = bundleOf(
+            "screenMode" to "EDIT",
+            "walletId" to wallet.id
+        )
+
+        findNavController().navigate(
+            R.id.ind_wallet_navigation_graph,
+            bundle
+        )
     }
 
     override fun onDestroyView() {

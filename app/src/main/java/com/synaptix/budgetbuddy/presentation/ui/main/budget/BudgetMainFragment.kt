@@ -26,6 +26,9 @@ import androidx.lifecycle.repeatOnLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import java.text.NumberFormat
+import java.time.LocalDate
+import java.time.YearMonth
+import java.time.temporal.ChronoUnit
 import java.util.Locale
 
 @AndroidEntryPoint
@@ -78,6 +81,7 @@ class BudgetMainFragment : Fragment() {
     private fun setupUI() {
         setupRecyclerView()
         setupClickListeners()
+        updateDaysRemaining()
     }
 
     private fun setupRecyclerView() {
@@ -169,6 +173,15 @@ class BudgetMainFragment : Fragment() {
 
         binding.totalBudgetedTextView.text = budgetedText
         binding.totalSpentTextView.text = spentText
+    }
+
+
+    private fun updateDaysRemaining() {
+        val today = LocalDate.now()
+        val endOfMonth = YearMonth.from(today).atEndOfMonth()
+        val daysRemaining = ChronoUnit.DAYS.between(today, endOfMonth).toInt()
+
+        binding.daysOfMonthTextView.text = "$daysRemaining days"
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\

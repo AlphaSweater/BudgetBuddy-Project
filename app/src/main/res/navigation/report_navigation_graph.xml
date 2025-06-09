@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/report_navigation_graph"
+    app:startDestination="@id/generalReportsFragment">
+
+    <argument
+        android:name="startDestination"
+        app:argType="string"
+        android:defaultValue="generalReportsFragment" />
+
+    <fragment
+        android:id="@+id/generalReportsFragment"
+        android:name="com.synaptix.budgetbuddy.presentation.ui.main.general.generalReports.GeneralReportsFragment"
+        android:label="General Reports"
+        tools:layout="@layout/fragment_general_reports">
+        <action
+            android:id="@+id/action_generalReportsFragment_to_generalTransactionsFragment"
+            app:destination="@id/generalTransactionsFragment"
+            app:popUpTo="@id/report_navigation_graph"
+            app:popUpToInclusive="false" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/generalTransactionsFragment"
+        android:name="com.synaptix.budgetbuddy.presentation.ui.main.general.generalTransactions.GeneralTransactionsFragment"
+        android:label="General Transactions"
+        tools:layout="@layout/fragment_general_transactions">
+        <action
+            android:id="@+id/action_generalTransactionsFragment_to_generalReportsFragment"
+            app:destination="@id/generalReportsFragment"
+            app:popUpTo="@id/report_navigation_graph"
+            app:popUpToInclusive="false" />
+    </fragment>
+</navigation> 

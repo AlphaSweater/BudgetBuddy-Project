@@ -129,7 +129,6 @@
     <string name="total_budget">Total budget</string>
     <string name="total_spent">Total spent</string>
     <string name="end_of_month">End of Month</string>
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <!-- =========================================================== -->
 
@@ -138,5 +137,6 @@
     <string name="no_categories_found">No Categories Found</string>
     <string name="no_wallets_found">No Wallets Found\n</string>
     <string name="no_transactions_found">No Transactions Found</string>
+    <string name="no_expense_categories_found">No Expense Categories Found</string>
 
 </resources>

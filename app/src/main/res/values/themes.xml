@@ -1,26 +1,6 @@
-<!--    ======================================================================================-->
-<!--    Group 2 - Group Members:-->
-<!--    ======================================================================================-->
-<!--    * Chad Fairlie ST10269509-->
-<!--    * Dhiren Ruthenavelu ST10256859-->
-<!--    * Kayla Ferreira ST10259527-->
-<!--    * Nathan Teixeira ST10249266-->
-<!--    ======================================================================================-->
-<!--    Declaration:-->
-<!--    ======================================================================================-->
-<!--    We declare that this work is our own original work and that no part of it has been-->
-<!--    copied from any other source, except where explicitly acknowledged.-->
-<!--    ======================================================================================-->
-<!--    References:-->
-<!--    ======================================================================================-->
-<!--    * ChatGPT was used to help with the design and planning. As well as assisted with-->
-<!--    finding and fixing errors in the code.-->
-<!--    * ChatGPT also helped with the forming of comments for the code.-->
-<!--    * https://www.youtube.com/watch?v=A_tPafV23DM&list=PLPgs125_L-X9H6J7x4beRU-AxJ4mXe5vX-->
-<!--    ======================================================================================-->
-
+<?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <style name="Theme.BudgetBuddy" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+    <style name="Theme.BudgetBuddy" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Custom attributes -->
         <item name="bb_background">@color/light_background</item>
         <item name="bb_surface">@color/light_shaded</item>
@@ -36,19 +16,81 @@
         <item name="bb_buttonText">@android:color/white</item>
         <item name="bb_buttonSelected">@color/light_button_selected</item>
 
-        <!-- Material theme compatibility (fallback) -->
-        <item name="colorPrimary">@color/light_shaded</item>
-        <item name="colorPrimaryVariant">@color/light_shaded</item>
-        <item name="colorOnPrimary">@color/light_text</item>
+        <!-- Material 3 theme attributes -->
+        <item name="colorPrimary">@color/button</item>
+        <item name="colorOnPrimary">@android:color/white</item>
+        <item name="colorPrimaryContainer">@color/light_shaded</item>
+        <item name="colorOnPrimaryContainer">@color/light_text</item>
         <item name="colorSecondary">@color/light_shaded_alt</item>
         <item name="colorOnSecondary">@color/light_text_shaded</item>
-        <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
+        <item name="colorSecondaryContainer">@color/light_shaded_alt</item>
+        <item name="colorOnSecondaryContainer">@color/light_text_shaded</item>
+        <item name="colorTertiary">@color/button</item>
+        <item name="colorOnTertiary">@android:color/white</item>
+        <item name="colorTertiaryContainer">@color/light_shaded</item>
+        <item name="colorOnTertiaryContainer">@color/light_text</item>
+        <item name="colorSurface">@color/light_shaded</item>
+        <item name="colorOnSurface">@color/light_text</item>
+        <item name="colorSurfaceVariant">@color/light_shaded_alt</item>
+        <item name="colorOnSurfaceVariant">@color/light_text_shaded</item>
+        <item name="colorOutline">@android:color/transparent</item>
+        <item name="colorOutlineVariant">@android:color/transparent</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar">true</item>
+
+        <!-- Remove outlines globally -->
+        <item name="materialCardViewStyle">@style/Widget.BudgetBuddy.CardView</item>
+        <item name="textInputStyle">@style/Widget.BudgetBuddy.TextInputLayout</item>
+        <item name="materialButtonStyle">@style/Widget.BudgetBuddy.Button</item>
+
+        <!-- Shape -->
+        <item name="shapeAppearanceSmallComponent">@style/ShapeAppearance.BudgetBuddy.SmallComponent</item>
+        <item name="shapeAppearanceMediumComponent">@style/ShapeAppearance.BudgetBuddy.MediumComponent</item>
+        <item name="shapeAppearanceLargeComponent">@style/ShapeAppearance.BudgetBuddy.LargeComponent</item>
 
         <item name="bottomNavigationStyle">@style/Widget.BudgetBuddy.BottomNavigationView</item>
     </style>
 
-    <style name="Widget.BudgetBuddy.BottomNavigationView" parent="Widget.MaterialComponents.BottomNavigationView">
+    <style name="Widget.BudgetBuddy.BottomNavigationView" parent="Widget.Material3.BottomNavigationView">
         <item name="itemIconTint">@color/bottom_nav_selector</item>
         <item name="itemTextColor">@color/bottom_nav_selector</item>
+        <item name="itemRippleColor">?attr/bb_surfaceAlt</item>
+        <item name="itemIconSize">24dp</item>
+        <item name="itemTextAppearanceActive">@style/TextAppearance.Material3.LabelMedium</item>
+        <item name="itemTextAppearanceInactive">@style/TextAppearance.Material3.LabelMedium</item>
+        <item name="labelVisibilityMode">labeled</item>
+    </style>
+
+    <!-- Remove outlines from MaterialCardView -->
+    <style name="Widget.BudgetBuddy.CardView" parent="Widget.Material3.CardView.Elevated">
+        <item name="strokeWidth">0dp</item>
+    </style>
+
+    <!-- Remove outlines from TextInputLayout -->
+    <style name="Widget.BudgetBuddy.TextInputLayout" parent="Widget.Material3.TextInputLayout.OutlinedBox">
+        <item name="boxStrokeWidth">0dp</item>
+        <item name="boxStrokeWidthFocused">0dp</item>
+    </style>
+
+    <!-- Remove outlines from MaterialButton -->
+    <style name="Widget.BudgetBuddy.Button" parent="Widget.Material3.Button">
+        <item name="strokeWidth">0dp</item>
+    </style>
+
+    <!-- Shape Appearances -->
+    <style name="ShapeAppearance.BudgetBuddy.SmallComponent" parent="ShapeAppearance.Material3.SmallComponent">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">8dp</item>
+    </style>
+
+    <style name="ShapeAppearance.BudgetBuddy.MediumComponent" parent="ShapeAppearance.Material3.MediumComponent">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">12dp</item>
+    </style>
+
+    <style name="ShapeAppearance.BudgetBuddy.LargeComponent" parent="ShapeAppearance.Material3.LargeComponent">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">16dp</item>
     </style>
 </resources>

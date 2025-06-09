@@ -22,8 +22,11 @@
 package com.synaptix.budgetbuddy.core.usecase.auth
 
 import com.synaptix.budgetbuddy.core.model.Result
+import com.synaptix.budgetbuddy.core.model.User
+import com.synaptix.budgetbuddy.core.usecase.main.defaults.InsertDefaultsUseCase
 import com.synaptix.budgetbuddy.data.firebase.model.UserDTO
 import com.synaptix.budgetbuddy.data.firebase.repository.FirestoreUserRepository
+import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 
 sealed class SignupResult {
@@ -32,42 +35,50 @@ sealed class SignupResult {
     data class Error(val message: String) : SignupResult()
 }
 
-// UseCase class for handling user signup logic
 class SignupUserUseCase @Inject constructor(
-    private val userRepository: FirestoreUserRepository
+    private val userRepository: FirestoreUserRepository,
+    private val insertDefaultsUseCase: InsertDefaultsUseCase
 ) {
     suspend operator fun invoke(email: String, password: String, firstName: String? = null, lastName: String? = null): SignupResult {
         return try {
-            // Check if email exists
-            when (val emailCheck = userRepository.emailExists(email)) {
-                is Result.Success -> {
-                    if (emailCheck.data) {
-                        return SignupResult.EmailExists
-                    }
-                }
-                is Result.Error -> {
-                    return SignupResult.Error(emailCheck.exception.message ?: "Failed to check email")
-                }
+            // 1. Check if email exists
+            val emailCheck = userRepository.emailExists(email)
+            if (emailCheck is Result.Success && emailCheck.data) {
+                return SignupResult.EmailExists
+            } else if (emailCheck is Result.Error) {
+                return SignupResult.Error(emailCheck.exception.message ?: "Failed to check email")
             }
 
-            // Create user data
+            // 2. Create user DTO
             val userData = UserDTO(
                 email = email,
                 firstName = firstName,
                 lastName = lastName
             )
 
-            // Register user
-            when (val result = userRepository.registerUser(email, password, userData)) {
-                is Result.Success -> SignupResult.Success
-                is Result.Error -> SignupResult.Error(result.exception.message ?: "Failed to register user")
+            // 3. Register user
+            val registrationResult = userRepository.registerUser(email, password, userData)
+            if (registrationResult is Result.Error) {
+                return SignupResult.Error(registrationResult.exception.message ?: "Failed to register user")
             }
+
+            // 4. Convert to core User model with ID
+            val userId = if (registrationResult is Result.Success) { registrationResult.data.id }
+                else { return SignupResult.Error("Failed to retrieve user ID after registration") }
+            val user = User(id = userId, email = email, firstName = firstName, lastName = lastName)
+
+            // 5. Insert default data
+            val defaultsResult = insertDefaultsUseCase.execute(user).first()
+            return when (defaultsResult) {
+                is InsertDefaultsUseCase.InsertResult.Success -> SignupResult.Success
+                is InsertDefaultsUseCase.InsertResult.Error -> SignupResult.Error("Registered, but failed to set up defaults: ${defaultsResult.message}")
+            }
+
         } catch (e: Exception) {
             SignupResult.Error(e.localizedMessage ?: "Unknown error")
         }
     }
 
-    // Function to check if the email already exists
     suspend fun emailExists(email: String): Boolean {
         return when (val result = userRepository.emailExists(email)) {
             is Result.Success -> result.data

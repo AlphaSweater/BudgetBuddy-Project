@@ -12,6 +12,8 @@ import com.synaptix.budgetbuddy.core.model.Category
 import com.synaptix.budgetbuddy.core.model.HomeListItems
 import com.synaptix.budgetbuddy.core.model.Transaction
 import com.synaptix.budgetbuddy.core.model.Wallet
+import com.synaptix.budgetbuddy.core.util.CurrencyUtil
+import com.synaptix.budgetbuddy.core.util.DateUtil
 import com.synaptix.budgetbuddy.presentation.ui.common.BaseAdapter
 
 /**
@@ -113,10 +115,8 @@ class HomeAdapter(
 
             iconView.setImageResource(R.drawable.ic_ui_wallet)
             nameText.text = item.wallet.name
-            val balanceFormatted = String.format("R %.2f", item.wallet.balance)
-            balanceText.text = balanceFormatted
-
-            dateText.text = "• ${item.relativeDate}"
+            balanceText.text = CurrencyUtil.formatWithSymbol(item.wallet.balance)
+            dateText.text = "• ${DateUtil.formatDate(item.wallet.lastTransactionAt)}"
 
             itemView.setOnClickListener { onClick?.invoke(item.wallet) }
         }
@@ -169,8 +169,7 @@ class HomeAdapter(
                 noteContainer.visibility = View.GONE
             }
 
-            val amountFormatted = String.format("R %.2f", item.transaction.amount)
-            amountText.text = amountFormatted
+            amountText.text = CurrencyUtil.formatWithSymbol(item.transaction.amount)
 
             val colorRes = if (item.transaction.category.type.equals("INCOME", ignoreCase = true)) {
                 R.color.profit_green
@@ -180,7 +179,7 @@ class HomeAdapter(
 
             amountText.setTextColor(ContextCompat.getColor(itemView.context, colorRes))
 
-            dateText.text = item.relativeDate
+            dateText.text = DateUtil.formatDateToDMY(item.transaction.date)
 
             itemView.setOnClickListener { onClick?.invoke(item.transaction) }
         }
@@ -220,7 +219,7 @@ class HomeAdapter(
             nameText.text = item.category.name
             transactionsText.text = "${item.transactionCount} transactions"
             amountText.text = item.amount
-            dateText.text = item.relativeDate
+            dateText.text = DateUtil.formatDate(item.lastActivityAt)
 
             itemView.setOnClickListener { onClick?.invoke(item.category) }
         }
