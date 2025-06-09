@@ -58,6 +58,7 @@
                 <ImageButton
                     android:id="@+id/btnGoBack"
                     style="@style/ToolButtonIcon"
+                    android:visibility="invisible"
                     android:contentDescription="@string/back"
                     android:src="@drawable/ic_ui_arrow_back" />
 
@@ -68,6 +69,7 @@
 
                 <ImageButton
                     style="@style/ToolButtonIcon"
+                    android:visibility="invisible"
                     android:layout_width="48dp"
                     android:layout_height="48dp" />
             </LinearLayout>
