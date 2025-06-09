@@ -24,7 +24,7 @@ class BudgetCalculationUseCase @Inject constructor(
     private val categoryRepository: FirestoreCategoryRepository,
     private val transactionRepository: FirestoreTransactionRepository
 ) {
-        /**
+    /**
      * Calculates the total budget summary for a user
      * @param userId The ID of the user to calculate budget for
      * @return TotalBudgetSummary containing total budgeted and spent amounts
@@ -138,8 +138,12 @@ class BudgetCalculationUseCase @Inject constructor(
 
             try {
                 val domainUser = user.toDomain()
-                val domainCategories = categories.map { it.toDomain(domainUser) }
-                val domainBudgets = budgets.map { it.toDomain(domainUser, domainCategories) }
+                // Create a map of category IDs to categories for quick lookup
+                val categoryMap = categories.map { it.toDomain(domainUser) }.associateBy { it.id }
+                // Map budgets using only the categories that are actually in the budget document
+                val domainBudgets = budgets.map { budget ->
+                    budget.toDomain(domainUser, budget.categoryIds.mapNotNull { categoryMap[it] })
+                }
 
                 Result.Success(calculateTotalSummary(domainBudgets, transactions))
             } catch (e: Exception) {
@@ -191,14 +195,77 @@ class BudgetCalculationUseCase @Inject constructor(
     private fun calculateTotalSummary(budgets: List<Budget>, transactions: List<TransactionDTO>): BudgetListItems.TotalBudgetsSummary {
         val totalBudgets = budgets.size
         val totalBudgeted = budgets.sumOf { it.amount }
-        val budgetCategoryIds = budgets.flatMap { it.categories.map { category -> category.id } }.toSet()
         
-        val totalSpent = transactions
-            .filter { it.categoryId in budgetCategoryIds }
-            .sumOf { it.amount }
+        // Get only the categories that are actually stored in the budget documents
+        val budgetCategories = budgets.flatMap { budget ->
+            // Only use the categories that are actually in this budget
+            budget.categories
+        }.distinctBy { it.id }
+        
+        // Then filter to only expense categories that are in budgets
+        val budgetExpenseCategories = budgetCategories.filter { it.type == "expense" }
+        
+        // Get the IDs of these categories
+        val budgetExpenseCategoryIds = budgetExpenseCategories.map { it.id }.toSet()
 
+        println("\n=== BUDGETS DETAIL ===")
+        budgets.forEach { budget ->
+            println("\nBudget: ${budget.name}")
+            println("Amount: ${budget.amount}")
+            println("Categories in this budget:")
+            budget.categories.forEach { category ->
+                println("  - Category: ${category.name}")
+                println("    ID: ${category.id}")
+                println("    Type: ${category.type}")
+            }
+        }
+
+        println("\n=== BUDGET EXPENSE CATEGORIES ===")
+        println("Total unique expense categories in budgets: ${budgetExpenseCategories.size}")
+        budgetExpenseCategories.forEach { category ->
+            println("  - ${category.name} (${category.id})")
+        }
+        
+        println("\n=== ALL TRANSACTIONS ===")
+        println("Total transactions before filtering: ${transactions.size}")
+        transactions.forEach { transaction ->
+            val category = budgetCategories.find { it.id == transaction.categoryId }
+            println("\nTransaction:")
+            println("  Amount: ${transaction.amount}")
+            println("  Category ID: ${transaction.categoryId}")
+            println("  Category Name: ${category?.name ?: "NOT FOUND IN BUDGETS"}")
+            println("  Category Type: ${category?.type ?: "NOT FOUND IN BUDGETS"}")
+            println("  Is in budget expense categories: ${transaction.categoryId in budgetExpenseCategoryIds}")
+        }
+
+        // Filter transactions to only include those from expense categories that are in budgets
+        val filteredTransactions = transactions.filter { transaction ->
+            val isIncluded = transaction.categoryId in budgetExpenseCategoryIds
+            if (!isIncluded) {
+                val category = budgetCategories.find { it.id == transaction.categoryId }
+                println("\nFiltered out transaction:")
+                println("  Amount: ${transaction.amount}")
+                println("  Category ID: ${transaction.categoryId}")
+                println("  Category Name: ${category?.name ?: "NOT FOUND IN BUDGETS"}")
+                println("  Category Type: ${category?.type ?: "NOT FOUND IN BUDGETS"}")
+            }
+            isIncluded
+        }
+
+        println("\n=== FILTERED TRANSACTIONS ===")
+        println("Total transactions after filtering: ${filteredTransactions.size}")
+        filteredTransactions.forEach { transaction ->
+            val category = budgetCategories.find { it.id == transaction.categoryId }
+            println("\nTransaction:")
+            println("  Amount: ${transaction.amount}")
+            println("  Category ID: ${transaction.categoryId}")
+            println("  Category Name: ${category?.name ?: "NOT FOUND IN BUDGETS"}")
+            println("  Category Type: ${category?.type ?: "NOT FOUND IN BUDGETS"}")
+        }
+
+        val totalSpent = filteredTransactions.sumOf { it.amount }
         val totalRemaining = totalBudgeted - totalSpent
 
-        return BudgetListItems.TotalBudgetsSummary(totalBudgets,totalBudgeted, totalSpent, totalRemaining)
+        return BudgetListItems.TotalBudgetsSummary(totalBudgets, totalBudgeted, totalSpent, totalRemaining)
     }
 } 

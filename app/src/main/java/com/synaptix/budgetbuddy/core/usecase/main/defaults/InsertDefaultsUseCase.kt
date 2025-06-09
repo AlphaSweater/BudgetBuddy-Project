@@ -25,6 +25,10 @@ class InsertDefaultsUseCase @Inject constructor(
             // insertDefaultLabels(user) <- for future use
             emit(InsertResult.Success)
         } catch (e: Exception) {
+            if (e.message?.contains("Flow was aborted") == true) {
+                // Ignore Flow abortion errors as they're expected
+                return@flow
+            }
             Log.e("InsertDefaultsUseCase", "Error inserting defaults: ${e.message}")
             emit(InsertResult.Error(e.message ?: "Unknown error"))
         }
