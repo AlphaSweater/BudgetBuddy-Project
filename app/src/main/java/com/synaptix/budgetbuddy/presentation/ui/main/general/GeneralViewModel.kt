@@ -279,6 +279,23 @@ class GeneralViewModel @Inject constructor(
             }
     }
 
+    private suspend fun loadLabels(userId: String) {
+        getLabelsUseCase.execute(userId)
+            .catch { e ->
+                _labelsState.value = LabelState.Error(e.message ?: "Unknown error")
+            }
+            .collect { result ->
+                _labelsState.value = when (result) {
+                    is GetLabelsUseCase.GetLabelsResult.Success -> {
+                        if (result.labels.isEmpty()) LabelState.Empty
+                        else LabelState.Success(result.labels)
+                    }
+                    is GetLabelsUseCase.GetLabelsResult.Error ->
+                        LabelState.Error("Failed to load labels")
+                }
+            }
+    }
+
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     // Filter Management
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
