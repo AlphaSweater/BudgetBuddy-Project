@@ -136,7 +136,8 @@ https://github.com/AlphaSweater/BudgetBuddy-Project.git
 | Wallet Overview | Budget Overview | Category Reports | Transactions |
 |-----------------|-------------------|--------------------|-----------|
 | <img src="https://i.postimg.cc/52M7R67D/Screenshot-20250609-205611-Budget-Buddy.jpg" width="200"/> | <img src="https://i.postimg.cc/tCmRdGB1/Screenshot-20250609-205330-Budget-Buddy.jpg" width="200"/> | <img src="https://i.postimg.cc/B68RGRxz/Screenshot-20250609-205340-Budget-Buddy.jpg" width="200"/> | <img src="https://i.postimg.cc/hts3HK7s/Screenshot-20250609-205343-Budget-Buddy.jpg" width="200"/> |
-</div
+</div>
+
 
 ## 👥 contributors
 <a href="https://github.com/AlphaSweater/BudgetBuddy-Project/graphs/contributors">
