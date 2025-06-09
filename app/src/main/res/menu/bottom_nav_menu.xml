@@ -21,20 +21,25 @@
 <!--    * https://www.youtube.com/watch?v=A_tPafV23DM&list=PLPgs125_L-X9H6J7x4beRU-AxJ4mXe5vX-->
 <!--    ======================================================================================-->
 
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
         android:id="@+id/navigation_home"
         android:icon="@drawable/ic_home_black_24dp"
-        android:title="@string/title_home" />
+        android:title="@string/title_home"
+        app:showAsAction="ifRoom" />
+
     <item
         android:id="@+id/navigation_wallet_main"
         android:icon="@drawable/ic_wallet_24"
-        android:title="@string/title_wallets" />
+        android:title="@string/title_wallets"
+        app:showAsAction="ifRoom" />
 
     <item
         android:id="@+id/navigation_budget_main"
         android:icon="@drawable/baseline_savings_24"
-        android:title="@string/title_budgets" />
+        android:title="@string/title_budgets"
+        app:showAsAction="ifRoom" />
 
 </menu>

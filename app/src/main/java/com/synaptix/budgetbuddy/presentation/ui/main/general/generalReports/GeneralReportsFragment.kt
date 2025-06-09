@@ -839,28 +839,23 @@ class GeneralReportsFragment : Fragment() {
                             requireContext(),
                             R.layout.item_dropdown_item,
                             walletNames
-                        ).apply {
-                            setDropDownViewResource(R.layout.item_dropdown_item)
-                        }
+                        )
 
-                        binding.spinnerWallet.adapter = adapter
+                        binding.autoCompleteWallet.setAdapter(adapter)
 
                         // Set up the item selected listener
-                        binding.spinnerWallet.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-                            override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
-                                val selectedWallet = if (position == 0) {
-                                    null // "All Wallets" selected
-                                } else {
-                                    wallets[position - 1] // Adjust index since we added "All Wallets" at position 0
-                                }
-                                viewModel.selectWallet(selectedWallet)
-                                Log.d("WalletDropdown", "Selected wallet: ${selectedWallet?.name ?: "All Wallets"}")
+                        binding.autoCompleteWallet.setOnItemClickListener { _, _, position, _ ->
+                            val selectedWallet = if (position == 0) {
+                                null // "All Wallets" selected
+                            } else {
+                                wallets[position - 1] // Adjust index since we added "All Wallets" at position 0
                             }
-
-                            override fun onNothingSelected(parent: AdapterView<*>) {
-                                viewModel.selectWallet(null)
-                            }
+                            viewModel.selectWallet(selectedWallet)
+                            Log.d("WalletDropdown", "Selected wallet: ${selectedWallet?.name ?: "All Wallets"}")
                         }
+
+                        // Set default selection to "All Wallets"
+                        binding.autoCompleteWallet.setText("All Wallets", false)
                     }
                 }
             }
