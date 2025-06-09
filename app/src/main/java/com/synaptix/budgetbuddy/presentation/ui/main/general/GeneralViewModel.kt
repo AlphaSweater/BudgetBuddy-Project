@@ -7,10 +7,12 @@ import androidx.lifecycle.viewModelScope
 import com.synaptix.budgetbuddy.core.model.Category
 import com.synaptix.budgetbuddy.core.model.Transaction
 import com.synaptix.budgetbuddy.core.model.Wallet
+import com.synaptix.budgetbuddy.core.model.Label
 import com.synaptix.budgetbuddy.core.usecase.auth.GetUserIdUseCase
 import com.synaptix.budgetbuddy.core.usecase.main.category.GetCategoriesUseCase
 import com.synaptix.budgetbuddy.core.usecase.main.transaction.GetTransactionsUseCase
 import com.synaptix.budgetbuddy.core.usecase.main.wallet.GetWalletsUseCase
+import com.synaptix.budgetbuddy.core.usecase.main.label.GetLabelsUseCase
 import com.synaptix.budgetbuddy.core.util.DateUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
@@ -44,6 +46,7 @@ class GeneralViewModel @Inject constructor(
     private val getCategoriesUseCase: GetCategoriesUseCase,
     private val getUserIdUseCase: GetUserIdUseCase,
     private val getWalletsUseCase: GetWalletsUseCase,
+    private val getLabelsUseCase: GetLabelsUseCase,
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -80,6 +83,13 @@ class GeneralViewModel @Inject constructor(
         object Empty : WalletState()
     }
 
+    sealed class LabelState {
+        object Loading : LabelState()
+        data class Success(val labels: List<Label>) : LabelState()
+        data class Error(val message: String) : LabelState()
+        object Empty : LabelState()
+    }
+
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     // UI State
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
@@ -106,6 +116,9 @@ class GeneralViewModel @Inject constructor(
 
     private var _totalBalance = MutableStateFlow<Double>(0.0)
     var totalBalance: StateFlow<Double> = _totalBalance.asStateFlow()
+
+    private val _labelsState = MutableStateFlow<LabelState>(LabelState.Loading)
+    val labelsState: StateFlow<LabelState> = _labelsState
 
     fun setTotalBalance(balance: Double) {
         _totalBalance.value = balance
@@ -158,6 +171,7 @@ class GeneralViewModel @Inject constructor(
             launch { loadTransactions(userId) }
             launch { loadCategories(userId) }
             launch { loadWallets(userId) }
+            launch { loadLabels(userId) }
         }
     }
 
@@ -223,6 +237,23 @@ class GeneralViewModel @Inject constructor(
                 _expenseGoal.value = null
             }
         }
+    }
+
+    private suspend fun loadLabels(userId: String) {
+        getLabelsUseCase.execute(userId)
+            .catch { e ->
+                _labelsState.value = LabelState.Error(e.message ?: "Unknown error")
+            }
+            .collect { result ->
+                _labelsState.value = when (result) {
+                    is GetLabelsUseCase.GetLabelsResult.Success -> {
+                        if (result.labels.isEmpty()) LabelState.Empty
+                        else LabelState.Success(result.labels)
+                    }
+                    is GetLabelsUseCase.GetLabelsResult.Error ->
+                        LabelState.Error("Failed to load labels")
+                }
+            }
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
@@ -337,6 +368,13 @@ class GeneralViewModel @Inject constructor(
         loadData()
     }
 
+    fun getLabelsByType(type: String): List<Label> {
+        return when (val state = labelsState.value) {
+            is LabelState.Success -> state.labels
+            else -> emptyList()
+        }
+    }
+
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     // Helper Functions
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
@@ -344,5 +382,6 @@ class GeneralViewModel @Inject constructor(
         _transactionsState.value = TransactionState.Empty
         _categoriesState.value = CategoryState.Empty
         _walletState.value = WalletState.Empty
+        _labelsState.value = LabelState.Empty
     }
 } 
