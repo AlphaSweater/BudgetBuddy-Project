@@ -302,12 +302,23 @@ class HomeMainFragment : Fragment() {
             granularity = 1f
             isGranularityEnabled = true
             setDrawGridLines(false)
-            setCenterAxisLabels(true)
+            setCenterAxisLabels(false)
             position = XAxis.XAxisPosition.BOTTOM
-            valueFormatter = IndexAxisValueFormatter(listOf("Income", "Expense"))
-            textColor = primaryTextColor
-            textSize = 12f
+
+            // Hide X-axis labels but keep the axis line
+            setDrawLabels(false)
+            axisLineColor = primaryTextColor
+            axisLineWidth = 1f
         }
+
+        // Configure Y-axis to ensure it's visible
+        axisLeft.apply {
+            setDrawAxisLine(true)
+            axisLineColor = primaryTextColor
+            axisLineWidth = 1f
+            textColor = primaryTextColor
+        }
+        axisRight.isEnabled = false
     }
 
     /**
