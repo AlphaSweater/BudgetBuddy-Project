@@ -339,6 +339,14 @@ class TransactionAddFragment : Fragment() {
             rowSelectRecurrenceRate.isEnabled = true
             rowSelectPhoto.isEnabled = true
 
+            // Reattach click listeners
+            rowSelectCategory.setOnClickListener { showCategorySelector() }
+            rowSelectWallet.setOnClickListener { showWalletSelector() }
+            rowSelectLabels.setOnClickListener { showLabelsSelector() }
+            rowSelectDate.setOnClickListener { showDatePicker() }
+            rowSelectRecurrenceRate.setOnClickListener { showRecurrenceSelector() }
+            rowSelectPhoto.setOnClickListener { showImageSourceDialog() }
+
             // Show all croc icons
             imgCrocCategory.visibility = View.VISIBLE
             imgCrocWallet.visibility = View.VISIBLE

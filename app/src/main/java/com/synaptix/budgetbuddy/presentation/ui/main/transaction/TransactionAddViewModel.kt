@@ -370,7 +370,12 @@ class TransactionAddViewModel @Inject constructor(
                                 when (result) {
                                     is UpdateTransactionUseCase.UpdateTransactionResult.Success -> {
                                         Log.d("TransactionAddViewModel", "Transaction updated successfully: ${result.transactionId}")
-                                        reset()
+                                        // Update the stored transaction with the new values
+                                        setTransaction(finalTransaction)
+                                        // Switch back to view mode
+                                        setScreenMode(ScreenMode.VIEW)
+                                        // Reset validation state
+                                        _validationState.value = ValidationState(shouldShowErrors = false)
                                         _savingUiState.value = SavingUiState.Success
                                     }
                                     is UpdateTransactionUseCase.UpdateTransactionResult.Error -> {
