@@ -6,6 +6,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import com.synaptix.budgetbuddy.R
 import com.synaptix.budgetbuddy.core.model.BudgetListItems
+import com.synaptix.budgetbuddy.core.util.CurrencyUtil
 import com.synaptix.budgetbuddy.presentation.ui.common.BaseAdapter
 
 /**
@@ -49,7 +50,6 @@ class WalletMainAdapter(
         private val walletName: TextView = itemView.findViewById(R.id.walletName)
         private val walletBalance: TextView = itemView.findViewById(R.id.walletBalance)
 
-
         /**
          * Binds wallet data to the view.
          * Sets the wallet icon, name, and balance.
@@ -58,7 +58,7 @@ class WalletMainAdapter(
         override fun bind(item: BudgetListItems.BudgetWalletItem) {
             walletIcon.setImageResource(item.walletIcon)
             walletName.text = item.walletName
-            walletBalance.text = item.walletBalance.toString()
+            walletBalance.text = CurrencyUtil.formatWithSymbol(item.walletBalance)
             
             itemView.setOnClickListener { onWalletClick(item) }
         }
