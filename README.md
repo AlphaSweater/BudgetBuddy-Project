@@ -16,7 +16,6 @@ With intuitive tools and insightful financial summaries, BudgetBuddy empowers us
 - [Video Demonstration](#-video-demo)
 - [Tech Stack](#-tech-stack)
 - [Screenshots](#-screenshots)
-- [Database Implementation](#-database-implementation)
 - [Contributors](#-contributors)
 - [References](#-references)
 
@@ -117,13 +116,19 @@ https://github.com/AlphaSweater/BudgetBuddy-Project.git
 
 ## 📸 Screenshots
 
-![App Screenshot](https://via.placeholder.com/468x300?text=App+Screenshot+Here)
+<p align="center">
+  <img src="https://i.postimg.cc/tT1634RM/Screenshot-20250609-152724-Budget-Buddy.jpg" width="22%" />
+  <img src="https://i.postimg.cc/BnLt7Vfj/Screenshot-20250609-152740-Budget-Buddy.jpg" width="22%" />
+  <img src="https://i.postimg.cc/nc8DbxTv/Screenshot-20250609-153217-Budget-Buddy.jpg" width="22%" />
+  <img src="https://via.placeholder.com/200x400?text=Screenshot+4" width="22%" />
+</p>
 
-
-## 🗄️ Database Implementation
-
-![App Screenshot](https://via.placeholder.com/468x300?text=App+Screenshot+Here)
-
+<p align="center">
+  <img src="https://via.placeholder.com/200x400?text=Screenshot+5" width="22%" />
+  <img src="https://via.placeholder.com/200x400?text=Screenshot+6" width="22%" />
+  <img src="https://via.placeholder.com/200x400?text=Screenshot+7" width="22%" />
+  <img src="https://via.placeholder.com/200x400?text=Screenshot+8" width="22%" />
+</p>
 
 ## 👥 contributors
 <a href="https://github.com/AlphaSweater/BudgetBuddy-Project/graphs/contributors">
