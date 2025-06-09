@@ -339,6 +339,7 @@ class HomeMainFragment : Fragment() {
      * Sets up interaction, animation, and visual settings.
      */
     private fun BarChart.configureChartAppearance() {
+        visibility = View.VISIBLE
         description.isEnabled = false
         setDrawGridBackground(false)
         setDrawBorders(false)
