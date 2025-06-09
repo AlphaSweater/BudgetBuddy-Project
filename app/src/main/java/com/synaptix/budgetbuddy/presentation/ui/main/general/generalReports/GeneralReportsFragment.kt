@@ -96,6 +96,44 @@ import kotlin.getValue
 @AndroidEntryPoint
 class GeneralReportsFragment : Fragment() {
 
+    //================================================================================
+    // Properties
+    //================================================================================
+
+    //================================================================================
+    // Lifecycle Methods
+    //================================================================================
+
+    //================================================================================
+    // Setup Methods
+    //================================================================================
+
+    //================================================================================
+    // State Observation
+    //================================================================================
+
+    //================================================================================
+    // UI Update Methods
+    //================================================================================
+
+    //================================================================================
+    // Chart Methods
+    //================================================================================
+
+    //================================================================================
+    // View Toggle Methods
+    //================================================================================
+
+    //================================================================================
+    // Utility Methods
+    //================================================================================
+
+    //================================================================================
+    // Navigation Methods
+    //================================================================================
+
+    private var isBalanceVisible = true
+
     // ViewBinding for safe view access
     private var _binding: FragmentGeneralReportsBinding? = null
     private val binding get() = _binding!!
@@ -158,7 +196,7 @@ class GeneralReportsFragment : Fragment() {
         setupViews()
         
         // Start observing states
-        observeStates()
+        observeViewModel()
     }
 
     private fun setupViews() {
@@ -197,9 +235,8 @@ class GeneralReportsFragment : Fragment() {
 
             btnClearDate.setOnClickListener {
                 currentDateRange = null
-                updateTimePeriodButtonText()
+                updateDateRangeText()
                 viewModel.clearDateRange()
-                tvDateRange.text = "Select Date"
             }
 
             // Chart toggles
@@ -246,7 +283,7 @@ class GeneralReportsFragment : Fragment() {
      * 
      * This ensures efficient resource usage and prevents memory leaks.
      */
-    private fun observeStates() {
+    private fun observeViewModel() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 // Load data when the fragment starts
@@ -268,7 +305,7 @@ class GeneralReportsFragment : Fragment() {
                     viewModel.dateRange.collectLatest { dateRange ->
                         Log.d("Filtering", "Date range changed: $dateRange")
                         currentDateRange = dateRange?.let { it.start to it.endInclusive }
-                        updateTimePeriodButtonText()
+                        updateDateRangeText()
                         updateUI()
                     }
                 }
@@ -432,7 +469,16 @@ class GeneralReportsFragment : Fragment() {
             )
         }
 
-        updateTotalBalance(filteredTransactions)
+        // Calculate new total balance by adding incomes and subtracting expenses
+        val newTotalBalance = filteredTransactions.fold(0.0) { total, transaction ->
+            if (transaction.category.type.equals("income", ignoreCase = true)) {
+                total + transaction.amount
+            } else {
+                total - transaction.amount
+            }
+        }
+        updateTotalBalance(newTotalBalance)
+
         expenseAdapter.submitList(expenseItems)
         incomeAdapter.submitList(incomeItems)
     }
@@ -745,9 +791,24 @@ class GeneralReportsFragment : Fragment() {
         }
     }
 
-    private fun updateTotalBalance(transactions: List<Transaction>) {
-        val totalBalance = transactions.sumOf { it.amount }
-        binding.tvCurrencyTotal.text = CurrencyUtil.formatWithSymbol(totalBalance)
+    private fun updateTotalBalance(balance: Double) {
+        viewModel.setTotalBalance(balance)
+        binding.apply {
+            // Update balance text with current visibility state
+            textViewCurrencyTotal.text = if (isBalanceVisible) {
+                CurrencyUtil.formatWithoutSymbol(balance)
+            } else {
+                "••••••"
+            }
+
+            // Set text color based on balance
+            val colorRes = if (balance >= 0) {
+                R.attr.bb_profit
+            } else {
+                R.attr.bb_expense
+            }
+            textViewCurrencyTotal.setTextColor(context?.getThemeColor(colorRes) ?: R.color.profit_green)
+        }
     }
 
     /**
@@ -908,13 +969,13 @@ class GeneralReportsFragment : Fragment() {
             val startDate = selection.first ?: return@addOnPositiveButtonClickListener
             val endDate = selection.second ?: return@addOnPositiveButtonClickListener
             currentDateRange = startDate to endDate
-            updateTimePeriodButtonText()
+            updateDateRangeText()
             viewModel.setDateRange(startDate, endDate)
         }
 
         dateRangePicker.addOnNegativeButtonClickListener {
             currentDateRange = null
-            updateTimePeriodButtonText()
+            updateDateRangeText()
             viewModel.clearDateRange()
         }
 
@@ -940,7 +1001,7 @@ class GeneralReportsFragment : Fragment() {
     }
 
     // Add this function to update the button text
-    private fun updateTimePeriodButtonText() {
+    private fun updateDateRangeText() {
         binding.tvDateRange.text = if (currentDateRange != null) {
             "${DateUtil.formatDateToDMY(currentDateRange!!.first, true)} -\n${DateUtil.formatDateToDMY(currentDateRange!!.second, true)}"
         } else {

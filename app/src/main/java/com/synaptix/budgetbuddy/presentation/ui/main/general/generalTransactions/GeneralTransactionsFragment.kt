@@ -23,6 +23,8 @@ import com.synaptix.budgetbuddy.databinding.FragmentGeneralTransactionsBinding
 import com.synaptix.budgetbuddy.presentation.ui.main.general.GeneralViewModel
 import com.synaptix.budgetbuddy.presentation.ui.main.general.generalReports.ReportListItems
 import com.synaptix.budgetbuddy.core.util.DateUtil
+import com.synaptix.budgetbuddy.core.util.PrivacyUtil
+import com.synaptix.budgetbuddy.extentions.getThemeColor
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -52,6 +54,8 @@ class GeneralTransactionsFragment : Fragment() {
     //================================================================================
     // Properties
     //================================================================================
+    private var isBalanceVisible = true
+
     private var _binding: FragmentGeneralTransactionsBinding? = null
     private val binding get() = _binding!!
 
@@ -116,6 +120,15 @@ class GeneralTransactionsFragment : Fragment() {
                 currentDateRange = null
                 updateDateRangeText()
                 viewModel.clearDateRange()
+            }
+
+            btnViewEye.setOnClickListener {
+                isBalanceVisible = PrivacyUtil.toggleBalanceVisibility(
+                    isVisible = isBalanceVisible,
+                    balanceView = textViewCurrencyTotal,
+                    eyeIcon = imageViewEye,
+                    balance = viewModel.totalBalance.value
+                )
             }
         }
     }
@@ -281,14 +294,39 @@ class GeneralTransactionsFragment : Fragment() {
             }
 
             transactionsAdapter.submitList(items)
-            updateTotalBalance(filteredTransactions)
+
+            // Calculate new total balance by adding incomes and subtracting expenses
+            val newTotalBalance = filteredTransactions.fold(0.0) { total, transaction ->
+                if (transaction.category.type.equals("income", ignoreCase = true)) {
+                    total + transaction.amount
+                } else {
+                    total - transaction.amount
+                }
+            }
+            updateTotalBalance(newTotalBalance)
+
             binding.recyclerViewGeneralTransactions.visibility = View.VISIBLE
         }
     }
 
-    private fun updateTotalBalance(transactions: List<Transaction>) {
-        val totalBalance = transactions.sumOf { it.amount }
-        binding.tvCurrencyTotal.text = CurrencyUtil.formatWithSymbol(totalBalance)
+    private fun updateTotalBalance(balance: Double) {
+        viewModel.setTotalBalance(balance)
+        binding.apply {
+            // Update balance text with current visibility state
+            textViewCurrencyTotal.text = if (isBalanceVisible) {
+                CurrencyUtil.formatWithoutSymbol(balance)
+            } else {
+                "••••••"
+            }
+
+            // Set text color based on balance
+            val colorRes = if (balance >= 0) {
+                R.attr.bb_profit
+            } else {
+                R.attr.bb_expense
+            }
+            textViewCurrencyTotal.setTextColor(context?.getThemeColor(colorRes) ?: R.color.profit_green)
+        }
     }
 
     //================================================================================
