@@ -37,6 +37,7 @@ import com.synaptix.budgetbuddy.core.model.Transaction
 import com.synaptix.budgetbuddy.core.model.Wallet
 import com.synaptix.budgetbuddy.core.util.CurrencyUtil
 import com.synaptix.budgetbuddy.core.util.DateUtil
+import com.synaptix.budgetbuddy.core.util.PrivacyUtil
 import com.synaptix.budgetbuddy.databinding.FragmentHomeBinding
 import com.synaptix.budgetbuddy.presentation.ui.main.transaction.TransactionAddViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -93,6 +94,7 @@ class HomeMainFragment : Fragment() {
      */
     private var totalIncome: Double = 0.0
     private var totalExpense: Double = 0.0
+    private var isBalanceVisible = true
 
     companion object {
         private const val MAX_ITEMS = 3
@@ -212,6 +214,16 @@ class HomeMainFragment : Fragment() {
             txtViewAllWallets.setOnClickListener { navigateToAllWallets() }
             txtViewAllCategories.setOnClickListener { navigateToAllCategories() }
             txtViewAllTransactions.setOnClickListener { navigateToAllTransactions() }
+            
+            // Add eye icon click listener
+            btnViewEye.setOnClickListener {
+                isBalanceVisible = PrivacyUtil.toggleBalanceVisibility(
+                    isVisible = isBalanceVisible,
+                    balanceView = textViewCurrencyTotal,
+                    eyeIcon = imageViewEye,
+                    balance = homeViewModel.totalWalletBalance.value
+                )
+            }
         }
     }
 
@@ -666,7 +678,12 @@ class HomeMainFragment : Fragment() {
 
     private fun updateTotalBalance(balance: Double?) {
         binding.apply {
-            textViewCurrencyTotal.text = CurrencyUtil.formatWithoutSymbol(balance)
+            // Update balance text with current visibility state
+            textViewCurrencyTotal.text = if (isBalanceVisible) {
+                CurrencyUtil.formatWithoutSymbol(balance)
+            } else {
+                "••••••"
+            }
             
             // Set text color based on balance
             val colorRes = if (balance != null && balance >= 0) {
