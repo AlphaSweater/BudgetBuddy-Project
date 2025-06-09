@@ -4,6 +4,7 @@
 
 <h1 align="center">📊 BUDGETBUDDY-PROJECT</h1>
 
+## 📝 Overview
 BudgetBuddy is a sleek, user-friendly budgeting app designed to help users take control of their personal finances. Whether you're tracking daily expenses, managing multiple income streams, or aiming to understand your financial habits better — BudgetBuddy is here to guide you.
 
 With intuitive tools and insightful financial summaries, BudgetBuddy empowers users to make smarter money decisions. From categorizing expenses to setting spending goals, our app provides everything you need for effective financial management.
@@ -17,6 +18,7 @@ With intuitive tools and insightful financial summaries, BudgetBuddy empowers us
 - [Tech Stack](#-tech-stack)
 - [Screenshots](#-screenshots)
 - [Contributors](#-contributors)
+- [Learning Outcomes](#-learning-outcomes)
 - [References](#-references)
 
 ## 🌟 Features
@@ -113,7 +115,6 @@ https://github.com/AlphaSweater/BudgetBuddy-Project.git
 - [GitHub Actions](https://github.com/AlphaSweater/BudgetBuddy-Project/actions)
 
 
-
 ## 📸 Screenshots
 
 <p align="center">
@@ -142,6 +143,14 @@ https://github.com/AlphaSweater/BudgetBuddy-Project.git
 - Kayla Ferreira ST10259527
 - Nathan Teixeira ST10249266
 
+## 🧠 Learning Outcomes
+
+- Advanced use of Jetpack Compose for UI
+- Integration of Firestore for real-time data syncing
+- Handling image uploads with external APIs (Imgur)
+- Creating custom mappers between database entities and domain models
+- Building responsive layouts and implementing state-driven UIs with Kotlin StateFlow
+- Using and managing coroutines for efficient thread utilization
 
 ## 📚 References
 
@@ -155,3 +164,9 @@ https://github.com/AlphaSweater/BudgetBuddy-Project.git
 - https://www.geeksforgeeks.org/spinner-in-kotlin/
 - ChatGPT was used to help with the design and planning. As well as assisted with finding and fixing errors in the code.
 - ChatGPT also helped with the forming of comments for the code.
+
+##
+
+- ![GitHub stars](https://img.shields.io/github/stars/AlphaSweater/BudgetBuddy-Project?style=social)
+![GitHub last commit](https://img.shields.io/github/last-commit/AlphaSweater/BudgetBuddy-Project)
+![Made with Kotlin](https://img.shields.io/badge/Made%20with-Kotlin-blue?logo=kotlin)
