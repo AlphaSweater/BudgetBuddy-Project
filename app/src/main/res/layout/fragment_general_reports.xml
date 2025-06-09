@@ -571,7 +571,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|center_horizontal"
         android:layout_marginBottom="16dp"
-        app:cardCornerRadius="24dp"
+        app:cardCornerRadius="20dp"
         app:cardElevation="4dp"
         app:cardBackgroundColor="?attr/bb_surface">
 
@@ -581,23 +581,44 @@
             android:orientation="horizontal"
             android:padding="4dp">
 
-            <com.google.android.material.button.MaterialButton
+            <!-- Reports Section -->
+            <LinearLayout
                 android:id="@+id/btnReportsView"
-                android:layout_width="wrap_content"
+                android:layout_width="120dp"
                 android:layout_height="wrap_content"
-                android:text="Reports"
-                android:textColor="?attr/bb_primaryText"
-                android:backgroundTint="?attr/bb_button"
-                app:cornerRadius="20dp"/>
+                android:padding="12dp"
+                android:background="@drawable/toggle_selected_button"
+                android:orientation="vertical"
+                android:gravity="center">
 
-            <com.google.android.material.button.MaterialButton
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="Reports"
+                    android:textStyle="bold"
+                    android:textSize="16sp"
+                    android:textColor="?attr/bb_primaryText" />
+            </LinearLayout>
+
+            <!-- Transactions Section -->
+            <LinearLayout
                 android:id="@+id/btnTransactionsView"
-                android:layout_width="wrap_content"
+                android:layout_width="120dp"
                 android:layout_height="wrap_content"
-                android:text="Transactions"
-                android:textColor="?attr/bb_primaryText"
-                android:backgroundTint="@android:color/transparent"
-                app:cornerRadius="20dp"/>
+                android:orientation="vertical"
+                android:padding="12dp"
+                android:gravity="center">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="Transactions"
+                    android:textStyle="bold"
+                    android:textSize="16sp"
+                    android:textColor="?attr/bb_primaryText" />
+            </LinearLayout>
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 
