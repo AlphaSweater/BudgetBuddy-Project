@@ -116,8 +116,16 @@ class HomeAdapter(
             iconView.setImageResource(R.drawable.ic_ui_wallet)
             nameText.text = item.wallet.name
             balanceText.text = CurrencyUtil.formatWithSymbol(item.wallet.balance)
-            dateText.text = "• ${DateUtil.formatDate(item.wallet.lastTransactionAt)}"
 
+            // Set text color based on balance
+            val colorRes = if (item.wallet.balance < 0) {
+                R.color.expense_red  // Red for negative balance
+            } else {
+                R.color.profit_green  // Green for positive/zero balance
+            }
+            balanceText.setTextColor(ContextCompat.getColor(itemView.context, colorRes))
+
+            dateText.text = "• ${DateUtil.formatDate(item.wallet.lastTransactionAt)}"
             itemView.setOnClickListener { onClick?.invoke(item.wallet) }
         }
     }
@@ -161,6 +169,8 @@ class HomeAdapter(
 
             walletIcon.setImageResource(R.drawable.ic_ui_wallet)
             walletName.text = item.transaction.wallet.name
+
+
 
             if (item.transaction.note.isNotBlank()) {
                 noteContainer.visibility = View.VISIBLE

@@ -4,6 +4,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import com.synaptix.budgetbuddy.R
 import com.synaptix.budgetbuddy.core.model.BudgetListItems
 import com.synaptix.budgetbuddy.core.util.CurrencyUtil
@@ -51,6 +52,7 @@ class WalletMainAdapter(
         private val walletName: TextView = itemView.findViewById(R.id.walletName)
         private val walletBalance: TextView = itemView.findViewById(R.id.walletBalance)
         private val dateText: TextView = itemView.findViewById(R.id.lastActivity)
+        private val context = itemView.context
 
         /**
          * Binds wallet data to the view.
@@ -62,8 +64,18 @@ class WalletMainAdapter(
             walletName.text = item.walletName
             walletBalance.text = CurrencyUtil.formatWithSymbol(item.walletBalance)
             dateText.text = "• ${DateUtil.formatDate(item.wallet.lastTransactionAt)}"
-            
+
+            // Set text color based on balance
+            val colorRes = if (item.walletBalance < 0) {
+                R.color.expense_red // Red color for negative balance
+            } else {
+                R.color.profit_green // Default text color
+            }
+            walletBalance.setTextColor(ContextCompat.getColor(context, colorRes))
+
+            dateText.text = "• ${DateUtil.formatDate(item.wallet.lastTransactionAt)}"
+
             itemView.setOnClickListener { onWalletClick(item) }
         }
+        }
     }
-}
