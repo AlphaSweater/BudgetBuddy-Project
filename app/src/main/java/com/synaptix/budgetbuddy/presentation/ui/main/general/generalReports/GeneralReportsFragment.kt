@@ -753,53 +753,7 @@ class GeneralReportsFragment : Fragment() {
             viewModel.getTransactionsByType("income")
         }
 
-        // Create entries for all categories, even those with no transactions
-        val pieEntries = allCategories.map { category ->
-            val categoryTotal = transactions
-                .filter { it.category.id == category.id }
-                .sumOf { it.amount.toDouble() }
-                .toFloat()
-            PieEntry(categoryTotal, category.name)
-        }
-
-        // Filter out categories with zero amount if you want to hide them
-        val nonZeroPieEntries = pieEntries.filter { it.value > 0 }
-
-        if (nonZeroPieEntries.isEmpty()) {
-            pieChart.clear()
-            pieChart.setNoDataText("No ${if (isExpense) "expenses" else "income"} data available")
-            pieChart.setNoDataTextColor(context.getThemeColor(R.attr.bb_primaryText))
-            pieChart.invalidate()
-            return
-        }
-
-        val pieDataSet = PieDataSet(nonZeroPieEntries, if (isExpense) "Expenses" else "Income").apply {
-            colors = allCategories
-                .filter { cat -> nonZeroPieEntries.any { it.label == cat.name } }
-                .map { ContextCompat.getColor(context, it.color) }
-            valueTextSize = 14f
-            valueTextColor = context.getThemeColor(R.attr.bb_background)
-            valueTypeface = Typeface.DEFAULT_BOLD
-            valueFormatter = PercentFormatter(pieChart)
-        }
-
-        val pieData = PieData(pieDataSet)
-
-        pieChart.apply {
-            data = pieData
-            isDrawHoleEnabled = true
-            holeRadius = 50f
-            setHoleColor(Color.TRANSPARENT)
-            setUsePercentValues(true)
-            setDrawEntryLabels(true)
-            setEntryLabelColor(context.getThemeColor(R.attr.bb_background))
-            setEntryLabelTypeface(Typeface.DEFAULT_BOLD)
-            setEntryLabelTextSize(12f)
-            description.isEnabled = false
-            legend.isEnabled = false
-            animateY(1000, Easing.EaseInOutQuad)
-            invalidate()
-        }
+        GraphUtil.setupPieChart(pieChart, allCategories, transactions, isExpense)
     }
 
     private fun updateExpenseGoalLines(minGoal: Double, maxGoal: Double) {

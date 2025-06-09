@@ -2,16 +2,23 @@ package com.synaptix.budgetbuddy.core.util
 
 import android.content.Context
 import android.graphics.Color
+import android.graphics.Typeface
 import android.util.Log
 import androidx.core.content.ContextCompat
 import com.github.mikephil.charting.animation.Easing
 import com.github.mikephil.charting.charts.LineChart
+import com.github.mikephil.charting.charts.PieChart
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
+import com.github.mikephil.charting.data.PieData
+import com.github.mikephil.charting.data.PieDataSet
+import com.github.mikephil.charting.data.PieEntry
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
+import com.github.mikephil.charting.formatter.PercentFormatter
 import com.synaptix.budgetbuddy.R
+import com.synaptix.budgetbuddy.core.model.Category
 import com.synaptix.budgetbuddy.core.model.Transaction
 import com.synaptix.budgetbuddy.extentions.getThemeColor
 import java.text.SimpleDateFormat
@@ -22,6 +29,9 @@ import java.util.Locale
 object GraphUtil {
     private const val TAG = "GraphUtil"
 
+    //================================================================================
+    // Line Chart Methods
+    //================================================================================
     fun setupLineChart(
         chart: LineChart,
         transactions: List<Transaction>,
@@ -231,6 +241,69 @@ object GraphUtil {
         }
     }
 
+    //================================================================================
+    // Pie Chart Methods
+    //================================================================================
+    fun setupPieChart(
+        chart: PieChart,
+        categories: List<Category>,
+        transactions: List<Transaction>,
+        isExpense: Boolean
+    ) {
+        val context = chart.context
+
+        // Create entries for all categories, even those with no transactions
+        val pieEntries = categories.map { category ->
+            val categoryTotal = transactions
+                .filter { it.category.id == category.id }
+                .sumOf { it.amount.toDouble() }
+                .toFloat()
+            PieEntry(categoryTotal, category.name)
+        }
+
+        // Filter out categories with zero amount if you want to hide them
+        val nonZeroPieEntries = pieEntries.filter { it.value > 0 }
+
+        if (nonZeroPieEntries.isEmpty()) {
+            chart.clear()
+            chart.setNoDataText("No ${if (isExpense) "expenses" else "income"} data available")
+            chart.setNoDataTextColor(context.getThemeColor(R.attr.bb_primaryText))
+            chart.invalidate()
+            return
+        }
+
+        val pieDataSet = PieDataSet(nonZeroPieEntries, if (isExpense) "Expenses" else "Income").apply {
+            colors = categories
+                .filter { cat -> nonZeroPieEntries.any { it.label == cat.name } }
+                .map { ContextCompat.getColor(context, it.color) }
+            valueTextSize = 14f
+            valueTextColor = context.getThemeColor(R.attr.bb_background)
+            valueTypeface = Typeface.DEFAULT_BOLD
+            valueFormatter = PercentFormatter(chart)
+        }
+
+        val pieData = PieData(pieDataSet)
+
+        chart.apply {
+            data = pieData
+            isDrawHoleEnabled = true
+            holeRadius = 50f
+            setHoleColor(Color.TRANSPARENT)
+            setUsePercentValues(true)
+            setDrawEntryLabels(true)
+            setEntryLabelColor(context.getThemeColor(R.attr.bb_background))
+            setEntryLabelTypeface(Typeface.DEFAULT_BOLD)
+            setEntryLabelTextSize(12f)
+            description.isEnabled = false
+            legend.isEnabled = false
+            animateY(1000, Easing.EaseInOutQuad)
+            invalidate()
+        }
+    }
+
+    //================================================================================
+    // Utility Methods
+    //================================================================================
     private fun generateDateRange(startDate: Long, endDate: Long): List<Long> {
         val dates = mutableListOf<Long>()
         val calendar = Calendar.getInstance().apply {
