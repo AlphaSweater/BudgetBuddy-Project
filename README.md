@@ -102,7 +102,8 @@ https://github.com/AlphaSweater/BudgetBuddy-Project.git
 ## 🎥 Video Demo
 
 📺 **Watch the full walkthrough of BudgetBuddy on YouTube:**
-👉 [Click here to view](https://www.youtube.com/watch?v=SFQ90baMvlU)
+👉 [Click here to view](https://youtu.be/lYHgekc2NSg)
+- https://youtu.be/lYHgekc2NSg
 
 
 ## 🔧 Tech Stack
