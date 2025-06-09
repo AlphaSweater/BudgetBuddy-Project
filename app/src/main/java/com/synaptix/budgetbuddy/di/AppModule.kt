@@ -31,6 +31,7 @@ import com.synaptix.budgetbuddy.core.usecase.auth.LoginUserUseCase
 import com.synaptix.budgetbuddy.core.usecase.main.budget.GetBudgetsUseCase
 import com.synaptix.budgetbuddy.core.usecase.main.transaction.AddTransactionUseCase
 import com.synaptix.budgetbuddy.core.usecase.main.category.GetCategoriesUseCase
+import com.synaptix.budgetbuddy.core.usecase.main.transaction.GetImageUseCase
 import com.synaptix.budgetbuddy.core.usecase.main.transaction.GetTransactionsUseCase
 import com.synaptix.budgetbuddy.core.usecase.main.transaction.UploadImageUseCase
 import com.synaptix.budgetbuddy.core.usecase.main.wallet.GetWalletsUseCase
@@ -184,6 +185,12 @@ object AppModule {
     @Singleton
     fun provideUploadImageUseCase() : UploadImageUseCase {
         return UploadImageUseCase()
+    }
+
+    @Provides
+    @Singleton
+    fun provideGetImageUseCase() : GetImageUseCase {
+        return GetImageUseCase()
     }
 }
 
