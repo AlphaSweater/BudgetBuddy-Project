@@ -858,59 +858,12 @@ class GeneralReportsFragment : Fragment() {
             expenseGoalJob = viewLifecycleOwner.lifecycleScope.launch {
                 viewModel.expenseGoal.collectLatest { goals ->
                     goals?.let { (minGoal, maxGoal) ->
-                        // Remove existing limit lines
-                        chart.axisLeft.removeAllLimitLines()
-
-                        // Only add goal lines if they have valid values
-                        if (minGoal > 0) {
-                            val minLine = LimitLine(minGoal.toFloat(), "Min Goal").apply {
-                                lineColor = ContextCompat.getColor(context, R.color.min_graph)
-                                lineWidth = 1f
-                                enableDashedLine(10f, 10f, 0f)
-                                textColor = ContextCompat.getColor(context, R.color.min_graph)
-                                textSize = 10f
-                            }
-                            chart.axisLeft.addLimitLine(minLine)
-                        }
-
-                        if (maxGoal > 0) {
-                            val maxLine = LimitLine(maxGoal.toFloat(), "Max Goal").apply {
-                                lineColor = ContextCompat.getColor(context, R.color.max_graph)
-                                lineWidth = 1f
-                                enableDashedLine(10f, 10f, 0f)
-                                textColor = ContextCompat.getColor(context, R.color.max_graph)
-                                textSize = 10f
-                            }
-                            chart.axisLeft.addLimitLine(maxLine)
-                        }
-
-                        // Get the current chart data
-                        val entries = (chart.data?.dataSets?.firstOrNull() as? LineDataSet)?.values ?: return@collectLatest
-
-                        // Adjust y-axis to include the goal lines and data
-                        val minY = entries.minByOrNull { it.y }?.y ?: 0f
-                        val maxY = entries.maxByOrNull { it.y }?.y ?: 0f
-                        val padding = maxOf(Math.abs(maxY - minY) * 0.1f, 100f)
-
-                        // Include goal lines in axis range if they exist
-                        val minAxis = minOf(
-                            minY - padding,
-                            if (minGoal > 0) minGoal.toFloat() - padding else minY - padding,
-                            0f
-                        )
-                        val maxAxis = maxOf(
-                            maxY + padding,
-                            if (maxGoal > 0) maxGoal.toFloat() + padding else maxY + padding
-                        )
-
-                        // Apply the new axis range
-                        chart.axisLeft.axisMinimum = minAxis
-                        chart.axisLeft.axisMaximum = maxAxis
-
-                        val (minGoal, maxGoal) = viewModel.expenseGoal.value ?: (0.0 to 0.0)
+                        Log.d("ExpenseGoal", "Received goals - Min: $minGoal, Max: $maxGoal")
                         updateExpenseGoalLines(minGoal, maxGoal)
-                        // Make sure to refresh the chart
-                        chart.invalidate()
+                    } ?: run {
+                        // Clear the lines if goals are null
+                        lineChartExpense.axisLeft.removeAllLimitLines()
+                        lineChartExpense.invalidate()
                     }
                 }
             }
@@ -993,13 +946,9 @@ class GeneralReportsFragment : Fragment() {
             return
         }
 
-        // Remove existing limit lines
-        lineChartExpense.axisLeft.removeAllLimitLines()
-
         // Get the current chart data
         val entries = (lineChartExpense.data?.dataSets?.firstOrNull() as? LineDataSet)?.values ?: run {
             Log.d("ExpenseGoalLines", "No chart data available")
-            lineChartExpense.invalidate()
             return
         }
 
@@ -1030,6 +979,9 @@ class GeneralReportsFragment : Fragment() {
         // Apply padding to the range with extra space at the top
         val minAxis = minValue - padding
         val maxAxis = maxValue + padding + extraTopSpace
+
+        // Remove existing limit lines
+        lineChartExpense.axisLeft.removeAllLimitLines()
 
         // Store limit lines to add them in the correct order
         val limitLines = mutableListOf<LimitLine>()
@@ -1068,7 +1020,6 @@ class GeneralReportsFragment : Fragment() {
         limitLines.forEach { lineChartExpense.axisLeft.addLimitLine(it) }
 
         // Set chart offsets to ensure labels are visible
-        // Parameters: left, top, right, bottom
         lineChartExpense.setExtraOffsets(16f, 40f, 32f, 30f)
 
         Log.d("ExpenseGoalLines", "Setting axis range - Min: $minAxis, Max: $maxAxis")
@@ -1077,20 +1028,19 @@ class GeneralReportsFragment : Fragment() {
         lineChartExpense.axisLeft.apply {
             axisMinimum = minAxis
             axisMaximum = maxAxis
-            setDrawLimitLinesBehindData(true)
+            setDrawLimitLinesBehindData(false)  // Changed to false to ensure lines are visible
             setDrawLabels(true)
             setDrawAxisLine(true)
             setPosition(YAxis.YAxisLabelPosition.OUTSIDE_CHART)
             xOffset = 12f
             setLabelCount(5, true)
-            // Ensure the axis is recalculated
             setStartAtZero(false)
         }
 
         // Force a complete redraw with the new settings
         lineChartExpense.setVisibleXRangeMaximum(entries.size.toFloat())
         lineChartExpense.moveViewToX(0f)
-        lineChartExpense.extraTopOffset = 40f  // Additional top offset
+        lineChartExpense.extraTopOffset = 40f
         lineChartExpense.extraBottomOffset = 20f
         lineChartExpense.extraLeftOffset = 16f
         lineChartExpense.extraRightOffset = 32f
@@ -1169,7 +1119,7 @@ class GeneralReportsFragment : Fragment() {
 
             // Update amounts when toggled
             val transactions = viewModel.getTransactionsByType("income")
-            val totalIncome = transactions.sumOf { it.amount.toDouble() }
+            val totalIncome = transactions.sumOf { it.amount }
             txtChartIncomeTotal.text =
                 if (totalIncome > 0) CurrencyUtil.formatWithSymbol(totalIncome)
                 else CurrencyUtil.formatWithSymbol(0.0)

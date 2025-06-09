@@ -108,6 +108,9 @@ class GeneralViewModel @Inject constructor(
     private val _selectedWallet = MutableStateFlow<Wallet?>(null)
     val selectedWallet: StateFlow<Wallet?> = _selectedWallet.asStateFlow()
 
+    private val _selectedWallets = MutableStateFlow<List<Wallet>>(emptyList())
+    val selectedWallets: StateFlow<List<Wallet>> = _selectedWallets.asStateFlow()
+
     private val _dateRange = MutableStateFlow<ClosedRange<Long>?>(null)
     val dateRange: StateFlow<ClosedRange<Long>?> = _dateRange.asStateFlow()
 
@@ -131,6 +134,37 @@ class GeneralViewModel @Inject constructor(
         // Restore saved state
         restoreSavedState()
         loadData()
+        
+        // Set up goal observation
+        viewModelScope.launch {
+            combine(_selectedWallets, _walletState) { selectedWallets, walletState ->
+                when (walletState) {
+                    is WalletState.Success -> {
+                        if (selectedWallets.isEmpty()) {
+                            // All wallets selected - sum up all min and max goals
+                            // Only include non-excluded wallets in the total
+                            val includedWallets = walletState.wallets.filter { !it.excludeFromTotal }
+                            val totalMinGoal = includedWallets.sumOf { it.minGoal }
+                            val totalMaxGoal = includedWallets.sumOf { it.maxGoal }
+                            Log.d("ExpenseGoal", "All wallets selected - Total Min: $totalMinGoal, Max: $totalMaxGoal")
+                            totalMinGoal to totalMaxGoal
+                        } else {
+                            // Specific wallets selected
+                            val totalMinGoal = selectedWallets.sumOf { it.minGoal }
+                            val totalMaxGoal = selectedWallets.sumOf { it.maxGoal }
+                            Log.d("ExpenseGoal", "Selected wallets - Total Min: $totalMinGoal, Max: $totalMaxGoal")
+                            totalMinGoal to totalMaxGoal
+                        }
+                    }
+                    else -> {
+                        Log.d("ExpenseGoal", "No wallet state available")
+                        null
+                    }
+                }
+            }.collect { goals ->
+                _expenseGoal.value = goals
+            }
+        }
     }
 
     private fun restoreSavedState() {
@@ -226,17 +260,6 @@ class GeneralViewModel @Inject constructor(
                     }
                 }
             }
-
-        // Observe selected wallet for expense goals
-        selectedWallet.collect { wallet ->
-            wallet?.let {
-                val minGoal = wallet.minGoal?.toDouble() ?: 0.0
-                val maxGoal = wallet.maxGoal?.toDouble() ?: 0.0
-                _expenseGoal.value = minGoal to maxGoal
-            } ?: run {
-                _expenseGoal.value = null
-            }
-        }
     }
 
     private suspend fun loadLabels(userId: String) {
@@ -323,6 +346,17 @@ class GeneralViewModel @Inject constructor(
 
     fun selectWallet(wallet: Wallet?) {
         _selectedWallet.value = wallet
+        // Update selected wallets list
+        _selectedWallets.value = if (wallet == null) {
+            // All wallets selected
+            when (val state = _walletState.value) {
+                is WalletState.Success -> state.wallets
+                else -> emptyList()
+            }
+        } else {
+            // Single wallet selected
+            listOf(wallet)
+        }
         // Save selected wallet ID to SavedStateHandle
         savedStateHandle[KEY_SELECTED_WALLET_ID] = wallet?.id
         filterTransactions()
