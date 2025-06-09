@@ -40,16 +40,8 @@
             app:destination="@id/navigation_wallet_main" />
 
         <action
-            android:id="@+id/action_homeFragment_to_generalTransactionsFragment"
-            app:destination="@id/navigation_general_transactions"
-            app:enterAnim="@anim/slide_in_up"
-            app:exitAnim="@anim/fade_out"
-            app:popEnterAnim="@anim/fade_in"
-            app:popExitAnim="@anim/slide_out_down"/>
-
-        <action
-            android:id="@+id/action_homeFragment_to_generalReportsFragment"
-            app:destination="@id/navigation_general_reports"
+            android:id="@+id/action_homeFragment_to_reportNavigationGraph"
+            app:destination="@id/report_navigation_graph"
             app:enterAnim="@anim/slide_in_up"
             app:exitAnim="@anim/fade_out"
             app:popEnterAnim="@anim/fade_in"
@@ -69,6 +61,14 @@
     <!-- Include Category Navigation Graph -->
     <include
         app:graph="@navigation/ind_category_navigation_graph"
+        app:enterAnim="@anim/slide_in_up"
+        app:exitAnim="@anim/fade_out"
+        app:popEnterAnim="@anim/fade_in"
+        app:popExitAnim="@anim/slide_out_down"/>
+
+    <!-- Include Report Navigation Graph -->
+    <include
+        app:graph="@navigation/report_navigation_graph"
         app:enterAnim="@anim/slide_in_up"
         app:exitAnim="@anim/fade_out"
         app:popEnterAnim="@anim/fade_in"

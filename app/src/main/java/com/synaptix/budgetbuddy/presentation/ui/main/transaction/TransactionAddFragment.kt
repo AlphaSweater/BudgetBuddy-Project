@@ -36,6 +36,7 @@ import com.synaptix.budgetbuddy.core.model.Wallet
 import com.synaptix.budgetbuddy.databinding.FragmentTransactionAddBinding
 import com.synaptix.budgetbuddy.extentions.getThemeColor
 import com.synaptix.budgetbuddy.presentation.ui.main.transaction.TransactionAddViewModel.ScreenMode
+import com.synaptix.budgetbuddy.core.util.CurrencyUtil
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -126,27 +127,45 @@ class TransactionAddFragment : Fragment() {
                 if (newText != current) {
                     binding.edtTextAmount.removeTextChangedListener(this)
 
+                    // Remove any non-digit characters
                     val cleanString = newText.replace("[^\\d]".toRegex(), "")
-                    val parsed = if (cleanString.isNotEmpty()) {
-                        BigDecimal(cleanString)
+                    
+                    // Check if the number is too long (12 digits before decimal + 2 after)
+                    if (cleanString.length > 14) {
+                        // Keep only the first 14 digits
+                        val truncatedString = cleanString.substring(0, 14)
+                        val parsed = BigDecimal(truncatedString)
                             .setScale(2, RoundingMode.FLOOR)
                             .divide(BigDecimal(100))
-                    } else {
-                        BigDecimal.ZERO
-                    }
-
-                    if (parsed.compareTo(BigDecimal.ZERO) == 0) {
-                        current = ""
-                        binding.edtTextAmount.setText("")
-                        transactionAddViewModel.setAmount(0.0)
-                        updateAmountAppearance(0.0)
-                    } else {
-                        val formatted = DecimalFormat("#,##0.00").format(parsed)
+                        
+                        val formatted = CurrencyUtil.formatWithoutSymbol(parsed.toDouble())
                         current = formatted
                         binding.edtTextAmount.setText(formatted)
                         binding.edtTextAmount.setSelection(formatted.length)
                         transactionAddViewModel.setAmount(parsed.toDouble())
                         updateAmountAppearance(parsed.toDouble())
+                    } else {
+                        val parsed = if (cleanString.isNotEmpty()) {
+                            BigDecimal(cleanString)
+                                .setScale(2, RoundingMode.FLOOR)
+                                .divide(BigDecimal(100))
+                        } else {
+                            BigDecimal.ZERO
+                        }
+
+                        if (parsed.compareTo(BigDecimal.ZERO) == 0) {
+                            current = ""
+                            binding.edtTextAmount.setText("")
+                            transactionAddViewModel.setAmount(0.0)
+                            updateAmountAppearance(0.0)
+                        } else {
+                            val formatted = CurrencyUtil.formatWithoutSymbol(parsed.toDouble())
+                            current = formatted
+                            binding.edtTextAmount.setText(formatted)
+                            binding.edtTextAmount.setSelection(formatted.length)
+                            transactionAddViewModel.setAmount(parsed.toDouble())
+                            updateAmountAppearance(parsed.toDouble())
+                        }
                     }
 
                     binding.edtTextAmount.addTextChangedListener(this)

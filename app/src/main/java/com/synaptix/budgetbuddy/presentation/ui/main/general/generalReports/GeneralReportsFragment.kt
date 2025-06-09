@@ -24,6 +24,7 @@ import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.charts.PieChart
 import com.github.mikephil.charting.components.XAxis
 import android.text.format.DateFormat
+import androidx.navigation.navGraphViewModels
 import com.github.mikephil.charting.components.LimitLine
 import com.github.mikephil.charting.components.YAxis
 import com.google.android.material.datepicker.MaterialDatePicker
@@ -53,6 +54,7 @@ import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
+import kotlin.getValue
 
 /**
  * Fragment for displaying financial reports and analytics.
@@ -1094,17 +1096,20 @@ class GeneralReportsFragment : Fragment() {
 
     private fun setupViewSwitcher() {
         binding.apply {
-            // Set initial state - Reports view is active
-            btnReportsView.setBackgroundResource(R.drawable.toggle_selected_button)
-            btnTransactionsView.setBackgroundResource(android.R.color.transparent)
-
-            // Set up click listeners
-            btnTransactionsView.setOnClickListener {
-                findNavController().navigate(R.id.navigation_general_transactions)
-            }
+            // Set initial state for reports view
+            btnReportsView.isSelected = true
+            btnTransactionsView.isSelected = false
 
             btnReportsView.setOnClickListener {
                 // Already in reports view, do nothing
+            }
+
+            btnTransactionsView.setOnClickListener {
+                try {
+                    findNavController().navigate(R.id.action_generalReportsFragment_to_generalTransactionsFragment)
+                } catch (e: Exception) {
+                    Log.e("GeneralReportsFragment", "Navigation error: ${e.message}")
+                }
             }
         }
     }
