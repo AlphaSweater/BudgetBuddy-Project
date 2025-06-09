@@ -1,25 +1,59 @@
-# BudgetBuddy App - PROG7313
 
-## Project Description
-BudgetBuddy is a user-friendly personal budget tracker app designed to help individuals take control of their finances with ease. Whether you're looking to manage your daily expenses, track multiple sources of income, or simply gain better insights into your spending habits, BudgetBuddy makes the process effective and simple. The app allows users to easily track their income and expenses, categorize transactions, and monitor their finances through easy-to-read summaries and reports. With its clean and modern interface, BudgetBuddy offers an intuitive experience suitable for both beginners and experienced users alike. By providing monthly breakdowns, income vs. expense comparisons, and insightful summaries, the app incourages users to make informed financial decisions and develop better money management habits over time. Whether your goal is to save more, reduce unnecessary spending, or plan for the future. BudgetBuddy is your companion on your journey to financial stability and success.
+![Logo](https://i.postimg.cc/L6MYhpN8/Logo-With-Title.png)
 
 
-## The Application's Features
+<h1 align="center">📊 BUDGETBUDDY-PROJECT</h1>
 
-- **SignUp and Login**: Users can securely create an account and log in to access their personal budget data from anywhere. This ensures that all financial information is protected and personalized for each user.
-  
-- **Create Categories and Entries**: Users can easily organize their finances by creating custom categories (e.g., Food, Transport, Entertainment) and adding income or expense entries under each category. This helps users track where their money is going in a structured way.
-  
-- **Take and Store Photos**: Users can capture and attach photos of receipts, invoices, or any related documents to your entries. This feature helps users keep a visual record of their transactions for better tracking and accountability.
-  
-- **Set Minimum and Maximum Goals**: Set financial goals by setting minimum and maximum spending limits. This allows users to stick to their budget and avoid overspending.
-  
-- **View List of Entries in a Period**: View a detailed list of all income and expense entries within a selected date range. This makes it easy to review and analyze user financial activity over days, weeks, or months.
-  
-- **View Category Totals in a Period**: Get a clear summary of total spending and earnings per category within a specific time period. This feature provides insights into user's spending habits and helps adjust their budget as needed.
+<p align="center">
+  <img src="https://img.shields.io/github/stars/AlphaSweater/BudgetBuddy-Project?style=social">
+  <img src="https://img.shields.io/github/last-commit/AlphaSweater/BudgetBuddy-Project">
+  <img src="https://img.shields.io/badge/Made%20with-Kotlin-blue?logo=kotlin">
+</p>
+
+## 📝 Overview
+BudgetBuddy is a sleek, user-friendly budgeting app designed to help users take control of their personal finances. Whether you're tracking daily expenses, managing multiple income streams, or aiming to understand your financial habits better — BudgetBuddy is here to guide you.
+
+With intuitive tools and insightful financial summaries, BudgetBuddy empowers users to make smarter money decisions. From categorizing expenses to setting spending goals, our app provides everything you need for effective financial management.
+
+## 📚 Table of Contents
+- [Features](#-features)
+- [Own Features](#own-features)
+- [Security Features](#-security-features)
+- [Prerequisites](#️-prerequisites)
+- [How to Compile and Run](#-how-to-compile-and-run-the-application)
+- [Video Demonstration](#-video-demo)
+- [Tech Stack](#-tech-stack)
+- [Screenshots](#-screenshots)
+- [Contributors](#-contributors)
+- [Learning Outcomes](#-learning-outcomes)
+- [References](#-references)
+
+## 🌟 Features
+
+- SignUp and Login: Users can securely create an account and log in to access their personal budget data from anywhere. This ensures that all financial information is protected and personalized for each user.
+
+- Create Categories and Entries: Users can easily organize their finances by creating custom categories (e.g., Food, Transport, Entertainment) and adding income or expense entries under each category. This helps users track where their money is going in a structured way.
+
+- Take and Store Photos: Users can capture and attach photos of receipts, invoices, or any related documents to your entries. This feature helps users keep a visual record of their transactions for better tracking and accountability.
+
+- Set Minimum and Maximum Goals: Set financial goals by setting minimum and maximum spending limits. This allows users to stick to their budget and avoid overspending.
+
+- View List of Entries in a Period: View a detailed list of all income and expense entries within a selected date range. This makes it easy to review and analyze user financial activity over days, weeks, or months.
+
+- View Category Totals in a Period: Get a clear summary of total spending and earnings per category within a specific time period. This feature provides insights into user's spending habits and helps adjust their budget as needed.
 
 
-## Before You Can Compile and Run The Application
+## Own Features
+
+- Multi-Wallet support: Application allows for multiple different wallets to be created and used by one profile, each wallet has its own transactions and balance as well as their own individual minimum and maximum goals that gets added together to create a global minimum and maximum goal for the user.
+
+- Advanced multi-Budget Support: Application allows for users to create multiple budgets that can each track spending for multiple different categories for that month. Amount spent in each budget resets on the first of every month.
+
+## 🔐 Security Features
+- Firebase Authentication for secure login and identity management.
+- Input validation and protection against improper input.
+
+## 🛠️ Prerequisites 
 
 1. **Ensure that you have Android Studio downloaded or you won't be able to run the project.**
 Ensure that you have Android Studio installed on your computer.
@@ -28,13 +62,11 @@ Ensure that you have Android Studio installed on your computer.
 👉 https://developer.android.com/studio
 
 3. Make sure you have the following installed within Android Studio:
-- Android SDK 25+
+- Android SDK 26+
 - Gradle 8.0+
 
 4. Install an Android emulator or use a real device for testing.
-
-
-## How to Compile and Run The Application
+## 🚀 How to Compile and Run The Application
 
 1. Download and install Android Studio (Giraffe or newer) from the official site:
 https://developer.android.com/studio
@@ -67,14 +99,69 @@ https://github.com/AlphaSweater/BudgetBuddy-Project.git
 6. The app will install and launch on your selected device, showing the BudgetBuddy application.
 
 
-## YouTube Video Demonstration
+## 🎥 Video Demo
 
-Below is the link for our YouTube video:
+📺 **Watch the full walkthrough of BudgetBuddy on YouTube:**
+👉 [Click here to view](https://youtu.be/lYHgekc2NSg)
+- https://youtu.be/lYHgekc2NSg
 
-- https://www.youtube.com/watch?v=SFQ90baMvlU
+
+## 🔧 Tech Stack
+### Core
+
+- 100% [Kotlin](https://kotlinlang.org/)
+- 100% [Jetpack Compose](https://developer.android.com/jetpack/compose)
+- [Material3 design](https://m3.material.io/) (UI components)
+- [Kotlin Coroutines](https://kotlinlang.org/docs/coroutines-overview.html) (structured concurrency)
+- [Kotlin Flow](https://kotlinlang.org/docs/flow.html)
+- [Hilt](https://dagger.dev/hilt/) (DI)
+
+### Database
+- [Firestore](https://console.firebase.google.com) (firebase no-sql database)
+- [Imgur API](https://console.firebase.google.com) (Image uploading and storage)
+
+### Build & CI
+- [Gradle KTS](https://docs.gradle.org/current/userguide/kotlin_dsl.html)
+- [Gradle version catalogs](https://developer.android.com/build/migrate-to-catalogs) (dependencies versions)
+- [GitHub Actions](https://github.com/AlphaSweater/BudgetBuddy-Project/actions)
 
 
-## References
+## 📸 Screenshots
+
+<div align="center">
+  
+| Landing Page | Sign Up | Login | Home page |
+|-----------------|------------------------|-------------------|-----------------|
+| <img src="https://i.postimg.cc/tT1634RM/Screenshot-20250609-152724-Budget-Buddy.jpg" width="200"/> | <img src="https://i.postimg.cc/BnLt7Vfj/Screenshot-20250609-152740-Budget-Buddy.jpg" width="200"/> | <img src="https://i.postimg.cc/nc8DbxTv/Screenshot-20250609-153217-Budget-Buddy.jpg" width="200"/> | <img src="https://i.postimg.cc/3Jp1HYzp/Screenshot-20250609-210010-Budget-Buddy.jpg" width="200"/> |
+
+| Wallet Overview | Budget Overview | Category Reports | Transactions |
+|-----------------|-------------------|--------------------|-----------|
+| <img src="https://i.postimg.cc/52M7R67D/Screenshot-20250609-205611-Budget-Buddy.jpg" width="200"/> | <img src="https://i.postimg.cc/tCmRdGB1/Screenshot-20250609-205330-Budget-Buddy.jpg" width="200"/> | <img src="https://i.postimg.cc/B68RGRxz/Screenshot-20250609-205340-Budget-Buddy.jpg" width="200"/> | <img src="https://i.postimg.cc/hts3HK7s/Screenshot-20250609-205343-Budget-Buddy.jpg" width="200"/> |
+</div>
+
+
+## 👥 contributors
+<a href="https://github.com/AlphaSweater/BudgetBuddy-Project/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=AlphaSweater/BudgetBuddy-Project" />
+</a>
+
+- Made with [contrib.rocks](https://contrib.rocks).
+
+- Chad Fairlie ST10269509
+- Dhiren Ruthenavelu ST10256859
+- Kayla Ferreira ST10259527
+- Nathan Teixeira ST10249266
+
+## 🧠 Learning Outcomes
+
+- Advanced use of Jetpack Compose for UI
+- Integration of Firestore for real-time data syncing
+- Handling image uploads with external APIs (Imgur)
+- Creating custom mappers between database entities and domain models
+- Building responsive layouts and implementing state-driven UIs with Kotlin StateFlow
+- Using and managing coroutines for efficient thread utilization
+
+## 📚 References
 
 - https://www.youtube.com/watch?v=A_tPafV23DM&list=PLPgs125_L-X9H6J7x4beRU-AxJ4mXe5vX
 - https://www.geeksforgeeks.org/kotlin-android-tutorial/
@@ -87,10 +174,8 @@ Below is the link for our YouTube video:
 - ChatGPT was used to help with the design and planning. As well as assisted with finding and fixing errors in the code.
 - ChatGPT also helped with the forming of comments for the code.
 
+##
+![App Demo](https://i.postimg.cc/HWtLyjr6/kerchoo-kachow.gif)
+##
 
-## Authors
 
-- Chad Fairlie ST10269509
-- Dhiren Ruthenavelu ST10256859
-- Kayla Ferreira ST10259527
-- Nathan Teixeira ST10249266
