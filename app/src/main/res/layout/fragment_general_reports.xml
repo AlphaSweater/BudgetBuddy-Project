@@ -136,30 +136,13 @@
                             android:layout_marginEnd="8dp"
                             app:tint="@color/cat_light_brown" />
 
-                        <com.google.android.material.textfield.TextInputLayout
-                            android:id="@+id/walletDropdownLayout"
-                            style="@style/Widget.Material3.TextInputLayout.OutlinedBox.Dense"
+                        <Spinner
+                            android:id="@+id/spinnerWallet"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:hint="Wallet"
-                            app:endIconMode="dropdown_menu"
-                            app:boxBackgroundColor="?attr/bb_surface"
-                            app:boxCornerRadiusTopStart="12dp"
-                            app:boxCornerRadiusTopEnd="12dp"
-                            app:boxCornerRadiusBottomStart="12dp"
-                            app:boxCornerRadiusBottomEnd="12dp">
-
-                            <AutoCompleteTextView
-                                android:id="@+id/autoCompleteWallet"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:inputType="none"
-                                android:textSize="13sp"
-                                android:background="@android:color/transparent"
-                                android:padding="8dp"
-                                android:dropDownBackground="?attr/bb_surface" />
-                        </com.google.android.material.textfield.TextInputLayout>
+                            android:background="@android:color/transparent"
+                            android:padding="8dp" />
 
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>

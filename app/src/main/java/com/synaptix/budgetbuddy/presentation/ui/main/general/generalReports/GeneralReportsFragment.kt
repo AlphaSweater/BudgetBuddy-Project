@@ -131,8 +131,6 @@ class GeneralReportsFragment : Fragment() {
     ): View {
         _binding = FragmentGeneralReportsBinding.inflate(inflater, container, false)
         return binding.root
-
-
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -142,7 +140,6 @@ class GeneralReportsFragment : Fragment() {
         setupWalletDropdown()
         setupPieChart(true)
         observeStates()
-
 
         // Set initial toggle state
         binding.btnChartExpenseToggle.setBackgroundResource(R.drawable.toggle_selected)
@@ -180,22 +177,24 @@ class GeneralReportsFragment : Fragment() {
      */
     private fun setupOnClickListeners() {
         binding.apply {
+            // Back button
             btnGoBack.setOnClickListener {
                 findNavController().popBackStack()
             }
 
+            // Date selection
             btnSelectDate.setOnClickListener {
                 showDateRangePicker()
             }
 
-            btnCatExpenseToggle.setOnClickListener {
-                showCategoryExpenseToggle()
+            btnClearDate.setOnClickListener {
+                currentDateRange = null
+                updateTimePeriodButtonText()
+                viewModel.clearDateRange()
+                tvDateRange.text = "Select Date"
             }
 
-            btnCatIncomeToggle.setOnClickListener {
-                showCategoryIncomeToggle()
-            }
-
+            // Chart toggles
             btnChartExpenseToggle.setOnClickListener {
                 showChartExpense()
             }
@@ -204,8 +203,22 @@ class GeneralReportsFragment : Fragment() {
                 showChartIncome()
             }
 
-            btnWalletArrow.setOnClickListener {
-                spinnerWallet.performClick()
+            // Category toggles
+            btnCatExpenseToggle.setOnClickListener {
+                showCategoryExpenseToggle()
+            }
+
+            btnCatIncomeToggle.setOnClickListener {
+                showCategoryIncomeToggle()
+            }
+
+            // Label toggles
+            btnLabelExpenseToggle.setOnClickListener {
+                showLabelExpenseToggle()
+            }
+
+            btnLabelIncomeToggle.setOnClickListener {
+                showLabelIncomeToggle()
             }
         }
     }
@@ -370,8 +383,6 @@ class GeneralReportsFragment : Fragment() {
             txtChartIncomeTotal.text = "R ${String.format("%.2f", totalIncome)}"
         }
 
-
-
         val dateFormat = SimpleDateFormat("MMM d", Locale.getDefault())
 
         // Get all expense categories, not just those with transactions
@@ -429,7 +440,7 @@ class GeneralReportsFragment : Fragment() {
             // Show 0.00 if no expenses
             val transactions = viewModel.getTransactionsByType("expense")
             val totalExpense = transactions.sumOf { it.amount.toDouble() }
-            btnCatExpenseToggle.findViewById<TextView>(R.id.txtExpenseTotal).text =
+            txtExpenseTotal.text =
                 if (totalExpense > 0) "-R ${String.format("%.2f", totalExpense)}"
                 else "R 0.00"
         }
@@ -445,7 +456,7 @@ class GeneralReportsFragment : Fragment() {
             // Show 0.00 if no income
             val transactions = viewModel.getTransactionsByType("income")
             val totalIncome = transactions.sumOf { it.amount.toDouble() }
-            btnCatIncomeToggle.findViewById<TextView>(R.id.txtIncomeTotal).text =
+            txtIncomeTotal.text =
                 if (totalIncome > 0) "R ${String.format("%.2f", totalIncome)}"
                 else "R 0.00"
         }
@@ -826,17 +837,13 @@ class GeneralReportsFragment : Fragment() {
 
                         val adapter = ArrayAdapter(
                             requireContext(),
-                            R.layout.spinner_item,
+                            R.layout.item_dropdown_item,
                             walletNames
                         ).apply {
-                            setDropDownViewResource(R.layout.spinner_item)
+                            setDropDownViewResource(R.layout.item_dropdown_item)
                         }
 
                         binding.spinnerWallet.adapter = adapter
-
-                        // Set the selection without triggering the listener
-                        binding.spinnerWallet.onItemSelectedListener = null // Remove any existing listener first
-                        binding.spinnerWallet.setSelection(0, false) // Select "All Wallets" by default
 
                         // Set up the item selected listener
                         binding.spinnerWallet.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
@@ -919,13 +926,13 @@ class GeneralReportsFragment : Fragment() {
 
     // Add this function to update the button text
     private fun updateTimePeriodButtonText() {
-        binding.btnTimePeriod.text = if (currentDateRange != null) {
+        binding.tvDateRange.text = if (currentDateRange != null) {
             val startDate = Date(currentDateRange!!.first)
             val endDate = Date(currentDateRange!!.second)
             val dateFormat = DateFormat.getMediumDateFormat(requireContext())
             "${dateFormat.format(startDate)} - ${dateFormat.format(endDate)}"
         } else {
-            "Select Time Period"
+            "Select Date"
         }
     }
 
@@ -1044,6 +1051,21 @@ class GeneralReportsFragment : Fragment() {
 
         Log.d("ExpenseGoalLines", "Chart updated with goal lines")
     }
+
+    private fun showLabelExpenseToggle() {
+        binding.apply {
+            // TODO: Implement label expense view
+            highlightToggle(btnLabelExpenseToggle, btnLabelIncomeToggle)
+        }
+    }
+
+    private fun showLabelIncomeToggle() {
+        binding.apply {
+            // TODO: Implement label income view
+            highlightToggle(btnLabelIncomeToggle, btnLabelExpenseToggle)
+        }
+    }
+
     /**
      * Navigates to transaction details screen.
      * To be implemented when the details screen is ready.
