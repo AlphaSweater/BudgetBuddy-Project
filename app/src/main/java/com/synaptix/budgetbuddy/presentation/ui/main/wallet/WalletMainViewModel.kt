@@ -33,9 +33,6 @@ class WalletMainViewModel @Inject constructor(
     private val _totalBalance = MutableStateFlow(0.0)
     val totalBalance: StateFlow<Double> = _totalBalance
 
-    private val _isBalanceVisible = MutableStateFlow(true)
-    val isBalanceVisible: StateFlow<Boolean> = _isBalanceVisible
-
     // Transactions state
     private val _transactions = MutableStateFlow<List<Transaction>>(emptyList())
     val transactions: StateFlow<List<Transaction>> = _transactions
@@ -112,10 +109,6 @@ class WalletMainViewModel @Inject constructor(
         val total = wallets.filter { !it.excludeFromTotal }
             .sumOf { it.balance }
         _totalBalance.value = total
-    }
-
-    fun toggleBalanceVisibility() {
-        _isBalanceVisible.value = !_isBalanceVisible.value
     }
 
     override fun onCleared() {

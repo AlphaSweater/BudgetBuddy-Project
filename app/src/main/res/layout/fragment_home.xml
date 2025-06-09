@@ -45,32 +45,44 @@
             app:layout_constraintTop_toTopOf="parent"
             android:backgroundTint="@android:color/transparent">
 
-            <LinearLayout
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center"
                 android:layout_marginTop="8dp">
 
-                <TextView
-                    android:id="@+id/textView_currency_total2"
+                <!-- Group container for ZAR + value -->
+                <LinearLayout
+                    android:id="@+id/llCurrencyGroup"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="ZAR"
-                    android:textColor="?attr/bb_primaryText"
-                    android:textSize="24sp"
-                    android:textStyle="bold"/>
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent">
 
-                <TextView
-                    android:id="@+id/textView_currency_total"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="12,200"
-                    android:textColor="?attr/bb_profit"
-                    android:textSize="24sp"
-                    android:textStyle="bold"
-                    android:layout_marginStart="8dp"/>
+                    <TextView
+                        android:id="@+id/textViewCurrencySymbol"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="ZAR"
+                        android:textColor="?attr/bb_primaryText"
+                        android:textSize="24sp"
+                        android:textStyle="bold"/>
 
+                    <TextView
+                        android:id="@+id/textViewCurrencyTotal"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="12,200"
+                        android:textColor="?attr/bb_profit"
+                        android:textSize="24sp"
+                        android:textStyle="bold"
+                        android:layout_marginStart="8dp"/>
+                </LinearLayout>
+
+                <!-- Eye button aligned to value but not affecting centering -->
                 <FrameLayout
                     android:id="@+id/btnViewEye"
                     android:layout_width="48dp"
@@ -78,7 +90,11 @@
                     android:layout_marginStart="8dp"
                     android:background="?attr/selectableItemBackgroundBorderless"
                     android:clickable="true"
-                    android:focusable="true">
+                    android:focusable="true"
+                    app:layout_constraintTop_toTopOf="@+id/llCurrencyGroup"
+                    app:layout_constraintBottom_toBottomOf="@+id/llCurrencyGroup"
+                    app:layout_constraintStart_toEndOf="@+id/llCurrencyGroup"
+                    app:layout_constraintEnd_toEndOf="parent">
 
                     <ImageView
                         android:id="@+id/imageViewEye"
@@ -88,12 +104,13 @@
                         android:src="@drawable/ic_ui_privacy_eye_open"
                         app:tint="?attr/bb_primaryText"/>
                 </FrameLayout>
-            </LinearLayout>
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
             <TextView
+                android:id="@+id/tvTotalBalance"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/total_balance"
+                android:text="Total Balance"
                 android:textColor="?attr/bb_secondaryText"
                 android:textSize="16sp"/>
         </LinearLayout>
