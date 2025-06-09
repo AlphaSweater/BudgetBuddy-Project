@@ -19,7 +19,7 @@ class DefaultCategoryUseCase @Inject constructor(
         data class Error(val message: String) : DefaultCategoryResult()
     }
 
-    fun populateForUser(user: User): Flow<DefaultCategoryResult> = flow {
+    fun execute(user: User): Flow<DefaultCategoryResult> = flow {
         try {
             val defaultCategories = getDefaultCategories(user)
 
