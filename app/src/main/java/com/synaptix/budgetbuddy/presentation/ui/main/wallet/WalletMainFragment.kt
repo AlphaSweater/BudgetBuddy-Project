@@ -460,7 +460,7 @@ class WalletMainFragment : Fragment() {
         val bundle = Bundle().apply {
             putString("walletId", wallet.wallet.id)
         }
-        findNavController().navigate(R.id.action_walletMainFragment_to_walletReportFragment, bundle)
+        findNavController().navigate(R.id.action_navigation_wallet_main_to_report_navigation_graph, bundle)
     }
 
     //================================================================================
