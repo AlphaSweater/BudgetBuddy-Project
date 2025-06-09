@@ -8,6 +8,17 @@ BudgetBuddy is a sleek, user-friendly budgeting app designed to help users take 
 
 With intuitive tools and insightful financial summaries, BudgetBuddy empowers users to make smarter money decisions. From categorizing expenses to setting spending goals, our app provides everything you need for effective financial management.
 
+## 📚 Table of Contents
+- [Features](#-features)
+- [Own Features](#own-features)
+- [Prerequisites](#️-prerequisites)
+- [How to Compile and Run](#-how-to-compile-and-run-the-application)
+- [Video Demonstration](#-video-demo)
+- [Tech Stack](#-tech-stack)
+- [Screenshots](#-screenshots)
+- [Database Implementation](#-database-implementation)
+- [Contributors](#-contributors)
+- [References](#-references)
 
 ## 🌟 Features
 
@@ -28,7 +39,9 @@ With intuitive tools and insightful financial summaries, BudgetBuddy empowers us
 
 - Multi-Wallet support: Application allows for multiple different wallets to be created and used by one profile, each wallet has its own transactions and balance as well as their own individual minimum and maximum goals that gets added together to create a global minimum and maximum goal for the user.
 
-- Advanced multi-Budget Support: 
+- Advanced multi-Budget Support: Application allows for users to create multiple budgets that can each track spending for multiple different categories for that month. Amount spent in each budget resets on the first of every month.
+
+
 ## 🛠️ Prerequisites 
 
 1. **Ensure that you have Android Studio downloaded or you won't be able to run the project.**
@@ -75,11 +88,12 @@ https://github.com/AlphaSweater/BudgetBuddy-Project.git
 6. The app will install and launch on your selected device, showing the BudgetBuddy application.
 
 
-## 🎥 YouTube Video Demonstration
+## 🎥 Video Demo
 
-Below is the link for our YouTube video:
+📺 **Watch the full walkthrough of BudgetBuddy on YouTube:**
+👉 [Click here to view](https://www.youtube.com/watch?v=SFQ90baMvlU)
 
-- https://www.youtube.com/watch?v=SFQ90baMvlU
+
 ## 🔧 Tech Stack
 ### Core
 
@@ -97,7 +111,7 @@ Below is the link for our YouTube video:
 ### Build & CI
 - [Gradle KTS](https://docs.gradle.org/current/userguide/kotlin_dsl.html)
 - [Gradle version catalogs](https://developer.android.com/build/migrate-to-catalogs) (dependencies versions)
-- [GitHub Actions](https://github.com/Ivy-Apps/ivy-wallet/actions)
+- [GitHub Actions](https://github.com/AlphaSweater/BudgetBuddy-Project/actions)
 
 
 
@@ -109,6 +123,8 @@ Below is the link for our YouTube video:
 ## 🗄️ Database Implementation
 
 ![App Screenshot](https://via.placeholder.com/468x300?text=App+Screenshot+Here)
+
+
 ## 👥 contributors
 <a href="https://github.com/AlphaSweater/BudgetBuddy-Project/graphs/contributors">
   <img src="https://contrib.rocks/image?repo=AlphaSweater/BudgetBuddy-Project" />
