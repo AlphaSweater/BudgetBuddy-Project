@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
@@ -25,6 +26,7 @@ import com.synaptix.budgetbuddy.presentation.ui.main.general.generalReports.Repo
 import com.synaptix.budgetbuddy.core.util.DateUtil
 import com.synaptix.budgetbuddy.core.util.PrivacyUtil
 import com.synaptix.budgetbuddy.extentions.getThemeColor
+import com.synaptix.budgetbuddy.presentation.ui.main.transaction.TransactionAddViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -101,10 +103,11 @@ class GeneralTransactionsFragment : Fragment() {
     private fun setupRecyclerView() {
         transactionsAdapter = GeneralTransactionsAdapter { transaction ->
             // Navigate to transaction view
-            val bundle = Bundle().apply {
-                putString("transactionId", transaction.id)
-                putString("screenMode", "VIEW")
-            }
+            val bundle = bundleOf(
+                "screenMode" to TransactionAddViewModel.ScreenMode.VIEW,
+                "transactionId" to transaction.id
+            )
+
             findNavController().navigate(
                 R.id.ind_transaction_navigation_graph,
                 bundle
