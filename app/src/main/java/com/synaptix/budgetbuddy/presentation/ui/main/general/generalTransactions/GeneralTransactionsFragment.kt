@@ -100,8 +100,15 @@ class GeneralTransactionsFragment : Fragment() {
 
     private fun setupRecyclerView() {
         transactionsAdapter = GeneralTransactionsAdapter { transaction ->
-            // Handle transaction click
-            // findNavController().navigate(...)
+            // Navigate to transaction view
+            val bundle = Bundle().apply {
+                putString("transactionId", transaction.id)
+                putString("screenMode", "VIEW")
+            }
+            findNavController().navigate(
+                R.id.ind_transaction_navigation_graph,
+                bundle
+            )
         }
 
         binding.recyclerViewGeneralTransactions.apply {
