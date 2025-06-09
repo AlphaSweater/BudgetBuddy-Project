@@ -127,19 +127,16 @@ https://github.com/AlphaSweater/BudgetBuddy-Project.git
 
 ## 📸 Screenshots
 
-<p align="center">
-  <img src="https://i.postimg.cc/tT1634RM/Screenshot-20250609-152724-Budget-Buddy.jpg" width="22%" />
-  <img src="https://i.postimg.cc/BnLt7Vfj/Screenshot-20250609-152740-Budget-Buddy.jpg" width="22%" />
-  <img src="https://i.postimg.cc/nc8DbxTv/Screenshot-20250609-153217-Budget-Buddy.jpg" width="22%" />
-  <img src="https://via.placeholder.com/200x400?text=Screenshot+4" width="22%" />
-</p>
+<div align="center">
+  
+| Landing Page | Sign Up | Login | Home page |
+|-----------------|------------------------|-------------------|-----------------|
+| <img src="https://i.postimg.cc/tT1634RM/Screenshot-20250609-152724-Budget-Buddy.jpg" width="200"/> | <img src="https://i.postimg.cc/BnLt7Vfj/Screenshot-20250609-152740-Budget-Buddy.jpg" width="200"/> | <img src="https://i.postimg.cc/nc8DbxTv/Screenshot-20250609-153217-Budget-Buddy.jpg" width="200"/> | <img src="https://i.postimg.cc/3Jp1HYzp/Screenshot-20250609-210010-Budget-Buddy.jpg" width="200"/> |
 
-<p align="center">
-  <img src="https://via.placeholder.com/200x400?text=Screenshot+5" width="22%" />
-  <img src="https://via.placeholder.com/200x400?text=Screenshot+6" width="22%" />
-  <img src="https://via.placeholder.com/200x400?text=Screenshot+7" width="22%" />
-  <img src="https://via.placeholder.com/200x400?text=Screenshot+8" width="22%" />
-</p>
+| Wallet Overview | Budget Overview | Category Reports | Transactions |
+|-----------------|-------------------|--------------------|-----------|
+| <img src="https://i.postimg.cc/52M7R67D/Screenshot-20250609-205611-Budget-Buddy.jpg" width="200"/> | <img src="https://i.postimg.cc/tCmRdGB1/Screenshot-20250609-205330-Budget-Buddy.jpg" width="200"/> | <img src="https://i.postimg.cc/B68RGRxz/Screenshot-20250609-205340-Budget-Buddy.jpg" width="200"/> | <img src="https://i.postimg.cc/hts3HK7s/Screenshot-20250609-205343-Budget-Buddy.jpg" width="200"/> |
+</div
 
 ## 👥 contributors
 <a href="https://github.com/AlphaSweater/BudgetBuddy-Project/graphs/contributors">
