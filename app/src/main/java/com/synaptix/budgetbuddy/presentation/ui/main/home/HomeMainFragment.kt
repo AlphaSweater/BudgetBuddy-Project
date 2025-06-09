@@ -581,10 +581,13 @@ class HomeMainFragment : Fragment() {
     //================================================================================
     /**
      * Navigates to wallet details screen.
-     * To be implemented when the details screen is ready.
      */
     private fun navigateToWalletDetails(wallet: Wallet) {
-        // TODO: Implement navigation to wallet details
+        val bundle = bundleOf(
+            "startDestination" to "generalReportsFragment",
+            "walletId" to wallet.id
+        )
+        findNavController().navigate(R.id.action_homeFragment_to_reportNavigationGraph, bundle)
     }
 
     /**
