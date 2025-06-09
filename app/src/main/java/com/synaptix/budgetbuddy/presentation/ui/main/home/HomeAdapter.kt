@@ -179,7 +179,7 @@ class HomeAdapter(
 
             amountText.setTextColor(ContextCompat.getColor(itemView.context, colorRes))
 
-            dateText.text = item.relativeDate
+            dateText.text = DateUtil.formatDateToDMY(item.transaction.date)
 
             itemView.setOnClickListener { onClick?.invoke(item.transaction) }
         }

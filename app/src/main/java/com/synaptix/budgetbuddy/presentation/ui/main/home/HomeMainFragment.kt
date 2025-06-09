@@ -432,7 +432,6 @@ class HomeMainFragment : Fragment() {
                     val transactionItems = state.transactions.take(MAX_ITEMS).map { transaction ->
                         HomeListItems.HomeTransactionItem(
                             transaction = transaction,
-                            relativeDate = DateUtil.formatDate(transaction.date)
                         )
                     }
                     transactionAdapter.submitList(transactionItems)
