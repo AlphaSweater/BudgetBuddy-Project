@@ -33,6 +33,9 @@ import com.synaptix.budgetbuddy.R
 import com.synaptix.budgetbuddy.core.model.Budget
 import com.synaptix.budgetbuddy.core.model.BudgetListItems
 import com.synaptix.budgetbuddy.presentation.ui.common.BaseAdapter
+import com.synaptix.budgetbuddy.presentation.ui.main.transaction.TransactionAddViewModel.ValidationState
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import java.text.NumberFormat
 import java.util.Locale
 
@@ -135,6 +138,36 @@ class BudgetMainAdapter(
             itemView.setOnClickListener { onBudgetClick(item.budget) }
         }
     }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    private val _amount = MutableStateFlow<Double?>(null)
+    val amount: StateFlow<Double?> = _amount
+
+    fun setAmount(amount: Double?) {
+        _amount.value = amount
+        validateForm()
+    }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // Validation State
+    private val _validationState = MutableStateFlow(ValidationState())
+    val validationState: StateFlow<ValidationState> = _validationState
+    // Validate the form fields and update validation state
+    fun validateForm(): Boolean {
+        val currentState = _validationState.value
+        val isAmountValid = (_amount.value ?: 0.0) > 0.0
+
+        _validationState.value = currentState.copy(
+            isAmountValid = isAmountValid,
+            amountError = if (currentState.shouldShowErrors && !isAmountValid) "Please enter a valid amount" else null,
+        )
+
+        return isAmountValid
+    }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
 
     companion object {
         private val currencyFormat = NumberFormat.getNumberInstance(Locale("en", "ZA")).apply {

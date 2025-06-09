@@ -22,6 +22,8 @@
 package com.synaptix.budgetbuddy.presentation.ui.main.budget.budgetAdd
 
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -35,11 +37,14 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.navGraphViewModels
 import com.synaptix.budgetbuddy.R
 import com.synaptix.budgetbuddy.core.model.Category
+import com.synaptix.budgetbuddy.core.util.CurrencyUtil
 import com.synaptix.budgetbuddy.databinding.FragmentBudgetAddBinding
 import com.synaptix.budgetbuddy.extentions.getThemeColor
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import java.math.BigDecimal
+import java.math.RoundingMode
 
 @AndroidEntryPoint
 class BudgetAddFragment : Fragment() {
@@ -67,7 +72,9 @@ class BudgetAddFragment : Fragment() {
     private fun setupUI() {
         setupCurrencySpinner()
         setupClickListeners()
+        setupTextWatchers()
     }
+
 
     private fun setupCurrencySpinner() {
         val currencies = arrayOf("ZAR")
@@ -92,8 +99,12 @@ class BudgetAddFragment : Fragment() {
     }
 
     private fun saveBudget() {
+        // Get the raw amount from the ViewModel or formatted text
+        val amountText = binding.amount.text.toString()
+        val amount = amountText.replace("[^\\d.]".toRegex(), "").toDoubleOrNull()
+
         sharedViewModel.setBudgetName(binding.budgetName.text.toString())
-        sharedViewModel.setBudgetAmount(binding.amount.text.toString().toDoubleOrNull())
+        sharedViewModel.setBudgetAmount(amount)
         sharedViewModel.showValidationErrors()
 
         if (sharedViewModel.validateForm()) {
@@ -181,6 +192,65 @@ class BudgetAddFragment : Fragment() {
                 binding.textSelectedCategoryName.text = summary
             }
         }
+    }
+
+    private fun setupTextWatchers() {
+        setupAmountWatcher()
+    }
+
+    private fun setupAmountWatcher() {
+        binding.amount.addTextChangedListener(object : TextWatcher {
+            private var current = ""
+            private var isFormatting = false
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+
+            override fun afterTextChanged(s: Editable?) {
+                if (isFormatting) return
+
+                isFormatting = true
+                try {
+                    if (s.toString() != current) {
+                        binding.amount.removeTextChangedListener(this)
+
+                        // Remove all non-digit characters
+                        val cleanString = s.toString().replace("[^\\d]".toRegex(), "")
+
+                        // Handle empty input
+                        if (cleanString.isEmpty()) {
+                            current = ""
+                            binding.amount.setText("")
+                            sharedViewModel.setBudgetAmount(0.0)
+                            binding.amount.addTextChangedListener(this)
+                            return
+                        }
+
+                        // Limit to 14 digits
+                        val limitedString = if (cleanString.length > 14) {
+                            cleanString.substring(0, 14)
+                        } else {
+                            cleanString
+                        }
+
+                        // Convert to double and format with 2 decimal places
+                        val amount = limitedString.toDoubleOrNull()?.div(100) ?: 0.0
+                        val formatted = String.format("%,.2f", amount)
+
+                        current = formatted
+                        binding.amount.setText(formatted)
+                        binding.amount.setSelection(formatted.length)
+
+                        // Store the raw amount in the ViewModel
+                        sharedViewModel.setBudgetAmount(amount)
+
+                        binding.amount.addTextChangedListener(this)
+                    }
+                } finally {
+                    isFormatting = false
+                }
+            }
+        })
     }
 
     override fun onDestroyView() {
