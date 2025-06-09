@@ -244,14 +244,58 @@ class CategoryAddNewViewModel @Inject constructor(
     // Available Options
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private val _colors = MutableStateFlow<List<CategoryItem.ColorItem>>(listOf(
+        // Reds
+        CategoryItem.ColorItem(R.color.cat_light_red, "Light Red"),
+        CategoryItem.ColorItem(R.color.cat_dark_red, "Dark Red"),
+        CategoryItem.ColorItem(R.color.cat_dark_maroon, "Dark Maroon"),
         CategoryItem.ColorItem(R.color.cat_dark_pink, "Pink"),
+        CategoryItem.ColorItem(R.color.cat_light_pink, "Light Pink"),
+        CategoryItem.ColorItem(R.color.cat_baby_pink, "Baby Pink"),
+        CategoryItem.ColorItem(R.color.cat_rose_pink, "Rose Pink"),
+
+        // Oranges
+        CategoryItem.ColorItem(R.color.cat_light_orange, "Light Orange"),
+        CategoryItem.ColorItem(R.color.cat_dark_orange, "Dark Orange"),
+        CategoryItem.ColorItem(R.color.cat_orange, "Orange"),
+        CategoryItem.ColorItem(R.color.cat_coral, "Coral"),
+
+        // Yellows
+        CategoryItem.ColorItem(R.color.cat_light_yellow, "Light Yellow"),
         CategoryItem.ColorItem(R.color.cat_yellow, "Yellow"),
+        CategoryItem.ColorItem(R.color.cat_dark_yellow, "Dark Yellow"),
         CategoryItem.ColorItem(R.color.cat_gold, "Gold"),
-        CategoryItem.ColorItem(R.color.cat_dark_purple, "Purple"),
-        CategoryItem.ColorItem(R.color.cat_light_green, "Green"),
-        CategoryItem.ColorItem(R.color.cat_light_purple, "Light Purple"),
+
+        // Greens
+        CategoryItem.ColorItem(R.color.cat_light_green, "Light Green"),
+        CategoryItem.ColorItem(R.color.cat_pastel_green, "Pastel Green"),
+        CategoryItem.ColorItem(R.color.cat_mint, "Mint"),
+        CategoryItem.ColorItem(R.color.cat_forest_green, "Forest Green"),
+        CategoryItem.ColorItem(R.color.cat_dark_green, "Dark Green"),
+        CategoryItem.ColorItem(R.color.cat_teal, "Teal"),
+
+        // Blues
+        CategoryItem.ColorItem(R.color.cat_light_blue, "Light Blue"),
+        CategoryItem.ColorItem(R.color.cat_sky_blue, "Sky Blue"),
         CategoryItem.ColorItem(R.color.cat_dark_blue, "Dark Blue"),
-        CategoryItem.ColorItem(R.color.cat_light_blue, "Light Blue")
+        CategoryItem.ColorItem(R.color.cat_royal_blue, "Royal Blue"),
+        CategoryItem.ColorItem(R.color.cat_turquoise, "Turquoise"),
+
+        // Purples
+        CategoryItem.ColorItem(R.color.cat_light_purple, "Light Purple"),
+        CategoryItem.ColorItem(R.color.cat_lavender, "Lavender"),
+        CategoryItem.ColorItem(R.color.cat_dark_purple, "Dark Purple"),
+        CategoryItem.ColorItem(R.color.cat_deep_purple, "Deep Purple"),
+
+        // Browns
+        CategoryItem.ColorItem(R.color.cat_light_bronze, "Light Bronze"),
+        CategoryItem.ColorItem(R.color.cat_dark_bronze, "Dark Bronze"),
+        CategoryItem.ColorItem(R.color.cat_light_brown, "Light Brown"),
+        CategoryItem.ColorItem(R.color.cat_dark_brown, "Dark Brown"),
+
+        // Greys / Neutrals
+        CategoryItem.ColorItem(R.color.cat_silver, "Silver"),
+        CategoryItem.ColorItem(R.color.cat_light_grey, "Light Grey"),
+        CategoryItem.ColorItem(R.color.cat_dark_grey, "Dark Grey")
     ))
     val colors: StateFlow<List<CategoryItem.ColorItem>> = _colors
 
@@ -374,7 +418,7 @@ class CategoryAddNewViewModel @Inject constructor(
         CategoryItem.IconItem(R.drawable.ic_cat_warehouse, "Warehouse"),
         CategoryItem.IconItem(R.drawable.ic_cat_waves, "Waves"),
         CategoryItem.IconItem(R.drawable.ic_cat_work, "Work"),
-        CategoryItem.IconItem(R.drawable.ic_cat_wrench, "Wrench"),
+        CategoryItem.IconItem(R.drawable.ic_cat_wrench, "Wrench")
     ))
     val icons: StateFlow<List<CategoryItem.IconItem>> = _icons
 

@@ -74,6 +74,7 @@
 
     <!-- =========================================================================================== -->
     <!-- Category colour -->
+    <!-- Existing Colors -->
     <color name="cat_light_pink">#FFB6C1</color>
     <color name="cat_dark_pink">#FF69B4</color>
     <color name="cat_light_purple">#E6E6FA</color>
@@ -91,6 +92,44 @@
     <color name="cat_light_bronze">#f1a66b</color>
     <color name="cat_dark_bronze">#c57436</color>
     <color name="cat_dark_maroon">#842352</color>
+
+    <!-- Reds -->
+    <color name="cat_light_red">#FF7F7F</color>
+    <color name="cat_dark_red">#B22222</color>
+
+    <!-- Oranges -->
+    <color name="cat_light_orange">#FFB347</color>
+    <color name="cat_dark_orange">#FF8C00</color>
+
+    <!-- Yellows -->
+    <color name="cat_light_yellow">#FFFF99</color>
+    <color name="cat_dark_yellow">#E6AC00</color>
+
+    <!-- Greens -->
+    <color name="cat_pastel_green">#77DD77</color>
+    <color name="cat_forest_green">#006400</color>
+
+    <!-- Blues -->
+    <color name="cat_sky_blue">#ADD8E6</color>
+    <color name="cat_royal_blue">#00008B</color>
+
+    <!-- Purples -->
+    <color name="cat_lavender">#D8BFD8</color>
+    <color name="cat_deep_purple">#4B0082</color>
+
+    <!-- Greys / Neutrals -->
+    <color name="cat_light_grey">#D3D3D3</color>
+    <color name="cat_dark_grey">#696969</color>
+
+    <!-- Pinks -->
+    <color name="cat_baby_pink">#FFC0CB</color>
+    <color name="cat_rose_pink">#C71585</color>
+
+    <!-- Unique / Accent Colors -->
+    <color name="cat_turquoise">#40E0D0</color>
+    <color name="cat_teal">#008080</color>
+    <color name="cat_mint">#AAF0D1</color>
+    <color name="cat_coral">#FF7F50</color>
     <!-- =========================================================================================== -->
 
     <!-- =========================================================================================== -->
