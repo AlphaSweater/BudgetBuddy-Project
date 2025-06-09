@@ -34,16 +34,16 @@ class InsertDefaultsUseCase @Inject constructor(
 
     private suspend fun insertDefaultCategories(user: User) {
         val defaultCategories = listOf(
-            Category.new(user, "Food", "Expense", R.drawable.ic_cat_food, R.color.cat_dark_purple),
-            Category.new(user, "Transport", "Expense", R.drawable.ic_cat_vehicle, R.color.cat_yellow),
-            Category.new(user, "Utilities", "Expense", R.drawable.ic_cat_fuel, R.color.cat_dark_brown),
-            Category.new(user, "Entertainment", "Expense", R.drawable.ic_cat_art, R.color.cat_dark_purple),
-            Category.new(user, "Salary", "Income", R.drawable.ic_cat_income, R.color.cat_orange),
-            Category.new(user, "Freelance", "Income", R.drawable.ic_cat_electronics, R.color.cat_dark_pink)
+            Category.new(user, "Food", "expense", R.drawable.ic_cat_food, R.color.cat_dark_purple),
+            Category.new(user, "Transport", "expense", R.drawable.ic_cat_vehicle, R.color.cat_yellow),
+            Category.new(user, "Utilities", "expense", R.drawable.ic_cat_fuel, R.color.cat_dark_brown),
+            Category.new(user, "Entertainment", "expense", R.drawable.ic_cat_art, R.color.cat_dark_purple),
+            Category.new(user, "Salary", "income", R.drawable.ic_cat_income, R.color.cat_orange),
+            Category.new(user, "Freelance", "income", R.drawable.ic_cat_electronics, R.color.cat_dark_pink)
         )
 
         for (category in defaultCategories) {
-            val result = categoryRepository.createCategory(user.id, category.toDTO())
+            val result = categoryRepository.createCategory(user.id, category.toDTO(isDefault = true))
             if (result is Result.Error) {
                 throw Exception("Failed to add category: ${category.name}")
             }
