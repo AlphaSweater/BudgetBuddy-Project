@@ -940,10 +940,7 @@ class GeneralReportsFragment : Fragment() {
     // Add this function to update the button text
     private fun updateTimePeriodButtonText() {
         binding.tvDateRange.text = if (currentDateRange != null) {
-            val startDate = Date(currentDateRange!!.first)
-            val endDate = Date(currentDateRange!!.second)
-            val dateFormat = DateFormat.getMediumDateFormat(requireContext())
-            "${dateFormat.format(startDate)} - ${dateFormat.format(endDate)}"
+            "${DateUtil.formatDateToDMY(currentDateRange!!.first, true)} -\n${DateUtil.formatDateToDMY(currentDateRange!!.second, true)}"
         } else {
             "Select Date"
         }
@@ -1098,7 +1095,7 @@ class GeneralReportsFragment : Fragment() {
     private fun setupViewSwitcher() {
         binding.apply {
             // Set initial state - Reports view is active
-            btnReportsView.setBackgroundResource(R.drawable.toggle_selected)
+            btnReportsView.setBackgroundResource(R.drawable.toggle_selected_button)
             btnTransactionsView.setBackgroundResource(android.R.color.transparent)
 
             // Set up click listeners

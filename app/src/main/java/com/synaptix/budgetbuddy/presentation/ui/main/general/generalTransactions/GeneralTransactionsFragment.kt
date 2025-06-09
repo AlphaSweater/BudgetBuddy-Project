@@ -182,7 +182,7 @@ class GeneralTransactionsFragment : Fragment() {
     private fun setupViewSwitcher() {
         binding.apply {
             // Set initial state - Transactions view is active
-            btnTransactionsView.setBackgroundResource(R.drawable.toggle_selected)
+            btnTransactionsView.setBackgroundResource(R.drawable.toggle_selected_button)
             btnReportsView.setBackgroundResource(android.R.color.transparent)
 
             // Set up click listeners
@@ -321,10 +321,7 @@ class GeneralTransactionsFragment : Fragment() {
 
     private fun updateDateRangeText() {
         binding.tvDateRange.text = if (currentDateRange != null) {
-            val startDate = Date(currentDateRange!!.first)
-            val endDate = Date(currentDateRange!!.second)
-            val dateFormat = SimpleDateFormat("MMM d, yyyy", Locale.getDefault())
-            "${dateFormat.format(startDate)} - ${dateFormat.format(endDate)}"
+            "${DateUtil.formatDateToDMY(currentDateRange!!.first, true)} -\n${DateUtil.formatDateToDMY(currentDateRange!!.second, true)}"
         } else {
             "Select Date"
         }
@@ -340,11 +337,7 @@ class GeneralTransactionsFragment : Fragment() {
         return when {
             isSameDay(now, date) -> "Today"
             isYesterday(now, date) -> "Yesterday"
-            else -> {
-                val day = date.get(Calendar.DAY_OF_MONTH)
-                val month = date.getDisplayName(Calendar.MONTH, Calendar.SHORT, Locale.getDefault())
-                "$month $day"
-            }
+            else -> DateUtil.formatDateToDM(timestamp)
         }
     }
 
