@@ -12,6 +12,7 @@ With intuitive tools and insightful financial summaries, BudgetBuddy empowers us
 ## 📚 Table of Contents
 - [Features](#-features)
 - [Own Features](#own-features)
+- [Security Features](#-security-features)
 - [Prerequisites](#️-prerequisites)
 - [How to Compile and Run](#-how-to-compile-and-run-the-application)
 - [Video Demonstration](#-video-demo)
@@ -42,6 +43,9 @@ With intuitive tools and insightful financial summaries, BudgetBuddy empowers us
 
 - Advanced multi-Budget Support: Application allows for users to create multiple budgets that can each track spending for multiple different categories for that month. Amount spent in each budget resets on the first of every month.
 
+## 🔐 Security Features
+- Firebase Authentication for secure login and identity management.
+- Input validation and protection against improper input.
 
 ## 🛠️ Prerequisites 
 
