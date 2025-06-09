@@ -93,7 +93,7 @@ class GeneralReportAdapter(
 
         /**
          * Binds category data to the view.
-         * Sets the category icon and color, name, transaction count, amount, and date.
+         * Sets the category icon, name, transaction count, amount, and date.
          * 
          * @param item The ReportListItems object containing category data
          */
@@ -108,6 +108,14 @@ class GeneralReportAdapter(
             transactionsText.text = "${item.transactionCount} transactions"
             amountText.text = item.amount
             dateText.text = item.relativeDate
+
+            // Set text color based on the type
+            val colorRes = if (item.category.type.equals("income", ignoreCase = true)) {
+                R.color.profit_green
+            } else {
+                R.color.expense_red
+            }
+            amountText.setTextColor(ContextCompat.getColor(itemView.context, colorRes))
 
             itemView.setOnClickListener { onClick?.invoke(item.category) }
         }
@@ -146,6 +154,14 @@ class GeneralReportAdapter(
             amountText.text = item.amount
             dateText.text = item.relativeDate
 
+            // Set text color based on the type
+            val colorRes = if (item.type.equals("income", ignoreCase = true)) {
+                R.color.profit_green
+            } else {
+                R.color.expense_red
+            }
+            amountText.setTextColor(ContextCompat.getColor(itemView.context, colorRes))
+
             itemView.setOnClickListener { onClick?.invoke(item.label) }
         }
     }
@@ -163,6 +179,7 @@ sealed class ReportListItems {
         val label: Label,
         val transactionCount: Int,
         val amount: String,
-        val relativeDate: String
+        val relativeDate: String,
+        val type: String
     ) : ReportListItems()
 }

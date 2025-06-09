@@ -228,28 +228,40 @@ class GeneralReportsFragment : Fragment() {
             // Chart toggles
             btnChartExpenseToggle.setOnClickListener {
                 showChartExpense()
+                showCategoryExpenseToggle()
+                showLabelExpenseToggle()
             }
 
             btnChartIncomeToggle.setOnClickListener {
                 showChartIncome()
+                showCategoryIncomeToggle()
+                showLabelIncomeToggle()
             }
 
             // Category toggles
             btnCatExpenseToggle.setOnClickListener {
                 showCategoryExpenseToggle()
+                showChartExpense()
+                showLabelExpenseToggle()
             }
 
             btnCatIncomeToggle.setOnClickListener {
                 showCategoryIncomeToggle()
+                showChartIncome()
+                showLabelIncomeToggle()
             }
 
             // Label toggles
             btnLabelExpenseToggle.setOnClickListener {
                 showLabelExpenseToggle()
+                showChartExpense()
+                showCategoryExpenseToggle()
             }
 
             btnLabelIncomeToggle.setOnClickListener {
                 showLabelIncomeToggle()
+                showChartIncome()
+                showCategoryIncomeToggle()
             }
         }
     }
@@ -561,7 +573,8 @@ class GeneralReportsFragment : Fragment() {
                 amount = CurrencyUtil.formatWithSymbol(labelTransactions.sumOf { it.amount.toDouble() }),
                 relativeDate = labelTransactions.maxByOrNull { it.date }?.let {
                     dateFormat.format(Date(it.date))
-                } ?: "No transactions"
+                } ?: "No transactions",
+                type = "expense"  // Add type for expense items
             )
         }
 
@@ -578,7 +591,8 @@ class GeneralReportsFragment : Fragment() {
                 amount = CurrencyUtil.formatWithSymbol(labelTransactions.sumOf { it.amount.toDouble() }),
                 relativeDate = labelTransactions.maxByOrNull { it.date }?.let {
                     dateFormat.format(Date(it.date))
-                } ?: "No transactions"
+                } ?: "No transactions",
+                type = "income"  // Add type for income items
             )
         }
 
@@ -1023,8 +1037,6 @@ class GeneralReportsFragment : Fragment() {
         binding.apply {
             recyclerViewExpenseCategory.visibility = View.VISIBLE
             recyclerViewIncomeCategory.visibility = View.GONE
-            recyclerViewLabelExpense.visibility = View.GONE
-            recyclerViewLabelIncome.visibility = View.GONE
             setupPieChart(isExpense = true)
             highlightToggle(btnCatExpenseToggle, btnCatIncomeToggle)
         }
@@ -1034,8 +1046,6 @@ class GeneralReportsFragment : Fragment() {
         binding.apply {
             recyclerViewExpenseCategory.visibility = View.GONE
             recyclerViewIncomeCategory.visibility = View.VISIBLE
-            recyclerViewLabelExpense.visibility = View.GONE
-            recyclerViewLabelIncome.visibility = View.GONE
             setupPieChart(isExpense = false)
             highlightToggle(btnCatIncomeToggle, btnCatExpenseToggle)
         }
@@ -1043,23 +1053,19 @@ class GeneralReportsFragment : Fragment() {
 
     private fun showLabelExpenseToggle() {
         binding.apply {
-            recyclerViewExpenseCategory.visibility = View.GONE
-            recyclerViewIncomeCategory.visibility = View.GONE
             recyclerViewLabelExpense.visibility = View.VISIBLE
             recyclerViewLabelIncome.visibility = View.GONE
-            setupPieChart(isExpense = true)
             highlightToggle(btnLabelExpenseToggle, btnLabelIncomeToggle)
+            updateLabelLists()
         }
     }
 
     private fun showLabelIncomeToggle() {
         binding.apply {
-            recyclerViewExpenseCategory.visibility = View.GONE
-            recyclerViewIncomeCategory.visibility = View.GONE
             recyclerViewLabelExpense.visibility = View.GONE
             recyclerViewLabelIncome.visibility = View.VISIBLE
-            setupPieChart(isExpense = false)
             highlightToggle(btnLabelIncomeToggle, btnLabelExpenseToggle)
+            updateLabelLists()
         }
     }
 
