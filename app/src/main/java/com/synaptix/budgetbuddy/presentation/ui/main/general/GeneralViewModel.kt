@@ -135,6 +135,28 @@ class GeneralViewModel @Inject constructor(
         restoreSavedState()
         loadData()
         
+        // Handle wallet ID and startDestination from bundle
+        viewModelScope.launch {
+            // Get startDestination from bundle
+            val startDestination = savedStateHandle.get<String>("startDestination") ?: "generalReportsFragment"
+            
+            // Handle wallet ID from bundle if present
+            savedStateHandle.get<String>("walletId")?.let { walletId ->
+                // Wait for wallets to load before setting the selected wallet
+                walletState.collect { state ->
+                    if (state is WalletState.Success) {
+                        val wallet = state.wallets.find { it.id == walletId }
+                        if (wallet != null) {
+                            selectWallet(wallet)
+                        } else {
+                            // If wallet not found, select all wallets
+                            selectWallet(null)
+                        }
+                    }
+                }
+            }
+        }
+        
         // Set up goal observation
         viewModelScope.launch {
             combine(_selectedWallets, _walletState) { selectedWallets, walletState ->
