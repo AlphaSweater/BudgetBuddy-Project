@@ -97,4 +97,23 @@ object DateUtil {
             }
         }
     }
+
+    /**
+     * Formats a date into a human-readable string of 24/03/2025
+     */
+    fun formatDateToDMY(timestamp: Long?): String {
+        if (timestamp == null) return "N/A"
+        val date = Date(timestamp)
+        return SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(date)
+    }
+
+    /**
+     * Formats a date into a human-readable string of 24 March or 24 Mar
+     */
+    fun formatDateToDM(timestamp: Long?, useShortMonth: Boolean = false): String {
+        if (timestamp == null) return "N/A"
+        val date = Date(timestamp)
+        val format = if (useShortMonth) "dd MMM" else "dd MMMM"
+        return SimpleDateFormat(format, Locale.getDefault()).format(date)
+    }
 } 

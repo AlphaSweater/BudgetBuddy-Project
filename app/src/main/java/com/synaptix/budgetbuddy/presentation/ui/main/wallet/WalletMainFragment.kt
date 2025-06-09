@@ -165,7 +165,7 @@ class WalletMainFragment : Fragment() {
 
             runningBalance += dailyNet
             entries.add(Entry((index + 1).toFloat(), runningBalance.toFloat()))
-            xLabels.add(DateUtil.formatDate(date, true))
+            xLabels.add(DateUtil.formatDateToDM(date, true))
         }
 
         // Determine line and gradient colors based on transaction types
