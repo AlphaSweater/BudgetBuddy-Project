@@ -1,6 +1,7 @@
 package com.synaptix.budgetbuddy.presentation.ui.main.general
 
 import android.util.Log
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.synaptix.budgetbuddy.core.model.Category
@@ -10,6 +11,7 @@ import com.synaptix.budgetbuddy.core.usecase.auth.GetUserIdUseCase
 import com.synaptix.budgetbuddy.core.usecase.main.category.GetCategoriesUseCase
 import com.synaptix.budgetbuddy.core.usecase.main.transaction.GetTransactionsUseCase
 import com.synaptix.budgetbuddy.core.usecase.main.wallet.GetWalletsUseCase
+import com.synaptix.budgetbuddy.core.util.DateUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -25,11 +27,13 @@ import javax.inject.Inject
  * 2. Loading and filtering data from the backend
  * 3. Handling date range filtering
  * 4. Managing expense goals
+ * 5. Persisting user selections (wallet and date range)
  * 
  * The ViewModel uses:
  * - StateFlow for UI state management
  * - Coroutines for asynchronous operations
  * - UseCases for business logic
+ * - SavedStateHandle for state persistence
  * 
  * Data Flow:
  * Repository -> UseCase -> ViewModel -> UI
@@ -39,8 +43,18 @@ class GeneralViewModel @Inject constructor(
     private val getTransactionsUseCase: GetTransactionsUseCase,
     private val getCategoriesUseCase: GetCategoriesUseCase,
     private val getUserIdUseCase: GetUserIdUseCase,
-    private val getWalletsUseCase: GetWalletsUseCase
+    private val getWalletsUseCase: GetWalletsUseCase,
+    private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // Constants
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    companion object {
+        private const val KEY_SELECTED_WALLET_ID = "selected_wallet_id"
+        private const val KEY_DATE_RANGE_START = "date_range_start"
+        private const val KEY_DATE_RANGE_END = "date_range_end"
+    }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     // State Definitions
@@ -94,7 +108,33 @@ class GeneralViewModel @Inject constructor(
     // Initialization
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     init {
+        // Restore saved state
+        restoreSavedState()
         loadData()
+    }
+
+    private fun restoreSavedState() {
+        // Restore selected wallet
+        savedStateHandle.get<String>(KEY_SELECTED_WALLET_ID)?.let { walletId ->
+            viewModelScope.launch {
+                // Wait for wallets to load before setting the selected wallet
+                walletState.collect { state ->
+                    if (state is WalletState.Success) {
+                        val wallet = state.wallets.find { it.id == walletId }
+                        if (wallet != null) {
+                            _selectedWallet.value = wallet
+                        }
+                    }
+                }
+            }
+        }
+
+        // Restore date range
+        val startDate = savedStateHandle.get<Long>(KEY_DATE_RANGE_START)
+        val endDate = savedStateHandle.get<Long>(KEY_DATE_RANGE_END)
+        if (startDate != null && endDate != null) {
+            _dateRange.value = startDate..endDate
+        }
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
@@ -199,11 +239,8 @@ class GeneralViewModel @Inject constructor(
                 val transactionDay = cal.timeInMillis
                 transactionDay in dateRange.start..dateRange.endInclusive
             } else {
-                // Default to last 3 months if no date range is set
-                val calendar = Calendar.getInstance()
-                val endDate = calendar.timeInMillis
-                calendar.add(Calendar.MONTH, -3)
-                val startDate = calendar.timeInMillis
+                // Default to current month if no date range is set
+                val (startDate, endDate) = DateUtil.getCurrentMonthRange()
                 transaction.date in startDate..endDate
             }
 
@@ -248,6 +285,8 @@ class GeneralViewModel @Inject constructor(
 
     fun selectWallet(wallet: Wallet?) {
         _selectedWallet.value = wallet
+        // Save selected wallet ID to SavedStateHandle
+        savedStateHandle[KEY_SELECTED_WALLET_ID] = wallet?.id
         filterTransactions()
     }
 
@@ -269,12 +308,21 @@ class GeneralViewModel @Inject constructor(
             set(Calendar.MILLISECOND, 999)
         }
 
-        _dateRange.value = startCal.timeInMillis..endCal.timeInMillis
+        val range = startCal.timeInMillis..endCal.timeInMillis
+        _dateRange.value = range
+        
+        // Save date range to SavedStateHandle
+        savedStateHandle[KEY_DATE_RANGE_START] = range.start
+        savedStateHandle[KEY_DATE_RANGE_END] = range.endInclusive
+        
         filterTransactions()
     }
 
     fun clearDateRange() {
         _dateRange.value = null
+        // Clear saved date range
+        savedStateHandle.remove<Long>(KEY_DATE_RANGE_START)
+        savedStateHandle.remove<Long>(KEY_DATE_RANGE_END)
         filterTransactions()
     }
 

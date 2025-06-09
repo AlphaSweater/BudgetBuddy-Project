@@ -21,6 +21,7 @@ import com.synaptix.budgetbuddy.core.util.CurrencyUtil
 import com.synaptix.budgetbuddy.databinding.FragmentGeneralTransactionsBinding
 import com.synaptix.budgetbuddy.presentation.ui.main.general.GeneralViewModel
 import com.synaptix.budgetbuddy.presentation.ui.main.general.generalReports.ReportListItems
+import com.synaptix.budgetbuddy.core.util.DateUtil
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -146,8 +147,17 @@ class GeneralTransactionsFragment : Fragment() {
                                     viewModel.selectWallet(selectedWallet)
                                 }
 
-                                // Set default selection to "All Wallets"
-                                binding.autoCompleteWallet.setText("All Wallets", false)
+                                // Set initial selection based on persisted wallet
+                                viewModel.selectedWallet.value?.let { selectedWallet ->
+                                    val position = wallets.indexOf(selectedWallet) + 1 // +1 because of "All Wallets"
+                                    if (position > 0) {
+                                        binding.autoCompleteWallet.setText(walletNames[position], false)
+                                    } else {
+                                        binding.autoCompleteWallet.setText("All Wallets", false)
+                                    }
+                                } ?: run {
+                                    binding.autoCompleteWallet.setText("All Wallets", false)
+                                }
                             }
                         }
                         else -> {}
@@ -160,6 +170,12 @@ class GeneralTransactionsFragment : Fragment() {
     private fun setupDateSelection() {
         binding.btnSelectDate.setOnClickListener {
             showDateRangePicker()
+        }
+
+        // Update date range text based on persisted range
+        viewModel.dateRange.value?.let { range ->
+            currentDateRange = range.start to range.endInclusive
+            updateDateRangeText()
         }
     }
 
@@ -202,6 +218,16 @@ class GeneralTransactionsFragment : Fragment() {
                 launch {
                     viewModel.selectedWallet.collectLatest { selectedWallet ->
                         updateTransactionsForSelectedWallet(selectedWallet)
+                    }
+                }
+
+                // Collect date range changes
+                launch {
+                    viewModel.dateRange.collectLatest { range ->
+                        range?.let {
+                            currentDateRange = it.start to it.endInclusive
+                            updateDateRangeText()
+                        }
                     }
                 }
 
@@ -266,10 +292,10 @@ class GeneralTransactionsFragment : Fragment() {
     private fun showDateRangePicker() {
         val calendar = Calendar.getInstance()
         
-        // Default to last 30 days
-        val defaultEndDate = calendar.timeInMillis
-        calendar.add(Calendar.DAY_OF_MONTH, -30)
-        val defaultStartDate = calendar.timeInMillis
+        // Use persisted date range if available, otherwise default to current month
+        val (defaultStartDate, defaultEndDate) = viewModel.dateRange.value?.let { range ->
+            range.start to range.endInclusive
+        } ?: DateUtil.getCurrentMonthRange()
 
         // Create and show the date range picker dialog
         val dateRangePicker = MaterialDatePicker.Builder.dateRangePicker()
