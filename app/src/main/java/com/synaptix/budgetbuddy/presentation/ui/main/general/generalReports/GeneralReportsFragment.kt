@@ -39,6 +39,7 @@ import com.synaptix.budgetbuddy.core.model.Label
 import com.synaptix.budgetbuddy.core.model.Transaction
 import com.synaptix.budgetbuddy.core.util.CurrencyUtil
 import com.synaptix.budgetbuddy.core.util.DateUtil
+import com.synaptix.budgetbuddy.core.util.PrivacyUtil
 import com.synaptix.budgetbuddy.databinding.FragmentGeneralReportsBinding
 import com.synaptix.budgetbuddy.extentions.getThemeColor
 import com.synaptix.budgetbuddy.presentation.ui.main.general.GeneralViewModel
@@ -263,6 +264,15 @@ class GeneralReportsFragment : Fragment() {
                 showChartIncome()
                 showCategoryIncomeToggle()
             }
+
+            btnViewEye.setOnClickListener {
+                isBalanceVisible = PrivacyUtil.toggleBalanceVisibility(
+                    isVisible = isBalanceVisible,
+                    balanceView = textViewCurrencyTotal,
+                    eyeIcon = imageViewEye,
+                    balance = viewModel.totalBalance.value
+                )
+            }
         }
     }
 
@@ -445,8 +455,15 @@ class GeneralReportsFragment : Fragment() {
                 setupLineChart(lineChartExpense, expenseTransactions, "expense")
                 setupLineChart(lineChartIncome, incomeTransactions, "income")
 
-                // Update pie chart
-                setupPieChart(binding.btnCatExpenseToggle.background != null)
+                // Update pie chart based on current toggle state
+                val isExpense = when {
+                    binding.recyclerViewExpenseCategory.visibility == View.VISIBLE -> true
+                    binding.recyclerViewIncomeCategory.visibility == View.VISIBLE -> false
+                    binding.recyclerViewLabelExpense.visibility == View.VISIBLE -> true
+                    binding.recyclerViewLabelIncome.visibility == View.VISIBLE -> false
+                    else -> true // Default to expense if no view is visible
+                }
+                setupPieChart(isExpense)
 
                 // Update category lists if we have categories loaded
                 (viewModel.categoriesState.value as? GeneralViewModel.CategoryState.Success)?.let { categoryState ->
