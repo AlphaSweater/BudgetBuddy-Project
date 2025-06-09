@@ -114,6 +114,7 @@
             android:layout_height="24dp"
             android:contentDescription="Navigate"
             android:src="@drawable/ic_arrow_open_24"
+            android:visibility="invisible"
             app:tint="?attr/bb_secondaryText"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
