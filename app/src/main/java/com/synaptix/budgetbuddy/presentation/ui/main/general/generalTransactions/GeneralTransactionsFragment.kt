@@ -12,6 +12,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.navGraphViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.synaptix.budgetbuddy.R
@@ -29,6 +30,7 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
+import kotlin.getValue
 
 /**
  * Fragment for displaying general transactions.
@@ -73,7 +75,7 @@ class GeneralTransactionsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupViews()
-        observeStates()
+        observeViewModel()
     }
 
     override fun onDestroyView() {
@@ -85,11 +87,11 @@ class GeneralTransactionsFragment : Fragment() {
     // Setup Methods
     //================================================================================
     private fun setupViews() {
+        setupViewSwitcher()
         setupRecyclerView()
         setupClickListeners()
         setupWalletDropdown()
         setupDateSelection()
-        setupViewSwitcher()
     }
 
     private fun setupRecyclerView() {
@@ -181,13 +183,16 @@ class GeneralTransactionsFragment : Fragment() {
 
     private fun setupViewSwitcher() {
         binding.apply {
-            // Set initial state - Transactions view is active
-            btnTransactionsView.setBackgroundResource(R.drawable.toggle_selected_button)
-            btnReportsView.setBackgroundResource(android.R.color.transparent)
+            // Set initial state for transactions view
+            btnReportsView.isSelected = false
+            btnTransactionsView.isSelected = true
 
-            // Set up click listeners
             btnReportsView.setOnClickListener {
-                findNavController().navigate(R.id.navigation_general_reports)
+                try {
+                    findNavController().navigate(R.id.action_generalTransactionsFragment_to_generalReportsFragment)
+                } catch (e: Exception) {
+                    Log.e("GeneralTransactionsFragment", "Navigation error: ${e.message}")
+                }
             }
 
             btnTransactionsView.setOnClickListener {
@@ -199,7 +204,7 @@ class GeneralTransactionsFragment : Fragment() {
     //================================================================================
     // State Observation
     //================================================================================
-    private fun observeStates() {
+    private fun observeViewModel() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 // Collect wallet state
