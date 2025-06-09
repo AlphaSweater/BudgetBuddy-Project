@@ -104,6 +104,13 @@ class GeneralViewModel @Inject constructor(
     private val _expenseGoal = MutableStateFlow<Pair<Double, Double>?>(null)
     val expenseGoal: StateFlow<Pair<Double, Double>?> = _expenseGoal.asStateFlow()
 
+    private var _totalBalance = MutableStateFlow<Double>(0.0)
+    var totalBalance: StateFlow<Double> = _totalBalance.asStateFlow()
+
+    fun setTotalBalance(balance: Double) {
+        _totalBalance.value = balance
+    }
+
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     // Initialization
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
