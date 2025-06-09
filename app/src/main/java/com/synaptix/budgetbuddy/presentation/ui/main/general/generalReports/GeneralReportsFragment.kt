@@ -139,6 +139,7 @@ class GeneralReportsFragment : Fragment() {
         setupOnClickListeners()
         setupWalletDropdown()
         setupPieChart(true)
+        setupViewSwitcher()
         observeStates()
 
         // Set initial toggle state
@@ -1075,6 +1076,23 @@ class GeneralReportsFragment : Fragment() {
      */
     private fun navigateToCategoryDetails(category: Category) {
         // TODO: Implement navigation to category details
+    }
+
+    private fun setupViewSwitcher() {
+        binding.apply {
+            // Set initial state - Reports view is active
+            btnReportsView.setBackgroundResource(R.drawable.toggle_selected)
+            btnTransactionsView.setBackgroundResource(android.R.color.transparent)
+
+            // Set up click listeners
+            btnTransactionsView.setOnClickListener {
+                findNavController().navigate(R.id.navigation_general_transactions)
+            }
+
+            btnReportsView.setOnClickListener {
+                // Already in reports view, do nothing
+            }
+        }
     }
 
     override fun onDestroyView() {
