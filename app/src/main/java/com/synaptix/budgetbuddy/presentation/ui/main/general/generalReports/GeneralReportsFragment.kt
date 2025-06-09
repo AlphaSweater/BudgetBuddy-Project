@@ -13,7 +13,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -41,10 +41,14 @@ import com.github.mikephil.charting.formatter.PercentFormatter
 import com.synaptix.budgetbuddy.R
 import com.synaptix.budgetbuddy.core.model.Category
 import com.synaptix.budgetbuddy.core.model.Transaction
+import com.synaptix.budgetbuddy.core.util.CurrencyUtil
+import com.synaptix.budgetbuddy.core.util.DateUtil
 import com.synaptix.budgetbuddy.databinding.FragmentGeneralReportsBinding
 import com.synaptix.budgetbuddy.extentions.getThemeColor
+import com.synaptix.budgetbuddy.presentation.ui.main.general.GeneralViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -96,8 +100,8 @@ class GeneralReportsFragment : Fragment() {
 
     private var currentDateRange: Pair<Long, Long>? = null
 
-    // ViewModel for data management
-    private val viewModel: GeneralReportsViewModel by viewModels()
+    // Use activityViewModels to share the ViewModel between fragments
+    private val viewModel: GeneralViewModel by activityViewModels()
 
     private lateinit var lineChartExpense: LineChart
     private lateinit var lineChartIncome: LineChart
@@ -135,29 +139,34 @@ class GeneralReportsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        
+        // Initialize chart views
+        lineChartExpense = binding.lineChartExpense
+        lineChartIncome = binding.lineChartIncome
+
+        // Set initial visibility
+        lineChartExpense.visibility = View.VISIBLE
+        lineChartIncome.visibility = View.GONE
+
+        // Set initial toggle states
+        binding.btnChartExpenseToggle.setBackgroundResource(R.drawable.toggle_selected)
+        binding.btnChartIncomeToggle.setBackgroundResource(android.R.color.transparent)
+
+        // Setup all views and listeners
+        setupViews()
+        
+        // Start observing states
+        observeStates()
+    }
+
+    private fun setupViews() {
         setupRecyclerViews()
         setupOnClickListeners()
         setupWalletDropdown()
         setupPieChart(true)
         setupViewSwitcher()
-        observeStates()
-
-        // Set initial toggle state
-        binding.btnChartExpenseToggle.setBackgroundResource(R.drawable.toggle_selected)
-        binding.btnChartIncomeToggle.setBackgroundResource(android.R.color.transparent)
-        // Initialize views
-        lineChartExpense = binding.lineChartExpense
-        lineChartIncome = binding.lineChartIncome
-
-        // Show expense chart by default
-        lineChartExpense.visibility = View.VISIBLE
-        lineChartIncome.visibility = View.GONE
     }
 
-    /**
-     * Sets up the RecyclerViews for displaying transactions and categories.
-     * Uses LinearLayoutManager for vertical scrolling.
-     */
     private fun setupRecyclerViews() {
         binding.apply {
             recyclerViewExpenseCategory.apply {
@@ -172,10 +181,6 @@ class GeneralReportsFragment : Fragment() {
         }
     }
 
-    /**
-     * Sets up click listeners for UI elements.
-     * Handles navigation and toggle actions.
-     */
     private fun setupOnClickListeners() {
         binding.apply {
             // Back button
@@ -242,7 +247,6 @@ class GeneralReportsFragment : Fragment() {
     private fun observeStates() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-
                 // Load data when the fragment starts
                 viewModel.loadData()
 
@@ -251,7 +255,7 @@ class GeneralReportsFragment : Fragment() {
 
                 launch {
                     // Observe wallet selection changes
-                    viewModel.selectedWallet.collect { selectedWallet ->
+                    viewModel.selectedWallet.collectLatest { selectedWallet ->
                         Log.d("Filtering", "Wallet changed: ${selectedWallet?.name}")
                         updateUI()
                     }
@@ -259,25 +263,27 @@ class GeneralReportsFragment : Fragment() {
 
                 launch {
                     // Observe date range changes
-                    viewModel.dateRange.collect { dateRange ->
+                    viewModel.dateRange.collectLatest { dateRange ->
                         Log.d("Filtering", "Date range changed: $dateRange")
+                        currentDateRange = dateRange?.let { it.start to it.endInclusive }
+                        updateTimePeriodButtonText()
                         updateUI()
                     }
                 }
 
                 launch {
                     // Observe transactions
-                    viewModel.transactionsState.collect { state ->
+                    viewModel.transactionsState.collectLatest { state ->
                         when (state) {
-                            is GeneralReportsViewModel.TransactionState.Success -> {
+                            is GeneralViewModel.TransactionState.Success -> {
                                 Log.d("Filtering", "Transactions updated: ${state.transactions.size} items")
                                 updateUI()
                             }
-                            is GeneralReportsViewModel.TransactionState.Loading -> {
+                            is GeneralViewModel.TransactionState.Loading -> {
                                 // Show loading state if needed
                                 Log.d("Filtering", "Loading transactions...")
                             }
-                            is GeneralReportsViewModel.TransactionState.Error -> {
+                            is GeneralViewModel.TransactionState.Error -> {
                                 Log.e("Filtering", "Error loading transactions: ${state.message}")
                                 // Show error state if needed
                             }
@@ -288,9 +294,9 @@ class GeneralReportsFragment : Fragment() {
 
                 launch {
                     // Observe categories
-                    viewModel.categoriesState.collect { state ->
+                    viewModel.categoriesState.collectLatest { state ->
                         when (state) {
-                            is GeneralReportsViewModel.CategoryState.Success -> {
+                            is GeneralViewModel.CategoryState.Success -> {
                                 Log.d("Filtering", "Categories updated: ${state.categories.size} items")
                                 updateCategoryLists(state.categories)
                             }
@@ -298,8 +304,9 @@ class GeneralReportsFragment : Fragment() {
                         }
                     }
                 }
+
                 launch {
-                    viewModel.expenseGoal.collect { goals ->
+                    viewModel.expenseGoal.collectLatest { goals ->
                         goals?.let { (minGoal, maxGoal) ->
                             Log.d("ExpenseGoal", "Received goals - Min: $minGoal, Max: $maxGoal")
                             // Only update if the expense chart is visible
@@ -316,9 +323,10 @@ class GeneralReportsFragment : Fragment() {
             }
         }
     }
+
     private fun updateUI() {
-        when (val state = viewModel.transactionsState.value) {
-            is GeneralReportsViewModel.TransactionState.Success -> {
+        when (viewModel.transactionsState.value) {
+            is GeneralViewModel.TransactionState.Success -> {
                 // Update charts with filtered transactions
                 val expenseTransactions = viewModel.getTransactionsByType("expense")
                 val incomeTransactions = viewModel.getTransactionsByType("income")
@@ -331,17 +339,17 @@ class GeneralReportsFragment : Fragment() {
                 setupPieChart(binding.btnCatExpenseToggle.background != null)
 
                 // Update category lists if we have categories loaded
-                (viewModel.categoriesState.value as? GeneralReportsViewModel.CategoryState.Success)?.let { categoryState ->
+                (viewModel.categoriesState.value as? GeneralViewModel.CategoryState.Success)?.let { categoryState ->
                     updateCategoryLists(categoryState.categories)
                 }
             }
-            is GeneralReportsViewModel.TransactionState.Loading -> {
+            is GeneralViewModel.TransactionState.Loading -> {
                 // Show loading state if needed
             }
-            is GeneralReportsViewModel.TransactionState.Error -> {
+            is GeneralViewModel.TransactionState.Error -> {
                 // Show error state if needed
             }
-            is GeneralReportsViewModel.TransactionState.Empty -> {
+            is GeneralViewModel.TransactionState.Empty -> {
                 // Show empty state if needed
             }
         }
@@ -363,7 +371,7 @@ class GeneralReportsFragment : Fragment() {
      */
     private fun updateCategoryLists(categories: List<Category>) {
         val filteredTransactions = when (val state = viewModel.transactionsState.value) {
-            is GeneralReportsViewModel.TransactionState.Success -> state.transactions
+            is GeneralViewModel.TransactionState.Success -> state.transactions
             else -> emptyList()
         }
 
@@ -375,13 +383,13 @@ class GeneralReportsFragment : Fragment() {
 
         binding.apply {
             btnCatExpenseToggle.findViewById<TextView>(R.id.txtExpenseTotal).text =
-                "-R ${String.format("%.2f", totalExpense)}"
+                CurrencyUtil.formatWithSymbol(-totalExpense)
             btnCatIncomeToggle.findViewById<TextView>(R.id.txtIncomeTotal).text =
-                "R ${String.format("%.2f", totalIncome)}"
+                CurrencyUtil.formatWithSymbol(totalIncome)
 
             // Update chart toggle amounts
-            txtChartExpenseTotal.text = "-R ${String.format("%.2f", totalExpense)}"
-            txtChartIncomeTotal.text = "R ${String.format("%.2f", totalIncome)}"
+            txtChartExpenseTotal.text = CurrencyUtil.formatWithSymbol(-totalExpense)
+            txtChartIncomeTotal.text = CurrencyUtil.formatWithSymbol(totalIncome)
         }
 
         val dateFormat = SimpleDateFormat("MMM d", Locale.getDefault())
@@ -402,7 +410,7 @@ class GeneralReportsFragment : Fragment() {
             ReportListItems.ReportCategoryItem(
                 category = category,
                 transactionCount = categoryTransactions.size,
-                amount = String.format("R %.2f", categoryTransactions.sumOf { it.amount.toDouble() }),
+                amount = CurrencyUtil.formatWithSymbol(categoryTransactions.sumOf { it.amount.toDouble() }),
                 relativeDate = categoryTransactions.maxByOrNull { it.date }?.let {
                     dateFormat.format(Date(it.date))
                 } ?: "No transactions"
@@ -415,7 +423,7 @@ class GeneralReportsFragment : Fragment() {
             ReportListItems.ReportCategoryItem(
                 category = category,
                 transactionCount = categoryTransactions.size,
-                amount = String.format("R %.2f", categoryTransactions.sumOf { it.amount.toDouble() }),
+                amount = CurrencyUtil.formatWithSymbol(categoryTransactions.sumOf { it.amount.toDouble() }),
                 relativeDate = categoryTransactions.maxByOrNull { it.date }?.let {
                     dateFormat.format(Date(it.date))
                 } ?: "No transactions"
@@ -442,8 +450,8 @@ class GeneralReportsFragment : Fragment() {
             val transactions = viewModel.getTransactionsByType("expense")
             val totalExpense = transactions.sumOf { it.amount.toDouble() }
             txtExpenseTotal.text =
-                if (totalExpense > 0) "-R ${String.format("%.2f", totalExpense)}"
-                else "R 0.00"
+                if (totalExpense > 0) CurrencyUtil.formatWithSymbol(-totalExpense)
+                else CurrencyUtil.formatWithSymbol(0.0)
         }
     }
 
@@ -458,8 +466,8 @@ class GeneralReportsFragment : Fragment() {
             val transactions = viewModel.getTransactionsByType("income")
             val totalIncome = transactions.sumOf { it.amount.toDouble() }
             txtIncomeTotal.text =
-                if (totalIncome > 0) "R ${String.format("%.2f", totalIncome)}"
-                else "R 0.00"
+                if (totalIncome > 0) CurrencyUtil.formatWithSymbol(totalIncome)
+                else CurrencyUtil.formatWithSymbol(0.0)
         }
     }
 
@@ -479,8 +487,8 @@ class GeneralReportsFragment : Fragment() {
             val transactions = viewModel.getTransactionsByType("expense")
             val totalExpense = transactions.sumOf { it.amount.toDouble() }
             txtChartExpenseTotal.text =
-                if (totalExpense > 0) "-R ${String.format("%.2f", totalExpense)}"
-                else "R 0.00"
+                if (totalExpense > 0) CurrencyUtil.formatWithSymbol(-totalExpense)
+                else CurrencyUtil.formatWithSymbol(0.0)
         }
     }
 
@@ -495,8 +503,8 @@ class GeneralReportsFragment : Fragment() {
             val transactions = viewModel.getTransactionsByType("income")
             val totalIncome = transactions.sumOf { it.amount.toDouble() }
             txtChartIncomeTotal.text =
-                if (totalIncome > 0) "R ${String.format("%.2f", totalIncome)}"
-                else "R 0.00"
+                if (totalIncome > 0) CurrencyUtil.formatWithSymbol(totalIncome)
+                else CurrencyUtil.formatWithSymbol(0.0)
         }
     }
 
@@ -674,7 +682,7 @@ class GeneralReportsFragment : Fragment() {
             expenseGoalJob?.cancel()
 
             expenseGoalJob = viewLifecycleOwner.lifecycleScope.launch {
-                viewModel.expenseGoal.collect { goals ->
+                viewModel.expenseGoal.collectLatest { goals ->
                     goals?.let { (minGoal, maxGoal) ->
                         // Remove existing limit lines
                         chart.axisLeft.removeAllLimitLines()
@@ -703,7 +711,7 @@ class GeneralReportsFragment : Fragment() {
                         }
 
                         // Get the current chart data
-                        val entries = (chart.data?.dataSets?.firstOrNull() as? LineDataSet)?.values ?: return@collect
+                        val entries = (chart.data?.dataSets?.firstOrNull() as? LineDataSet)?.values ?: return@collectLatest
 
                         // Adjust y-axis to include the goal lines and data
                         val minY = entries.minByOrNull { it.y }?.y ?: 0f
@@ -737,7 +745,7 @@ class GeneralReportsFragment : Fragment() {
 
     private fun updateTotalBalance(transactions: List<Transaction>) {
         val totalBalance = transactions.sumOf { it.amount }
-        binding.tvCurrencyTotal.text = String.format("R %.2f", totalBalance)
+        binding.tvCurrencyTotal.text = CurrencyUtil.formatWithSymbol(totalBalance)
     }
 
     /**
@@ -829,34 +837,46 @@ class GeneralReportsFragment : Fragment() {
     private fun setupWalletDropdown() {
         lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.walletState.collect { wallets ->
-                    Log.d("WalletDropdown", "walletState emitted with wallets: ${wallets.map { it.name }}")
+                viewModel.walletState.collectLatest { walletState ->
+                    when (walletState) {
+                        is GeneralViewModel.WalletState.Success -> {
+                            val wallets = walletState.wallets
+                            if (wallets.isNotEmpty()) {
+                                // Create a list with "All Wallets" as the first item
+                                val walletNames = listOf("All Wallets") + wallets.map { it.name }
 
-                    if (wallets.isNotEmpty()) {
-                        // Create a list with "All Wallets" as the first item
-                        val walletNames = listOf("All Wallets") + wallets.map { it.name }
+                                val adapter = ArrayAdapter(
+                                    requireContext(),
+                                    R.layout.item_dropdown_item,
+                                    walletNames
+                                )
 
-                        val adapter = ArrayAdapter(
-                            requireContext(),
-                            R.layout.item_dropdown_item,
-                            walletNames
-                        )
+                                binding.autoCompleteWallet.setAdapter(adapter)
 
-                        binding.autoCompleteWallet.setAdapter(adapter)
+                                // Set up the item selected listener
+                                binding.autoCompleteWallet.setOnItemClickListener { _, _, position, _ ->
+                                    val selectedWallet = if (position == 0) {
+                                        null // "All Wallets" selected
+                                    } else {
+                                        wallets[position - 1] // Adjust index since we added "All Wallets" at position 0
+                                    }
+                                    viewModel.selectWallet(selectedWallet)
+                                }
 
-                        // Set up the item selected listener
-                        binding.autoCompleteWallet.setOnItemClickListener { _, _, position, _ ->
-                            val selectedWallet = if (position == 0) {
-                                null // "All Wallets" selected
-                            } else {
-                                wallets[position - 1] // Adjust index since we added "All Wallets" at position 0
+                                // Set initial selection based on persisted wallet
+                                viewModel.selectedWallet.value?.let { selectedWallet ->
+                                    val position = wallets.indexOf(selectedWallet) + 1 // +1 because of "All Wallets"
+                                    if (position > 0) {
+                                        binding.autoCompleteWallet.setText(walletNames[position], false)
+                                    } else {
+                                        binding.autoCompleteWallet.setText("All Wallets", false)
+                                    }
+                                } ?: run {
+                                    binding.autoCompleteWallet.setText("All Wallets", false)
+                                }
                             }
-                            viewModel.selectWallet(selectedWallet)
-                            Log.d("WalletDropdown", "Selected wallet: ${selectedWallet?.name ?: "All Wallets"}")
                         }
-
-                        // Set default selection to "All Wallets"
-                        binding.autoCompleteWallet.setText("All Wallets", false)
+                        else -> {}
                     }
                 }
             }
@@ -865,20 +885,17 @@ class GeneralReportsFragment : Fragment() {
 
     private fun showDateRangePicker() {
         val calendar = Calendar.getInstance()
-        val currentYear = calendar.get(Calendar.YEAR)
-        val currentMonth = calendar.get(Calendar.MONTH)
-        val currentDay = calendar.get(Calendar.DAY_OF_MONTH)
-
-        // Default to last 30 days
-        val defaultEndDate = calendar.timeInMillis
-        calendar.add(Calendar.DAY_OF_MONTH, -30)
-        val defaultStartDate = calendar.timeInMillis
+        
+        // Use persisted date range if available, otherwise default to current month
+        val (defaultStartDate, defaultEndDate) = viewModel.dateRange.value?.let { range ->
+            range.start to range.endInclusive
+        } ?: DateUtil.getCurrentMonthRange()
 
         // Create and show the date range picker dialog
         val dateRangePicker = MaterialDatePicker.Builder.dateRangePicker()
             .setTitleText("Select Date Range")
             .setSelection(
-                UtilPair(
+                androidx.core.util.Pair(
                     defaultStartDate,
                     defaultEndDate
                 )
@@ -923,10 +940,7 @@ class GeneralReportsFragment : Fragment() {
     // Add this function to update the button text
     private fun updateTimePeriodButtonText() {
         binding.tvDateRange.text = if (currentDateRange != null) {
-            val startDate = Date(currentDateRange!!.first)
-            val endDate = Date(currentDateRange!!.second)
-            val dateFormat = DateFormat.getMediumDateFormat(requireContext())
-            "${dateFormat.format(startDate)} - ${dateFormat.format(endDate)}"
+            "${DateUtil.formatDateToDMY(currentDateRange!!.first, true)} -\n${DateUtil.formatDateToDMY(currentDateRange!!.second, true)}"
         } else {
             "Select Date"
         }
@@ -1038,10 +1052,10 @@ class GeneralReportsFragment : Fragment() {
         // Force a complete redraw with the new settings
         lineChartExpense.setVisibleXRangeMaximum(entries.size.toFloat())
         lineChartExpense.moveViewToX(0f)
-        lineChartExpense.setExtraTopOffset(40f)  // Additional top offset
-        lineChartExpense.setExtraBottomOffset(20f)
-        lineChartExpense.setExtraLeftOffset(16f)
-        lineChartExpense.setExtraRightOffset(32f)
+        lineChartExpense.extraTopOffset = 40f  // Additional top offset
+        lineChartExpense.extraBottomOffset = 20f
+        lineChartExpense.extraLeftOffset = 16f
+        lineChartExpense.extraRightOffset = 32f
         lineChartExpense.invalidate()
         lineChartExpense.requestLayout()
 
@@ -1081,7 +1095,7 @@ class GeneralReportsFragment : Fragment() {
     private fun setupViewSwitcher() {
         binding.apply {
             // Set initial state - Reports view is active
-            btnReportsView.setBackgroundResource(R.drawable.toggle_selected)
+            btnReportsView.setBackgroundResource(R.drawable.toggle_selected_button)
             btnTransactionsView.setBackgroundResource(android.R.color.transparent)
 
             // Set up click listeners
