@@ -7,6 +7,7 @@ import android.widget.TextView
 import com.synaptix.budgetbuddy.R
 import com.synaptix.budgetbuddy.core.model.BudgetListItems
 import com.synaptix.budgetbuddy.core.util.CurrencyUtil
+import com.synaptix.budgetbuddy.core.util.DateUtil
 import com.synaptix.budgetbuddy.presentation.ui.common.BaseAdapter
 
 /**
@@ -49,6 +50,7 @@ class WalletMainAdapter(
         private val walletIcon: ImageView = itemView.findViewById(R.id.walletIcon)
         private val walletName: TextView = itemView.findViewById(R.id.walletName)
         private val walletBalance: TextView = itemView.findViewById(R.id.walletBalance)
+        private val dateText: TextView = itemView.findViewById(R.id.lastActivity)
 
         /**
          * Binds wallet data to the view.
@@ -59,6 +61,7 @@ class WalletMainAdapter(
             walletIcon.setImageResource(item.walletIcon)
             walletName.text = item.walletName
             walletBalance.text = CurrencyUtil.formatWithSymbol(item.walletBalance)
+            dateText.text = "• ${DateUtil.formatDate(item.wallet.lastTransactionAt)}"
             
             itemView.setOnClickListener { onWalletClick(item) }
         }

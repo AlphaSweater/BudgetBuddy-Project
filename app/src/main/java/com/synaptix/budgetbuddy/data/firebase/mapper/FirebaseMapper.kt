@@ -50,14 +50,14 @@ object FirebaseMapper {
     )
 
     // Category mappings
-    fun Category.toDTO(): CategoryDTO = CategoryDTO(
+    fun Category.toDTO(isDefault : Boolean = false): CategoryDTO = CategoryDTO(
         id = id,
         userId = user?.id,
         name = name,
         type = type,
         color = color,
         icon = icon,
-        isDefault = user == null
+        isDefault = isDefault
     )
 
     fun CategoryDTO.toDomain(user: User?): Category = Category(
