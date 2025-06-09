@@ -170,6 +170,8 @@ https://github.com/AlphaSweater/BudgetBuddy-Project.git
 - ChatGPT also helped with the forming of comments for the code.
 
 ##
+![App Demo](https://i.postimg.cc/HWtLyjr6/kerchoo-kachow.gif)
+##
 
 - ![GitHub stars](https://img.shields.io/github/stars/AlphaSweater/BudgetBuddy-Project?style=social)
 ![GitHub last commit](https://img.shields.io/github/last-commit/AlphaSweater/BudgetBuddy-Project)
