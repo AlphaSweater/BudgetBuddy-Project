@@ -20,6 +20,10 @@ import android.text.TextWatcher
 import androidx.core.widget.doAfterTextChanged
 import com.google.android.material.snackbar.Snackbar
 import androidx.navigation.navGraphViewModels
+import com.synaptix.budgetbuddy.core.util.CurrencyUtil
+import com.synaptix.budgetbuddy.extentions.getThemeColor
+import java.math.BigDecimal
+import java.math.RoundingMode
 
 @AndroidEntryPoint
 class WalletAddFragment : Fragment() {
@@ -73,10 +77,6 @@ class WalletAddFragment : Fragment() {
                 findNavController().popBackStack()
             }
 
-            switchNotifications.setOnCheckedChangeListener { _, isChecked ->
-                sharedViewModel.updateEnableNotifications(isChecked)
-            }
-
             switchExcludeTotal.setOnCheckedChangeListener { _, isChecked ->
                 sharedViewModel.updateExcludeFromTotal(isChecked)
             }
@@ -87,34 +87,18 @@ class WalletAddFragment : Fragment() {
         }
     }
 
-    private fun setupTextWatchers() {
-        with(binding){
-            binding.edtWalletName.doAfterTextChanged { text ->
-                sharedViewModel.setWalletName(text.toString())
-            }
-
-            binding.edtTextAmount.doAfterTextChanged { text ->
-                sharedViewModel.setWalletAmount(text.toString())
-            }
-        }
-    }
 
     // --- Save Logic ---
     private fun saveWallet() {
         val walletName = binding.edtWalletName.text.toString()
         sharedViewModel.setWalletName(walletName)
 
-        val walletAmount = binding.edtTextAmount.text.toString()
-        sharedViewModel.setWalletAmount(walletAmount)
-
-        val walletMinGoal = binding.edtMinAmount.text.toString()
-        sharedViewModel.setWalletMinGoal(walletMinGoal)
-
-        val walletMaxGoal = binding.edtMaxAmount.text.toString()
-        sharedViewModel.setWalletMaxGoal(walletMaxGoal)
-
         val walletCurrency = binding.spinnerCurrency.selectedItem.toString()
         sharedViewModel.setWalletCurrency(walletCurrency)
+
+        val walletAmount = sharedViewModel.walletAmount.value ?: 0.0
+        val walletMinGoal = sharedViewModel.walletMinGoal.value ?: 0.0
+        val walletMaxGoal = sharedViewModel.walletMaxGoal.value ?: 0.0
 
         // Show validation errors if any
         sharedViewModel.showValidationErrors()
@@ -190,6 +174,211 @@ class WalletAddFragment : Fragment() {
 //            }
         }
     }
+
+    private fun setupTextWatchers() {
+        setupAmountWatcher()
+        setupMinAmountWatcher()
+        setupMaxAmountWatcher()
+    }
+
+    private fun setupAmountWatcher() {
+        var current = ""
+
+        val watcher = object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+
+            override fun afterTextChanged(s: Editable?) {
+                val newText = s.toString()
+                if (newText != current) {
+                    binding.edtTextAmount.removeTextChangedListener(this)
+
+                    // Handle empty input
+                    if (newText.isEmpty()) {
+                        current = ""
+                        binding.edtTextAmount.setText("")
+                        sharedViewModel.setWalletAmount(0.0)
+                        return
+                    }
+
+                    // Remove any non-digit characters
+                    val cleanString = newText.replace("[^\\d]".toRegex(), "")
+
+                    // Check if the number is too long (12 digits before decimal + 2 after)
+                    if (cleanString.length > 14) {
+                        // Keep only the first 14 digits
+                        val truncatedString = cleanString.substring(0, 14)
+                        val parsed = BigDecimal(truncatedString)
+                            .setScale(2, RoundingMode.FLOOR)
+                            .divide(BigDecimal(100))
+
+                        val formatted = CurrencyUtil.formatWithoutSymbol(parsed.toDouble())
+                        current = formatted
+                        binding.edtTextAmount.setText(formatted)
+                        binding.edtTextAmount.setSelection(formatted.length)
+                        sharedViewModel.setWalletAmount(parsed.toDouble())
+                    } else {
+                        val parsed = if (cleanString.isNotEmpty()) {
+                            BigDecimal(cleanString)
+                                .setScale(2, RoundingMode.FLOOR)
+                                .divide(BigDecimal(100))
+                        } else {
+                            BigDecimal.ZERO
+                        }
+
+                        if (parsed.compareTo(BigDecimal.ZERO) == 0) {
+                            current = ""
+                            binding.edtTextAmount.setText("")
+                            sharedViewModel.setWalletAmount(0.0)
+                        } else {
+                            val formatted = CurrencyUtil.formatWithoutSymbol(parsed.toDouble())
+                            current = formatted
+                            binding.edtTextAmount.setText(formatted)
+                            binding.edtTextAmount.setSelection(formatted.length)
+                            sharedViewModel.setWalletAmount(parsed.toDouble())  // This line was missing
+                        }
+                    }
+
+                    binding.edtTextAmount.addTextChangedListener(this)
+                }
+            }
+        }
+        binding.edtTextAmount.addTextChangedListener(watcher)
+        binding.edtTextAmount.tag = watcher
+    }
+
+    private fun setupMinAmountWatcher() {
+        var current = ""
+
+        val watcher = object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+
+            override fun afterTextChanged(s: Editable?) {
+                val newText = s.toString()
+                if (newText != current) {
+                    binding.edtMinAmount.removeTextChangedListener(this)
+
+                    // Handle empty input
+                    if (newText.isEmpty()) {
+                        current = ""
+                        binding.edtMinAmount.setText("")
+                        sharedViewModel.setWalletMinGoal(0.0)
+                        return
+                    }
+
+                    // Remove any non-digit characters
+                    val cleanString = newText.replace("[^\\d]".toRegex(), "")
+
+                    // Check if the number is too long (12 digits before decimal + 2 after)
+                    if (cleanString.length > 14) {
+                        // Keep only the first 14 digits
+                        val truncatedString = cleanString.substring(0, 14)
+                        val parsed = BigDecimal(truncatedString)
+                            .setScale(2, RoundingMode.FLOOR)
+                            .divide(BigDecimal(100))
+
+                        val formatted = CurrencyUtil.formatWithoutSymbol(parsed.toDouble())
+                        current = formatted
+                        binding.edtMinAmount.setText(formatted)
+                        binding.edtMinAmount.setSelection(formatted.length)
+                        sharedViewModel.setWalletMinGoal(parsed.toDouble())
+                    } else {
+                        val parsed = if (cleanString.isNotEmpty()) {
+                            BigDecimal(cleanString)
+                                .setScale(2, RoundingMode.FLOOR)
+                                .divide(BigDecimal(100))
+                        } else {
+                            BigDecimal.ZERO
+                        }
+
+                        if (parsed.compareTo(BigDecimal.ZERO) == 0) {
+                            current = ""
+                            binding.edtMinAmount.setText("")
+                            sharedViewModel.setWalletMinGoal(0.0)
+                        } else {
+                            val formatted = CurrencyUtil.formatWithoutSymbol(parsed.toDouble())
+                            current = formatted
+                            binding.edtMinAmount.setText(formatted)
+                            binding.edtMinAmount.setSelection(formatted.length)
+                            sharedViewModel.setWalletMinGoal(parsed.toDouble())
+                        }
+                    }
+
+                    binding.edtMinAmount.addTextChangedListener(this)
+                }
+            }
+        }
+        binding.edtMinAmount.addTextChangedListener(watcher)
+        binding.edtMinAmount.tag = watcher
+    }
+
+    private fun setupMaxAmountWatcher() {
+        var current = ""
+
+        val watcher = object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+
+            override fun afterTextChanged(s: Editable?) {
+                val newText = s.toString()
+                if (newText != current) {
+                    binding.edtMaxAmount.removeTextChangedListener(this)
+
+                    // Handle empty input
+                    if (newText.isEmpty()) {
+                        current = ""
+                        binding.edtMaxAmount.setText("")
+                        sharedViewModel.setWalletMaxGoal(0.0)
+                        return
+                    }
+
+                    // Remove any non-digit characters
+                    val cleanString = newText.replace("[^\\d]".toRegex(), "")
+
+                    // Check if the number is too long (12 digits before decimal + 2 after)
+                    if (cleanString.length > 14) {
+                        // Keep only the first 14 digits
+                        val truncatedString = cleanString.substring(0, 14)
+                        val parsed = BigDecimal(truncatedString)
+                            .setScale(2, RoundingMode.FLOOR)
+                            .divide(BigDecimal(100))
+
+                        val formatted = CurrencyUtil.formatWithoutSymbol(parsed.toDouble())
+                        current = formatted
+                        binding.edtMaxAmount.setText(formatted)
+                        binding.edtMaxAmount.setSelection(formatted.length)
+                        sharedViewModel.setWalletMaxGoal(parsed.toDouble())
+                    } else {
+                        val parsed = if (cleanString.isNotEmpty()) {
+                            BigDecimal(cleanString)
+                                .setScale(2, RoundingMode.FLOOR)
+                                .divide(BigDecimal(100))
+                        } else {
+                            BigDecimal.ZERO
+                        }
+
+                        if (parsed.compareTo(BigDecimal.ZERO) == 0) {
+                            current = ""
+                            binding.edtMaxAmount.setText("")
+                            sharedViewModel.setWalletMaxGoal(0.0)
+                        } else {
+                            val formatted = CurrencyUtil.formatWithoutSymbol(parsed.toDouble())
+                            current = formatted
+                            binding.edtMaxAmount.setText(formatted)
+                            binding.edtMaxAmount.setSelection(formatted.length)
+                            sharedViewModel.setWalletMaxGoal(parsed.toDouble())
+                        }
+                    }
+
+                    binding.edtMaxAmount.addTextChangedListener(this)
+                }
+            }
+        }
+        binding.edtMaxAmount.addTextChangedListener(watcher)
+        binding.edtMaxAmount.tag = watcher
+    }
+
 
     private fun showError(message: String) {
         Snackbar.make(binding.root, message, Snackbar.LENGTH_SHORT)
