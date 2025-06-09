@@ -910,6 +910,14 @@ class TransactionAddFragment : Fragment() {
                 launch { transactionAddViewModel.selectedLabels.collect { labels ->
                     updateSelectedLabels(labels)
                 } }
+                launch { transactionAddViewModel.transaction.collect { transaction ->
+                    transaction?.let {
+                        // Load image if available
+                        if (it.photoUrl != null) {
+                            transactionAddViewModel.loadImageFromUrl(it.photoUrl)
+                        }
+                    }
+                } }
                 launch { transactionAddViewModel.imageBytes.collect { bytes ->
                     if (bytes != null) {
                         val bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
@@ -917,8 +925,10 @@ class TransactionAddFragment : Fragment() {
                             setImageBitmap(bitmap)
                             visibility = View.VISIBLE
                         }
+                        binding.imagePreviewContainer.visibility = View.VISIBLE
                     } else {
                         binding.imagePreview.visibility = View.GONE
+                        binding.imagePreviewContainer.visibility = View.GONE
                     }
                 } }
             }
