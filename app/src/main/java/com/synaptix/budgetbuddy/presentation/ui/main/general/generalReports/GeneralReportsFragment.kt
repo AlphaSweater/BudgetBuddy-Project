@@ -459,13 +459,13 @@ class GeneralReportsFragment : Fragment() {
                 }
             }
             is GeneralViewModel.TransactionState.Loading -> {
-                // Show loading state if needed
+                // Show loading state
             }
             is GeneralViewModel.TransactionState.Error -> {
-                // Show error state if needed
+                // Show error state
             }
             is GeneralViewModel.TransactionState.Empty -> {
-                // Show empty state if needed
+                // Show empty state
             }
         }
     }
@@ -495,41 +495,53 @@ class GeneralReportsFragment : Fragment() {
 
         val dateFormat = SimpleDateFormat("MMM d", Locale.getDefault())
 
-        // Get all expense categories, not just those with transactions
-        val expenseCategories = categories
+        // Get expense categories with transactions
+        val expenseItems = categories
             .filter { it.type.equals("expense", ignoreCase = true) }
-            .sortedBy { it.name }
+            .map { category ->
+                val categoryTransactions = filteredTransactions.filter { it.category.id == category.id }
+                Triple(
+                    category,
+                    categoryTransactions,
+                    categoryTransactions.sumOf { it.amount.toDouble() }
+                )
+            }
+            .filter { it.second.isNotEmpty() } // Only keep categories with transactions
+            .sortedByDescending { it.third } // Sort by amount in descending order
+            .map { (category, transactions, _) ->
+                ReportListItems.ReportCategoryItem(
+                    category = category,
+                    transactionCount = transactions.size,
+                    amount = CurrencyUtil.formatWithSymbol(transactions.sumOf { it.amount.toDouble() }),
+                    relativeDate = transactions.maxByOrNull { it.date }?.let {
+                        dateFormat.format(Date(it.date))
+                    } ?: "No transactions"
+                )
+            }
 
-        // Get all income categories, not just those with transactions
-        val incomeCategories = categories
+        // Get income categories with transactions
+        val incomeItems = categories
             .filter { it.type.equals("income", ignoreCase = true) }
-            .sortedBy { it.name }
-
-        // Map all expense categories, including those with no transactions
-        val expenseItems = expenseCategories.map { category ->
-            val categoryTransactions = filteredTransactions.filter { it.category.id == category.id }
-            ReportListItems.ReportCategoryItem(
-                category = category,
-                transactionCount = categoryTransactions.size,
-                amount = CurrencyUtil.formatWithSymbol(categoryTransactions.sumOf { it.amount.toDouble() }),
-                relativeDate = categoryTransactions.maxByOrNull { it.date }?.let {
-                    dateFormat.format(Date(it.date))
-                } ?: "No transactions"
-            )
-        }
-
-        // Map all income categories, including those with no transactions
-        val incomeItems = incomeCategories.map { category ->
-            val categoryTransactions = filteredTransactions.filter { it.category.id == category.id }
-            ReportListItems.ReportCategoryItem(
-                category = category,
-                transactionCount = categoryTransactions.size,
-                amount = CurrencyUtil.formatWithSymbol(categoryTransactions.sumOf { it.amount.toDouble() }),
-                relativeDate = categoryTransactions.maxByOrNull { it.date }?.let {
-                    dateFormat.format(Date(it.date))
-                } ?: "No transactions"
-            )
-        }
+            .map { category ->
+                val categoryTransactions = filteredTransactions.filter { it.category.id == category.id }
+                Triple(
+                    category,
+                    categoryTransactions,
+                    categoryTransactions.sumOf { it.amount.toDouble() }
+                )
+            }
+            .filter { it.second.isNotEmpty() } // Only keep categories with transactions
+            .sortedByDescending { it.third } // Sort by amount in descending order
+            .map { (category, transactions, _) ->
+                ReportListItems.ReportCategoryItem(
+                    category = category,
+                    transactionCount = transactions.size,
+                    amount = CurrencyUtil.formatWithSymbol(transactions.sumOf { it.amount.toDouble() }),
+                    relativeDate = transactions.maxByOrNull { it.date }?.let {
+                        dateFormat.format(Date(it.date))
+                    } ?: "No transactions"
+                )
+            }
 
         // Calculate new total balance by adding incomes and subtracting expenses
         val newTotalBalance = filteredTransactions.fold(0.0) { total, transaction ->
@@ -560,41 +572,82 @@ class GeneralReportsFragment : Fragment() {
 
         val dateFormat = SimpleDateFormat("MMM d", Locale.getDefault())
 
-        // Create expense label items
-        val expenseLabelItems = labels.map { label ->
-            val labelTransactions = filteredTransactions.filter { transaction ->
-                transaction.labels.any { it.id == label.id } &&
+        // Calculate label totals
+        val expenseLabelTotal = filteredTransactions
+            .filter { transaction ->
+                transaction.labels.isNotEmpty() &&
                 transaction.category.type.equals("expense", ignoreCase = true)
             }
+            .sumOf { it.amount.toDouble() }
 
-            ReportListItems.ReportLabelItem(
-                label = label,
-                transactionCount = labelTransactions.size,
-                amount = CurrencyUtil.formatWithSymbol(labelTransactions.sumOf { it.amount.toDouble() }),
-                relativeDate = labelTransactions.maxByOrNull { it.date }?.let {
-                    dateFormat.format(Date(it.date))
-                } ?: "No transactions",
-                type = "expense"  // Add type for expense items
-            )
-        }
-
-        // Create income label items
-        val incomeLabelItems = labels.map { label ->
-            val labelTransactions = filteredTransactions.filter { transaction ->
-                transaction.labels.any { it.id == label.id } &&
+        val incomeLabelTotal = filteredTransactions
+            .filter { transaction ->
+                transaction.labels.isNotEmpty() &&
                 transaction.category.type.equals("income", ignoreCase = true)
             }
+            .sumOf { it.amount.toDouble() }
 
-            ReportListItems.ReportLabelItem(
-                label = label,
-                transactionCount = labelTransactions.size,
-                amount = CurrencyUtil.formatWithSymbol(labelTransactions.sumOf { it.amount.toDouble() }),
-                relativeDate = labelTransactions.maxByOrNull { it.date }?.let {
-                    dateFormat.format(Date(it.date))
-                } ?: "No transactions",
-                type = "income"  // Add type for income items
-            )
+        // Update label toggle totals
+        binding.apply {
+            btnLabelExpenseToggle.findViewById<TextView>(R.id.txtLabelExpenseTotal).text =
+                CurrencyUtil.formatWithSymbol(-expenseLabelTotal)
+            btnLabelIncomeToggle.findViewById<TextView>(R.id.txtLabelIncomeTotal).text =
+                CurrencyUtil.formatWithSymbol(incomeLabelTotal)
         }
+
+        // Create expense label items
+        val expenseLabelItems = labels
+            .map { label ->
+                val labelTransactions = filteredTransactions.filter { transaction ->
+                    transaction.labels.any { it.id == label.id } &&
+                    transaction.category.type.equals("expense", ignoreCase = true)
+                }
+                Triple(
+                    label,
+                    labelTransactions,
+                    labelTransactions.sumOf { it.amount.toDouble() }
+                )
+            }
+            .filter { it.second.isNotEmpty() } // Only keep labels with transactions
+            .sortedByDescending { it.third } // Sort by amount in descending order
+            .map { (label, transactions, _) ->
+                ReportListItems.ReportLabelItem(
+                    label = label,
+                    transactionCount = transactions.size,
+                    amount = CurrencyUtil.formatWithSymbol(transactions.sumOf { it.amount.toDouble() }),
+                    relativeDate = transactions.maxByOrNull { it.date }?.let {
+                        dateFormat.format(Date(it.date))
+                    } ?: "No transactions",
+                    type = "expense"
+                )
+            }
+
+        // Create income label items
+        val incomeLabelItems = labels
+            .map { label ->
+                val labelTransactions = filteredTransactions.filter { transaction ->
+                    transaction.labels.any { it.id == label.id } &&
+                    transaction.category.type.equals("income", ignoreCase = true)
+                }
+                Triple(
+                    label,
+                    labelTransactions,
+                    labelTransactions.sumOf { it.amount.toDouble() }
+                )
+            }
+            .filter { it.second.isNotEmpty() } // Only keep labels with transactions
+            .sortedByDescending { it.third } // Sort by amount in descending order
+            .map { (label, transactions, _) ->
+                ReportListItems.ReportLabelItem(
+                    label = label,
+                    transactionCount = transactions.size,
+                    amount = CurrencyUtil.formatWithSymbol(transactions.sumOf { it.amount.toDouble() }),
+                    relativeDate = transactions.maxByOrNull { it.date }?.let {
+                        dateFormat.format(Date(it.date))
+                    } ?: "No transactions",
+                    type = "income"
+                )
+            }
 
         // Update both adapters regardless of current view
         labelExpenseAdapter.submitList(expenseLabelItems)
