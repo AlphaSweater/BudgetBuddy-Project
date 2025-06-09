@@ -488,7 +488,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
                 android:clipToPadding="false"
-                android:visibility="visible" />
+                android:visibility="visible"
+                tools:listitem="@layout/item_home_category"/>
 
             <!-- Income Category RecyclerView -->
             <androidx.recyclerview.widget.RecyclerView
@@ -548,6 +549,7 @@
                             android:background="@android:color/transparent" />
 
                         <TextView
+                            android:id="@+id/txtLabelExpenseTotal"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:gravity="center"
@@ -576,6 +578,7 @@
                             android:textColor="?attr/bb_primaryText" />
 
                         <TextView
+                            android:id="@+id/txtLabelIncomeTotal"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:gravity="center"
@@ -585,6 +588,44 @@
                     </LinearLayout>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
+
+            <!-- Empty State Views -->
+            <TextView
+                android:id="@+id/emptyLabelExpenseView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="16dp"
+                android:text="No expense Labels found"
+                android:textAlignment="center"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/emptyLabelIncomeView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="16dp"
+                android:text="No income Labels found"
+                android:textAlignment="center"
+                android:visibility="gone" />
+
+            <!-- Expense Label RecyclerView -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerViewLabelExpense"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:clipToPadding="false"
+                android:visibility="visible"
+                tools:listitem="@layout/item_home_label"/>
+
+            <!-- Income Label RecyclerView -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerViewLabelIncome"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:clipToPadding="false"
+                android:visibility="gone" />
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>

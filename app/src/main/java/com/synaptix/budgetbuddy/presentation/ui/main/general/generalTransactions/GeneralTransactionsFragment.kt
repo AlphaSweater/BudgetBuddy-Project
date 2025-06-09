@@ -287,7 +287,7 @@ class GeneralTransactionsFragment : Fragment() {
             }.sortedByDescending { it.date }
 
             val items = filteredTransactions.map { transaction ->
-                ReportListItems.ReportTransactionItem(
+                TransactionListItems.TransactionItem(
                     transaction = transaction,
                     relativeDate = formatDate(transaction.date)
                 )
