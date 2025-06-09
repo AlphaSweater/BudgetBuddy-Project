@@ -1,5 +1,6 @@
 package com.synaptix.budgetbuddy.presentation.ui.main.transaction
 
+import android.graphics.Bitmap
 import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -23,6 +24,7 @@ import com.synaptix.budgetbuddy.core.usecase.main.transaction.AddTransactionUseC
 import com.synaptix.budgetbuddy.core.usecase.main.transaction.GetTransactionUseCase
 import com.synaptix.budgetbuddy.core.usecase.main.transaction.UpdateTransactionUseCase
 import com.synaptix.budgetbuddy.core.usecase.main.transaction.UploadImageUseCase
+import com.synaptix.budgetbuddy.core.usecase.main.transaction.GetImageUseCase
 import java.io.Serializable
 
 @HiltViewModel
@@ -32,6 +34,7 @@ class TransactionAddViewModel @Inject constructor(
     private val updateTransactionUseCase: UpdateTransactionUseCase,
     private val getTransactionUseCase: GetTransactionUseCase,
     private val uploadImageUseCase: UploadImageUseCase,
+    private val getImageUseCase: GetImageUseCase,
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -484,6 +487,29 @@ class TransactionAddViewModel @Inject constructor(
 
         // Reset unsaved changes flag
         _hasUnsavedChanges.value = false
+    }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    // Image Loading
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    fun loadImageFromUrl(url: String) {
+        viewModelScope.launch {
+            try {
+                getImageUseCase.execute(url).fold(
+                    onSuccess = { bitmap ->
+                        // Convert bitmap to bytes
+                        val stream = java.io.ByteArrayOutputStream()
+                        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream)
+                        _imageBytes.value = stream.toByteArray()
+                    },
+                    onFailure = { error ->
+                        Log.e("TransactionAddViewModel", "Error loading image: ${error.message}")
+                    }
+                )
+            } catch (e: Exception) {
+                Log.e("TransactionAddViewModel", "Exception loading image: ${e.message}")
+            }
+        }
     }
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~EOF~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
