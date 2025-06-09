@@ -188,7 +188,6 @@ class BudgetMainFragment : Fragment() {
     // Navigation
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     private fun onBudgetClicked(budget: Budget) {
-        findNavController().navigate(R.id.action_budgetMainFragment_to_budgetReportFragment)
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
