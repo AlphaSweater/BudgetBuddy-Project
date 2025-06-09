@@ -67,7 +67,7 @@ class WalletMainAdapter(
 
             // Set text color based on balance
             val colorRes = if (item.walletBalance < 0) {
-                R.color.error // Red color for negative balance
+                R.color.expense_red // Red color for negative balance
             } else {
                 R.color.profit_green // Default text color
             }

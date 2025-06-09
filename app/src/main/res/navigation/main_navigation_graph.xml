@@ -103,6 +103,9 @@
             app:exitAnim="@anim/fade_out"
             app:popEnterAnim="@anim/fade_in"
             app:popExitAnim="@anim/slide_out_down"/>
+        <action
+            android:id="@+id/action_navigation_wallet_main_to_report_navigation_graph"
+            app:destination="@id/report_navigation_graph" />
     </fragment>
 
     <!-- Include Wallet Navigation Graph -->
