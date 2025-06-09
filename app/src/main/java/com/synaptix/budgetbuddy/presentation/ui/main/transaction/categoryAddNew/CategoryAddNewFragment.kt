@@ -98,7 +98,7 @@ class CategoryAddNewFragment : Fragment() {
             }
         }
         binding.recyclerViewIcons.apply {
-            layoutManager = GridLayoutManager(requireContext(), 2).apply {
+            layoutManager = GridLayoutManager(requireContext(), 3).apply {
                 orientation = LinearLayoutManager.HORIZONTAL
             }
             adapter = iconAdapter
