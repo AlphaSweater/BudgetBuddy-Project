@@ -131,7 +131,7 @@
                         android:id="@+id/ivEye"
                         android:layout_width="24dp"
                         android:layout_height="24dp"
-                        android:src="@drawable/ic_ui_privacy_open"
+                        android:src="@drawable/ic_ui_privacy_eye_open"
                         android:layout_marginStart="8dp"
                         app:tint="?attr/bb_primaryText"/>
                 </LinearLayout>

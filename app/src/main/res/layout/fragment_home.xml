@@ -71,13 +71,23 @@
                     android:textStyle="bold"
                     android:layout_marginStart="8dp"/>
 
-                <ImageView
-                    android:id="@+id/imageView_eye"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/ic_ui_privacy_open"
+                <FrameLayout
+                    android:id="@+id/btnViewEye"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
                     android:layout_marginStart="8dp"
-                    app:tint="?attr/bb_primaryText"/>
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:clickable="true"
+                    android:focusable="true">
+
+                    <ImageView
+                        android:id="@+id/imageViewEye"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_gravity="center"
+                        android:src="@drawable/ic_ui_privacy_eye_open"
+                        app:tint="?attr/bb_primaryText"/>
+                </FrameLayout>
             </LinearLayout>
 
             <TextView
