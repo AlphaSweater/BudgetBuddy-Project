@@ -163,6 +163,13 @@ class GeneralReportsFragment : Fragment() {
         
         // Start observing states
         observeViewModel()
+        
+        // Check if we should navigate to transactions
+        arguments?.getString("startDestination")?.let { destination ->
+            if (destination == "generalTransactionsFragment") {
+                findNavController().navigate(R.id.action_generalReportsFragment_to_generalTransactionsFragment_withAnimation)
+            }
+        }
     }
 
     override fun onDestroyView() {
@@ -311,7 +318,11 @@ class GeneralReportsFragment : Fragment() {
                                 
                                 // Set initial selection based on bundle wallet ID or persisted wallet
                                 val selectedWallet = if (walletId != null) {
-                                    wallets.find { it.id == walletId }
+                                    wallets.find { it.id == walletId } ?: run {
+                                        // If wallet not found, select all wallets
+                                        viewModel.selectWallet(null)
+                                        null
+                                    }
                                 } else {
                                     viewModel.selectedWallet.value
                                 }

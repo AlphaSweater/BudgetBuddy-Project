@@ -625,19 +625,23 @@ class HomeMainFragment : Fragment() {
 
     /**
      * Navigates to all categories screen.
-     * To be implemented when the screen is ready.
      */
     private fun navigateToAllCategories() {
-        val bundle = bundleOf("startDestination" to "generalReportsFragment")
+        val bundle = bundleOf(
+            "startDestination" to "generalReportsFragment",
+            "walletId" to ""
+        )
         findNavController().navigate(R.id.action_homeFragment_to_reportNavigationGraph, bundle)
     }
 
     /**
      * Navigates to all transactions screen.
-     * Currently navigates to the reports screen.
      */
     private fun navigateToAllTransactions() {
-        val bundle = bundleOf("startDestination" to "generalTransactionsFragment")
+        val bundle = bundleOf(
+            "startDestination" to "generalTransactionsFragment",
+            "walletId" to ""
+        )
         findNavController().navigate(R.id.action_homeFragment_to_reportNavigationGraph, bundle)
     }
 
