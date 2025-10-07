@@ -171,6 +171,7 @@ https://github.com/AlphaSweater/BudgetBuddy-Project.git
 - https://www.geeksforgeeks.org/cardview-in-android-with-example/
 - https://www.geeksforgeeks.org/switch-in-kotlin/
 - https://www.geeksforgeeks.org/spinner-in-kotlin/
+- https://www.youtube.com/watch?v=KwDSkSBDyfQ
 - ChatGPT was used to help with the design and planning. As well as assisted with finding and fixing errors in the code.
 - ChatGPT also helped with the forming of comments for the code.
 
